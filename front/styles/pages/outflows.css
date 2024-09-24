@@ -1,0 +1,80 @@
+#outflows button,
+#outflows select,
+#outflows .select {
+    width: 100%;
+}
+
+#outflows button {
+    margin-bottom: 10px;
+}
+
+#outflows form#manage-outflow-form #outflows-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: space-between;
+}
+
+#outflows form#manage-outflow-form #outflows-container .field .control .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 5px;
+}
+
+#outflows form#manage-outflow-form .field:not(.has-addons) .control {
+    padding: 5px 5px 10px 5px;
+    border-radius: 15px;
+}
+
+#outflows form#manage-outflow-form .field.has-addons .control + .control {
+    width: 100%;
+}
+
+#outflows form#manage-outflow-form #outflows-container .field .control:has(.checkbox) {
+    background: orange;
+    color: white;
+}
+
+#outflows form#manage-outflow-form #outflows-container .field:has(.control .checkbox input:checked) {
+    opacity: 0.5;
+    text-decoration-line: line-through;
+    -webkit-text-decoration-line: line-through;
+    text-decoration-color: white;
+    -webkit-text-decoration-color: white;
+}
+#outflows form#manage-outflow-form #outflows-container .field .control .checkbox {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+}
+
+#outflows form#manage-outflow-form #outflows-container .field {
+    width: 30%;
+    margin-bottom: 5px;
+}
+
+#outflows form#manage-outflow-form #outflows-container .field .control .checkbox input {
+    display: none;
+}
+#outflows form#manage-outflow-form #outflows-container .field .control .checkbox span {
+    text-align: center;
+}
+#outflows form#manage-outflow-form #outflows-container .field .control .checkbox span:first-of-type {
+    font-size: 10px;
+    display: inline-block;
+    width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#outflows form#manage-outflow-form #outflows-container .field .control .checkbox span + span {
+    font-size: 15px;
+}
+
+#outflows form#manage-outflow-form #outflows-container .field .control .checkbox:hover {
+    color: inherit;
+}

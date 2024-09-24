@@ -1,0 +1,17 @@
+{
+  "name": "buddj",
+  "version": "1.0.0",
+  "description": "Buddj is my PWA to manage my monthly budget.",
+  "main": "index.js",
+  "scripts": {
+    "ci:front": "cd front && npm ci",
+    "ci:back": "cd back && npm ci",
+    "ci": "run-p --print-label ci:back ci:front"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "npm-run-all2": "^6.2.3"
+  }
+}

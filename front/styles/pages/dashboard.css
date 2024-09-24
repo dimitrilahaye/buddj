@@ -1,0 +1,8 @@
+#dashboard select,
+#dashboard .select {
+    width: 100%;
+}
+
+#dashboard .searchForDashboardContainer.field.is-grouped {
+    margin-bottom: 1.05rem;
+}

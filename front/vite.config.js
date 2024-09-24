@@ -1,0 +1,37 @@
+import {VitePWA} from 'vite-plugin-pwa'
+import {defineConfig} from "vite";
+
+export default defineConfig({
+    plugins: [
+        VitePWA({
+            injectRegister: 'inline',
+            manifestFilename: 'manifest.json',
+            manifest: {
+                theme_color: "#f37c3c",
+                background_color: "#000000",
+                icons: [
+                    {
+                        purpose: "maskable",
+                        sizes: "512x512",
+                        src: "/assets/images/icon512_maskable.png",
+                        type: "image/png"
+                    },
+                    {
+                        purpose: "any",
+                        sizes: "512x512",
+                        src: "/assets/images/icon512_rounded.png",
+                        type: "image/png"
+                    }
+                ],
+                orientation: "any",
+                display: "standalone",
+                dir: "auto",
+                lang: "fr",
+                name: "Mortal Kompta",
+                short_name: "MortalKompta",
+                start_url: "/",
+                scope: "/"
+            },
+        })
+    ]
+});

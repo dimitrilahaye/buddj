@@ -1,0 +1,75 @@
+name: Buddj ~ Quality control
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  back_checks:
+    name: Back ~ QC Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Back ~ Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Back ~ Install
+        working-directory: ./back
+        run: npm install
+
+      - name: Back ~ ESLint checks
+        working-directory: ./back
+        run: npm run lint
+
+  back_tests:
+    name: Back ~ Tests Node.js ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    container: node:20.17.0-bookworm-slim
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Back ~ Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Back ~ Install
+        working-directory: ./back
+        run: npm install
+
+      - name: Back ~ Tests
+        working-directory: ./back
+        run: npm run test:full
+        env:
+          DB_URL_TEST: postgres
+          DB_PORT_TEST: 5432
+          DB_USER_TEST: postgres
+          DB_PASSWORD_TEST: postgres
+          DB_NAME_TEST: postgres
+          PORT: ${{ secrets.PORT }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+          SCOPES: ${{ secrets.SCOPES }}
+          SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          FRONT_URL: ${{ secrets.FRONT_URL }}
+          FRONT_REDIRECT_URL: ${{ secrets.FRONT_REDIRECT_URL }}

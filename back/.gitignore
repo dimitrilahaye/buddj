@@ -1,0 +1,7 @@
+.vercel
+.env
+node_modules
+.idea
+docker/postgres-data
+dist
+tmp.md

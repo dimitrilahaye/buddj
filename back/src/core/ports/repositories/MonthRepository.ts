@@ -1,0 +1,41 @@
+import Month from "../../models/month/Month.js";
+import WeeklyExpense from "../../models/month/account/WeeklyExpense.js";
+import AccountOutflow from "../../models/month/account/AccountOutflow.js";
+
+export default interface MonthRepository {
+    save(month: Month): Promise<Month>;
+
+    addExpenseToWeeklyBudget(month: Month, weeklyId: string, expense: WeeklyExpense): Promise<void>;
+
+    addOutflow(month: Month, outflow: AccountOutflow): Promise<void>;
+
+    updateAccountCurrentBalance(month: Month): Promise<void>;
+
+    updateWeeklyBudgetCurrentBalance(month: Month, weeklyId: string): Promise<void>;
+
+    deleteExpense(expenseId: string): Promise<void>;
+
+    deleteOutflow(outflowId: string): Promise<void>;
+
+    manageOutflowsChecking(outflows: {
+        id: string;
+        isChecked: boolean;
+    }[]): Promise<void>;
+
+    manageExpensesChecking(month: Month, weeklyBudgets: {
+        id: string,
+        expenses: { id: string, isChecked: boolean }[],
+    }[]): Promise<void>;
+
+    archive(month: Month): Promise<void>;
+
+    unarchive(month: Month): Promise<void>;
+
+    delete(month: Month): Promise<void>;
+
+    findAllUnarchived(): Promise<Month[]>;
+
+    findAllArchived(): Promise<Month[]>;
+
+    getById(monthId: string): Promise<Month | null>;
+}
