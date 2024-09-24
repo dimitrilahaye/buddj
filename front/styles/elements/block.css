@@ -1,0 +1,57 @@
+.block {
+    margin-bottom: 0 !important;
+}
+
+.block.column {
+    padding: 0.15rem;
+}
+
+.block.column p {
+    border-radius: 0.375em;
+    font-weight: 600;
+    padding: 1.25rem 0;
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.block.column p {
+    border-radius: 6px;
+    border-style: solid;
+    border-width: max(1px, 0.0625em);
+}
+
+.block.column p.is-danger:not(.is-outlined) {
+    background: rgb(255, 102, 133);
+}
+
+.block.column p.is-success:not(.is-outlined) {
+    background: rgb(72, 199, 142);
+}
+
+.block.column p.is-link:not(.is-outlined) {
+    background: rgb(66, 88, 255);
+}
+
+.block.column p.is-outlined {
+    background-color: transparent;
+}
+
+.block.column p.is-danger.is-outlined {
+    border-color: rgb(255, 102, 133);
+    color: rgb(255, 102, 133);
+}
+
+.block.column p.is-success.is-outlined {
+    border-color: rgb(72, 199, 142);
+    color: rgb(72, 199, 142);
+}
+
+.block.column p.is-link.is-outlined {
+    border-color: rgb(66, 88, 255);
+    color: rgb(66, 88, 255);
+}
+
+.block.column p span {
+    display: block;
+}

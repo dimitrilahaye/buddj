@@ -1,0 +1,10 @@
+#archived-months .table tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#archived-months button {
+    width: 100%;
+    margin-bottom: 10px;
+}

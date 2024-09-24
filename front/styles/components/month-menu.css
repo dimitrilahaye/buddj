@@ -1,0 +1,40 @@
+
+
+#month-dropdown {
+    margin-bottom: 1.5rem;
+}
+
+#month-dropdown,
+#month-dropdown .dropdown-trigger,
+#month-dropdown .dropdown-menu {
+    width: 100%;
+}
+
+#month-dropdown .dropdown {
+    outline: none;
+}
+
+#month-dropdown .dropdown-trigger .title.is-2 {
+    margin-bottom: 0;
+}
+
+#month-dropdown .dropdown-trigger .title.is-2 span.title-container {
+    font-size: 1.35rem;
+    display: block;
+    padding-top: 2px;
+    padding-right: 13px;
+    border-top: 1px solid grey;
+    width: fit-content;
+}
+
+#month-dropdown .dropdown-trigger .title.is-2 span.month-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 200;
+    color: grey;
+    padding-bottom: 5px;
+}
+
+#month-dropdown .dropdown-item .buttons .button {
+    width: auto;
+}

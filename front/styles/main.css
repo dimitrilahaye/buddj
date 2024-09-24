@@ -1,0 +1,14 @@
+#app {
+    top: 90px;
+    padding-bottom: 20px;
+}
+
+.title.is-2 {
+    font-size: 1.35rem;
+    margin-bottom: 10px;
+}
+
+.title.is-3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}

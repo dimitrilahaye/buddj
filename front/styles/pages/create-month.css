@@ -1,0 +1,151 @@
+#create-month select,
+#create-month .select,
+#create-month .input,
+#create-month .control:not(.week),
+#create-month .field,
+#create-month button {
+    width: 100%;
+}
+
+#create-month .field-body {
+    display: flex;
+    gap: 10px;
+}
+
+#create-month input[type="month"]::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+#create-month input[type="month"] {
+    text-align: left;
+}
+
+
+#create-month form#form .items-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: space-between;
+}
+
+#create-month form#form .items-container .field .control {
+    background: orange;
+    color: white;
+    padding: 5px;
+    border-radius: 15px;
+    height: 60px;
+}
+
+#create-month form#form .items-container .field .control .input {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+}
+
+#create-month form#form .items-container .field {
+    width: 30%;
+    margin-bottom: 5px;
+}
+#create-month form#form .items-container .field .control label span {
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+#create-month form#form .items-container .field .control label span:first-of-type {
+    font-size: 10px;
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#create-month form#form .items-container .field .control label span + span {
+    font-size: 15px;
+}
+
+.new-item .control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.new-item span {
+    text-align: center;
+}
+
+.new-item .control button {
+    outline: none;
+    background-color: transparent;
+    color: white;
+    border-style: none;
+}
+
+#create-month form#form .items-container#outflows .field .control {
+    background-color: orange;
+}
+
+#create-month form#form .items-container#weekly .field .control {
+    background-color: red;
+}
+
+#create-month #outflows, #create-month #weekly {
+    margin-bottom: 20px;
+}
+
+/*
+############################################################
+EDIT ITEMS
+############################################################
+*/
+
+#edit-item {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    width: 100vw;
+    height: 100%;
+    justify-content: center;
+    align-items: flex-end;
+    background: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.2s;
+    display: flex;
+    box-sizing: border-box;
+}
+
+#edit-item .edit-item-container {
+    width: 100%;
+    padding: 10px;
+    background: white;
+}
+
+#edit-item .edit-item-container .fields {
+    display: flex;
+    gap: 10px;
+}
+
+#edit-item .edit-item-container .fields .control {
+    flex: 2;
+}
+
+#edit-item .edit-item-container .fields .control + .control {
+    flex: 1;
+}
+
+#edit-item .edit-item-container .buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+#edit-item .edit-item-container .buttons .button {
+    flex: 1;
+}
+
+#edit-item .edit-item-container .buttons .button + .button {
+    flex: 2;
+}

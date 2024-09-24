@@ -1,0 +1,177 @@
+/* (A) WRAPPER */
+#numWrap, #numWrap * {
+    box-sizing: border-box;
+}
+
+#numWrap {
+    /* (A1) FULL SCREEN COVER */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    width: 100vw;
+    height: 100%;
+    justify-content: center;
+    align-items: flex-end;
+    background: rgba(0, 0, 0, 0.5);
+
+    /* (A2) HIDE BY DEFAULT */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+
+    /* (A3) CENTER ON SCREEN + BACKGROUND COLOR */
+    display: flex;
+}
+
+/* (A3) SHOW NUMPAD */
+#numWrap.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* (B) NUMPAD */
+#numPad {
+    width: 100%;
+    padding: 10px;
+    background: white;
+}
+
+/* (C) DISPLAY */
+#numDisplay {
+    width: 100%;
+    border: 0;
+    padding: 5px;
+    margin: 0 auto 5px;
+    background: #d6d6d6;
+    color: #000 !important;
+    font-size: 42px;
+    text-align: right;
+    display: block;
+}
+
+#numDisplay:focus {
+    outline: none;
+}
+
+#numDisplay::selection {
+    background: none;
+}
+
+/* (D) BUTTONS WRAPPER */
+#numBWrap {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 5px 5px;
+    grid-template-areas:
+    "num7 num8 num9 delete"
+    "num4 num5 num6 cancel"
+    "num1 num2 num3 valid"
+    "num0 num0 dot valid";
+}
+
+.num7 {
+    grid-area: num7;
+}
+
+.num8 {
+    grid-area: num8;
+}
+
+.num9 {
+    grid-area: num9;
+}
+
+.num4 {
+    grid-area: num4;
+}
+
+.num5 {
+    grid-area: num5;
+}
+
+.num6 {
+    grid-area: num6;
+}
+
+.clr {
+    grid-area: delete;
+}
+
+.cancel {
+    grid-area: cancel;
+}
+
+.num1 {
+    grid-area: num1;
+}
+
+.num2 {
+    grid-area: num2;
+}
+
+.num3 {
+    grid-area: num3;
+}
+
+.valid {
+    grid-area: valid;
+}
+
+.num0 {
+    grid-area: num0;
+}
+
+.dot {
+    grid-area: dot;
+}
+
+/* (E) BUTTONS */
+#numBWrap div {
+    font-size: 24px;
+    color: black;
+    text-align: center;
+    padding: 15px 0;
+}
+
+#numBWrap div:hover {
+    cursor: pointer;
+}
+
+#numBWrap .num, #numBWrap .zero, #numBWrap .dot {
+    background: #d6d6d6;
+}
+
+#numBWrap .zero {
+    grid-column: span 2;
+}
+
+#numBWrap .del, #numBWrap .clr {
+    background: #808080;
+    color: white
+}
+
+#numBWrap .cx {
+    background: #940909;
+    color: white
+}
+
+#numBWrap .ok {
+    background: #115296;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* (F) NO DECIMAL POINTS ALLOWED */
+#numWrap.noDec .dot {
+    display: none;
+}
+
+#numWrap.noDec .zero {
+    grid-column: span 3;
+}

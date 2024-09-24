@@ -1,0 +1,160 @@
+import Koi, {ValidatorError} from "../../../../consumers/api/validators/Koi.js";
+import expect from "../../../test-helpers.js";
+
+describe('Unit | Consumers | Validators | Koi', () => {
+    describe('When validation is OK', () => {
+        const testCases = [
+            {
+                when: 'when we test an uuid',
+                test: (() => Koi.validate('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d').uuid()),
+            },
+            {
+                when: 'when we test a date',
+                test: (() => Koi.validate(new Date()).date()),
+            },
+            {
+                when: 'when we test a boolean',
+                test: (() => Koi.validate(true).boolean()),
+            },
+            {
+                when: 'when we test a number',
+                test: (() => Koi.validate(123).number()),
+            },
+            {
+                when: 'when we test a string',
+                test: (() => Koi.validate('hello').string()),
+            },
+            {
+                when: 'when we test an array',
+                test: (() => Koi.validate([]).array()),
+            },
+            {
+                when: 'when we test an empty array',
+                test: (() => Koi.validate([]).array().empty()),
+            },
+            {
+                when: 'when we test a not empty array',
+                test: (() => Koi.validate([123]).array().notEmpty()),
+            },
+            {
+                when: 'when we test an object',
+                test: (() => Koi.validate({}).object()),
+            },
+            {
+                when: 'when we test an empty object',
+                test: (() => Koi.validate({}).object().empty()),
+            },
+            {
+                when: 'when we test a not empty object',
+                test: (() => Koi.validate({hello: 'world'}).object().notEmpty()),
+            },
+            {
+                when: 'when we test a null value',
+                test: (() => Koi.validate(null).nil()),
+            },
+            {
+                when: 'when we test an undefined value',
+                test: (() => Koi.validate(undefined).nil()),
+            },
+            {
+                when: 'when we test a not nil value',
+                test: (() => Koi.validate('whatever').notNil()),
+            },
+        ];
+        testCases.forEach((testCase) => {
+            it(`should not throw error ${testCase.when}`, () => {
+                expect(() => testCase.test()).not.throw(Error);
+            });
+        });
+    });
+    describe('When validation is KO', () => {
+        const testCases = [
+            {
+                when: 'when we test an uuid',
+                test: (() => Koi.validate('not an uuid').uuid()),
+                message: 'ValidatorError: is not an uuid',
+            },
+            {
+                when: 'when we test a number',
+                test: (() => Koi.validate('not a number').number()),
+                message: 'ValidatorError: is not a number',
+            },
+            {
+                when: 'when we test a boolean',
+                test: (() => Koi.validate('not a boolean').boolean()),
+                message: 'ValidatorError: is not a boolean',
+            },
+            {
+                when: 'when we test a date',
+                test: (() => Koi.validate('not a date').date()),
+                message: 'ValidatorError: is not a date',
+            },
+            {
+                when: 'when we test a string',
+                test: (() => Koi.validate(123).string()),
+                message: 'ValidatorError: is not a string',
+            },
+            {
+                when: 'when we test an array',
+                test: (() => Koi.validate('not an array').array()),
+                message: 'ValidatorError: is not an array',
+            },
+            {
+                when: 'when we test an empty array',
+                test: (() => Koi.validate(['i am not empty']).array().empty()),
+                message: 'ValidatorError: is not empty',
+            },
+            {
+                when: 'when we test a not empty array',
+                test: (() => Koi.validate([]).array().notEmpty()),
+                message: 'ValidatorError: is empty',
+            },
+            {
+                when: 'when we test an object',
+                test: (() => Koi.validate('not an object').object()),
+                message: 'ValidatorError: is not an object',
+            },
+            {
+                when: 'when we test an empty object',
+                test: (() => Koi.validate({hello: 'world'}).object().empty()),
+                message: 'ValidatorError: is not empty',
+            },
+            {
+                when: 'when we test a not empty object',
+                test: (() => Koi.validate({}).object().notEmpty()),
+                message: 'ValidatorError: is empty',
+            },
+            {
+                when: 'when we test a null value',
+                test: (() => Koi.validate('not null').nil()),
+                message: 'ValidatorError: is not null nor undefined',
+            },
+            {
+                when: 'when we test an undefined value',
+                test: (() => Koi.validate('not undefined').nil()),
+                message: 'ValidatorError: is not null nor undefined',
+            },
+            {
+                when: 'when we test a not nil value which is null',
+                test: (() => Koi.validate(null).notNil()),
+                message: 'ValidatorError: is null or undefined',
+            },
+            {
+                when: 'when we test a not nil value which is undefined',
+                test: (() => Koi.validate(undefined).notNil()),
+                message: 'ValidatorError: is null or undefined',
+            },
+        ];
+        testCases.forEach((testCase) => {
+            it(`should throw a ValidatorError ${testCase.when}`, () => {
+                try {
+                    testCase.test()
+                    expect.fail('it should have throw an error');
+                } catch (e: any) {
+                    expect(e).to.be.instanceof(ValidatorError);
+                    expect(e.message).to.be.equal(testCase.message);
+                }
+            });
+        });
+    });
+});
