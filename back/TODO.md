@@ -3,11 +3,12 @@
 ## Destination monorepo
 
 - [x] CI avec DB embarquée
-- [ ] Création d'un monorepo sur le compte github de
+- [x] Création d'un monorepo sur le compte github de
       dimitrilahaye
-- [ ] Revoir la DX du repo pour le faire tourner en local
-- [ ] Installer Renovate
-- [ ] Lancer la CI sur le monorepo
+- [x] Revoir la DX du repo pour le faire tourner en local
+- [x] Installer Renovate
+- [x] Lancer la CI sur le monorepo
+- [x] Pouvoir déployer le back sur Vercel
 - [ ] Brancher [Render](https://render.com/)
 - [ ] Brancher les DNS
 - [ ] Lancer la CD

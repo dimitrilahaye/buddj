@@ -6,7 +6,13 @@
   "scripts": {
     "ci:front": "cd front && npm ci",
     "ci:back": "cd back && npm ci",
-    "ci": "run-p --print-label ci:back ci:front"
+    "ci": "run-p --print-label ci:back ci:front",
+    "docker:back": "cd back && docker compose up -d",
+    "docker": "run-p --print-label docker:back",
+    "dev:back": "cd back && npm run dev",
+    "dev:front": "cd front && npm run dev",
+    "dev": "run-p --print-label dev:back dev:front",
+    "deploy:back": "cd back && npm run deploy"
   },
   "keywords": [],
   "author": "",
