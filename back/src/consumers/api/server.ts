@@ -236,7 +236,7 @@ function buildApi(
   api.use(errorHandler);
 
   const PORT = envVars.port || 8080;
-  const server = api.listen(PORT, () => {
+  const server = api.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
   });
 
