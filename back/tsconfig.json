@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
+  "extends": "./node_modules/@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "preserveConstEnums": true,
     "moduleResolution": "bundler",
@@ -9,7 +9,7 @@
     "declaration": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "esnext",
+    "module": "esnext"
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["./dist", "node_modules", "./src/tests"]
