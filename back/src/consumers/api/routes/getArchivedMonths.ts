@@ -1,23 +1,29 @@
-import {Router} from "express";
+import { Router, Response, Request } from "express";
 import UpdateExpenseCommand from "../commands/UpdateExpenseCommand.js";
-import {MonthDtoBuilder} from "../dtos/monthDto.js";
-import GetArchivedMonths from "../../../core/usecases/GetArchivedMonths";
+import { MonthDtoBuilder } from "../dtos/monthDto.js";
+import GetArchivedMonths from "../../../core/usecases/GetArchivedMonths.js";
 
 type UpdateExpenseDeps = {
-    getArchivedMonthsUsecase: GetArchivedMonths,
-    monthDto: MonthDtoBuilder,
+  getArchivedMonthsUsecase: GetArchivedMonths;
+  monthDto: MonthDtoBuilder;
+};
+
+function getArchivedMonths(
+  router: Router,
+  { getArchivedMonthsUsecase, monthDto }: UpdateExpenseDeps
+) {
+  return router.get(
+    "/months/archived",
+    async (req: Request, res: Response, next: any) => {
+      try {
+        const months = await getArchivedMonthsUsecase.execute();
+        const dtos = months.map((month) => monthDto(month));
+        res.status(200).send({ success: true, data: dtos });
+      } catch (e) {
+        next(e);
+      }
+    }
+  );
 }
 
-function getArchivedMonths(router: Router, {getArchivedMonthsUsecase, monthDto}: UpdateExpenseDeps) {
-    return router.get('/months/archived', async (req, res, next) => {
-        try {
-            const months = await getArchivedMonthsUsecase.execute();
-            const dtos = months.map((month) => monthDto(month));
-            res.status(200).send({success: true, data: dtos});
-        } catch (e) {
-            next(e);
-        }
-    });
-}
-
-export {getArchivedMonths};
+export { getArchivedMonths };
