@@ -1,215 +1,246 @@
-import express, {Express, NextFunction, Request, Response, Router} from "express";
+import express, {
+  Express,
+  NextFunction,
+  Request,
+  Response,
+  Router,
+} from "express";
 import cors from "cors";
 import cookieSession from "cookie-session";
 import passport from "passport";
 
 import UserRepository from "../../providers/persistence/repositories/UserRepository.js";
-import {getMonthTemplate} from "./routes/monthTemplate.js";
+import { getMonthTemplate } from "./routes/monthTemplate.js";
 import GetMonthCreationTemplate from "../../core/usecases/GetMonthCreationTemplate.js";
 import errorHandler from "./errorHandler.js";
-import {createNewMonth} from "./routes/createNewMonth.js";
+import { createNewMonth } from "./routes/createNewMonth.js";
 import CreateNewMonth from "../../core/usecases/CreateNewMonth.js";
-import {getUnarchivedMonths} from "./routes/GetUnarchivedMonths.js";
+import { getUnarchivedMonths } from "./routes/GetUnarchivedMonths.js";
 import GetUnarchivedMonths from "../../core/usecases/GetUnarchivedMonths.js";
-import {addWeeklyExpense} from "./routes/addWeeklyExpense.js";
+import { addWeeklyExpense } from "./routes/addWeeklyExpense.js";
 import AddWeeklyExpense from "../../core/usecases/AddWeeklyExpense.js";
 import ManageExpensesChecking from "../../core/usecases/ManageExpensesChecking.js";
-import {manageExpensesChecking} from "./routes/manageExpensesChecking.js";
+import { manageExpensesChecking } from "./routes/manageExpensesChecking.js";
 import ManageOutflowsChecking from "../../core/usecases/ManageOutflowsChecking.js";
-import {MonthDtoBuilder} from "./dtos/monthDto.js";
-import {manageOutflowsChecking} from "./routes/manageOutflowsChecking.js";
+import { MonthDtoBuilder } from "./dtos/monthDto.js";
+import { manageOutflowsChecking } from "./routes/manageOutflowsChecking.js";
 import ArchiveMonth from "../../core/usecases/ArchiveMonth.js";
-import {archiveMonth} from "./routes/archiveMonth.js";
+import { archiveMonth } from "./routes/archiveMonth.js";
 import DeleteExpense from "../../core/usecases/DeleteExpense.js";
-import {deleteExpense} from "./routes/deleteExpense.js";
+import { deleteExpense } from "./routes/deleteExpense.js";
 import UpdateExpense from "../../core/usecases/UpdateExpense.js";
-import {updateExpense} from "./routes/updateExpense.js";
+import { updateExpense } from "./routes/updateExpense.js";
 import DeleteOutflow from "../../core/usecases/DeleteOutflow.js";
-import {deleteOutflow} from "./routes/deleteOutflow.js";
+import { deleteOutflow } from "./routes/deleteOutflow.js";
 import AddOutflow from "../../core/usecases/AddOutflow.js";
-import {addOutflow} from "./routes/addOutflow.js";
+import { addOutflow } from "./routes/addOutflow.js";
 import GetArchivedMonths from "../../core/usecases/GetArchivedMonths.js";
-import {getArchivedMonths} from "./routes/getArchivedMonths.js";
+import { getArchivedMonths } from "./routes/getArchivedMonths.js";
 import UnarchiveMonth from "../../core/usecases/UnarchiveMonth.js";
-import {unarchiveMonth} from "./routes/unarchiveMonth.js";
+import { unarchiveMonth } from "./routes/unarchiveMonth.js";
 import DeleteMonth from "../../core/usecases/DeleteMonth.js";
-import {deleteMonth} from "./routes/deleteMonth.js";
+import { deleteMonth } from "./routes/deleteMonth.js";
 
 declare global {
-    namespace Express {
-        interface Request {
-            // @ts-ignore
-            user: User;
-        }
-
-        interface User {
-            googleId: string;
-            name: string;
-            email: string;
-        }
+  namespace Express {
+    interface Request {
+      // @ts-ignore
+      user: User;
     }
+
+    interface User {
+      googleId: string;
+      name: string;
+      email: string;
+    }
+  }
 }
 
 type Vars = {
-    nodeEnv: string,
-    port: number,
-    clientId: string,
-    clientSecret: string,
-    redirectUri: string,
-    scopes: string,
-    scriptId: string,
-    sessionSecret: string,
-    frontUrl: string,
-    frontRedirectUrl: string,
-    dbUrl: string,
-    dbPort: number,
-    dbUser: string,
-    dbPassword: string,
-    dbName: string,
-}
+  nodeEnv: string;
+  port: number;
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+  scopes: string;
+  scriptId: string;
+  sessionSecret: string;
+  frontUrl: string;
+  frontRedirectUrl: string;
+  dbUrl: string;
+  dbPort: number;
+  dbUser: string;
+  dbPassword: string;
+  dbName: string;
+};
 
 type SetupPassport = (api: Express) => void;
 
 export type Deps = {
-    userRepository: UserRepository,
-    monthDto: MonthDtoBuilder,
-    getMonthCreationTemplateUsecase: GetMonthCreationTemplate,
-    createNewMonthUsecase: CreateNewMonth,
-    getUnarchivedMonthsUsecase: GetUnarchivedMonths,
-    addWeeklyExpenseUsecase: AddWeeklyExpense,
-    manageExpensesCheckingUsecase: ManageExpensesChecking,
-    manageOutflowsCheckingUsecase: ManageOutflowsChecking,
-    archiveMonthUsecase: ArchiveMonth,
-    deleteExpenseUsecase: DeleteExpense,
-    updateExpenseUsecase: UpdateExpense,
-    deleteOutflowUsecase: DeleteOutflow,
-    addOutflowUsecase: AddOutflow,
-    getArchivedMonthsUsecase: GetArchivedMonths,
-    unarchiveMonthUsecase: UnarchiveMonth,
-    deleteMonthUsecase: DeleteMonth,
-}
+  userRepository: UserRepository;
+  monthDto: MonthDtoBuilder;
+  getMonthCreationTemplateUsecase: GetMonthCreationTemplate;
+  createNewMonthUsecase: CreateNewMonth;
+  getUnarchivedMonthsUsecase: GetUnarchivedMonths;
+  addWeeklyExpenseUsecase: AddWeeklyExpense;
+  manageExpensesCheckingUsecase: ManageExpensesChecking;
+  manageOutflowsCheckingUsecase: ManageOutflowsChecking;
+  archiveMonthUsecase: ArchiveMonth;
+  deleteExpenseUsecase: DeleteExpense;
+  updateExpenseUsecase: UpdateExpense;
+  deleteOutflowUsecase: DeleteOutflow;
+  addOutflowUsecase: AddOutflow;
+  getArchivedMonthsUsecase: GetArchivedMonths;
+  unarchiveMonthUsecase: UnarchiveMonth;
+  deleteMonthUsecase: DeleteMonth;
+};
 
 function buildApi(
-    envVars: Vars,
-    setupPassport: SetupPassport,
-    {
-        monthDto,
-        getMonthCreationTemplateUsecase,
-        getUnarchivedMonthsUsecase,
-        createNewMonthUsecase,
-        addWeeklyExpenseUsecase,
-        manageExpensesCheckingUsecase,
-        manageOutflowsCheckingUsecase,
-        archiveMonthUsecase,
-        deleteExpenseUsecase,
-        updateExpenseUsecase,
-        deleteOutflowUsecase,
-        addOutflowUsecase,
-        getArchivedMonthsUsecase,
-        unarchiveMonthUsecase,
-        deleteMonthUsecase,
-    }: Deps) {
-    const api = express();
+  envVars: Vars,
+  setupPassport: SetupPassport,
+  {
+    monthDto,
+    getMonthCreationTemplateUsecase,
+    getUnarchivedMonthsUsecase,
+    createNewMonthUsecase,
+    addWeeklyExpenseUsecase,
+    manageExpensesCheckingUsecase,
+    manageOutflowsCheckingUsecase,
+    archiveMonthUsecase,
+    deleteExpenseUsecase,
+    updateExpenseUsecase,
+    deleteOutflowUsecase,
+    addOutflowUsecase,
+    getArchivedMonthsUsecase,
+    unarchiveMonthUsecase,
+    deleteMonthUsecase,
+  }: Deps
+) {
+  const api = express();
 
-    api.use(express.json())
-    api.use(cors({
-        origin: envVars.frontUrl,
-        credentials: true,
-    }));
-    if (envVars.nodeEnv === 'production') {
-        api.set('trust proxy', 1);
+  api.use(express.json());
+  api.use(
+    cors({
+      origin: envVars.frontUrl,
+      credentials: true,
+    })
+  );
+  if (envVars.nodeEnv === "production") {
+    api.set("trust proxy", 1);
+  }
+  api.use(
+    cookieSession({
+      secret: envVars.sessionSecret,
+      maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years lul
+      secure: envVars.nodeEnv === "production",
+      sameSite: ["development", "test"].includes(envVars.nodeEnv as string)
+        ? true
+        : "none",
+      name: "mkapi",
+      httpOnly: true,
+      // @ts-ignore
+      proxy: envVars.nodeEnv === "production",
+    })
+  );
+
+  // register regenerate & save after the cookieSession middleware initialization
+  api.use(function (request, response, next) {
+    if (request.session && !request.session.regenerate) {
+      request.session.regenerate = (cb: any) => {
+        cb();
+      };
     }
-    api.use(cookieSession({
-        secret: envVars.sessionSecret,
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years lul
-        secure: envVars.nodeEnv === 'production',
-        sameSite: ["development", "test"].includes(envVars.nodeEnv as string) ? true : "none",
-        name: 'mkapi',
-        httpOnly: true,
-        // @ts-ignore
-        proxy: envVars.nodeEnv === 'production',
-    }));
-
-// register regenerate & save after the cookieSession middleware initialization
-    api.use(function (request, response, next) {
-        if (request.session && !request.session.regenerate) {
-            request.session.regenerate = (cb: any) => {
-                cb()
-            }
-        }
-        if (request.session && !request.session.save) {
-            request.session.save = (cb: any) => {
-                cb()
-            }
-        }
-        next()
-    });
-
-    setupPassport(api);
-
-    const router: Router = Router();
-
-    // accessType seems not to be a property of auth options
-    router.get('/auth/google', passport.authenticate('google', {
-        scope: envVars.scopes.split(" "),
-        // @ts-ignore
-        accessType: 'offline',
-        prompt: 'consent',
-    }));
-    router.get('/auth/google/callback', passport.authenticate('google', {
-        failureRedirect: '/',
-        successRedirect: envVars.frontRedirectUrl,
-    }));
-
-    const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
-        if (req.user || req.path.includes('auth/google')) {
-            next();
-        } else {
-            res.sendStatus(401);
-        }
+    if (request.session && !request.session.save) {
+      request.session.save = (cb: any) => {
+        cb();
+      };
     }
+    next();
+  });
 
-    router.get('/auth/logout', isLoggedIn, function (req, res, next) {
-        req.logout(function (err) {
-            if (err) return next(err);
-            res.sendStatus(200);
-        });
+  setupPassport(api);
+
+  const router: Router = Router();
+
+  router.get("/health", (req, res) => {
+    const data = {
+      uptime: process.uptime(),
+      message: "Ok",
+      date: new Date(),
+    };
+
+    res.status(200).send(data);
+  });
+
+  // accessType seems not to be a property of auth options
+  router.get(
+    "/auth/google",
+    passport.authenticate("google", {
+      scope: envVars.scopes.split(" "),
+      // @ts-ignore
+      accessType: "offline",
+      prompt: "consent",
+    })
+  );
+  router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", {
+      failureRedirect: "/",
+      successRedirect: envVars.frontRedirectUrl,
+    })
+  );
+
+  const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
+    if (req.user || req.path.includes("auth/google")) {
+      next();
+    } else {
+      res.sendStatus(401);
+    }
+  };
+
+  router.get("/auth/logout", isLoggedIn, function (req, res, next) {
+    req.logout(function (err) {
+      if (err) return next(err);
+      res.sendStatus(200);
     });
+  });
 
-    api.use(isLoggedIn);
+  api.use(isLoggedIn);
 
-    api.use(deleteMonth(router, {deleteMonthUsecase, monthDto}));
-    api.use(getArchivedMonths(router, {getArchivedMonthsUsecase, monthDto}));
-    api.use(addOutflow(router, {addOutflowUsecase, monthDto}));
-    api.use(deleteOutflow(router, {deleteOutflowUsecase, monthDto}));
-    api.use(updateExpense(router, {updateExpenseUsecase, monthDto}));
-    api.use(deleteExpense(router, {deleteExpenseUsecase, monthDto}));
-    api.use(unarchiveMonth(router, {unarchiveMonthUsecase, monthDto}));
-    api.use(archiveMonth(router, {archiveMonthUsecase, monthDto}));
-    api.use(manageOutflowsChecking(router, {manageOutflowsCheckingUsecase, monthDto}));
-    api.use(manageExpensesChecking(router, {manageExpensesCheckingUsecase}));
-    api.use(addWeeklyExpense(router, {addWeeklyExpenseUsecase}));
-    api.use(getMonthTemplate(router, {getMonthCreationTemplateUsecase}));
-    api.use(getUnarchivedMonths(router, {getUnarchivedMonthsUsecase}));
-    api.use(createNewMonth(router, {createNewMonthUsecase}));
+  api.use(deleteMonth(router, { deleteMonthUsecase, monthDto }));
+  api.use(getArchivedMonths(router, { getArchivedMonthsUsecase, monthDto }));
+  api.use(addOutflow(router, { addOutflowUsecase, monthDto }));
+  api.use(deleteOutflow(router, { deleteOutflowUsecase, monthDto }));
+  api.use(updateExpense(router, { updateExpenseUsecase, monthDto }));
+  api.use(deleteExpense(router, { deleteExpenseUsecase, monthDto }));
+  api.use(unarchiveMonth(router, { unarchiveMonthUsecase, monthDto }));
+  api.use(archiveMonth(router, { archiveMonthUsecase, monthDto }));
+  api.use(
+    manageOutflowsChecking(router, { manageOutflowsCheckingUsecase, monthDto })
+  );
+  api.use(manageExpensesChecking(router, { manageExpensesCheckingUsecase }));
+  api.use(addWeeklyExpense(router, { addWeeklyExpenseUsecase }));
+  api.use(getMonthTemplate(router, { getMonthCreationTemplateUsecase }));
+  api.use(getUnarchivedMonths(router, { getUnarchivedMonthsUsecase }));
+  api.use(createNewMonth(router, { createNewMonthUsecase }));
 
-    router.get('/me', isLoggedIn, async (req, res) => {
-        try {
-            res.send(req.user);
-        } catch (e: any) {
-            res.status(500).send(e.message);
-        }
-    });
+  router.get("/me", isLoggedIn, async (req, res) => {
+    try {
+      res.send(req.user);
+    } catch (e: any) {
+      res.status(500).send(e.message);
+    }
+  });
 
-    api.use(router);
-    api.use(errorHandler);
+  api.use(router);
+  api.use(errorHandler);
 
-    const PORT = envVars.port || 8080;
-    const server = api.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+  const PORT = envVars.port || 8080;
+  const server = api.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 
-    return server;
+  return server;
 }
 
 export default buildApi;
