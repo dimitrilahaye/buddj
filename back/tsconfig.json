@@ -2,14 +2,14 @@
   "extends": "./node_modules/@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "preserveConstEnums": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node16",
     "emitDeclarationOnly": false,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "declaration": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "esnext"
+    "module": "node16"
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["./dist", "node_modules", "./src/tests"]
