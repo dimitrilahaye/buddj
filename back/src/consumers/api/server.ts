@@ -128,6 +128,7 @@ function buildApi(
   if (envVars.nodeEnv === "production") {
     api.set("trust proxy", 1);
   }
+
   api.use(
     cookieSession({
       secret: envVars.sessionSecret,
@@ -191,7 +192,11 @@ function buildApi(
   );
 
   const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
-    if (req.user || req.path.includes("auth/google")) {
+    if (
+      req.user ||
+      req.path.includes("auth/google") ||
+      req.path.includes("health")
+    ) {
       next();
     } else {
       res.sendStatus(401);
@@ -236,7 +241,7 @@ function buildApi(
   api.use(errorHandler);
 
   const PORT = envVars.port || 8080;
-  const server = api.listen(PORT, "0.0.0.0", () => {
+  const server = api.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 
