@@ -29,6 +29,7 @@ jobs:
 
   back_tests:
     name: Back ~ Tests Node.js ${{ matrix.node-version }}
+    needs: back_checks
     runs-on: ubuntu-latest
     container: node:20.18.0-bookworm-slim
 
@@ -74,3 +75,31 @@ jobs:
           FRONT_URL: ${{ secrets.FRONT_URL }}
           FRONT_REDIRECT_URL: ${{ secrets.FRONT_REDIRECT_URL }}
           TEMPLATE: ${{ secrets.TEMPLATE }}
+
+  back_CD:
+    name: Back ~ Deployment
+    needs: [back_checks, back_tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy
+        if: github.event.pull_request.head.ref == 'render-configuration'
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_API }}
+        run: curl "$deploy_url"
+
+  front_CD:
+    name: Front ~ Deployment
+    needs: [back_checks, back_tests, back_CD]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy
+        if: github.event.pull_request.head.ref == 'render-configuration'
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP }}
+        run: curl "$deploy_url"
