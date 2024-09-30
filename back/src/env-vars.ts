@@ -15,15 +15,6 @@ export type DbConfig = {
 
 let dbConfig = {};
 
-if (process.env.NODE_ENV === "development") {
-  dbConfig = {
-    dbUrl: process.env.DB_URL as string,
-    dbPort: Number(process.env.DB_PORT),
-    dbUser: process.env.DB_USER as string,
-    dbPassword: process.env.DB_PASSWORD as string,
-    dbName: process.env.DB_NAME as string,
-  };
-}
 if (process.env.NODE_ENV === "test") {
   dbConfig = {
     dbUrl: process.env.DB_URL_TEST as string,
@@ -32,14 +23,13 @@ if (process.env.NODE_ENV === "test") {
     dbPassword: process.env.DB_PASSWORD_TEST as string,
     dbName: process.env.DB_NAME_TEST as string,
   };
-}
-if (process.env.NODE_ENV === "production") {
+} else {
   dbConfig = {
-    dbUrl: process.env.DB_URL_PROD as string,
-    dbPort: Number(process.env.DB_PORT_PROD),
-    dbUser: process.env.DB_USER_PROD as string,
-    dbPassword: process.env.DB_PASSWORD_PROD as string,
-    dbName: process.env.DB_NAME_PROD as string,
+    dbUrl: process.env.DB_URL as string,
+    dbPort: Number(process.env.DB_PORT),
+    dbUser: process.env.DB_USER as string,
+    dbPassword: process.env.DB_PASSWORD as string,
+    dbName: process.env.DB_NAME as string,
   };
 }
 
