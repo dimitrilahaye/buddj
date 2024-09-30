@@ -4,9 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 5174",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:prod": "ng build --configuration production --base-href https://buddj.app/",
+    "test:headless": "ng test --watch=false --browsers=ChromeHeadless"
   },
   "private": true,
   "dependencies": {
