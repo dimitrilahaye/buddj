@@ -19,8 +19,8 @@
   "display": "standalone",
   "dir": "auto",
   "lang": "fr",
-  "name": "Mortal Kompta",
-  "short_name": "MortalKompta",
+  "name": "Buddj.app",
+  "short_name": "Buddj",
   "start_url": "/",
   "scope": "/"
 }

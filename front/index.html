@@ -1,293 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Mortal Kompta</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Buddj.app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json" />
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-          href="/assets/images/iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-          href="/assets/images/iPhone_15_Pro__iPhone_15__iPhone_14_Pro_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-          href="/assets/images/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-          href="/assets/images/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-          href="/assets/images/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-          href="/assets/images/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/iPhone_11__iPhone_XR_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-          href="/assets/images/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/12.9__iPad_Pro_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/11__iPad_Pro__10.5__iPad_Pro_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/10.9__iPad_Air_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/10.5__iPad_Air_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/10.2__iPad_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-          href="/assets/images/8.3__iPad_Mini_landscape.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-          href="/assets/images/iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-          href="/assets/images/iPhone_15_Pro__iPhone_15__iPhone_14_Pro_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-          href="/assets/images/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-          href="/assets/images/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-          href="/assets/images/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-          href="/assets/images/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/iPhone_11__iPhone_XR_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-          href="/assets/images/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/12.9__iPad_Pro_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/11__iPad_Pro__10.5__iPad_Pro_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/10.9__iPad_Air_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/10.5__iPad_Air_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/10.2__iPad_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png">
-    <link rel="apple-touch-startup-image"
-          media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-          href="/assets/images/8.3__iPad_Mini_portrait.png">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/images/apple-touch-icon.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_16_Pro_Max_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_16_Pro_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_16_Plus__iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_16__iPhone_15_Pro__iPhone_15__iPhone_14_Pro_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/iPhone_11__iPhone_XR_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+      href="assets/images/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/13__iPad_Pro_M4_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/12.9__iPad_Pro_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/11__iPad_Pro_M4_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/11__iPad_Pro__10.5__iPad_Pro_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/10.9__iPad_Air_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/10.5__iPad_Air_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/10.2__iPad_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+      href="assets/images/8.3__iPad_Mini_landscape.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_16_Pro_Max_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_16_Pro_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_16_Plus__iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_16__iPhone_15_Pro__iPhone_15__iPhone_14_Pro_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/iPhone_11__iPhone_XR_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+      href="assets/images/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/13__iPad_Pro_M4_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/12.9__iPad_Pro_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/11__iPad_Pro_M4_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/11__iPad_Pro__10.5__iPad_Pro_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/10.9__iPad_Air_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/10.5__iPad_Air_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/10.2__iPad_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+      href="assets/images/8.3__iPad_Mini_portrait.png"
+    />
 
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/images/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/images/favicon-16x16.png"
+    />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main.css" />
     <!-- elements css -->
-    <link rel="stylesheet" href="styles/elements/block.css">
-    <link rel="stylesheet" href="styles/elements/loader.css">
+    <link rel="stylesheet" href="styles/elements/block.css" />
+    <link rel="stylesheet" href="styles/elements/loader.css" />
     <!-- components css -->
-    <link rel="stylesheet" href="styles/components/navbar.css">
-    <link rel="stylesheet" href="styles/components/notification.css">
-    <link rel="stylesheet" href="styles/components/week-block.css">
-    <link rel="stylesheet" href="styles/components/week-dashboard.css">
-    <link rel="stylesheet" href="styles/components/numpad.css">
-    <link rel="stylesheet" href="styles/components/month-menu.css">
+    <link rel="stylesheet" href="styles/components/navbar.css" />
+    <link rel="stylesheet" href="styles/components/notification.css" />
+    <link rel="stylesheet" href="styles/components/week-block.css" />
+    <link rel="stylesheet" href="styles/components/week-dashboard.css" />
+    <link rel="stylesheet" href="styles/components/numpad.css" />
+    <link rel="stylesheet" href="styles/components/month-menu.css" />
     <!-- pages css -->
-    <link rel="stylesheet" href="styles/pages/login.css">
-    <link rel="stylesheet" href="styles/pages/dashboard.css">
-    <link rel="stylesheet" href="styles/pages/receipt.css">
-    <link rel="stylesheet" href="styles/pages/pending.css">
-    <link rel="stylesheet" href="styles/pages/outflows.css">
-    <link rel="stylesheet" href="styles/pages/create-month.css">
-    <link rel="stylesheet" href="styles/pages/home.css">
-    <link rel="stylesheet" href="styles/pages/archived-months.css">
-</head>
-<body>
-<!-- NavBar -->
-<main id="app" class="container is-fluid">
-    <!-- Pages -->
-</main>
+    <link rel="stylesheet" href="styles/pages/login.css" />
+    <link rel="stylesheet" href="styles/pages/dashboard.css" />
+    <link rel="stylesheet" href="styles/pages/receipt.css" />
+    <link rel="stylesheet" href="styles/pages/pending.css" />
+    <link rel="stylesheet" href="styles/pages/outflows.css" />
+    <link rel="stylesheet" href="styles/pages/create-month.css" />
+    <link rel="stylesheet" href="styles/pages/home.css" />
+    <link rel="stylesheet" href="styles/pages/archived-months.css" />
+  </head>
+  <body>
+    <!-- NavBar -->
+    <main id="app" class="container is-fluid">
+      <!-- Pages -->
+    </main>
 
-<script type="module">
-    import Rouster from "./scripts/services/Rouster.js";
-    // pages
-    import Login from "./scripts/pages/Login.js";
-    import Home from "./scripts/pages/Home.js";
-    import Dashboard from "./scripts/pages/Dashboard.js";
-    import Outflows from "./scripts/pages/Outflows.js";
-    import CreateMonth from "./scripts/pages/CreateMonth.js";
-    import Weekly from "./scripts/pages/Weekly.js";
-    // components
-    import NavBar from "./scripts/components/NavBar.js";
-    import Numpad from "./scripts/components/Numpad.js";
-    import MonthMenu from "./scripts/components/MonthMenu.js";
-    // services
-    import CbApi from "./scripts/services/CbApi.js";
-    import ArchivedMonths from "./scripts/pages/ArchivedMonths";
+    <script type="module">
+      import Rouster from "./scripts/services/Rouster.js";
+      // pages
+      import Login from "./scripts/pages/Login.js";
+      import Home from "./scripts/pages/Home.js";
+      import Dashboard from "./scripts/pages/Dashboard.js";
+      import Outflows from "./scripts/pages/Outflows.js";
+      import CreateMonth from "./scripts/pages/CreateMonth.js";
+      import Weekly from "./scripts/pages/Weekly.js";
+      // components
+      import NavBar from "./scripts/components/NavBar.js";
+      import Numpad from "./scripts/components/Numpad.js";
+      import MonthMenu from "./scripts/components/MonthMenu.js";
+      // services
+      import CbApi from "./scripts/services/CbApi.js";
+      import ArchivedMonths from "./scripts/pages/ArchivedMonths";
 
-    document.addEventListener('DOMContentLoaded', async () => {
+      document.addEventListener("DOMContentLoaded", async () => {
         const api = new CbApi();
         const router = new Rouster();
-        const monthMenu = new MonthMenu({router});
+        const monthMenu = new MonthMenu({ router });
         const numpad = new Numpad();
         numpad.init();
-        const $main = document.querySelector('#app');
+        const $main = document.querySelector("#app");
         /** @type {Month[]} */
         let months;
 
         function getSelectedMonthId() {
-            const url = new URL(location.href);
-            return url.pathname.split('/').at(-1);
+          const url = new URL(location.href);
+          return url.pathname.split("/").at(-1);
         }
 
-        const navBar = new NavBar({router, logoutHandler});
-        $main.insertAdjacentElement('beforebegin', navBar.$element);
+        const navBar = new NavBar({ router, logoutHandler });
+        $main.insertAdjacentElement("beforebegin", navBar.$element);
 
         async function setMonths() {
-            try {
-                if (months === undefined) {
-                    months = await api.getMonths();
-                }
-            } catch (e) {
-                router.navigate('/login');
+          try {
+            if (months === undefined) {
+              months = await api.getMonths();
             }
+          } catch (e) {
+            router.navigate("/login");
+          }
         }
 
         async function refreshMonths() {
-            try {
-                months = await api.getMonths();
-            } catch (e) {
-                router.navigate('/login');
-            }
+          try {
+            months = await api.getMonths();
+          } catch (e) {
+            router.navigate("/login");
+          }
         }
 
         /** @var {Page} */
         let page;
 
         router.add("/", () => {
-            router.navigate("/home");
+          router.navigate("/home");
         });
         router.add("/login", () => {
-            navBar.hideBurger();
-            page = new Login({$main, loginHandler});
+          navBar.hideBurger();
+          page = new Login({ $main, loginHandler });
         });
         router.add("/home", async () => {
-            const homePage = new Home({$main, router, archiveMonthsSubmitHandler});
-            page = homePage;
-            homePage.loader.start();
-            await refreshMonths();
-            homePage.createDropdowns(months);
+          const homePage = new Home({
+            $main,
+            router,
+            archiveMonthsSubmitHandler,
+          });
+          page = homePage;
+          homePage.loader.start();
+          await refreshMonths();
+          homePage.createDropdowns(months);
         });
-        router.add("/weekly/:monthId", async ({params}) => {
-            const {monthId} = params;
-            if (!monthId) {
-                router.navigate('/');
-                return;
-            }
-            try {
-                const weeklyPage = new Weekly({
-                    $main,
-                    monthMenu,
-                    updatePendingHandler
-                });
-                page = weeklyPage;
-                await setMonths();
-                const month = months.find((month) => month.id === monthId);
-                weeklyPage.setMonthName(month);
-                weeklyPage.displayPendingForm(month.account.weeklyBudgets, deleteExpenseHandler);
-                weeklyPage.updateWeeksSelect(month.account.weeklyBudgets, receiptCallback, numpad);
-            } catch (message) {
-                page.notification.error(message);
-            }
+        router.add("/weekly/:monthId", async ({ params }) => {
+          const { monthId } = params;
+          if (!monthId) {
+            router.navigate("/");
+            return;
+          }
+          try {
+            const weeklyPage = new Weekly({
+              $main,
+              monthMenu,
+              updatePendingHandler,
+            });
+            page = weeklyPage;
+            await setMonths();
+            const month = months.find((month) => month.id === monthId);
+            weeklyPage.setMonthName(month);
+            weeklyPage.displayPendingForm(
+              month.account.weeklyBudgets,
+              deleteExpenseHandler
+            );
+            weeklyPage.updateWeeksSelect(
+              month.account.weeklyBudgets,
+              receiptCallback,
+              numpad
+            );
+          } catch (message) {
+            page.notification.error(message);
+          }
         });
-        router.add("/dashboard/:monthId", async ({params}) => {
-            const {monthId} = params;
-            if (!monthId) {
-                router.navigate('/');
-                return;
-            }
-            try {
-                const dashboardPage = new Dashboard({$main, monthMenu});
-                page = dashboardPage;
-                await setMonths();
-                const month = months.find((month) => month.id === monthId);
-                dashboardPage.setMonthName(month);
-                dashboardPage.displayWeekDashboard(month.dashboard);
-            } catch (message) {
-                page.notification.error(message);
-            }
+        router.add("/dashboard/:monthId", async ({ params }) => {
+          const { monthId } = params;
+          if (!monthId) {
+            router.navigate("/");
+            return;
+          }
+          try {
+            const dashboardPage = new Dashboard({ $main, monthMenu });
+            page = dashboardPage;
+            await setMonths();
+            const month = months.find((month) => month.id === monthId);
+            dashboardPage.setMonthName(month);
+            dashboardPage.displayWeekDashboard(month.dashboard);
+          } catch (message) {
+            page.notification.error(message);
+          }
         });
-        router.add("/outflows/:monthId", async ({params}) => {
-            const {monthId} = params;
-            if (!monthId) {
-                router.navigate('/');
-                return;
-            }
-            try {
-                const outflowsPage = new Outflows({$main, monthMenu, updateOutflowsHandler});
-                page = outflowsPage
-                await setMonths();
-                const month = months.find((month) => month.id === monthId);
-                const {currentBalance, outflows} = month.account;
-                outflowsPage.setMonthName(month);
-                outflowsPage.displayForm({currentBalance, outflows}, numpad, deleteOutflowHandler, addOutflowHandler);
-            } catch (message) {
-                page.notification.error(message);
-            }
+        router.add("/outflows/:monthId", async ({ params }) => {
+          const { monthId } = params;
+          if (!monthId) {
+            router.navigate("/");
+            return;
+          }
+          try {
+            const outflowsPage = new Outflows({
+              $main,
+              monthMenu,
+              updateOutflowsHandler,
+            });
+            page = outflowsPage;
+            await setMonths();
+            const month = months.find((month) => month.id === monthId);
+            const { currentBalance, outflows } = month.account;
+            outflowsPage.setMonthName(month);
+            outflowsPage.displayForm(
+              { currentBalance, outflows },
+              numpad,
+              deleteOutflowHandler,
+              addOutflowHandler
+            );
+          } catch (message) {
+            page.notification.error(message);
+          }
         });
         router.add("/admin/create", async () => {
-            const createMonth = new CreateMonth({$main});
-            page = createMonth;
-            createMonth.loader.start();
-            const data = await api.getMonthTemplate();
-            createMonth.initializeTemplate(data, numpad, createMonthSubmitHandler);
+          const createMonth = new CreateMonth({ $main });
+          page = createMonth;
+          createMonth.loader.start();
+          const data = await api.getMonthTemplate();
+          createMonth.initializeTemplate(
+            data,
+            numpad,
+            createMonthSubmitHandler
+          );
         });
         router.add("/admin/archived", async () => {
-            const archivedMonths = new ArchivedMonths({$main, unarchiveMonthHandler, deleteMonthHandler});
-            page = archivedMonths;
-            archivedMonths.loader.start();
-            const data = await api.getArchivedMonths();
-            archivedMonths.initPage(data);
-            archivedMonths.loader.stop();
+          const archivedMonths = new ArchivedMonths({
+            $main,
+            unarchiveMonthHandler,
+            deleteMonthHandler,
+          });
+          page = archivedMonths;
+          archivedMonths.loader.start();
+          const data = await api.getArchivedMonths();
+          archivedMonths.initPage(data);
+          archivedMonths.loader.stop();
         });
 
         /**
@@ -295,19 +452,19 @@
          * @param {Login} login
          */
         async function loginHandler(login) {
-            try {
-                login.startLoader();
-                await api.auth();
-            } catch (e) {
-                page.notification.error(e);
-            } finally {
-                login.stopLoader();
-            }
+          try {
+            login.startLoader();
+            await api.auth();
+          } catch (e) {
+            page.notification.error(e);
+          } finally {
+            login.stopLoader();
+          }
         }
 
         async function logoutHandler() {
-            await api.logout();
-            router.navigate('/login');
+          await api.logout();
+          router.navigate("/login");
         }
 
         /**
@@ -317,19 +474,19 @@
          * @return {Promise<null|string>}
          */
         async function receiptCallback(receiptPage, result) {
-            try {
-                receiptPage.startLoader();
-                const monthId = getSelectedMonthId();
-                const {week: weekId, ...expense} = result;
-                expense.amount = Number(expense.amount);
-                await api.addExpense(monthId, weekId, expense);
-                page.notification.success();
-                location.reload();
-            } catch (message) {
-                page.notification.error(message);
-            } finally {
-                receiptPage.stopLoader();
-            }
+          try {
+            receiptPage.startLoader();
+            const monthId = getSelectedMonthId();
+            const { week: weekId, ...expense } = result;
+            expense.amount = Number(expense.amount);
+            await api.addExpense(monthId, weekId, expense);
+            page.notification.success();
+            location.reload();
+          } catch (message) {
+            page.notification.error(message);
+          } finally {
+            receiptPage.stopLoader();
+          }
         }
 
         /**
@@ -338,17 +495,17 @@
          * @param {*} result
          */
         async function updatePendingHandler(pendingPage, result) {
-            try {
-                pendingPage.startSubmitLoader();
-                const monthId = getSelectedMonthId();
-                await api.manageExpensesChecking(monthId, result);
-                page.notification.success();
-                location.reload();
-            } catch (message) {
-                page.notification.error(message);
-            } finally {
-                pendingPage.stopSubmitLoader();
-            }
+          try {
+            pendingPage.startSubmitLoader();
+            const monthId = getSelectedMonthId();
+            await api.manageExpensesChecking(monthId, result);
+            page.notification.success();
+            location.reload();
+          } catch (message) {
+            page.notification.error(message);
+          } finally {
+            pendingPage.stopSubmitLoader();
+          }
         }
 
         /**
@@ -357,17 +514,17 @@
          * @param {*} result
          */
         async function updateOutflowsHandler(page, result) {
-            try {
-                page.startManageOutflowsSubmitLoader();
-                const monthId = getSelectedMonthId();
-                await api.manageOutflowsChecking(monthId, result);
-                page.notification.success();
-                location.reload();
-            } catch (message) {
-                page.notification.error(message);
-            } finally {
-                page.stopManageOutflowsSubmitLoader();
-            }
+          try {
+            page.startManageOutflowsSubmitLoader();
+            const monthId = getSelectedMonthId();
+            await api.manageOutflowsChecking(monthId, result);
+            page.notification.success();
+            location.reload();
+          } catch (message) {
+            page.notification.error(message);
+          } finally {
+            page.stopManageOutflowsSubmitLoader();
+          }
         }
 
         /**
@@ -376,16 +533,16 @@
          * @param {*} result
          */
         async function createMonthSubmitHandler(page, result) {
-            try {
-                page.startSubmitLoader();
-                await api.createMonth(result);
-                page.notification.success();
-                router.navigate('/home');
-            } catch (message) {
-                page.notification.error(message);
-            } finally {
-                page.stopSubmitLoader();
-            }
+          try {
+            page.startSubmitLoader();
+            await api.createMonth(result);
+            page.notification.success();
+            router.navigate("/home");
+          } catch (message) {
+            page.notification.error(message);
+          } finally {
+            page.stopSubmitLoader();
+          }
         }
 
         /**
@@ -394,15 +551,15 @@
          * @param {string} monthId
          */
         async function archiveMonthsSubmitHandler(page, monthId) {
-            try {
-                page.loader.start();
-                await api.archiveMonth(monthId);
-                router.navigate('/home');
-                page.notification.success();
-                location.reload();
-            } catch (message) {
-                page.notification.error(message);
-            }
+          try {
+            page.loader.start();
+            await api.archiveMonth(monthId);
+            router.navigate("/home");
+            page.notification.success();
+            location.reload();
+          } catch (message) {
+            page.notification.error(message);
+          }
         }
 
         /**
@@ -412,15 +569,15 @@
          * @param {string} expenseId
          */
         async function deleteExpenseHandler(page, weeklyId, expenseId) {
-            try {
-                page.loader.start();
-                const monthId = getSelectedMonthId();
-                await api.deleteExpense(monthId, weeklyId, expenseId);
-                page.notification.success();
-                location.reload();
-            } catch (message) {
-                page.notification.error(message);
-            }
+          try {
+            page.loader.start();
+            const monthId = getSelectedMonthId();
+            await api.deleteExpense(monthId, weeklyId, expenseId);
+            page.notification.success();
+            location.reload();
+          } catch (message) {
+            page.notification.error(message);
+          }
         }
 
         /**
@@ -429,15 +586,15 @@
          * @param {string} outflowId
          */
         async function deleteOutflowHandler(page, outflowId) {
-            try {
-                page.loader.start();
-                const monthId = getSelectedMonthId();
-                await api.deleteOutflow(monthId, outflowId);
-                page.notification.success();
-                location.reload();
-            } catch (message) {
-                page.notification.error(message);
-            }
+          try {
+            page.loader.start();
+            const monthId = getSelectedMonthId();
+            await api.deleteOutflow(monthId, outflowId);
+            page.notification.success();
+            location.reload();
+          } catch (message) {
+            page.notification.error(message);
+          }
         }
 
         /**
@@ -445,19 +602,19 @@
          * @param {Outflows} page
          * @param {OutflowFormResult} result
          */
-        async function addOutflowHandler(page, {label, amount}) {
-            try {
-                page.startAddOutflowSubmitLoader();
-                const monthId = getSelectedMonthId();
-                await api.addOutflow(monthId, {
-                    label,
-                    amount: Number(amount),
-                });
-                page.notification.success();
-                location.reload();
-            } catch (message) {
-                page.notification.error(message);
-            }
+        async function addOutflowHandler(page, { label, amount }) {
+          try {
+            page.startAddOutflowSubmitLoader();
+            const monthId = getSelectedMonthId();
+            await api.addOutflow(monthId, {
+              label,
+              amount: Number(amount),
+            });
+            page.notification.success();
+            location.reload();
+          } catch (message) {
+            page.notification.error(message);
+          }
         }
 
         /**
@@ -465,13 +622,13 @@
          * @param {string} monthId
          */
         async function unarchiveMonthHandler(monthId) {
-            try {
-                await api.unarchiveMonth(monthId);
-                page.notification.success();
-                router.navigate('/home');
-            } catch (message) {
-                page.notification.error(message);
-            }
+          try {
+            await api.unarchiveMonth(monthId);
+            page.notification.success();
+            router.navigate("/home");
+          } catch (message) {
+            page.notification.error(message);
+          }
         }
 
         /**
@@ -479,15 +636,15 @@
          * @param {string} monthId
          */
         async function deleteMonthHandler(monthId) {
-            try {
-                await api.deleteMonth(monthId);
-                page.notification.success();
-                router.navigate('/home');
-            } catch (message) {
-                page.notification.error(message);
-            }
+          try {
+            await api.deleteMonth(monthId);
+            page.notification.success();
+            router.navigate("/home");
+          } catch (message) {
+            page.notification.error(message);
+          }
         }
-    });
-</script>
-</body>
+      });
+    </script>
+  </body>
 </html>
