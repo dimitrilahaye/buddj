@@ -12,6 +12,9 @@
     "dev:back": "cd back && npm run dev",
     "dev:front": "cd front && npm run dev",
     "dev": "run-p --print-label dev:back dev:front",
+    "build:back": "cd back && npm run build",
+    "build:front": "cd front && npm run build",
+    "build": "run-p --print-label build:back build:front",
     "deploy:back": "cd back && npm run deploy"
   },
   "keywords": [],
