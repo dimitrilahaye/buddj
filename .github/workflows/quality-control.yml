@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, render-configuration]
+    branches: [main, render-configuration, front-v2]
 
 jobs:
   back_checks:
