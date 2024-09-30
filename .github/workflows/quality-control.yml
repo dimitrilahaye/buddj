@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, render-configuration]
 
 jobs:
   back_checks:
@@ -76,9 +76,51 @@ jobs:
           FRONT_REDIRECT_URL: ${{ secrets.FRONT_REDIRECT_URL }}
           TEMPLATE: ${{ secrets.TEMPLATE }}
 
+  front_checks:
+    name: Front ~ QC Checks
+    needs: [back_checks, back_tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Front ~ Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Front ~ Install
+        working-directory: ./front-v2
+        run: npm install
+
+      - name: Back ~ ESLint checks
+        working-directory: ./front-v2
+        run: npm run lint
+
+  front_tests:
+    name: Front ~ Tests ${{ matrix.node-version }}
+    needs: [back_checks, back_tests, front_checks]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Front ~ Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Front ~ Install
+        working-directory: ./front-v2
+        run: npm install
+
+      - name: Front ~ Tests
+        working-directory: ./front-v2
+        run: npm run test
+
   back_CD:
     name: Back ~ Deployment
-    needs: [back_checks, back_tests]
+    needs: [back_checks, back_tests, front_checks, front_tests]
     runs-on: ubuntu-latest
 
     steps:
@@ -92,7 +134,7 @@ jobs:
 
   front_CD:
     name: Front ~ Deployment
-    needs: [back_checks, back_tests, back_CD]
+    needs: [back_checks, back_tests, front_checks, front_tests, back_CD]
     runs-on: ubuntu-latest
 
     steps:
