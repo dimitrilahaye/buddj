@@ -1,28 +1,29 @@
 import htmlFactory from "../utils/htmlFactory.js";
 import Component from "./Component.js";
+import logoUrl from "../../assets/images/logo.png";
 
 export default class NavBar extends Component {
-    /** @type {Rouster} */
-    #router;
+  /** @type {Rouster} */
+  #router;
 
-    /** @type {HTMLElement} */
-    #$burger;
-    /** @type {HTMLElement} */
-    #$menu;
+  /** @type {HTMLElement} */
+  #$burger;
+  /** @type {HTMLElement} */
+  #$menu;
 
-    /**
-     *
-     * @param {Rouster} router
-     * @param {function(): void} logoutHandler
-     */
-    constructor({router, logoutHandler}) {
-        super();
+  /**
+   *
+   * @param {Rouster} router
+   * @param {function(): void} logoutHandler
+   */
+  constructor({ router, logoutHandler }) {
+    super();
 
-        this.#router = router;
-        this.$element = htmlFactory(`
+    this.#router = router;
+    this.$element = htmlFactory(`
             <nav id="navBar" class="nav-bar navbar is-fixed-top">
               <div class="navbar-brand">
-                <img id="logo" class="navbar-item" alt="" src="/assets/images/logo.png" width="60px"/>
+                <img id="logo" class="navbar-item" alt="" width="60px"/>
                 <div id="burger" class="navbar-burger js-burger" data-target="menu">
                   <span></span>
                   <span></span>
@@ -41,35 +42,40 @@ export default class NavBar extends Component {
             </nav>
         `);
 
-        this.$element.querySelector('#logo').addEventListener('click', () => {
-            this.#router.navigate('/home');
-        });
+    this.$element.querySelector("#logo").addEventListener("click", () => {
+      this.#router.navigate("/home");
+    });
 
-        this.$element.querySelector('#archivedMonths').addEventListener('click', () => {
-            this.closeMenuDropdown();
-            this.#router.navigate('/admin/archived');
-        });
+    this.$element
+      .querySelector("#archivedMonths")
+      .addEventListener("click", () => {
+        this.closeMenuDropdown();
+        this.#router.navigate("/admin/archived");
+      });
 
-        this.$element.querySelector('#logoutLink').addEventListener('click', () => {
-            this.closeMenuDropdown();
-            logoutHandler();
-        });
+    this.$element.querySelector("#logoutLink").addEventListener("click", () => {
+      this.closeMenuDropdown();
+      logoutHandler();
+    });
 
-        this.#$burger = this.$element.querySelector('#burger');
-        this.#$menu = this.$element.querySelector('#menu');
+    this.#$burger = this.$element.querySelector("#burger");
+    this.#$menu = this.$element.querySelector("#menu");
 
-        this.#$burger.addEventListener('click', () => {
-            this.#$burger.classList.toggle('is-active');
-            this.#$menu.classList.toggle('is-active');
-        });
-    }
+    this.#$burger.addEventListener("click", () => {
+      this.#$burger.classList.toggle("is-active");
+      this.#$menu.classList.toggle("is-active");
+    });
 
-    closeMenuDropdown() {
-        this.#$burger.classList.remove('is-active');
-        this.#$menu.classList.remove('is-active');
-    }
+    const logo = this.$element.querySelector("#logo");
+    logo.src = logoUrl;
+  }
 
-    hideBurger() {
-        this.#$burger.classList.add('is-hidden');
-    }
+  closeMenuDropdown() {
+    this.#$burger.classList.remove("is-active");
+    this.#$menu.classList.remove("is-active");
+  }
+
+  hideBurger() {
+    this.#$burger.classList.add("is-hidden");
+  }
 }

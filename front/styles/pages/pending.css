@@ -1,92 +1,106 @@
 #pending button,
 #pending select,
 #pending .select {
-    width: 100%;
+  width: 100%;
 }
 
 #pending button {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 #pending form#form #pending-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 5px;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: space-between;
 }
 
 #pending form#form .field .control {
-    padding: 5px 5px 10px 5px;
-    border-radius: 15px;
+  padding: 5px 5px 10px 5px;
+  border-radius: 15px;
 }
 
 #pending form#form .field:first-of-type .control:has(.input) {
-    background: #0156D6;
+  background: #0156d6;
 }
 
 #pending form#form #pending-container .field .control:has(.checkbox) {
-    background: red;
-    color: white;
+  background: var(--pending);
+  color: white;
 }
 
-#pending form#form #pending-container .field:has(.control .checkbox input:checked) {
-    opacity: 0.5;
+#pending
+  form#form
+  #pending-container
+  .field:has(.control .checkbox input:checked) {
+  opacity: 0.5;
 }
-#pending form#form #pending-container .field .control label.checkbox:has(input:checked) {
-    text-decoration-line: line-through;
-    -webkit-text-decoration-line: line-through;
-    text-decoration-color: white;
-    -webkit-text-decoration-color: white;
+#pending
+  form#form
+  #pending-container
+  .field
+  .control
+  label.checkbox:has(input:checked) {
+  text-decoration-line: line-through;
+  -webkit-text-decoration-line: line-through;
+  text-decoration-color: white;
+  -webkit-text-decoration-color: white;
 }
 #pending form#form #pending-container .field .control .checkbox {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 5px;
 }
 
 #pending form#form #pending-container .field {
-    width: 30%;
-    margin-bottom: 5px;
+  width: 30%;
+  margin-bottom: 5px;
 }
 
 #pending form#form #pending-container .field .control .checkbox input {
-    display: none;
+  display: none;
 }
 #pending form#form #pending-container .field .control .header-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-#pending form#form #pending-container .field .control .header-container span.week {
-    text-align: left;
-    font-size: 10px;
-    font-weight: bold;
-    background-color: white;
-    color: red;
-    border-radius: 5px;
-    padding: 5px;
+#pending
+  form#form
+  #pending-container
+  .field
+  .control
+  .header-container
+  span.week {
+  text-align: left;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: white;
+  color: var(--pending);
+  border-radius: 5px;
+  padding: 5px;
 }
 #pending form#form #pending-container .field .control .checkbox span.label,
 #pending form#form #pending-container .field .control .checkbox span.amount {
-    text-align: center;
-    color: white;
+  text-align: center;
+  color: white;
 }
 #pending form#form #pending-container .field .control .checkbox span.label {
-    font-size: 10px;
-    display: inline-block;
-    width: 90%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 10px;
+  display: inline-block;
+  width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #pending form#form #pending-container .field .control .checkbox span.amount {
-    font-size: 15px;
+  font-size: 15px;
 }
 
 #pending form#form #pending-container .field .control .checkbox:hover {
-    color: inherit;
+  color: inherit;
 }

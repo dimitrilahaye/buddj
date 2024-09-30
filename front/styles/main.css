@@ -1,14 +1,34 @@
 #app {
-    top: 90px;
-    padding-bottom: 20px;
+  top: 90px;
+  padding-bottom: 20px;
+
+  --info: #5731b3;
+  --outflow: #f942ff;
+  --pending: #822eb3;
+  --warning: #ff42d5;
+  --cancel: #7c46ff;
 }
 
 .title.is-2 {
-    font-size: 1.35rem;
-    margin-bottom: 10px;
+  font-size: 1.35rem;
+  margin-bottom: 10px;
 }
 
 .title.is-3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.button.is-link {
+  background-color: var(--info);
+}
+
+.button.is-warning {
+  background-color: var(--warning);
+  color: white;
+}
+
+.button.is-info.is-light {
+  background-color: var(--cancel);
+  color: white;
 }
