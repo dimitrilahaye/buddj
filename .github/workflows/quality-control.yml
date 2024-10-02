@@ -8,28 +8,7 @@ on:
 
 jobs:
   back_checks:
-    name: Back ~ QC Checks
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Back ~ Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Back ~ Install
-        working-directory: ./back
-        run: npm install
-
-      - name: Back ~ ESLint checks
-        working-directory: ./back
-        run: npm run lint
-
-  back_tests:
-    name: Back ~ Tests Node.js ${{ matrix.node-version }}
-    needs: back_checks
+    name: Back ~ Quality Checks
     runs-on: ubuntu-latest
     container: node:20.18.0-bookworm-slim
 
@@ -47,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Back ~ Use Node.js 20
+      - name: Back ~ Use Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -55,6 +34,10 @@ jobs:
       - name: Back ~ Install
         working-directory: ./back
         run: npm install
+
+      - name: Back ~ ESLint checks
+        working-directory: ./back
+        run: npm run lint
 
       - name: Back ~ Tests
         working-directory: ./back
@@ -77,14 +60,14 @@ jobs:
           TEMPLATE: ${{ secrets.TEMPLATE }}
 
   front_checks:
-    name: Front ~ QC Checks
-    needs: [back_checks, back_tests]
+    name: Front ~ Quality Checks
+    needs: back_checks
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Front ~ Use Node.js 20
+      - name: Front ~ Use Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -97,30 +80,13 @@ jobs:
         working-directory: ./front-v2
         run: npm run lint
 
-  front_tests:
-    name: Front ~ Tests ${{ matrix.node-version }}
-    needs: [back_checks, back_tests, front_checks]
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Front ~ Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Front ~ Install
-        working-directory: ./front-v2
-        run: npm install
-
       - name: Front ~ Tests
         working-directory: ./front-v2
         run: npm run test:headless
 
   back_CD:
     name: Back ~ Deployment
-    needs: [back_checks, back_tests, front_checks, front_tests]
+    needs: [back_checks, front_checks]
     runs-on: ubuntu-latest
 
     steps:
@@ -134,7 +100,7 @@ jobs:
 
   front_CD:
     name: Front ~ Deployment
-    needs: [back_checks, back_tests, front_checks, front_tests, back_CD]
+    needs: [back_checks, front_checks, back_CD]
     runs-on: ubuntu-latest
 
     steps:
