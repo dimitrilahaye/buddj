@@ -76,6 +76,20 @@ jobs:
         working-directory: ./front-v2
         run: npm install
 
+      - name: Front ~ Generate environment.ts
+        working-directory: ./front-v2
+        run: |
+          cp src/environments/environment.template.ts src/environments/environment.ts
+          sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.ts
+          sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.ts
+
+      - name: Front ~ Generate environment.production.ts
+        working-directory: ./front-v2
+        run: |
+          cp src/environments/environment.template.ts src/environments/environment.production.ts
+          sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.production.ts
+          sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.production.ts
+
       - name: Back ~ ESLint checks
         working-directory: ./front-v2
         run: npm run lint

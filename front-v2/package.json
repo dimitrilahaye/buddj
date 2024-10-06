@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 5174",
+    "start": "ng serve --port 5173",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "build": "ng build && npm run storybook:build",
@@ -25,6 +25,8 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "@angular/service-worker": "^18.2.0",
+    "@use-gesture/vanilla": "10.3.1",
+    "ngxtension": "4.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
