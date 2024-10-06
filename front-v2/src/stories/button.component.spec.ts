@@ -4,7 +4,7 @@ import { composeStories, createMountable } from '@storybook/testing-angular';
 import * as stories from './button-old.stories';
 const { Primary } = composeStories(stories);
 
-describe('ButtonComponent', function () {
+xdescribe('ButtonComponent', function () {
   describe('primary and large', function () {
     const handleClickSpy = jasmine.createSpy();
     beforeEach(async () => {

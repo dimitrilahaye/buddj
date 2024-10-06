@@ -42,3 +42,5 @@ testem.log
 Thumbs.db
 
 *storybook.log
+src/environments/environment.ts
+src/environments/environment.production.ts

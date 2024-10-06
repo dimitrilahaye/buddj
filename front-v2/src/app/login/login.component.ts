@@ -1,5 +1,9 @@
-import { Component, output } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { DesignSystemModule } from '../design-system/design-system.module';
+import {
+  AUTHENTICATION_SERVICE,
+  AuthenticationServiceInterface,
+} from '../services/authentication/authentication.interface';
 
 @Component({
   selector: 'app-login',
@@ -9,9 +13,12 @@ import { DesignSystemModule } from '../design-system/design-system.module';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-  login = output();
+  constructor(
+    @Inject(AUTHENTICATION_SERVICE)
+    private authenticationService: AuthenticationServiceInterface
+  ) {}
 
   onLogin() {
-    this.login.emit();
+    this.authenticationService.login();
   }
 }
