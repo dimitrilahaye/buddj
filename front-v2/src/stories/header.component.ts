@@ -1,13 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ButtonComponent } from './button.component';
+import { ButtonOldComponent } from './button-old.component';
 import type { User } from './user';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule, ButtonOldComponent],
   template: `<header>
     <div class="storybook-header">
       <div>
@@ -40,29 +40,29 @@ import type { User } from './user';
             Welcome, <b>{{ user.name }}</b
             >!
           </span>
-          <app-button
+          <app-old-button
             *ngIf="user"
             size="small"
             (onClick)="onLogout.emit($event)"
             label="Log out"
-          ></app-button>
+          ></app-old-button>
         </div>
         <div *ngIf="!user">
-          <app-button
+          <app-old-button
             *ngIf="!user"
             size="small"
             class="margin-left"
             (onClick)="onLogin.emit($event)"
             label="Log in"
-          ></app-button>
-          <app-button
+          ></app-old-button>
+          <app-old-button
             *ngIf="!user"
             size="small"
             [primary]="true"
             class="margin-left"
             (onClick)="onCreateAccount.emit($event)"
             label="Sign up"
-          ></app-button>
+          ></app-old-button>
         </div>
       </div>
     </div>
