@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/angular';
 import { composeStories, createMountable } from '@storybook/testing-angular';
 
-import * as stories from './button.stories';
+import * as stories from './button-old.stories';
 const { Primary } = composeStories(stories);
 
 describe('ButtonComponent', function () {

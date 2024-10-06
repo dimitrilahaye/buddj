@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-button',
+  selector: 'app-old-button',
   standalone: true,
   imports: [CommonModule],
   template: ` <button
@@ -15,7 +15,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   </button>`,
   styleUrls: ['./button.css'],
 })
-export class ButtonComponent {
+export class ButtonOldComponent {
   /** Is this the principal call to action on the page? */
   @Input()
   primary = false;
