@@ -30,7 +30,7 @@ jobs:
   back_tests:
     name: Back ~ Tests Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
-    container: node:20.17.0-bookworm-slim
+    container: node:20.18.0-bookworm-slim
 
     services:
       postgres:
