@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/angular';
 import { LoginComponent } from './login.component';
-import { AUTHENTICATION_SERVICE } from '../services/authentication/authentication.interface';
+import { AUTHENTICATION_SERVICE } from '../services/authentication/authentication.service.interface';
 import { TestBed } from '@angular/core/testing';
 import { AuthenticationService } from '../services/authentication/authentication.service';
 

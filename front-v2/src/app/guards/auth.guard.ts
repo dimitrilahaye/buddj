@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import {
   AUTHENTICATION_SERVICE,
   AuthenticationServiceInterface,
-} from '../services/authentication/authentication.interface';
+} from '../services/authentication/authentication.service.interface';
 import { catchError, map, Observable, of } from 'rxjs';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
