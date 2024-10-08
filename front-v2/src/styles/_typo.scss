@@ -1,4 +1,15 @@
+%font {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+}
 %title-3 {
+  @extend %font;
+
   font-size: var(--title-3);
   font-weight: bold;
+}
+%text-5 {
+  @extend %font;
+
+  font-size: var(--text-5);
 }
