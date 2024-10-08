@@ -37,8 +37,6 @@
     border-radius: 50%;
     border: 10px solid white;
     background: var(--color-950);
-    color: white;
-    font-size: 40px;
   }
 }
 
@@ -57,5 +55,70 @@
 .menu-footer-icons-icon {
   &__label {
     @extend %text-5;
+  }
+}
+
+.menu-footer-add {
+  &__link {
+    &--fade-in-up {
+      opacity: 0;
+      animation: fadeInUp 0.2s ease-out forwards;
+    }
+
+    position: absolute;
+    top: -50px;
+    background: var(--color-950);
+    right: 0px;
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    padding: 10px;
+    gap: 10px;
+    text-wrap: nowrap;
+    align-items: center;
+    color: white;
+    border: none;
+    border-radius: 15px;
+  }
+
+  &__plus {
+    &--rotate {
+      animation: plusRotation 0.2s linear forwards;
+      animation-iteration-count: 1;
+    }
+
+    background: none;
+    border: none;
+    color: white;
+    font-size: 40px;
+  }
+}
+
+.menu-footer-add-link {
+  &__icon {
+    font-size: 20px;
+  }
+  &__label {
+    @extend %text-10;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes plusRotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(45deg);
   }
 }
