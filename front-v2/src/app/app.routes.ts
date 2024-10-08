@@ -3,6 +3,7 @@ import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 import { authGuard } from './guards/auth.guard';
 import { MonthCreationComponent } from './month-creation/month-creation.component';
+import { monthTemplateResolver } from './resolvers/month-template.resolver';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -12,5 +13,8 @@ export const routes: Routes = [
     path: 'month-creation',
     component: MonthCreationComponent,
     canActivate: [authGuard],
+    resolve: {
+      template: monthTemplateResolver,
+    },
   },
 ];

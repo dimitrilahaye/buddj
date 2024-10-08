@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-export type User = {
-  name: string;
+export type Response<T> = {
+  success: boolean;
+  data: T;
 };

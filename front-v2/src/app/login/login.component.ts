@@ -3,7 +3,7 @@ import { DesignSystemModule } from '../design-system/design-system.module';
 import {
   AUTHENTICATION_SERVICE,
   AuthenticationServiceInterface,
-} from '../services/authentication/authentication.interface';
+} from '../services/authentication/authentication.service.interface';
 
 @Component({
   selector: 'app-login',
