@@ -9,7 +9,7 @@ import { authGuard } from './guards/auth.guard';
 import { AuthenticationService } from './services/authentication/authentication.service';
 import { routes } from './app.routes';
 import { HttpClient, HttpHandler } from '@angular/common/http';
-import { AUTHENTICATION_SERVICE } from './services/authentication/authentication.interface';
+import { AUTHENTICATION_SERVICE } from './services/authentication/authentication.service.interface';
 import { Observable, of } from 'rxjs';
 
 describe('Router Navigation with authGuard', () => {
