@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './components/login/login.component';
+import { HomeComponent } from './components/home/home.component';
 import { authGuard } from './guards/auth.guard';
-import { MonthCreationComponent } from './month-creation/month-creation.component';
+import { MonthCreationComponent } from './components/month-creation/month-creation.component';
 import { monthTemplateResolver } from './resolvers/month-template.resolver';
 
 export const routes: Routes = [
