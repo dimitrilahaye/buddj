@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
+import { ReactiveFormsModule } from '@angular/forms';
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -18,6 +19,7 @@ import { httpRequestsInterceptor } from './interceptors/http-requests.intercepto
 export const appConfig: ApplicationConfig = {
   providers: [
     BrowserModule,
+    ReactiveFormsModule,
     provideHttpClient(withInterceptors([httpRequestsInterceptor])),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
