@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthenticationServiceInterface } from './authentication.interface';
+import { AuthenticationServiceInterface } from './authentication.service.interface';
 import { environment } from '../../../environments/environment';
 import { catchError, map, Observable, of } from 'rxjs';
 
@@ -8,11 +8,9 @@ import { catchError, map, Observable, of } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthenticationService implements AuthenticationServiceInterface {
-  private cookieName: string;
   private apiUrl: string;
 
   constructor(private http: HttpClient) {
-    this.cookieName = environment.cookieName;
     this.apiUrl = environment.apiUrl;
   }
 
@@ -21,19 +19,11 @@ export class AuthenticationService implements AuthenticationServiceInterface {
   }
 
   isAuthenticated(): Observable<boolean> {
-    return this.http
-      .get<boolean>(`${this.apiUrl}/me`, {
-        withCredentials: true,
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
+    return this.http.get<boolean>(`${this.apiUrl}/me`).pipe(
+      map((user) => !!user),
+      catchError(() => {
+        return of(false);
       })
-      .pipe(
-        map((user) => !!user),
-        catchError(() => {
-          return of(false);
-        })
-      );
+    );
   }
 }
