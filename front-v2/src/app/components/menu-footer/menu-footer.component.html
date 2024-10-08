@@ -14,6 +14,25 @@
     </span>
   </div>
   <div class="menu-footer__add">
-    <i class="fa-solid fa-plus"></i>
+    @if(plusOpen) {
+    <button
+      class="menu-footer-add__link"
+      [ngClass]="{ 'menu-footer-add__link--fade-in-up': plusOpen }"
+      (click)="navigateToMonthCreation()"
+      type="button"
+    >
+      <i class="menu-footer-add-link__icon fa-solid fa-calendar-plus"></i>
+      <span class="menu-footer-add-link__label">Créer un nouveau mois</span>
+    </button>
+    }
+    <button
+      (click)="openPlus()"
+      class="menu-footer-add__plus"
+      [ngClass]="{ 'menu-footer-add__plus--rotate': plusOpen }"
+      type="button"
+      aria-label="Afficher le menu de création"
+    >
+      <i class="fa-solid fa-plus"></i>
+    </button>
   </div>
 </div>
