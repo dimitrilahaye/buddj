@@ -78,7 +78,7 @@
     align-items: center;
     color: white;
     border: none;
-    border-radius: 15px;
+    border-radius: var(--radius-50);
   }
 
   &__plus {

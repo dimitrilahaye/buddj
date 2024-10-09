@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MonthTemplate } from '../../models/monthTemplate.model';
-import { Month, Outflow } from '../../models/month.model';
+import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
 import {
   FormArray,
   FormBuilder,
@@ -25,8 +25,10 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
 export class MonthCreationComponent implements OnInit {
   form!: FormGroup;
   template: MonthTemplate | null = null;
-  isOpen = false;
+  isOutflowsModalOpen = false;
+  isWeeklyBudgetsModalOpen = false;
   selectedOutflowIndex: number | null = null;
+  selectedWeeklyBudgetIndex: number | null = null;
 
   newMonth: Month = {
     month: new Date(),
@@ -55,11 +57,19 @@ export class MonthCreationComponent implements OnInit {
           [Validators.required, amountValidator()],
         ],
         outflows: this.fb.array([]),
+        weeklyBudgets: this.fb.array([]),
       });
 
       this.newMonth.outflows.forEach((outflow) => this.addOutflow(outflow));
+      this.newMonth.weeklyBudgets.forEach((weeklyBudget) =>
+        this.addWeeklyBudgets(weeklyBudget)
+      );
     });
   }
+
+  /*
+  ################ Outflows managment ################
+  */
 
   addOutflow(outflow: Outflow) {
     const outflowGroup = this.fb.group({
@@ -73,15 +83,15 @@ export class MonthCreationComponent implements OnInit {
     return this.form.get('outflows') as FormArray;
   }
 
-  openModal(index: number) {
+  openOutflowsModal(index: number) {
     setTimeout(() => {
-      this.isOpen = true;
+      this.isOutflowsModalOpen = true;
     }, 0);
     this.selectedOutflowIndex = index;
   }
 
-  closeModal() {
-    this.isOpen = false;
+  closeOutflowsModal() {
+    this.isOutflowsModalOpen = false;
   }
 
   submitOutflowModal(event: Event) {
@@ -93,18 +103,66 @@ export class MonthCreationComponent implements OnInit {
         outflowsArray.at(this.selectedOutflowIndex)?.value
       );
     }
-    this.closeModal();
+    this.closeOutflowsModal();
   }
 
   deleteOutflow() {
     if (this.selectedOutflowIndex !== null) {
       this.outflows.removeAt(this.selectedOutflowIndex);
-      this.closeModal();
+      this.closeOutflowsModal();
     }
   }
 
   get outflowsFormGroup() {
     return this.outflows.at(this.selectedOutflowIndex!) as FormGroup;
+  }
+
+  /*
+  ################ Weekly budgets managment ################
+  */
+
+  addWeeklyBudgets(weeklyBudget: WeeklyBudget) {
+    const weeklyBudgetGroup = this.fb.group({
+      name: [{ value: weeklyBudget.name, disabled: true }, Validators.required],
+      initialBalance: [
+        weeklyBudget.initialBalance,
+        [Validators.required, amountValidator()],
+      ],
+    });
+    this.weeklyBudgets.push(weeklyBudgetGroup);
+  }
+
+  get weeklyBudgets(): FormArray {
+    return this.form.get('weeklyBudgets') as FormArray;
+  }
+
+  openWeeklyBudgetsModal(index: number) {
+    setTimeout(() => {
+      this.isWeeklyBudgetsModalOpen = true;
+    }, 0);
+    this.selectedWeeklyBudgetIndex = index;
+  }
+
+  closeWeeklyBudgetsModal() {
+    this.isWeeklyBudgetsModalOpen = false;
+  }
+
+  submitWeeklyBudgetModal(event: Event) {
+    event.preventDefault();
+    if (this.selectedWeeklyBudgetIndex !== null && this.form.valid) {
+      const updatedWeeklyBudget = this.weeklyBudgets.at(
+        this.selectedWeeklyBudgetIndex
+      );
+      const weeklyBudgetsArray = this.form.get('weeklyBudgets') as FormArray;
+      updatedWeeklyBudget.patchValue(
+        weeklyBudgetsArray.at(this.selectedWeeklyBudgetIndex)?.value
+      );
+    }
+    this.closeWeeklyBudgetsModal();
+  }
+
+  get weeklyBudgetsFormGroup() {
+    return this.weeklyBudgets.at(this.selectedWeeklyBudgetIndex!) as FormGroup;
   }
 
   onSubmit() {

@@ -23,6 +23,7 @@ export class TextComponent implements ControlValueAccessor {
   required = input(true);
   placeholder = input('');
   formControlName = input('');
+  disabled = false;
 
   private _value: string | null = null;
 
@@ -58,6 +59,10 @@ export class TextComponent implements ControlValueAccessor {
 
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 
   get hasError(): boolean {
