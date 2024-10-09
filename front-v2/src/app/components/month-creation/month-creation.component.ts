@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MonthTemplate } from '../../models/monthTemplate.model';
-import { Month } from '../../models/month.model';
+import { Month, Outflow } from '../../models/month.model';
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -24,8 +25,9 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
 export class MonthCreationComponent implements OnInit {
   form!: FormGroup;
   template: MonthTemplate | null = null;
+  isOpen = false;
+  selectedOutflowIndex: number | null = null;
 
-  currentStep = 1;
   newMonth: Month = {
     month: new Date(),
     startingBalance: 0,
@@ -37,13 +39,12 @@ export class MonthCreationComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
-      // get the template and set model
       this.template = data['template'];
       this.newMonth.month = new Date(this.template!.month);
       this.newMonth.startingBalance = this.template!.startingBalance;
       this.newMonth.weeklyBudgets = this.template!.weeklyBudgets;
       this.newMonth.outflows = this.template!.outflows;
-      // build form
+
       this.form = this.fb.group({
         month: [
           dateUtils.formatToYYYYMM(this.newMonth.month),
@@ -53,20 +54,57 @@ export class MonthCreationComponent implements OnInit {
           this.newMonth.startingBalance,
           [Validators.required, amountValidator()],
         ],
+        outflows: this.fb.array([]),
       });
+
+      this.newMonth.outflows.forEach((outflow) => this.addOutflow(outflow));
     });
   }
 
-  nextStep() {
-    if (this.currentStep < 3) {
-      this.currentStep++;
+  addOutflow(outflow: Outflow) {
+    const outflowGroup = this.fb.group({
+      label: [outflow.label, Validators.required],
+      amount: [outflow.amount, [Validators.required, amountValidator()]],
+    });
+    this.outflows.push(outflowGroup);
+  }
+
+  get outflows(): FormArray {
+    return this.form.get('outflows') as FormArray;
+  }
+
+  openModal(index: number) {
+    setTimeout(() => {
+      this.isOpen = true;
+    }, 0);
+    this.selectedOutflowIndex = index;
+  }
+
+  closeModal() {
+    this.isOpen = false;
+  }
+
+  submitOutflowModal(event: Event) {
+    event.preventDefault();
+    if (this.selectedOutflowIndex !== null && this.form.valid) {
+      const updatedOutflow = this.outflows.at(this.selectedOutflowIndex);
+      const outflowsArray = this.form.get('outflows') as FormArray;
+      updatedOutflow.patchValue(
+        outflowsArray.at(this.selectedOutflowIndex)?.value
+      );
+    }
+    this.closeModal();
+  }
+
+  deleteOutflow() {
+    if (this.selectedOutflowIndex !== null) {
+      this.outflows.removeAt(this.selectedOutflowIndex);
+      this.closeModal();
     }
   }
 
-  prevStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
+  get outflowsFormGroup() {
+    return this.outflows.at(this.selectedOutflowIndex!) as FormGroup;
   }
 
   onSubmit() {

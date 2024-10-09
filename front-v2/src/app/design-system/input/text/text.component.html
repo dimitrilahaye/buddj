@@ -1,0 +1,15 @@
+<div class="input-text">
+  <input
+    class="input-text__input"
+    type="text"
+    [required]="required()"
+    [placeholder]="placeholder()"
+    [value]="value"
+    (input)="onInput($event)"
+  />
+  @if(hasError) {
+  <div class="input-text__error-message">
+    {{ placeholder() }} est requis et doit être une chaîne valide.
+  </div>
+  }
+</div>
