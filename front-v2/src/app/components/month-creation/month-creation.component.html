@@ -1,11 +1,9 @@
-<p>month-creation works!</p>
-
 @if(form !== undefined) {
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<form class="month-creation" [formGroup]="form" (ngSubmit)="onSubmit()">
   <!-- 
     ##################### STEP 1 #####################
      -->
-  <div>
+  <div class="month-creation__step month-creation__step--step1">
     <!-- month date -->
     <app-input-month
       [formGroup]="form"
@@ -26,8 +24,79 @@
   <!-- 
   ##################### STEP 2 #####################
    -->
-  <div></div>
+  <div
+    class="month-creation__step month-creation__step--step2"
+    formArrayName="outflows"
+  >
+    <app-item
+      *ngFor="let outflow of outflows.controls; let i = index"
+      [formGroupName]="i"
+    >
+      <div class="month-creation-item">
+        <span class="month-creation-item__icon">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+        <div class="month-creation-item__info">
+          <span class="month-creation-item-info__label">{{
+            outflow.get("label")?.value
+          }}</span>
+          <span class="month-creation-item-info__amount"
+            >{{ outflow.get("amount")?.value }}€</span
+          >
+        </div>
 
-  <button type="submit">Soumettre</button>
+        <button
+          class="month-creation-item__edit"
+          type="button"
+          (click)="openModal(i)"
+        >
+          <i class="fa-solid fa-pen-fancy"></i>
+        </button>
+      </div>
+    </app-item>
+  </div>
+
+  <div class="month-creation__footer">
+    <app-button
+      [type]="'submit'"
+      [size]="'big'"
+      [label]="'Créer le nouveau mois'"
+    ></app-button>
+  </div>
 </form>
+} @if(outflowsFormGroup !== undefined) {
+<app-sliding-modal [isOpen]="isOpen" (close)="closeModal()">
+  <form [formGroup]="outflowsFormGroup" (ngSubmit)="submitOutflowModal($event)">
+    <div class="modal-container">
+      <!-- label -->
+      <app-input-text
+        [formGroup]="outflowsFormGroup"
+        formControlName="label"
+        [required]="true"
+      ></app-input-text>
+
+      <!-- amount -->
+      <app-input-number
+        [formGroup]="outflowsFormGroup"
+        formControlName="amount"
+        [required]="true"
+        [step]="'0.01'"
+      ></app-input-number>
+
+      <div class="modal-container__actions">
+        <app-button
+          class="login-page__login-button"
+          [label]="'Supprimer'"
+          [variant]="'danger'"
+          (click)="deleteOutflow()"
+        ></app-button>
+        <app-button
+          class="login-page__login-button"
+          [type]="'submit'"
+          [label]="'Modifier'"
+        ></app-button>
+      </div>
+    </div>
+  </form>
+</app-sliding-modal>
 }

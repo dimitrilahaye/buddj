@@ -8,9 +8,16 @@ import { Component, input, output } from '@angular/core';
 })
 export class ButtonComponent {
   label = input.required<string>();
-  login = output();
+  type = input<string>('button');
+  size = input<'big' | 'middle'>('middle');
+  variant = input<'default' | 'danger'>('default');
+  click = output();
 
-  onLogin() {
-    this.login.emit();
+  get className() {
+    return `button button--${this.size()} button--${this.variant()}`;
+  }
+
+  onClick() {
+    this.click.emit();
   }
 }
