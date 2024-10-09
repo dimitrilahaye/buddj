@@ -32,5 +32,6 @@
     @extend %title-3;
 
     color: var(--color-50);
+    text-wrap: nowrap;
   }
 }

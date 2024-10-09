@@ -93,11 +93,23 @@
   </div>
 
   <div class="month-creation__footer">
-    <app-button
-      [type]="'submit'"
-      [size]="'big'"
-      [label]="'Créer le nouveau mois'"
-    ></app-button>
+    <span class="month-creation-footer__forecast-balance"
+      >Solde prévisionnel : {{ forecastBalance }}€</span
+    >
+    <div class="month-creation-footer__actions">
+      <app-button
+        [type]="'submit'"
+        [size]="'big'"
+        [variant]="'danger'"
+        [label]="'Réinitialiser'"
+        (click)="resetForm()"
+      ></app-button>
+      <app-button
+        [type]="'submit'"
+        [size]="'big'"
+        [label]="'Créer'"
+      ></app-button>
+    </div>
   </div>
 </form>
 }
