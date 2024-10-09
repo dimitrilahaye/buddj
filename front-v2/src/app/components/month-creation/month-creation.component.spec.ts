@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MonthCreationComponent } from './month-creation.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import { ReactiveFormsModule } from '@angular/forms';
 
 describe('MonthCreationComponent', () => {
   let component: MonthCreationComponent;
@@ -10,13 +11,15 @@ describe('MonthCreationComponent', () => {
 
   const activatedRouteStub = {
     data: of({
-      template: {},
+      template: {
+        month: new Date(),
+      },
     }),
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MonthCreationComponent],
+      imports: [MonthCreationComponent, ReactiveFormsModule],
       providers: [{ provide: ActivatedRoute, useValue: activatedRouteStub }],
     }).compileComponents();
 
