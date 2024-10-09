@@ -3,18 +3,18 @@ import { render, screen } from '@testing-library/angular';
 
 describe('ButtonComponent', () => {
   it('should call login output on click', async () => {
-    const loginSpy = jasmine.createSpy();
+    const clickSpy = jasmine.createSpy();
     await render(ButtonComponent, {
       inputs: {
         label: 'My button',
       },
       on: {
-        login: loginSpy,
+        click: clickSpy,
       },
     });
 
     const button = screen.getByRole('button', { name: 'My button' });
     button.click();
-    expect(loginSpy).toHaveBeenCalled();
+    expect(clickSpy).toHaveBeenCalled();
   });
 });
