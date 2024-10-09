@@ -1,17 +1,16 @@
 .month-creation {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
   &__step {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 20px;
 
     &--step1 {
       flex-direction: row;
-    }
-
-    &--step2 {
-      padding-bottom: 20px;
     }
 
     &--step3 {
