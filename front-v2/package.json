@@ -6,14 +6,12 @@
     "start": "ng serve --port 5173",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
-    "build:dev": "ng build --configuration development && npm run storybook:build",
-    "build": "ng build && npm run storybook:build",
+    "build:dev": "ng build --configuration development",
+    "build": "ng build  --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --browsers=Chrome",
     "test:headless": "ng test --watch=false --browsers=ChromeHeadless",
-    "build:prod": "ng build --configuration production --base-href https://buddj.app/",
-    "storybook": "ng run front-v2:storybook",
-    "storybook:build": "ng run front-v2:build-storybook"
+    "build:prod": "ng build --configuration production --base-href https://buddj.app/"
   },
   "private": true,
   "dependencies": {
@@ -38,17 +36,7 @@
     "@angular-devkit/build-angular": "^18.2.6",
     "@angular/cli": "^18.2.6",
     "@angular/compiler-cli": "^18.2.0",
-    "@chromatic-com/storybook": "^1.9.0",
     "@compodoc/compodoc": "^1.1.25",
-    "@storybook/addon-docs": "^8.3.4",
-    "@storybook/addon-essentials": "^8.3.4",
-    "@storybook/addon-interactions": "^8.3.4",
-    "@storybook/addon-links": "^8.3.4",
-    "@storybook/addon-onboarding": "^8.3.4",
-    "@storybook/angular": "^8.3.4",
-    "@storybook/blocks": "^8.3.4",
-    "@storybook/test": "^8.3.4",
-    "@storybook/testing-angular": "^1.0.3",
     "@testing-library/angular": "^17.3.1",
     "@testing-library/dom": "^10.0.0",
     "@testing-library/jest-dom": "^6.4.8",
@@ -56,20 +44,13 @@
     "@types/jasmine": "~5.1.0",
     "angular-eslint": "18.3.1",
     "eslint": "^9.9.1",
-    "eslint-plugin-storybook": "^0.9.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "storybook": "^8.3.4",
     "typescript": "~5.5.2",
     "typescript-eslint": "8.2.0"
-  },
-  "eslintConfig": {
-    "extends": [
-      "plugin:storybook/recommended"
-    ]
   }
 }

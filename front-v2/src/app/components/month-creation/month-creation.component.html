@@ -1,5 +1,33 @@
 <p>month-creation works!</p>
 
-@if(template !== null) {
-{{ template.month }}
+@if(form !== undefined) {
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <!-- 
+    ##################### STEP 1 #####################
+     -->
+  <div>
+    <!-- month date -->
+    <app-input-month
+      [formGroup]="form"
+      formControlName="month"
+      [required]="true"
+      [placeholder]="'Mois'"
+      [min]="(newMonth.month | date : 'yyyy-MM') || ''"
+    ></app-input-month>
+    <!-- month starting balance -->
+    <app-input-number
+      [formGroup]="form"
+      formControlName="startingBalance"
+      [required]="true"
+      [placeholder]="'Solde initial'"
+      [step]="'0.01'"
+    ></app-input-number>
+  </div>
+  <!-- 
+  ##################### STEP 2 #####################
+   -->
+  <div></div>
+
+  <button type="submit">Soumettre</button>
+</form>
 }
