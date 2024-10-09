@@ -67,6 +67,36 @@ export class MonthCreationComponent implements OnInit {
     });
   }
 
+  get forecastBalance() {
+    const totalOutflows = (this.form.value as Month).outflows.reduce(
+      (total, { amount }) => {
+        return total + amount;
+      },
+      0
+    );
+    const totalWeeklyBudgets = (this.form.value as Month).weeklyBudgets.reduce(
+      (total, { initialBalance }) => {
+        return total + initialBalance;
+      },
+      0
+    );
+
+    const forecastBalance =
+      (this.form.value as Month).startingBalance -
+      (totalOutflows + totalWeeklyBudgets);
+
+    return forecastBalance.toFixed(2);
+  }
+
+  resetForm() {
+    this.form.reset({
+      month: dateUtils.formatToYYYYMM(this.newMonth.month),
+      startingBalance: this.newMonth.startingBalance,
+      outflows: this.newMonth.outflows,
+      weeklyBudgets: this.newMonth.weeklyBudgets,
+    });
+  }
+
   /*
   ################ Outflows managment ################
   */
