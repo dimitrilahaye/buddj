@@ -1,4 +1,6 @@
-@if(form !== undefined) {
+@if(!dataLoaded) {
+<app-loader></app-loader>
+} @if(dataLoaded && form) {
 <form class="month-creation" [formGroup]="form" (ngSubmit)="onSubmit()">
   <!-- 
     ##################### STEP 1 #####################
