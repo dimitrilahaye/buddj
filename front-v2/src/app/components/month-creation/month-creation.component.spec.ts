@@ -4,8 +4,9 @@ import { MonthCreationComponent } from './month-creation.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MONTHS_SERVICE_SERVICE } from '../../services/months/months.service.interface';
+import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
 import { Renderer2 } from '@angular/core';
+import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
 
 describe('MonthCreationComponent', () => {
   let component: MonthCreationComponent;
@@ -24,7 +25,11 @@ describe('MonthCreationComponent', () => {
       imports: [MonthCreationComponent, ReactiveFormsModule],
       providers: [
         { provide: ActivatedRoute, useValue: activatedRouteStub },
-        { provide: MONTHS_SERVICE_SERVICE, useValue: {} },
+        { provide: MONTHS_SERVICE, useValue: {} },
+        {
+          provide: MONTHLY_BUDGETS_STORE,
+          useValue: {},
+        },
         Router,
         FormBuilder,
         Renderer2,

@@ -6,7 +6,5 @@ export default interface MonthTemplatesServiceInterface {
   getTemplate(): Observable<MonthTemplate>;
 }
 
-export const MONTH_TEMPLATES_SERVICE_SERVICE =
-  new InjectionToken<MonthTemplatesServiceInterface>(
-    'MONTH_TEMPLATES_SERVICE_SERVICE'
-  );
+export const MONTH_TEMPLATES_SERVICE =
+  new InjectionToken<MonthTemplatesServiceInterface>('MONTH_TEMPLATES_SERVICE');
