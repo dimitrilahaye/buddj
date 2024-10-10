@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MonthTemplate } from '../../models/monthTemplate.model';
 import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
 import {
@@ -38,7 +38,11 @@ export class MonthCreationComponent implements OnInit {
     outflows: [],
   };
 
-  constructor(private route: ActivatedRoute, private fb: FormBuilder) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
@@ -68,6 +72,10 @@ export class MonthCreationComponent implements OnInit {
 
       this.dataLoaded = true;
     });
+  }
+
+  backToHome() {
+    this.router.navigate(['home']);
   }
 
   get forecastBalance() {
