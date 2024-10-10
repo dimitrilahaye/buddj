@@ -1,0 +1,45 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  border: none;
+  border-radius: var(--radius-50);
+  padding: 0 15px;
+  box-sizing: border-box;
+
+  &:disabled {
+    background-color: var(--color-200);
+  }
+
+  &--middle {
+    height: 35px;
+  }
+
+  &--big {
+    height: 55px;
+  }
+
+  &--default {
+    background-color: var(--color-500);
+  }
+
+  &--danger {
+    background-color: var(--color-950);
+  }
+
+  &__label {
+    @extend %title-3;
+
+    color: var(--color-50);
+    text-wrap: nowrap;
+  }
+
+  &__loader {
+    color: var(--color-50);
+  }
+}

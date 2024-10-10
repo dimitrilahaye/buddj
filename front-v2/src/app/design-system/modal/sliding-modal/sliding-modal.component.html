@@ -1,0 +1,12 @@
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<div class="sliding-modal" [ngClass]="{ 'sliding-modal--active': isOpen }">
+  <div class="sliding-modal__backdrop" (click)="closeModal()"></div>
+  <div
+    class="sliding-modal__modal"
+    (click)="$event.stopPropagation()"
+    [ngClass]="{ 'sliding-modal__modal--visible': isOpen }"
+  >
+    <ng-content></ng-content>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<div class="input-month">
+  <input
+    class="input-month__input"
+    type="month"
+    [required]="required()"
+    [placeholder]="placeholder()"
+    [value]="value"
+    [min]="min() || ''"
+    (input)="onInput($event)"
+  />
+  @if(hasError) {
+  <div class="input-month__error-message">
+    {{ placeholder() }} est requis et doit être un mois valide.
+  </div>
+  }
+</div>

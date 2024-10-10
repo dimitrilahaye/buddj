@@ -1,0 +1,16 @@
+<div class="input-number">
+  <input
+    class="input-number__input"
+    type="number"
+    [required]="required()"
+    [placeholder]="placeholder()"
+    [step]="step()"
+    [value]="value"
+    (input)="onInput($event)"
+  />
+  @if(hasError) {
+  <div class="input-number__error-message">
+    {{ placeholder() }} est requis et doit être un nombre valide.
+  </div>
+  }
+</div>

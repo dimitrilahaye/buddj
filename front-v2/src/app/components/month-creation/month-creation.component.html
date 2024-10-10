@@ -1,0 +1,219 @@
+@if(!dataLoaded) {
+<app-loader></app-loader>
+} @if(dataLoaded && form) {
+<div class="header">
+  <button type="button" (click)="backToHome()">
+    <i class="fa-solid fa-circle-xmark"></i>
+  </button>
+</div>
+<form class="month-creation" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <!-- 
+    ##################### STEP 1 #####################
+     -->
+  <div class="month-creation__step month-creation__step--step1">
+    <!-- month date -->
+    <app-input-month
+      [formGroup]="form"
+      formControlName="month"
+      [required]="true"
+      [placeholder]="'Mois'"
+      [min]="(newMonth.month | date : 'yyyy-MM') || ''"
+    ></app-input-month>
+    <!-- month starting balance -->
+    <app-input-number
+      [formGroup]="form"
+      formControlName="startingBalance"
+      [required]="true"
+      [placeholder]="'Solde initial'"
+      [step]="'0.01'"
+    ></app-input-number>
+  </div>
+
+  <app-divider></app-divider>
+
+  <!-- 
+  ##################### STEP 2 #####################
+   -->
+  <div
+    #outflowsContainer
+    class="month-creation__step month-creation__step--step2"
+    formArrayName="outflows"
+  >
+    <div #addNewOutflowButton class="month-creation-step__add-outflow">
+      <app-button
+        (click)="addNewOutflow($event)"
+        [size]="'big'"
+        [label]="'Ajouter une sortie mensuelle'"
+      ></app-button>
+    </div>
+    <app-item
+      *ngFor="let outflow of outflows.controls; let i = index"
+      [formGroupName]="i"
+    >
+      <div class="month-creation-item">
+        <span class="month-creation-item__icon">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+        <div class="month-creation-item__info">
+          <span class="month-creation-item-info__label">{{
+            outflow.get("label")?.value
+          }}</span>
+          <span class="month-creation-item-info__amount"
+            >{{ outflow.get("amount")?.value }}€</span
+          >
+        </div>
+
+        <button
+          class="month-creation-item__edit"
+          type="button"
+          (click)="openOutflowsModal(i, $event)"
+        >
+          <i class="fa-solid fa-pen-fancy"></i>
+        </button>
+      </div>
+    </app-item>
+  </div>
+
+  <app-divider></app-divider>
+
+  <!-- 
+  ##################### STEP 3 #####################
+   -->
+
+  <div
+    class="month-creation__step month-creation__step--step3"
+    formArrayName="weeklyBudgets"
+  >
+    <app-item
+      *ngFor="let weeklyBudget of weeklyBudgets.controls; let i = index"
+      [formGroupName]="i"
+    >
+      <div class="month-creation-item">
+        <span class="month-creation-item__icon">
+          <i class="fa-solid fa-basket-shopping"></i>
+        </span>
+        <div class="month-creation-item__info">
+          <span class="month-creation-item-info__label">{{
+            weeklyBudget.get("name")?.value
+          }}</span>
+          <span class="month-creation-item-info__amount"
+            >{{ weeklyBudget.get("initialBalance")?.value }}€</span
+          >
+        </div>
+
+        <button
+          class="month-creation-item__edit"
+          type="button"
+          (click)="openWeeklyBudgetsModal(i, $event)"
+        >
+          <i class="fa-solid fa-pen-fancy"></i>
+        </button>
+      </div>
+    </app-item>
+  </div>
+
+  <div class="month-creation__footer">
+    <span class="month-creation-footer__forecast-balance"
+      >Solde prévisionnel : <strong>{{ forecastBalance }}€</strong></span
+    >
+    <div class="month-creation-footer__actions">
+      <app-button
+        [size]="'big'"
+        [variant]="'danger'"
+        [label]="'Réinitialiser'"
+        (click)="resetForm($event)"
+      ></app-button>
+      <app-button
+        [type]="'submit'"
+        [size]="'big'"
+        [label]="'Créer'"
+      ></app-button>
+    </div>
+  </div>
+</form>
+}
+
+<!-- 
+  ##################### Modal outflows (step 2) #####################
+   -->
+
+@if(outflowsFormGroup !== undefined) {
+<app-sliding-modal
+  [isOpen]="isOutflowsModalOpen"
+  (close)="closeOutflowsModal()"
+>
+  <form [formGroup]="outflowsFormGroup" (ngSubmit)="submitOutflowModal($event)">
+    <div class="modal-container">
+      <!-- label -->
+      <app-input-text
+        [formGroup]="outflowsFormGroup"
+        formControlName="label"
+        [required]="true"
+      ></app-input-text>
+
+      <!-- amount -->
+      <app-input-number
+        [formGroup]="outflowsFormGroup"
+        formControlName="amount"
+        [required]="true"
+        [step]="'0.01'"
+      ></app-input-number>
+
+      <div class="modal-container__actions">
+        <app-button
+          class="login-page__login-button"
+          [label]="'Supprimer'"
+          [variant]="'danger'"
+          (click)="deleteOutflow($event)"
+        ></app-button>
+        <app-button
+          class="login-page__login-button"
+          [type]="'submit'"
+          [label]="'Modifier'"
+        ></app-button>
+      </div>
+    </div>
+  </form>
+</app-sliding-modal>
+}
+
+<!-- 
+  ##################### Modal weekly budgets (step 3) #####################
+   -->
+
+@if(weeklyBudgetsFormGroup !== undefined) {
+<app-sliding-modal
+  [isOpen]="isWeeklyBudgetsModalOpen"
+  (close)="closeWeeklyBudgetsModal()"
+>
+  <form
+    [formGroup]="weeklyBudgetsFormGroup"
+    (ngSubmit)="submitWeeklyBudgetModal($event)"
+  >
+    <div class="modal-container">
+      <!-- name -->
+      <app-input-text
+        [formGroup]="weeklyBudgetsFormGroup"
+        formControlName="name"
+        [required]="true"
+      ></app-input-text>
+
+      <!-- initial balance -->
+      <app-input-number
+        [formGroup]="weeklyBudgetsFormGroup"
+        formControlName="initialBalance"
+        [required]="true"
+        [step]="'0.01'"
+      ></app-input-number>
+
+      <div class="modal-container__actions">
+        <app-button
+          class="login-page__login-button"
+          [type]="'submit'"
+          [label]="'Modifier'"
+        ></app-button>
+      </div>
+    </div>
+  </form>
+</app-sliding-modal>
+}

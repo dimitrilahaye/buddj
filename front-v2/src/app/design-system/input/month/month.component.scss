@@ -1,0 +1,30 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/input";
+
+.input-month {
+  &__input {
+    @extend %input;
+
+    position: relative;
+
+    &[type="month"]::-webkit-inner-spin-button,
+    &[type="month"]::-webkit-calendar-picker-indicator {
+      background: transparent;
+      bottom: 0;
+      color: transparent;
+      cursor: pointer;
+      height: auto;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: auto;
+    }
+  }
+
+  &__error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}

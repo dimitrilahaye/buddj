@@ -4,32 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, render-configuration, front-v2]
 
 jobs:
   back_checks:
-    name: Back ~ QC Checks
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Back ~ Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Back ~ Install
-        working-directory: ./back
-        run: npm install
-
-      - name: Back ~ ESLint checks
-        working-directory: ./back
-        run: npm run lint
-
-  back_tests:
-    name: Back ~ Tests Node.js ${{ matrix.node-version }}
-    needs: back_checks
+    name: Back ~ Quality Checks
     runs-on: ubuntu-latest
     container: node:20.17.0-bookworm-slim
 
@@ -47,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Back ~ Use Node.js 20
+      - name: Back ~ Use Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -55,6 +34,10 @@ jobs:
       - name: Back ~ Install
         working-directory: ./back
         run: npm install
+
+      - name: Back ~ ESLint checks
+        working-directory: ./back
+        run: npm run lint
 
       - name: Back ~ Tests
         working-directory: ./back
@@ -76,9 +59,48 @@ jobs:
           FRONT_REDIRECT_URL: ${{ secrets.FRONT_REDIRECT_URL }}
           TEMPLATE: ${{ secrets.TEMPLATE }}
 
+  front_checks:
+    name: Front ~ Quality Checks
+    needs: back_checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Front ~ Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Front ~ Install
+        working-directory: ./front-v2
+        run: npm install
+
+      - name: Front ~ Generate environment.ts
+        working-directory: ./front-v2
+        run: |
+          cp src/environments/environment.template.ts src/environments/environment.ts
+          sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.ts
+          sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.ts
+
+      - name: Front ~ Generate environment.production.ts
+        working-directory: ./front-v2
+        run: |
+          cp src/environments/environment.template.ts src/environments/environment.production.ts
+          sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.production.ts
+          sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.production.ts
+
+      - name: Back ~ ESLint checks
+        working-directory: ./front-v2
+        run: npm run lint
+
+      - name: Front ~ Tests
+        working-directory: ./front-v2
+        run: npm run test:headless
+
   back_CD:
     name: Back ~ Deployment
-    needs: [back_checks, back_tests]
+    needs: [back_checks, front_checks]
     runs-on: ubuntu-latest
 
     steps:
@@ -92,7 +114,7 @@ jobs:
 
   front_CD:
     name: Front ~ Deployment
-    needs: [back_checks, back_tests, back_CD]
+    needs: [back_checks, front_checks, back_CD]
     runs-on: ubuntu-latest
 
     steps:

@@ -1,0 +1,12 @@
+@import "../../../../styles/variables";
+
+.item {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  border-radius: var(--radius-70);
+  background-color: var(--light-60);
+  padding: 10px;
+  box-sizing: border-box;
+  height: 60px;
+}

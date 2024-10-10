@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "ci:front": "cd front && npm ci",
+    "ci:front-v2": "cd front-v2 && npm ci",
     "ci:back": "cd back && npm ci",
-    "ci": "run-p --print-label ci:back ci:front",
+    "ci": "run-p --print-label ci:back ci:front ci:front-v2",
     "docker:back": "cd back && docker compose up -d",
     "docker": "run-p --print-label docker:back",
     "dev:back": "cd back && npm run dev",

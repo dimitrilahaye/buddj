@@ -1,0 +1,20 @@
+.login-page {
+  position: relative;
+  height: 100vh;
+
+  &__logo {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+  }
+
+  &__login-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+  }
+}
