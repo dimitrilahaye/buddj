@@ -88,31 +88,32 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
       this.template = data['template'];
-      this.newMonth.month = new Date(this.template!.month);
-      this.newMonth.startingBalance = this.template!.startingBalance;
-      this.newMonth.weeklyBudgets = this.template!.weeklyBudgets;
-      this.newMonth.outflows = this.template!.outflows;
+      this.setNewMonthData();
 
-      this.form = this.fb.group({
-        month: [
-          dateUtils.formatToYYYYMM(this.newMonth.month),
-          [Validators.required, dateValidator()],
-        ],
-        startingBalance: [
-          this.newMonth.startingBalance,
-          [Validators.required, amountValidator()],
-        ],
-        outflows: this.fb.array([]),
-        weeklyBudgets: this.fb.array([]),
-      });
-
-      this.newMonth.outflows.forEach((outflow) => this.addOutflow(outflow));
-      this.newMonth.weeklyBudgets.forEach((weeklyBudget) =>
-        this.addWeeklyBudgets(weeklyBudget)
-      );
+      this.setForm();
 
       this.dataLoaded = true;
     });
+  }
+
+  private setForm() {
+    this.form = this.fb.group({
+      month: [
+        dateUtils.formatToYYYYMM(this.newMonth.month),
+        [Validators.required, dateValidator()],
+      ],
+      startingBalance: [
+        this.newMonth.startingBalance,
+        [Validators.required, amountValidator()],
+      ],
+      outflows: this.fb.array([]),
+      weeklyBudgets: this.fb.array([]),
+    });
+
+    this.newMonth.outflows.forEach((outflow) => this.addOutflow(outflow));
+    this.newMonth.weeklyBudgets.forEach((weeklyBudget) =>
+      this.addWeeklyBudgets(weeklyBudget)
+    );
   }
 
   backToHome() {
@@ -146,13 +147,17 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     return forecastBalance.toFixed(2);
   }
 
-  resetForm() {
-    this.form.reset({
-      month: dateUtils.formatToYYYYMM(this.newMonth.month),
-      startingBalance: this.newMonth.startingBalance,
-      outflows: this.newMonth.outflows,
-      weeklyBudgets: this.newMonth.weeklyBudgets,
-    });
+  resetForm(event: Event) {
+    this.setNewMonthData();
+    this.setForm();
+    event.stopPropagation();
+  }
+
+  private setNewMonthData() {
+    this.newMonth.month = new Date(this.template!.month);
+    this.newMonth.startingBalance = this.template!.startingBalance;
+    this.newMonth.weeklyBudgets = this.template!.weeklyBudgets;
+    this.newMonth.outflows = this.template!.outflows;
   }
 
   /*
@@ -181,11 +186,12 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
   }
 
-  openOutflowsModal(index: number) {
+  openOutflowsModal(index: number, event?: Event) {
     setTimeout(() => {
       this.isOutflowsModalOpen = true;
     }, 0);
     this.selectedOutflowIndex = index;
+    event?.stopPropagation();
   }
 
   closeOutflowsModal() {
@@ -204,11 +210,12 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     this.closeOutflowsModal();
   }
 
-  deleteOutflow() {
+  deleteOutflow(event: Event) {
     if (this.selectedOutflowIndex !== null) {
       this.outflows.removeAt(this.selectedOutflowIndex);
       this.closeOutflowsModal();
     }
+    event.stopPropagation();
   }
 
   get outflowsFormGroup() {
@@ -234,9 +241,10 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     return this.form.get('weeklyBudgets') as FormArray;
   }
 
-  openWeeklyBudgetsModal(index: number) {
+  openWeeklyBudgetsModal(index: number, event?: Event) {
     setTimeout(() => {
       this.isWeeklyBudgetsModalOpen = true;
+      event?.stopPropagation();
     }, 0);
     this.selectedWeeklyBudgetIndex = index;
   }
