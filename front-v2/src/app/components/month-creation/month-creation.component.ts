@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  Inject,
   OnInit,
   Renderer2,
   ViewChild,
@@ -21,6 +22,9 @@ import { dateValidator } from '../../validators/date.validator';
 import * as dateUtils from '../../utils/date';
 import { CommonModule } from '@angular/common';
 import { DesignSystemModule } from '../../design-system/design-system.module';
+import MonthsServiceInterface, {
+  MONTHS_SERVICE_SERVICE,
+} from '../../services/months/months.service.interface';
 
 @Component({
   selector: 'app-month-creation',
@@ -52,7 +56,9 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    @Inject(MONTHS_SERVICE_SERVICE)
+    private monthsService: MonthsServiceInterface
   ) {}
 
   ngAfterViewInit(): void {
@@ -111,6 +117,12 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
 
   backToHome() {
     this.router.navigate(['home']);
+  }
+
+  createNewMonth(newMonth: Month) {
+    this.monthsService.createMonth(newMonth).subscribe(() => {
+      this.backToHome();
+    });
   }
 
   get forecastBalance() {
@@ -251,9 +263,17 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     return this.weeklyBudgets.at(this.selectedWeeklyBudgetIndex!) as FormGroup;
   }
 
+  private formatToDate(val: string | null) {
+    const currentDay = new Date().getDate();
+    const dateValue = val ? new Date(`${val}-${currentDay}`) : null;
+    return dateValue?.toISOString() ?? null;
+  }
+
   onSubmit() {
     if (this.form.valid) {
-      console.log('Form Submitted', this.form.value);
+      const newMonth = this.form.getRawValue();
+      newMonth.month = this.formatToDate(newMonth.month);
+      this.createNewMonth(newMonth);
     } else {
       console.log('Form is invalid');
     }

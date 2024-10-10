@@ -15,6 +15,8 @@ import { AUTHENTICATION_SERVICE } from './services/authentication/authentication
 import { MonthTemplatesService } from './services/monthTemplates/monthTemplates.service';
 import { MONTH_TEMPLATES_SERVICE_SERVICE } from './services/monthTemplates/monthTemplates.service.interface';
 import { httpRequestsInterceptor } from './interceptors/http-requests.interceptor';
+import { MonthsService } from './services/months/months.service';
+import { MONTHS_SERVICE_SERVICE } from './services/months/months.service.interface';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,6 +33,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MONTH_TEMPLATES_SERVICE_SERVICE,
       useClass: MonthTemplatesService,
+    },
+    {
+      provide: MONTHS_SERVICE_SERVICE,
+      useClass: MonthsService,
     },
   ],
 };
