@@ -1,8 +1,33 @@
+@import "../../../styles/variables";
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  box-sizing: border-box;
+  align-items: flex-start;
+  background: white;
+
+  button {
+    border: 0;
+    background: none;
+    margin: none;
+    font-size: 30px;
+    color: var(--color-950);
+  }
+}
+
 .month-creation {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-top: 40px;
 
   &__step {
     display: flex;
