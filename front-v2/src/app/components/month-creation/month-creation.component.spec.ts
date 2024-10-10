@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MonthCreationComponent } from './month-creation.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MONTHS_SERVICE_SERVICE } from '../../services/months/months.service.interface';
+import { Renderer2 } from '@angular/core';
 
 describe('MonthCreationComponent', () => {
   let component: MonthCreationComponent;
@@ -20,7 +22,13 @@ describe('MonthCreationComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MonthCreationComponent, ReactiveFormsModule],
-      providers: [{ provide: ActivatedRoute, useValue: activatedRouteStub }],
+      providers: [
+        { provide: ActivatedRoute, useValue: activatedRouteStub },
+        { provide: MONTHS_SERVICE_SERVICE, useValue: {} },
+        Router,
+        FormBuilder,
+        Renderer2,
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MonthCreationComponent);
