@@ -1,3 +1,8 @@
-<button role="button" [class]="className" [type]="type()" (click)="onClick()">
+<button
+  role="button"
+  [class]="className"
+  [type]="type()"
+  (click)="onClick($event)"
+>
   <span class="button__label">{{ label() }}</span>
 </button>
