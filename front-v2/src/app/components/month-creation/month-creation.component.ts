@@ -80,7 +80,7 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
             this.renderer.setStyle(
               this.addNewOutflowButton.nativeElement,
               'display',
-              'block'
+              'flex'
             );
           } else {
             this.renderer.setStyle(
