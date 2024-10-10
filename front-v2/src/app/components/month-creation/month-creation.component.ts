@@ -23,8 +23,13 @@ import * as dateUtils from '../../utils/date';
 import { CommonModule } from '@angular/common';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import MonthsServiceInterface, {
-  MONTHS_SERVICE_SERVICE,
+  MONTHS_SERVICE,
 } from '../../services/months/months.service.interface';
+import { MonthlyBudget } from '../../models/monthlyBudget.model';
+import {
+  MONTHLY_BUDGETS_STORE,
+  MonthlyBudgetsStoreInterface,
+} from '../../stores/monthlyBudgets.store.interface';
 
 @Component({
   selector: 'app-month-creation',
@@ -57,8 +62,10 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     private router: Router,
     private fb: FormBuilder,
     private renderer: Renderer2,
-    @Inject(MONTHS_SERVICE_SERVICE)
-    private monthsService: MonthsServiceInterface
+    @Inject(MONTHS_SERVICE)
+    private monthsService: MonthsServiceInterface,
+    @Inject(MONTHLY_BUDGETS_STORE)
+    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
   ) {}
 
   ngAfterViewInit(): void {
@@ -121,9 +128,12 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
   }
 
   createNewMonth(newMonth: Month) {
-    this.monthsService.createMonth(newMonth).subscribe(() => {
-      this.backToHome();
-    });
+    this.monthsService
+      .createMonth(newMonth)
+      .subscribe((month: MonthlyBudget) => {
+        this.monthlyBudgetsStore.addMonth(month);
+        this.backToHome();
+      });
   }
 
   get forecastBalance() {

@@ -13,10 +13,12 @@ import { AuthenticationService } from './services/authentication/authentication.
 import { BrowserModule } from '@angular/platform-browser';
 import { AUTHENTICATION_SERVICE } from './services/authentication/authentication.service.interface';
 import { MonthTemplatesService } from './services/monthTemplates/monthTemplates.service';
-import { MONTH_TEMPLATES_SERVICE_SERVICE } from './services/monthTemplates/monthTemplates.service.interface';
+import { MONTH_TEMPLATES_SERVICE } from './services/monthTemplates/monthTemplates.service.interface';
 import { httpRequestsInterceptor } from './interceptors/http-requests.interceptor';
 import { MonthsService } from './services/months/months.service';
-import { MONTHS_SERVICE_SERVICE } from './services/months/months.service.interface';
+import { MONTHS_SERVICE } from './services/months/months.service.interface';
+import { MonthlyBudgetsStore } from './stores/monthlyBudgets.store';
+import { MONTHLY_BUDGETS_STORE } from './stores/monthlyBudgets.store.interface';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,12 +33,16 @@ export const appConfig: ApplicationConfig = {
     }),
     { provide: AUTHENTICATION_SERVICE, useClass: AuthenticationService },
     {
-      provide: MONTH_TEMPLATES_SERVICE_SERVICE,
+      provide: MONTH_TEMPLATES_SERVICE,
       useClass: MonthTemplatesService,
     },
     {
-      provide: MONTHS_SERVICE_SERVICE,
+      provide: MONTHS_SERVICE,
       useClass: MonthsService,
+    },
+    {
+      provide: MONTHLY_BUDGETS_STORE,
+      useClass: MonthlyBudgetsStore,
     },
   ],
 };
