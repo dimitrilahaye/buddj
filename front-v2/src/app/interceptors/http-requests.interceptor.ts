@@ -1,6 +1,15 @@
-import { HttpHeaders, HttpInterceptorFn } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpHeaders,
+  HttpInterceptorFn,
+} from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 export const httpRequestsInterceptor: HttpInterceptorFn = (req, next) => {
+  const toaster = inject(HotToastService);
+
   const headers = new HttpHeaders({
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -11,5 +20,13 @@ export const httpRequestsInterceptor: HttpInterceptorFn = (req, next) => {
     headers,
   });
 
-  return next(newReq);
+  return next(newReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      const errorMessage = error.error.message || 'An unknown error occurred';
+
+      toaster.error(errorMessage);
+
+      return throwError(() => new Error(errorMessage));
+    })
+  );
 };
