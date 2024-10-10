@@ -30,6 +30,8 @@ import {
   MONTHLY_BUDGETS_STORE,
   MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets.store.interface';
+import { finalize } from 'rxjs';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-month-creation',
@@ -56,12 +58,14 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     weeklyBudgets: [],
     outflows: [],
   };
+  creationLoader = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
     private renderer: Renderer2,
+    @Inject(HotToastService) private toaster: HotToastService,
     @Inject(MONTHS_SERVICE)
     private monthsService: MonthsServiceInterface,
     @Inject(MONTHLY_BUDGETS_STORE)
@@ -128,9 +132,16 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
   }
 
   createNewMonth(newMonth: Month) {
+    this.creationLoader = true;
     this.monthsService
       .createMonth(newMonth)
+      .pipe(
+        finalize(() => {
+          this.creationLoader = false;
+        })
+      )
       .subscribe((month: MonthlyBudget) => {
+        this.toaster.success('Votre mois a bien été crée !');
         this.monthlyBudgetsStore.addMonth(month);
         this.backToHome();
       });
