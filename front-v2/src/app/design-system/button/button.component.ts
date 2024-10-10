@@ -11,13 +11,13 @@ export class ButtonComponent {
   type = input<string>('button');
   size = input<'big' | 'middle'>('middle');
   variant = input<'default' | 'danger'>('default');
-  click = output();
+  click = output<Event>();
 
   get className() {
     return `button button--${this.size()} button--${this.variant()}`;
   }
 
-  onClick() {
-    this.click.emit();
+  onClick(event: Event) {
+    this.click.emit(event);
   }
 }
