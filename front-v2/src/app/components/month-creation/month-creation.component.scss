@@ -89,10 +89,15 @@
     display: none;
     position: sticky;
     top: 55px;
+    height: 72px;
     background-color: white;
     padding: 10px;
     border: none;
     cursor: pointer;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 }
 
