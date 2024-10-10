@@ -66,7 +66,7 @@
         <button
           class="month-creation-item__edit"
           type="button"
-          (click)="openOutflowsModal(i)"
+          (click)="openOutflowsModal(i, $event)"
         >
           <i class="fa-solid fa-pen-fancy"></i>
         </button>
@@ -104,7 +104,7 @@
         <button
           class="month-creation-item__edit"
           type="button"
-          (click)="openWeeklyBudgetsModal(i)"
+          (click)="openWeeklyBudgetsModal(i, $event)"
         >
           <i class="fa-solid fa-pen-fancy"></i>
         </button>
@@ -118,11 +118,10 @@
     >
     <div class="month-creation-footer__actions">
       <app-button
-        [type]="'submit'"
         [size]="'big'"
         [variant]="'danger'"
         [label]="'Réinitialiser'"
-        (click)="resetForm()"
+        (click)="resetForm($event)"
       ></app-button>
       <app-button
         [type]="'submit'"
@@ -165,7 +164,7 @@
           class="login-page__login-button"
           [label]="'Supprimer'"
           [variant]="'danger'"
-          (click)="deleteOutflow()"
+          (click)="deleteOutflow($event)"
         ></app-button>
         <app-button
           class="login-page__login-button"
