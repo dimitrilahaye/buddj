@@ -23,6 +23,7 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
   styleUrl: './month-creation.component.scss',
 })
 export class MonthCreationComponent implements OnInit {
+  dataLoaded = false;
   form!: FormGroup;
   template: MonthTemplate | null = null;
   isOutflowsModalOpen = false;
@@ -64,6 +65,8 @@ export class MonthCreationComponent implements OnInit {
       this.newMonth.weeklyBudgets.forEach((weeklyBudget) =>
         this.addWeeklyBudgets(weeklyBudget)
       );
+
+      this.dataLoaded = true;
     });
   }
 
