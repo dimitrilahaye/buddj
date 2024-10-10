@@ -8,6 +8,7 @@ import { SlidingModalComponent } from './modal/sliding-modal/sliding-modal.compo
 import { TextComponent } from './input/text/text.component';
 import { ItemComponent } from './item/item/item.component';
 import { DividerComponent } from './divider/divider.component';
+import { LoaderComponent } from './loader/loader.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { DividerComponent } from './divider/divider.component';
     SlidingModalComponent,
     ItemComponent,
     DividerComponent,
+    LoaderComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -28,6 +30,7 @@ import { DividerComponent } from './divider/divider.component';
     SlidingModalComponent,
     ItemComponent,
     DividerComponent,
+    LoaderComponent,
   ],
 })
 export class DesignSystemModule {}
