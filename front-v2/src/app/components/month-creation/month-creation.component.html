@@ -35,9 +35,17 @@
   ##################### STEP 2 #####################
    -->
   <div
+    #outflowsContainer
     class="month-creation__step month-creation__step--step2"
     formArrayName="outflows"
   >
+    <div #addNewOutflowButton class="month-creation-step__add-outflow">
+      <app-button
+        (click)="addNewOutflow($event)"
+        [size]="'big'"
+        [label]="'Ajouter une sortie mensuelle'"
+      ></app-button>
+    </div>
     <app-item
       *ngFor="let outflow of outflows.controls; let i = index"
       [formGroupName]="i"
@@ -106,7 +114,7 @@
 
   <div class="month-creation__footer">
     <span class="month-creation-footer__forecast-balance"
-      >Solde prévisionnel : {{ forecastBalance }}€</span
+      >Solde prévisionnel : <strong>{{ forecastBalance }}€</strong></span
     >
     <div class="month-creation-footer__actions">
       <app-button

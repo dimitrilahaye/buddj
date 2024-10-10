@@ -1,4 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MonthTemplate } from '../../models/monthTemplate.model';
 import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
@@ -22,7 +29,10 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
   templateUrl: './month-creation.component.html',
   styleUrl: './month-creation.component.scss',
 })
-export class MonthCreationComponent implements OnInit {
+export class MonthCreationComponent implements OnInit, AfterViewInit {
+  @ViewChild('outflowsContainer') outflowsContainer!: ElementRef;
+  @ViewChild('addNewOutflowButton') addNewOutflowButton!: ElementRef;
+
   dataLoaded = false;
   form!: FormGroup;
   template: MonthTemplate | null = null;
@@ -41,8 +51,33 @@ export class MonthCreationComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private renderer: Renderer2
   ) {}
+
+  ngAfterViewInit(): void {
+    if (this.dataLoaded) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            this.renderer.setStyle(
+              this.addNewOutflowButton.nativeElement,
+              'display',
+              'block'
+            );
+          } else {
+            this.renderer.setStyle(
+              this.addNewOutflowButton.nativeElement,
+              'display',
+              'none'
+            );
+          }
+        });
+      });
+
+      observer.observe(this.outflowsContainer.nativeElement);
+    }
+  }
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
@@ -122,6 +157,16 @@ export class MonthCreationComponent implements OnInit {
 
   get outflows(): FormArray {
     return this.form.get('outflows') as FormArray;
+  }
+
+  addNewOutflow(event: Event) {
+    const outflowGroup = this.fb.group({
+      label: ['???', Validators.required],
+      amount: [0, [Validators.required, amountValidator()]],
+    });
+    this.outflows.push(outflowGroup);
+    this.openOutflowsModal(this.outflows.length - 1);
+    event.stopPropagation();
   }
 
   openOutflowsModal(index: number) {
