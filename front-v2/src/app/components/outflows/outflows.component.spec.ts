@@ -17,7 +17,8 @@ describe('OutflowsComponent', () => {
         {
           provide: MONTHLY_BUDGETS_STORE,
           useValue: {
-            getCurrent: () => signal(null),
+            getCurrent: () =>
+              signal({ dashboard: { account: { currentBalance: 2000 } } }),
             getCurrentOutflows: () => signal([]),
           },
         },

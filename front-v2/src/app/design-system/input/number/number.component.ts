@@ -23,6 +23,7 @@ export class NumberComponent implements ControlValueAccessor {
   required = input(true);
   placeholder = input('');
   step = input('0.01');
+  size = input<'big' | 'middle'>('middle');
   formControlName = input('');
 
   private _value: number | null = null;
@@ -66,6 +67,10 @@ export class NumberComponent implements ControlValueAccessor {
 
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
+  }
+
+  get className() {
+    return `input-number__input input-number__input--${this.size()}`;
   }
 
   get hasError(): boolean {

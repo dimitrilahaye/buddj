@@ -4,6 +4,14 @@
 .input-number {
   &__input {
     @extend %input;
+
+    &--middle {
+      height: 35px;
+    }
+
+    &--big {
+      height: 55px;
+    }
   }
   &__error-message {
     color: red;

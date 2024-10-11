@@ -1,50 +1,62 @@
 <div class="outflows">
   @if(outflowsFormArray.controls.length) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="outflows-list" formArrayName="outflows">
-      <app-item
-        *ngFor="let outflow of outflowsFormArray.controls; let i = index"
-        [formGroupName]="i"
-      >
-        <button
-          type="button"
-          [ngClass]="{
-            'outflows-list-item--checked': isOutflowItemChecked(i)
-          }"
-          class="outflows-list-item"
-          (click)="toggleOutflowAtIndex(i, $event)"
+    <div class="outflows-list">
+      <app-input-number
+        [formGroup]="form"
+        formControlName="currentBalance"
+        [required]="true"
+        [placeholder]="'Solde actuel'"
+        [size]="'big'"
+        [step]="'0.01'"
+      ></app-input-number>
+      <div class="outflows-list" formArrayName="outflows">
+        <app-item
+          *ngFor="let outflow of outflowsFormArray.controls; let i = index"
+          [formGroupName]="i"
         >
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-money-bill-transfer"></i>
-          </span>
-          <div
-            [ngClass]="{
-              'outflows-list-item__info--checked': isOutflowItemChecked(i)
-            }"
-            class="outflows-list-item__info"
-          >
-            <span class="outflows-list-item-info__label">{{
-              outflow.get("label")?.value || "Label introuvable"
-            }}</span>
-            <span class="outflows-list-item-info__amount"
-              >{{ outflow.get("amount")?.value || "Somme introuvable" }}€</span
-            >
-          </div>
-
           <button
-            class="outflows-list-item__delete"
             type="button"
-            [disabled]="outflowDeletionIsLoadingByIndex(i)"
-            (click)="deleteOutflowByIndex(i, $event)"
+            [ngClass]="{
+              'outflows-list-item--checked': isOutflowItemChecked(i)
+            }"
+            class="outflows-list-item"
+            (click)="toggleOutflowAtIndex(i, $event)"
           >
-            @if(outflowDeletionIsLoadingByIndex(i)) {
-            <ng-container *ngTemplateOutlet="loader"></ng-container>
-            } @else {
-            <i class="fa-solid fa-trash-can"></i>
-            }
+            <span class="outflows-list-item__icon">
+              <i class="fa-solid fa-money-bill-transfer"></i>
+            </span>
+            <div
+              [ngClass]="{
+                'outflows-list-item__info--checked': isOutflowItemChecked(i)
+              }"
+              class="outflows-list-item__info"
+            >
+              <span class="outflows-list-item-info__label">{{
+                outflow.get("label")?.value || "Label introuvable"
+              }}</span>
+              <span class="outflows-list-item-info__amount"
+                >{{
+                  outflow.get("amount")?.value || "Somme introuvable"
+                }}€</span
+              >
+            </div>
+
+            <button
+              class="outflows-list-item__delete"
+              type="button"
+              [disabled]="outflowDeletionIsLoadingByIndex(i)"
+              (click)="deleteOutflowByIndex(i, $event)"
+            >
+              @if(outflowDeletionIsLoadingByIndex(i)) {
+              <ng-container *ngTemplateOutlet="loader"></ng-container>
+              } @else {
+              <i class="fa-solid fa-trash-can"></i>
+              }
+            </button>
           </button>
-        </button>
-      </app-item>
+        </app-item>
+      </div>
     </div>
   </form>
   }
