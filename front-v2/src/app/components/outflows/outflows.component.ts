@@ -66,6 +66,10 @@ export class OutflowsComponent implements OnInit {
 
   private setForm() {
     this.form = this.fb.group({
+      currentBalance: [
+        this.month()!.dashboard.account.currentBalance,
+        [Validators.required, amountValidator()],
+      ],
       outflows: this.fb.array([]),
     });
 
