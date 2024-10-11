@@ -5,6 +5,7 @@ import { MonthlyBudget } from '../../models/monthlyBudget.model';
 
 export default interface MonthsServiceInterface {
   createMonth(month: Month): Observable<MonthlyBudget>;
+  getUnarchivedMonths(): Observable<MonthlyBudget[]>;
 }
 
 export const MONTHS_SERVICE = new InjectionToken<MonthsServiceInterface>(
