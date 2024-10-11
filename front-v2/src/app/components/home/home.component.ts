@@ -39,7 +39,8 @@ export class HomeComponent {
     @Inject(MONTHS_SERVICE)
     private monthsService: MonthsServiceInterface
   ) {
-    if (!this.currentMonthlyBudget) {
+    const allMonths = this.monthlyBudgetsStore.getAll();
+    if (!allMonths().length) {
       this.displayLoader = true;
       this.monthsService
         .getUnarchivedMonths()
@@ -49,13 +50,19 @@ export class HomeComponent {
           })
         )
         .subscribe(() => {
-          this.currentMonthlyBudget = this.monthlyBudgetsStore.getCurrent();
-          this.isCurrentMonthTheFirst =
-            this.monthlyBudgetsStore.isCurrentMonthTheFirst();
-          this.isCurrentMonthTheLast =
-            this.monthlyBudgetsStore.isCurrentMonthTheLast();
+          this.initializeCurrentMonth();
         });
+    } else {
+      this.initializeCurrentMonth();
     }
+  }
+
+  private initializeCurrentMonth() {
+    this.currentMonthlyBudget = this.monthlyBudgetsStore.getCurrent();
+    this.isCurrentMonthTheFirst =
+      this.monthlyBudgetsStore.isCurrentMonthTheFirst();
+    this.isCurrentMonthTheLast =
+      this.monthlyBudgetsStore.isCurrentMonthTheLast();
   }
 
   get current() {
