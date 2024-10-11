@@ -13,11 +13,13 @@ import MonthsServiceInterface, {
 import { finalize } from 'rxjs';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { OutflowsComponent } from '../outflows/outflows.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
+    RouterOutlet,
     MenuFooterComponent,
     DateNormalizePipe,
     CurrencyPipe,
