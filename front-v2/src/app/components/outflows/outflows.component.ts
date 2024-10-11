@@ -40,8 +40,11 @@ export class OutflowsComponent implements OnInit {
   outflows: Signal<Outflow[] | null> = signal(null);
 
   form!: FormGroup;
+  addOutflowForm: FormGroup | null = null;
   outflowDeletionIsLoadingIndex: WritableSignal<number | null> = signal(null);
   formIsLoading = false;
+  addOutflowFormIsLoading = false;
+  isOutflowsModalOpen = false;
 
   constructor(
     private fb: FormBuilder,
@@ -91,6 +94,17 @@ export class OutflowsComponent implements OnInit {
     this.outflowsFormArray.push(outflowGroup);
   }
 
+  setAddOutflowForm() {
+    this.addOutflowForm = this.fb.group({
+      label: [null, Validators.required],
+      amount: [0, [Validators.required, amountValidator()]],
+    });
+  }
+
+  removeOutflow() {
+    this.addOutflowForm = null;
+  }
+
   get outflowsFormArray(): FormArray {
     return this.form.get('outflows') as FormArray;
   }
@@ -126,6 +140,40 @@ export class OutflowsComponent implements OnInit {
 
   stopDeletationLoading() {
     this.outflowDeletionIsLoadingIndex.update(() => null);
+  }
+
+  openOutflowsModal(event?: Event) {
+    setTimeout(() => {
+      this.isOutflowsModalOpen = true;
+      this.setAddOutflowForm();
+    }, 0);
+    event?.stopPropagation();
+  }
+
+  closeOutflowsModal() {
+    this.isOutflowsModalOpen = false;
+  }
+
+  submitOutflowModal(event: Event) {
+    event.preventDefault();
+    if (this.addOutflowForm && this.addOutflowForm!.valid) {
+      this.addOutflowFormIsLoading = true;
+      this.monthsService
+        .addOutflow(this.month()!.id, this.addOutflowForm.getRawValue())
+        .pipe(finalize(() => (this.addOutflowFormIsLoading = false)))
+        .subscribe(() => {
+          this.closeOutflowsModal();
+        });
+    } else {
+      this.addOutflowForm!.markAllAsTouched();
+    }
+    event.stopPropagation();
+  }
+
+  deleteOutflow(event: Event) {
+    this.outflowsFormArray.removeAt(this.outflows.length - 1);
+    this.closeOutflowsModal();
+    event.stopPropagation();
   }
 
   onSubmit() {
