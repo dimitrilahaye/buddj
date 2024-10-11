@@ -15,24 +15,44 @@
   </div>
   <div class="menu-footer__add">
     @if(plusOpen) {
-    <button
-      class="menu-footer-add__link"
-      [ngClass]="{ 'menu-footer-add__link--fade-in-up': plusOpen }"
-      (click)="navigateToMonthCreation()"
-      type="button"
+    <div
+      class="menu-footer-add__links"
+      [ngClass]="{ 'menu-footer-add__links--fade-in-up': plusOpen }"
     >
-      <i class="menu-footer-add-link__icon fa-solid fa-calendar-plus"></i>
-      <span class="menu-footer-add-link__label">Créer un nouveau mois</span>
-    </button>
+      <button
+        class="menu-footer-add-links__link"
+        (click)="navigateToOutflows()"
+        type="button"
+      >
+        <i
+          class="menu-footer-add-links-link__icon fa-solid fa-money-bill-transfer"
+        ></i>
+        <span class="menu-footer-add-links-link__label"
+          >Ajouter une sortie mensuelle</span
+        >
+      </button>
+      <button
+        class="menu-footer-add-links__link"
+        (click)="navigateToMonthCreation()"
+        type="button"
+      >
+        <i
+          class="menu-footer-add-links-link__icon fa-solid fa-calendar-plus"
+        ></i>
+        <span class="menu-footer-add-links-link__label"
+          >Créer un nouveau mois</span
+        >
+      </button>
+    </div>
     }
     <button
-      (click)="openPlus()"
+      (click)="toggle()"
       class="menu-footer-add__plus"
       [ngClass]="{ 'menu-footer-add__plus--rotate': plusOpen }"
       type="button"
       aria-label="Afficher le menu de création"
     >
-      <i class="fa-solid fa-plus"></i>
+      <i class="fa-solid fa-gear"></i>
     </button>
   </div>
 </div>
