@@ -7,6 +7,12 @@ export interface MonthlyBudgetsStoreInterface {
   addMonths(months: MonthlyBudget[]): void;
 
   getAll(): Signal<MonthlyBudget[]>;
+
+  getCurrent(): Signal<MonthlyBudget | null>;
+
+  setNextMonth(): Signal<MonthlyBudget | null>;
+
+  setPreviousMonth(): Signal<MonthlyBudget | null>;
 }
 
 export const MONTHLY_BUDGETS_STORE =
