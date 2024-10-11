@@ -8,6 +8,11 @@ export interface UpdateOutflowsChecking {
   outflows: Outflow[];
 }
 
+export interface AddOutflow {
+  label: string;
+  amount: number;
+}
+
 export default interface MonthsServiceInterface {
   createMonth(month: Month): Observable<MonthlyBudget>;
   getUnarchivedMonths(): Observable<MonthlyBudget[]>;
@@ -16,6 +21,7 @@ export default interface MonthsServiceInterface {
     monthId: string,
     data: UpdateOutflowsChecking
   ): Observable<MonthlyBudget>;
+  addOutflow(monthId: string, outflow: AddOutflow): Observable<MonthlyBudget>;
 }
 
 export const MONTHS_SERVICE = new InjectionToken<MonthsServiceInterface>(

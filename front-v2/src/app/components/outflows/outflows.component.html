@@ -60,15 +60,59 @@
     </div>
     <div class="outflows-submit">
       <app-button
+        [size]="'big'"
+        [label]="'Ajouter'"
+        (click)="openOutflowsModal($event)"
+      ></app-button>
+      <app-button
         [type]="'submit'"
         [size]="'big'"
-        [label]="'Valider mes modifications'"
+        [variant]="'danger'"
+        [label]="'Valider'"
         [loading]="formIsLoading"
       ></app-button>
     </div>
   </form>
   }
 </div>
+
+@if(addOutflowForm) {
+<app-sliding-modal
+  [isOpen]="isOutflowsModalOpen"
+  [canClose]="!addOutflowFormIsLoading"
+  (close)="closeOutflowsModal()"
+>
+  <form [formGroup]="addOutflowForm" (ngSubmit)="submitOutflowModal($event)">
+    <div class="modal-container">
+      <!-- label -->
+      <app-input-text
+        [formGroup]="addOutflowForm"
+        formControlName="label"
+        [required]="true"
+      ></app-input-text>
+
+      <!-- amount -->
+      <app-input-number
+        [formGroup]="addOutflowForm"
+        formControlName="amount"
+        [required]="true"
+        [step]="'0.01'"
+      ></app-input-number>
+
+      <div class="modal-container__actions">
+        <app-button
+          class="login-page__login-button"
+          [type]="'submit'"
+          [variant]="'danger'"
+          [label]="'Ajouter'"
+          [loading]="addOutflowFormIsLoading"
+          (click)="submitOutflowModal($event)"
+        ></app-button>
+      </div>
+    </div>
+  </form>
+</app-sliding-modal>
+}
 
 <ng-template #loader>
   <span class="outflows-list-item-delete__loader">
