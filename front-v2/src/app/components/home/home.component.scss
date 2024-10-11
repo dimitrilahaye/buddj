@@ -38,6 +38,10 @@
 
 .header-month {
   &__navigation {
+    &:disabled {
+      opacity: 0.5;
+    }
+
     font-size: 30px;
     border: none;
     background: none;
@@ -79,4 +83,11 @@
   &__amount {
     font-weight: bold;
   }
+}
+
+.content {
+  height: auto;
+  margin-top: 150px;
+  overflow: auto;
+  padding-bottom: 40px;
 }
