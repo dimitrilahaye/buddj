@@ -25,11 +25,6 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
 import MonthsServiceInterface, {
   MONTHS_SERVICE,
 } from '../../services/months/months.service.interface';
-import { MonthlyBudget } from '../../models/monthlyBudget.model';
-import {
-  MONTHLY_BUDGETS_STORE,
-  MonthlyBudgetsStoreInterface,
-} from '../../stores/monthlyBudgets.store.interface';
 import { finalize } from 'rxjs';
 import { HotToastService } from '@ngxpert/hot-toast';
 
@@ -67,9 +62,7 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     private renderer: Renderer2,
     @Inject(HotToastService) private toaster: HotToastService,
     @Inject(MONTHS_SERVICE)
-    private monthsService: MonthsServiceInterface,
-    @Inject(MONTHLY_BUDGETS_STORE)
-    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
+    private monthsService: MonthsServiceInterface
   ) {}
 
   ngAfterViewInit(): void {
@@ -140,9 +133,8 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
           this.creationLoader = false;
         })
       )
-      .subscribe((month: MonthlyBudget) => {
+      .subscribe(() => {
         this.toaster.success('Votre mois a bien été crée !');
-        this.monthlyBudgetsStore.addMonth(month);
         this.backToHome();
       });
   }

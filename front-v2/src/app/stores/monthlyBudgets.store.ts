@@ -14,6 +14,12 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     });
   }
 
+  addMonths(months: MonthlyBudget[]): void {
+    this._state.update(() => {
+      return [...months];
+    });
+  }
+
   getAll(): Signal<MonthlyBudget[]> {
     return this._state.asReadonly();
   }
