@@ -1,4 +1,4 @@
-import { InjectionToken, Signal } from '@angular/core';
+import { InjectionToken, Signal, WritableSignal } from '@angular/core';
 import { MonthlyBudget, Outflow } from '../models/monthlyBudget.model';
 
 export interface MonthlyBudgetsStoreInterface {
@@ -21,6 +21,10 @@ export interface MonthlyBudgetsStoreInterface {
   isCurrentMonthTheFirst(): Signal<boolean>;
 
   isCurrentMonthTheLast(): Signal<boolean>;
+
+  get askedForNewOutflow(): WritableSignal<number>;
+
+  askForNewOutflow(): void;
 }
 
 export const MONTHLY_BUDGETS_STORE =

@@ -27,6 +27,7 @@ import {
   MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets.store.interface';
 import { finalize } from 'rxjs';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-outflows',
@@ -52,7 +53,8 @@ export class OutflowsComponent implements AfterViewInit {
     @Inject(MONTHS_SERVICE)
     private monthsService: MonthsServiceInterface,
     @Inject(MONTHLY_BUDGETS_STORE)
-    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
+    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
+    @Inject(HotToastService) private toaster: HotToastService
   ) {}
 
   ngAfterViewInit(): void {
@@ -63,6 +65,17 @@ export class OutflowsComponent implements AfterViewInit {
       () => {
         if (this.month()) {
           this.setForm();
+        }
+      },
+      { injector: this.injector }
+    );
+
+    effect(
+      () => {
+        const timesNewOutflowHasBeenAsked =
+          this.monthlyBudgetsStore.askedForNewOutflow();
+        if (timesNewOutflowHasBeenAsked > 0) {
+          this.openOutflowsModal();
         }
       },
       { injector: this.injector }
@@ -123,7 +136,9 @@ export class OutflowsComponent implements AfterViewInit {
     this.monthsService
       .deleteOutflow(this.month()!.id, outflowToDelete.id)
       .pipe(finalize(() => this.stopDeletationLoading()))
-      .subscribe();
+      .subscribe(() =>
+        this.toaster.success('Votre sortie mensuelle a été supprimée !')
+      );
     event.stopPropagation();
   }
 
@@ -135,12 +150,9 @@ export class OutflowsComponent implements AfterViewInit {
     this.outflowDeletionIsLoadingIndex.update(() => null);
   }
 
-  openOutflowsModal(event?: Event) {
-    setTimeout(() => {
-      this.isOutflowsModalOpen = true;
-      this.setAddOutflowForm();
-    }, 0);
-    event?.stopPropagation();
+  openOutflowsModal() {
+    this.isOutflowsModalOpen = true;
+    this.setAddOutflowForm();
   }
 
   closeOutflowsModal() {
@@ -156,6 +168,7 @@ export class OutflowsComponent implements AfterViewInit {
         .pipe(finalize(() => (this.addOutflowFormIsLoading = false)))
         .subscribe(() => {
           this.closeOutflowsModal();
+          this.toaster.success('Votre sortie mensuelle a été ajoutée !');
         });
     } else {
       this.addOutflowForm!.markAllAsTouched();
@@ -174,6 +187,8 @@ export class OutflowsComponent implements AfterViewInit {
     this.monthsService
       .updateOutflowsChecking(this.month()!.id, this.form.getRawValue())
       .pipe(finalize(() => (this.formIsLoading = false)))
-      .subscribe();
+      .subscribe(() =>
+        this.toaster.success('Vos sorties mensuelles ont été modifiées !')
+      );
   }
 }
