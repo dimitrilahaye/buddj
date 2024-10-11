@@ -1,4 +1,10 @@
-import { effect, Injectable, Signal, signal } from '@angular/core';
+import {
+  effect,
+  Injectable,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { MonthlyBudgetsStoreInterface } from './monthlyBudgets.store.interface';
 import { MonthlyBudget, Outflow } from '../models/monthlyBudget.model';
 
@@ -8,9 +14,11 @@ import { MonthlyBudget, Outflow } from '../models/monthlyBudget.model';
 export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
   private _all = signal<MonthlyBudget[]>([]);
   private _currentMonth = signal<MonthlyBudget | null>(null);
+  // outflows management
   private _currentOutflows = signal<Outflow[]>([]);
   private _isCurrentMonthTheFirst = signal<boolean>(false);
   private _isCurrentMonthTheLast = signal<boolean>(false);
+  private _askedForNewOutflow: WritableSignal<number> = signal(0);
 
   constructor() {
     effect(
@@ -71,10 +79,6 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     return this._currentMonth.asReadonly();
   }
 
-  getCurrentOutflows(): Signal<Outflow[]> {
-    return this._currentOutflows.asReadonly();
-  }
-
   isCurrentMonthTheFirst(): Signal<boolean> {
     return this._isCurrentMonthTheFirst;
   }
@@ -111,6 +115,18 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     }
 
     return this.getCurrent();
+  }
+
+  getCurrentOutflows(): Signal<Outflow[]> {
+    return this._currentOutflows.asReadonly();
+  }
+
+  get askedForNewOutflow(): WritableSignal<number> {
+    return this._askedForNewOutflow;
+  }
+
+  askForNewOutflow(): void {
+    this._askedForNewOutflow.update((value) => value + 1);
   }
 
   private sortOutflowsByLabel(outflows: Outflow[]) {
