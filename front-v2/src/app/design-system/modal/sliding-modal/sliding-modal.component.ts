@@ -1,4 +1,4 @@
-import { Component, Input, output } from '@angular/core';
+import { Component, input, Input, output } from '@angular/core';
 
 @Component({
   selector: 'app-sliding-modal',
@@ -9,13 +9,16 @@ import { Component, Input, output } from '@angular/core';
 export class SlidingModalComponent {
   @Input()
   isOpen = false;
+  canClose = input(true);
 
   close = output();
 
   closeModal() {
-    this.isOpen = false;
-    setTimeout(() => {
-      this.close.emit();
-    }, 300);
+    if (this.canClose()) {
+      this.isOpen = false;
+      setTimeout(() => {
+        this.close.emit();
+      }, 300);
+    }
   }
 }
