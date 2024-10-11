@@ -2,9 +2,12 @@ import {
   ApplicationConfig,
   provideZoneChangeDetection,
   isDevMode,
+  LOCALE_ID,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { ReactiveFormsModule } from '@angular/forms';
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -20,6 +23,8 @@ import { MonthsService } from './services/months/months.service';
 import { MONTHS_SERVICE } from './services/months/months.service.interface';
 import { MonthlyBudgetsStore } from './stores/monthlyBudgets.store';
 import { MONTHLY_BUDGETS_STORE } from './stores/monthlyBudgets.store.interface';
+
+registerLocaleData(localeFr);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -37,6 +42,7 @@ export const appConfig: ApplicationConfig = {
       autoClose: true,
       dismissible: true,
     }),
+    { provide: LOCALE_ID, useValue: 'fr' },
     { provide: AUTHENTICATION_SERVICE, useClass: AuthenticationService },
     {
       provide: MONTH_TEMPLATES_SERVICE,
