@@ -5,11 +5,13 @@ import {
   MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets.store.interface';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
+import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MenuFooterComponent],
+  imports: [MenuFooterComponent, DateNormalizePipe, CurrencyPipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -21,5 +23,13 @@ export class HomeComponent {
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
   ) {
     this.monthlyBudgets = this.monthlyBudgetsStore.getAll();
+  }
+
+  get currentMonth() {
+    if (!this.monthlyBudgets || !this.monthlyBudgets()[0]) {
+      return null;
+    }
+
+    return this.monthlyBudgets()[0];
   }
 }
