@@ -4,6 +4,8 @@ import { MonthlyBudget } from '../models/monthlyBudget.model';
 export interface MonthlyBudgetsStoreInterface {
   addMonth(month: MonthlyBudget): void;
 
+  addMonths(months: MonthlyBudget[]): void;
+
   getAll(): Signal<MonthlyBudget[]>;
 }
 
