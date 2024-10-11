@@ -1,4 +1,4 @@
-import { Component, Inject, Signal } from '@angular/core';
+import { Component, Inject, signal, Signal } from '@angular/core';
 import { MenuFooterComponent } from '../menu-footer/menu-footer.component';
 import {
   MONTHLY_BUDGETS_STORE,
@@ -12,6 +12,7 @@ import MonthsServiceInterface, {
 } from '../../services/months/months.service.interface';
 import { finalize } from 'rxjs';
 import { DesignSystemModule } from '../../design-system/design-system.module';
+import { OutflowsComponent } from '../outflows/outflows.component';
 
 @Component({
   selector: 'app-home',
@@ -21,12 +22,15 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
     DateNormalizePipe,
     CurrencyPipe,
     DesignSystemModule,
+    OutflowsComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
   currentMonthlyBudget: Signal<MonthlyBudget | null> | null = null;
+  isCurrentMonthTheFirst: Signal<boolean> = signal(true);
+  isCurrentMonthTheLast: Signal<boolean> = signal(false);
   displayLoader = false;
 
   constructor(
@@ -46,6 +50,10 @@ export class HomeComponent {
         )
         .subscribe(() => {
           this.currentMonthlyBudget = this.monthlyBudgetsStore.getCurrent();
+          this.isCurrentMonthTheFirst =
+            this.monthlyBudgetsStore.isCurrentMonthTheFirst();
+          this.isCurrentMonthTheLast =
+            this.monthlyBudgetsStore.isCurrentMonthTheLast();
         });
     }
   }
@@ -56,6 +64,10 @@ export class HomeComponent {
     }
 
     return null;
+  }
+
+  get currentOutflows() {
+    return this.monthlyBudgetsStore.getCurrentOutflows();
   }
 
   getNextMonth() {
