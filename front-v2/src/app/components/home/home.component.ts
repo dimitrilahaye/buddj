@@ -7,22 +7,47 @@ import {
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
 import { CurrencyPipe } from '@angular/common';
+import MonthsServiceInterface, {
+  MONTHS_SERVICE,
+} from '../../services/months/months.service.interface';
+import { finalize } from 'rxjs';
+import { DesignSystemModule } from '../../design-system/design-system.module';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MenuFooterComponent, DateNormalizePipe, CurrencyPipe],
+  imports: [
+    MenuFooterComponent,
+    DateNormalizePipe,
+    CurrencyPipe,
+    DesignSystemModule,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
   monthlyBudgets: Signal<MonthlyBudget[]> | null = null;
+  displayLoader = false;
 
   constructor(
     @Inject(MONTHLY_BUDGETS_STORE)
-    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
+    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
+    @Inject(MONTHS_SERVICE)
+    private monthsService: MonthsServiceInterface
   ) {
-    this.monthlyBudgets = this.monthlyBudgetsStore.getAll();
+    if (!this.currentMonth) {
+      this.displayLoader = true;
+      this.monthsService
+        .getUnarchivedMonths()
+        .pipe(
+          finalize(() => {
+            this.displayLoader = false;
+          })
+        )
+        .subscribe(() => {
+          this.monthlyBudgets = this.monthlyBudgetsStore.getAll();
+        });
+    }
   }
 
   get currentMonth() {

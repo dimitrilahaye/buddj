@@ -1,11 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import MonthsServiceInterface from './months.service.interface';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { Month } from '../../models/month.model';
 import { Response } from '../../models/response.model';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
+import {
+  MONTHLY_BUDGETS_STORE,
+  MonthlyBudgetsStoreInterface,
+} from '../../stores/monthlyBudgets.store.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -13,13 +17,29 @@ import { MonthlyBudget } from '../../models/monthlyBudget.model';
 export class MonthsService implements MonthsServiceInterface {
   private apiUrl: string;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    @Inject(MONTHLY_BUDGETS_STORE)
+    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
+  ) {
     this.apiUrl = environment.apiUrl;
   }
 
   createMonth(month: Month): Observable<MonthlyBudget> {
     return this.http
       .post<Response<MonthlyBudget>>(`${this.apiUrl}/months`, month)
-      .pipe(map(({ data }) => data));
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        map(({ data }) => data)
+      );
+  }
+
+  getUnarchivedMonths(): Observable<MonthlyBudget[]> {
+    return this.http
+      .get<Response<MonthlyBudget[]>>(`${this.apiUrl}/months/unarchived`)
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.addMonths(data)),
+        map(({ data }) => data)
+      );
   }
 }
