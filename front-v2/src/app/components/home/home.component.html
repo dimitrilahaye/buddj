@@ -1,21 +1,28 @@
-@if (displayLoader) { <app-loader></app-loader> } @if (currentMonth) {
+@if (displayLoader) { <app-loader></app-loader> } @if (currentMonthlyBudget &&
+current !== null) {
 <header class="header">
   <div class="header__month">
+    <button class="header-month__navigation" (click)="getPreviousMonth()">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
     <span class="header-month__title">{{
-      currentMonth.date.toString() | dateNormalize
+      current.date.toString() | dateNormalize
     }}</span>
+    <button class="header-month__navigation" (click)="getNextMonth()">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
   </div>
   <div class="header__info">
     <div class="header-info__balance">
       <span class="header-info-balance__title">Solde courant :</span>
       <span class="header-info-balance__amount">{{
-        currentMonth.dashboard.account.currentBalance | currency : "EUR"
+        current.dashboard.account.currentBalance | currency : "EUR"
       }}</span>
     </div>
     <div class="header-info__balance">
       <span class="header-info-balance__title">Solde prévisionnel :</span>
       <span class="header-info-balance__amount">{{
-        currentMonth.dashboard.account.forecastBalance | currency : "EUR"
+        current.dashboard.account.forecastBalance | currency : "EUR"
       }}</span>
     </div>
   </div>
