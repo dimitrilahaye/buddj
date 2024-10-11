@@ -65,7 +65,7 @@ describe('Router Navigation with authGuard', () => {
     });
 
     describe('when authenticated', () => {
-      it('should be able to go to /home', fakeAsync(() => {
+      it('should be able to go to /home/outflows', fakeAsync(() => {
         TestBed.runInInjectionContext(async () => {
           authenticationServiceSpy.isAuthenticated.and.returnValue(of(true));
 
@@ -83,7 +83,7 @@ describe('Router Navigation with authGuard', () => {
           });
 
           await router.navigate(['/home']);
-          expect(router.url).toEqual('/home');
+          expect(router.url).toEqual('/home/outflows');
         });
       }));
     });
