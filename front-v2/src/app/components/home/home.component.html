@@ -2,13 +2,21 @@
 current !== null) {
 <header class="header">
   <div class="header__month">
-    <button class="header-month__navigation" (click)="getPreviousMonth()">
+    <button
+      class="header-month__navigation"
+      [disabled]="isCurrentMonthTheFirst()"
+      (click)="getPreviousMonth()"
+    >
       <i class="fa-solid fa-chevron-left"></i>
     </button>
     <span class="header-month__title">{{
       current.date.toString() | dateNormalize
     }}</span>
-    <button class="header-month__navigation" (click)="getNextMonth()">
+    <button
+      class="header-month__navigation"
+      [disabled]="isCurrentMonthTheLast()"
+      (click)="getNextMonth()"
+    >
       <i class="fa-solid fa-chevron-right"></i>
     </button>
   </div>
@@ -27,6 +35,11 @@ current !== null) {
     </div>
   </div>
 </header>
+<div class="content">
+  @if(current && currentOutflows()) {
+  <app-outflows></app-outflows>
+  }
+</div>
 } @else { pas de mois }
-<div class="outflows"></div>
+
 <app-menu-footer></app-menu-footer>
