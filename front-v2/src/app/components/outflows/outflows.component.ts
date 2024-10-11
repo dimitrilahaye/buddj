@@ -1,9 +1,9 @@
 import {
+  AfterViewInit,
   Component,
   effect,
   Inject,
   Injector,
-  OnInit,
   signal,
   Signal,
   WritableSignal,
@@ -35,7 +35,7 @@ import { finalize } from 'rxjs';
   templateUrl: './outflows.component.html',
   styleUrl: './outflows.component.scss',
 })
-export class OutflowsComponent implements OnInit {
+export class OutflowsComponent implements AfterViewInit {
   month: Signal<MonthlyBudget | null> = signal(null);
   outflows: Signal<Outflow[] | null> = signal(null);
 
@@ -55,14 +55,15 @@ export class OutflowsComponent implements OnInit {
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
   ) {}
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     this.month = this.monthlyBudgetsStore.getCurrent();
     this.outflows = this.monthlyBudgetsStore.getCurrentOutflows();
-    this.setForm();
 
     effect(
       () => {
-        this.resetOutflows();
+        if (this.month()) {
+          this.setForm();
+        }
       },
       { injector: this.injector }
     );
@@ -80,10 +81,6 @@ export class OutflowsComponent implements OnInit {
     this.outflows()!.forEach((outflow) => this.addOutflow(outflow));
   }
 
-  private resetOutflows() {
-    this.setForm();
-  }
-
   addOutflow(outflow: Outflow) {
     const outflowGroup = this.fb.group({
       id: [{ value: outflow.id, disabled: true }], // hidden
@@ -99,10 +96,6 @@ export class OutflowsComponent implements OnInit {
       label: [null, Validators.required],
       amount: [0, [Validators.required, amountValidator()]],
     });
-  }
-
-  removeOutflow() {
-    this.addOutflowForm = null;
   }
 
   get outflowsFormArray(): FormArray {

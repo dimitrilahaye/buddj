@@ -35,11 +35,12 @@ current !== null) {
     </div>
   </div>
 </header>
+}
 <div class="content">
-  @if(current && currentOutflows()) {
-  <app-outflows></app-outflows>
-  }
+  <router-outlet />
 </div>
-} @else { pas de mois }
+@if(!current) { pas de mois } @if(!currentOutflows()?.length) { pas de sorties
+mensuelles }
+<!-- } @else { pas de mois } -->
 
 <app-menu-footer></app-menu-footer>
