@@ -42,4 +42,15 @@ export class MonthsService implements MonthsServiceInterface {
         map(({ data }) => data)
       );
   }
+
+  deleteOutflow(monthId: string, outflowId: string): Observable<MonthlyBudget> {
+    return this.http
+      .delete<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/outflows/${outflowId}`
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(({ data }) => data)
+      );
+  }
 }
