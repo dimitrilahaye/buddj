@@ -112,7 +112,12 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
   }
 
   private sortOutflowsByLabel(outflows: Outflow[]) {
-    return outflows.sort((a, b) => a.label.localeCompare(b.label));
+    return outflows.sort((a, b) => {
+      if (a.isChecked !== b.isChecked) {
+        return a.isChecked ? 1 : -1;
+      }
+      return a.label.localeCompare(b.label);
+    });
   }
 
   private setSortedOutflows(outflows: Outflow[]) {
