@@ -1,4 +1,25 @@
-@if (monthlyBudgets) {
-{{ monthlyBudgets().length }}
-}
+@if (currentMonth) {
+<header class="header">
+  <div class="header__month">
+    <span class="header-month__title">{{
+      currentMonth.date.toString() | dateNormalize
+    }}</span>
+  </div>
+  <div class="header__info">
+    <div class="header-info__balance">
+      <span class="header-info-balance__title">Solde courant :</span>
+      <span class="header-info-balance__amount">{{
+        currentMonth.dashboard.account.currentBalance | currency : "EUR"
+      }}</span>
+    </div>
+    <div class="header-info__balance">
+      <span class="header-info-balance__title">Solde prévisionnel :</span>
+      <span class="header-info-balance__amount">{{
+        currentMonth.dashboard.account.forecastBalance | currency : "EUR"
+      }}</span>
+    </div>
+  </div>
+</header>
+} @else { pas de mois }
+<div class="outflows"></div>
 <app-menu-footer></app-menu-footer>
