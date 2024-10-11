@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import MonthsServiceInterface, {
+  AddOutflow,
   UpdateOutflowsChecking,
 } from './months.service.interface';
 import { map, Observable, tap } from 'rxjs';
@@ -49,6 +50,18 @@ export class MonthsService implements MonthsServiceInterface {
     return this.http
       .delete<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/outflows/${outflowId}`
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(({ data }) => data)
+      );
+  }
+
+  addOutflow(monthId: string, outflow: AddOutflow): Observable<MonthlyBudget> {
+    return this.http
+      .post<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/outflows/`,
+        outflow
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),

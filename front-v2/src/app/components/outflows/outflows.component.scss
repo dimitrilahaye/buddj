@@ -21,9 +21,12 @@
   background-color: white;
   padding: 0 40px;
   box-sizing: border-box;
+  gap: 10px;
 
   app-button {
-    flex: 1;
+    &:last-child {
+      flex: 1;
+    }
   }
 }
 
@@ -38,7 +41,7 @@
   padding: 0;
 
   &--checked {
-    opacity: 0.5;
+    opacity: 0.3;
   }
 
   &__icon {
@@ -96,5 +99,18 @@
 .outflows-list-item-delete {
   &__loader {
     color: var(--color-50);
+  }
+}
+
+.modal-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
   }
 }
