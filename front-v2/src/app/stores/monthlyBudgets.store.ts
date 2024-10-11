@@ -49,7 +49,9 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
 
   addMonth(month: MonthlyBudget) {
     this._all.update((months) => {
-      return [...months, month];
+      return [...months, month].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
     });
   }
 
