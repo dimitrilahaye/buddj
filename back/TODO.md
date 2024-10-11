@@ -70,3 +70,4 @@
 - Et donc injecter mes command
 - Utiliser les termes Serializer et Deserializer ? En fonctions du coup
 - En profiter pour avoir qu'une erreur globale "route params and body malformed" avec le nom de la route en paramètre
+- empêcher de supprimer le dernier outflow
