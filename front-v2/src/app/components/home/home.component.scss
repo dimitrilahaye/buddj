@@ -17,8 +17,16 @@
   background-color: var(--color-950);
   color: white;
   box-shadow: 0px 1px 10px 0 black;
-  padding: 30px 10px;
+  padding: 30px 20px;
   box-sizing: border-box;
+
+  &__month {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+    width: 100%;
+  }
 
   &__info {
     display: flex;
@@ -29,6 +37,15 @@
 }
 
 .header-month {
+  &__navigation {
+    font-size: 30px;
+    border: none;
+    background: none;
+    color: white;
+    width: 20px;
+    padding: 0;
+  }
+
   &__title {
     @extend %title-20;
 

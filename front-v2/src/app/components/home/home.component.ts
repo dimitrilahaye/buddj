@@ -26,7 +26,7 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  monthlyBudgets: Signal<MonthlyBudget[]> | null = null;
+  currentMonthlyBudget: Signal<MonthlyBudget | null> | null = null;
   displayLoader = false;
 
   constructor(
@@ -35,7 +35,7 @@ export class HomeComponent {
     @Inject(MONTHS_SERVICE)
     private monthsService: MonthsServiceInterface
   ) {
-    if (!this.currentMonth) {
+    if (!this.currentMonthlyBudget) {
       this.displayLoader = true;
       this.monthsService
         .getUnarchivedMonths()
@@ -45,16 +45,24 @@ export class HomeComponent {
           })
         )
         .subscribe(() => {
-          this.monthlyBudgets = this.monthlyBudgetsStore.getAll();
+          this.currentMonthlyBudget = this.monthlyBudgetsStore.getCurrent();
         });
     }
   }
 
-  get currentMonth() {
-    if (!this.monthlyBudgets || !this.monthlyBudgets()[0]) {
-      return null;
+  get current() {
+    if (this.currentMonthlyBudget) {
+      return this.currentMonthlyBudget();
     }
 
-    return this.monthlyBudgets()[0];
+    return null;
+  }
+
+  getNextMonth() {
+    this.monthlyBudgetsStore.setNextMonth();
+  }
+
+  getPreviousMonth() {
+    this.monthlyBudgetsStore.setPreviousMonth();
   }
 }
