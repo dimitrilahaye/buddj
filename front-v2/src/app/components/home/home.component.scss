@@ -30,7 +30,7 @@
 
 .header-month {
   &__title {
-    @extend %title-30;
+    @extend %title-20;
 
     text-transform: capitalize;
   }
@@ -62,7 +62,4 @@
   &__amount {
     font-weight: bold;
   }
-}
-
-.outflows {
 }

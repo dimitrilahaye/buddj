@@ -3,6 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HomeComponent } from './home.component';
 import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
 import { signal } from '@angular/core';
+import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
+import { of } from 'rxjs';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -16,6 +18,12 @@ describe('HomeComponent', () => {
           provide: MONTHLY_BUDGETS_STORE,
           useValue: {
             getAll: () => signal([]),
+          },
+        },
+        {
+          provide: MONTHS_SERVICE,
+          useValue: {
+            getUnarchivedMonths: () => of([]),
           },
         },
       ],
