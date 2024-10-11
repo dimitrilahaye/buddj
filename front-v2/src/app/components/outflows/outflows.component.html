@@ -1,5 +1,5 @@
 <div class="outflows">
-  @if(outflowsFormArray.controls.length) {
+  @if(form && outflowsFormArray.controls.length) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="outflows-list">
       <app-input-number

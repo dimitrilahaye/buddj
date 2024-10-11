@@ -18,6 +18,7 @@ describe('HomeComponent', () => {
           provide: MONTHLY_BUDGETS_STORE,
           useValue: {
             getAll: () => signal([]),
+            getCurrentOutflows: () => signal([]),
           },
         },
         {
