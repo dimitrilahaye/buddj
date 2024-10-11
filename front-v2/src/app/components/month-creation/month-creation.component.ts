@@ -91,7 +91,12 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
-      this.template = data['template'];
+      this.template = {
+        ...data['template'],
+        outflows: (data['template'] as MonthTemplate).outflows.sort((a, b) =>
+          a.label.localeCompare(b.label)
+        ),
+      };
       this.setNewMonthData();
 
       this.setForm();

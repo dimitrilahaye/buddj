@@ -16,6 +16,7 @@ describe('MonthCreationComponent', () => {
     data: of({
       template: {
         month: new Date(),
+        outflows: [],
       },
     }),
   };
