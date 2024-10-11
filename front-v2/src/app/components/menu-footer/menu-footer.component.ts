@@ -1,6 +1,10 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
+import {
+  MONTHLY_BUDGETS_STORE,
+  MonthlyBudgetsStoreInterface,
+} from '../../stores/monthlyBudgets.store.interface';
 
 @Component({
   selector: 'app-menu-footer',
@@ -10,12 +14,22 @@ import { Router } from '@angular/router';
   styleUrl: './menu-footer.component.scss',
 })
 export class MenuFooterComponent {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    @Inject(MONTHLY_BUDGETS_STORE)
+    private monthlyBudgetsStore: MonthlyBudgetsStoreInterface
+  ) {}
 
   plusOpen = false;
 
-  openPlus() {
+  toggle() {
     this.plusOpen = !this.plusOpen;
+  }
+
+  navigateToOutflows() {
+    this.monthlyBudgetsStore.askForNewOutflow();
+    this.toggle();
+    this.router.navigate(['/home', 'outflows']);
   }
 
   navigateToMonthCreation() {
