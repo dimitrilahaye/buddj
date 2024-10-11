@@ -41,6 +41,7 @@ export class OutflowsComponent implements OnInit {
 
   form!: FormGroup;
   outflowDeletionIsLoadingIndex: WritableSignal<number | null> = signal(null);
+  formIsLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -128,6 +129,10 @@ export class OutflowsComponent implements OnInit {
   }
 
   onSubmit() {
-    console.info(this.form.value);
+    this.formIsLoading = true;
+    this.monthsService
+      .updateOutflowsChecking(this.month()!.id, this.form.getRawValue())
+      .pipe(finalize(() => (this.formIsLoading = false)))
+      .subscribe();
   }
 }
