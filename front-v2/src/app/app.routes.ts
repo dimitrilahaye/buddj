@@ -5,6 +5,7 @@ import { authGuard } from './guards/auth.guard';
 import { MonthCreationComponent } from './components/month-creation/month-creation.component';
 import { monthTemplateResolver } from './resolvers/month-template.resolver';
 import { OutflowsComponent } from './components/outflows/outflows.component';
+import { ExpensesComponent } from './components/expenses/expenses.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -25,7 +26,7 @@ export const routes: Routes = [
       },
       {
         path: 'expenses',
-        component: OutflowsComponent,
+        component: ExpensesComponent,
       },
     ],
   },

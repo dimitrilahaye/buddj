@@ -2,7 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import MonthsServiceInterface, {
+  AddExpense,
   AddOutflow,
+  UpdateExpensesChecking,
   UpdateOutflowsChecking,
 } from './months.service.interface';
 import { map, Observable, tap } from 'rxjs';
@@ -75,8 +77,54 @@ export class MonthsService implements MonthsServiceInterface {
   ): Observable<MonthlyBudget> {
     return this.http
       .put<Response<MonthlyBudget>>(
-        `${this.apiUrl}/months/${monthId}/outflows/checking`,
+        `${this.apiUrl}/months/${monthId}outflows/checking`,
         data
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(({ data }) => data)
+      );
+  }
+
+  updateExpensesChecking(
+    monthId: string,
+    data: UpdateExpensesChecking
+  ): Observable<MonthlyBudget> {
+    return this.http
+      .put<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/expenses/checking`,
+        data
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(({ data }) => data)
+      );
+  }
+
+  deleteExpense(
+    monthId: string,
+    weeklyId: string,
+    expenseId: string
+  ): Observable<MonthlyBudget> {
+    return this.http
+      .delete<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/weekly/${weeklyId}/expenses/${expenseId}`
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(({ data }) => data)
+      );
+  }
+
+  addExpense(
+    monthId: string,
+    weeklyId: string,
+    expense: AddExpense
+  ): Observable<MonthlyBudget> {
+    return this.http
+      .post<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/weeks/${weeklyId}/expenses`,
+        expense
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
