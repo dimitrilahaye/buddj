@@ -19,6 +19,8 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
   private _isCurrentMonthTheFirst = signal<boolean>(false);
   private _isCurrentMonthTheLast = signal<boolean>(false);
   private _askedForNewOutflow: WritableSignal<number> = signal(0);
+  // expenses management
+  private _askedForNewExpense: WritableSignal<number> = signal(0);
 
   constructor() {
     effect(
@@ -127,6 +129,14 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
 
   askForNewOutflow(): void {
     this._askedForNewOutflow.update((value) => value + 1);
+  }
+
+  get askedForNewExpense(): WritableSignal<number> {
+    return this._askedForNewExpense;
+  }
+
+  askForNewExpense(): void {
+    this._askedForNewExpense.update((value) => value + 1);
   }
 
   private sortOutflowsByLabel(outflows: Outflow[]) {

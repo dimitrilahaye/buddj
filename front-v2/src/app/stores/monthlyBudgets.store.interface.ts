@@ -25,6 +25,10 @@ export interface MonthlyBudgetsStoreInterface {
   get askedForNewOutflow(): WritableSignal<number>;
 
   askForNewOutflow(): void;
+
+  get askedForNewExpense(): WritableSignal<number>;
+
+  askForNewExpense(): void;
 }
 
 export const MONTHLY_BUDGETS_STORE =
