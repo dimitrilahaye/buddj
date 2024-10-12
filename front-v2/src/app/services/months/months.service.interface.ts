@@ -13,6 +13,18 @@ export interface AddOutflow {
   amount: number;
 }
 
+export interface AddExpense {
+  label: string;
+  amount: number;
+}
+
+export interface UpdateExpensesChecking {
+  weeklyBudgets: {
+    id: string;
+    expenses: { id: string; isChecked: boolean }[];
+  }[];
+}
+
 export default interface MonthsServiceInterface {
   createMonth(month: Month): Observable<MonthlyBudget>;
   getUnarchivedMonths(): Observable<MonthlyBudget[]>;
@@ -22,6 +34,20 @@ export default interface MonthsServiceInterface {
     data: UpdateOutflowsChecking
   ): Observable<MonthlyBudget>;
   addOutflow(monthId: string, outflow: AddOutflow): Observable<MonthlyBudget>;
+  updateExpensesChecking(
+    monthId: string,
+    data: UpdateExpensesChecking
+  ): Observable<MonthlyBudget>;
+  deleteExpense(
+    monthId: string,
+    weeklyId: string,
+    expenseId: string
+  ): Observable<MonthlyBudget>;
+  addExpense(
+    monthId: string,
+    weeklyId: string,
+    expense: AddExpense
+  ): Observable<MonthlyBudget>;
 }
 
 export const MONTHS_SERVICE = new InjectionToken<MonthsServiceInterface>(

@@ -1,0 +1,115 @@
+<div class="expenses">
+  @if(form && expensesFormArray.controls.length) {
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="expenses-list" formArrayName="expenses">
+      <app-item
+        *ngFor="let expense of expensesFormArray.controls; let i = index"
+        [formGroupName]="i"
+      >
+        <button
+          type="button"
+          [ngClass]="{
+            'expenses-list-item--checked': isExpenseItemChecked(i)
+          }"
+          class="expenses-list-item"
+          (click)="toggleExpenseAtIndex(i, $event)"
+        >
+          <span class="expenses-list-item__icon">
+            <i class="fa-solid fa-basket-shopping"></i>
+          </span>
+          <div
+            [ngClass]="{
+              'expenses-list-item__info--checked': isExpenseItemChecked(i)
+            }"
+            class="expenses-list-item__info"
+          >
+            <span class="expenses-list-item-info__label">{{
+              expense.get("label")?.value || "Label introuvable"
+            }}</span>
+            <span class="expenses-list-item-info__amount"
+              >{{ expense.get("amount")?.value || "Somme introuvable" }}€</span
+            >
+          </div>
+
+          <button
+            class="expenses-list-item__delete"
+            type="button"
+            [disabled]="expenseDeletionIsLoadingByIndex(i)"
+            (click)="deleteExpenseByIndex(i, $event)"
+          >
+            @if(expenseDeletionIsLoadingByIndex(i)) {
+            <ng-container *ngTemplateOutlet="loader"></ng-container>
+            } @else {
+            <i class="fa-solid fa-trash-can"></i>
+            }
+          </button>
+        </button>
+      </app-item>
+    </div>
+    <div class="expenses-submit">
+      <app-button
+        [type]="'submit'"
+        [size]="'big'"
+        [variant]="'danger'"
+        [label]="'Sauvegarder les modifications'"
+        [loading]="formIsLoading"
+      ></app-button>
+    </div>
+  </form>
+  } @else { pas de dépenses actuellement }
+</div>
+
+@if(addExpenseForm) {
+<app-sliding-modal
+  [isOpen]="isExpensesModalOpen"
+  [canClose]="!addExpenseFormIsLoading"
+  (close)="closeExpensesModal()"
+>
+  <form [formGroup]="addExpenseForm" (ngSubmit)="submitExpenseModal($event)">
+    <div class="modal-container">
+      <!-- week -->
+      <select
+        class="modal-container__select"
+        formControlName="weekId"
+        id="weekId"
+      >
+        <option disabled value="">Choisir la semaine</option>
+        <option *ngFor="let week of weeks" [value]="week.id">
+          {{ week.name }}
+        </option>
+      </select>
+      <!-- label -->
+      <app-input-text
+        [formGroup]="addExpenseForm"
+        formControlName="label"
+        [required]="true"
+      ></app-input-text>
+
+      <!-- amount -->
+      <app-input-number
+        [formGroup]="addExpenseForm"
+        formControlName="amount"
+        [required]="true"
+        [step]="'0.01'"
+      ></app-input-number>
+
+      <div class="modal-container__actions">
+        <app-button
+          class="login-page__login-button"
+          [type]="'submit'"
+          [variant]="'danger'"
+          [label]="'Ajouter cette sortie mensuelle'"
+          [loading]="addExpenseFormIsLoading"
+          (click)="submitExpenseModal($event)"
+        ></app-button>
+      </div>
+    </div>
+  </form>
+</app-sliding-modal>
+}
+
+<ng-template #loader>
+  <span class="expenses-list-item-delete__loader">
+    <app-animated-spinner [width]="20" [height]="20"></app-animated-spinner>
+  </span>
+</ng-template>
