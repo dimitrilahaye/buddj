@@ -1,5 +1,5 @@
 import { InjectionToken, Signal, WritableSignal } from '@angular/core';
-import { MonthlyBudget, Outflow } from '../models/monthlyBudget.model';
+import { Expense, MonthlyBudget, Outflow } from '../models/monthlyBudget.model';
 
 export interface MonthlyBudgetsStoreInterface {
   addMonth(month: MonthlyBudget): void;
@@ -27,6 +27,8 @@ export interface MonthlyBudgetsStoreInterface {
   askForNewOutflow(): void;
 
   resetAskForNewOutflow(): void;
+
+  getCurrentExpenses(): Signal<Expense[] | null>;
 
   get askedForNewExpense(): WritableSignal<number>;
 
