@@ -21,6 +21,18 @@
     >
       <button
         class="menu-footer-add-links__link"
+        (click)="navigateToExpenses()"
+        type="button"
+      >
+        <i
+          class="menu-footer-add-links-link__icon fa-solid fa-basket-shopping"
+        ></i>
+        <span class="menu-footer-add-links-link__label"
+          >Ajouter une dépense</span
+        >
+      </button>
+      <button
+        class="menu-footer-add-links__link"
         (click)="navigateToOutflows()"
         type="button"
       >

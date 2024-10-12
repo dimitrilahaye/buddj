@@ -26,6 +26,12 @@ export class MenuFooterComponent {
     this.plusOpen = !this.plusOpen;
   }
 
+  navigateToExpenses() {
+    this.monthlyBudgetsStore.askForNewExpense();
+    this.toggle();
+    this.router.navigate(['/home', 'expenses']);
+  }
+
   navigateToOutflows() {
     this.monthlyBudgetsStore.askForNewOutflow();
     this.toggle();

@@ -23,6 +23,10 @@ export const routes: Routes = [
         path: 'outflows',
         component: OutflowsComponent,
       },
+      {
+        path: 'expenses',
+        component: OutflowsComponent,
+      },
     ],
   },
   {
