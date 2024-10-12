@@ -13,7 +13,7 @@
   box-sizing: border-box;
 
   &:disabled {
-    background-color: var(--color-200);
+    opacity: 0.5;
   }
 
   &--middle {
