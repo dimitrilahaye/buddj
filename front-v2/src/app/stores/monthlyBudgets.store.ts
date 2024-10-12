@@ -131,12 +131,20 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     this._askedForNewOutflow.update((value) => value + 1);
   }
 
+  resetAskForNewOutflow(): void {
+    this._askedForNewOutflow.set(0);
+  }
+
   get askedForNewExpense(): WritableSignal<number> {
     return this._askedForNewExpense;
   }
 
   askForNewExpense(): void {
     this._askedForNewExpense.update((value) => value + 1);
+  }
+
+  resetAskForNewExpense(): void {
+    this._askedForNewExpense.set(0);
   }
 
   private sortOutflowsByLabel(outflows: Outflow[]) {
