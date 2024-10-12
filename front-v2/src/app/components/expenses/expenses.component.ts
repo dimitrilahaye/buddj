@@ -12,6 +12,7 @@ import {
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { MonthlyBudget, Expense } from '../../models/monthlyBudget.model';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
@@ -43,7 +44,7 @@ export class ExpensesComponent implements AfterViewInit {
 
   form!: FormGroup;
   addExpenseForm: FormGroup | null = null;
-  expenseDeletionIsLoadingIndex: WritableSignal<number | null> = signal(null);
+  expenseDeletionIsLoadingIndex: WritableSignal<string | null> = signal(null);
   formIsLoading = false;
   addExpenseFormIsLoading = false;
   isExpensesModalOpen = false;
@@ -62,7 +63,6 @@ export class ExpensesComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.month = this.monthlyBudgetsStore.getCurrent();
     this.expenses = this.monthlyBudgetsStore.getCurrentExpenses();
-
     effect(
       () => {
         if (this.month()) {
@@ -81,6 +81,20 @@ export class ExpensesComponent implements AfterViewInit {
         }
       },
       { injector: this.injector }
+    );
+  }
+
+  get forecastBalance() {
+    return (
+      this.month()?.dashboard.weeks.forecastBalance ?? 'ERROR: forecast balance'
+    );
+  }
+
+  getCurrentBalanceByWeekName(weekName: string) {
+    return (
+      this.month()?.dashboard.weeks.weeklyBudgets.find(
+        (w) => w.weekName === weekName
+      )?.currentBalance ?? 0
     );
   }
 
@@ -105,17 +119,26 @@ export class ExpensesComponent implements AfterViewInit {
   }
 
   addExpense(expense: Expense) {
-    const expenseWeekId = this.weeks.find((w) =>
+    const expenseWeek = this.weeks.find((w) =>
       w.expensesId.includes(expense.id)
-    )?.id;
-    const expenseGroup = this.fb.group({
-      weekId: [expenseWeekId],
-      id: [{ value: expense.id, disabled: true }], // hidden
-      label: [expense.label, Validators.required],
-      amount: [expense.amount, [Validators.required, amountValidator()]],
-      isChecked: [{ value: expense.isChecked, disabled: true }], // hidden
-    });
-    this.expensesFormArray.push(expenseGroup);
+    );
+    if (expenseWeek) {
+      const expenseGroup = this.fb.group({
+        weekId: [expenseWeek.id],
+        weekName: [expenseWeek.name],
+        id: [{ value: expense.id, disabled: true }], // hidden
+        label: [expense.label, Validators.required],
+        amount: [expense.amount, [Validators.required, amountValidator()]],
+        isChecked: [{ value: expense.isChecked, disabled: true }], // hidden
+      });
+      this.expensesFormArray.push(expenseGroup);
+    }
+  }
+
+  getExpensesFormGroupByWeekId(weekId: string) {
+    return this.expensesFormArray.controls.filter(
+      (control) => control.get('weekId')?.value === weekId
+    );
   }
 
   setAddExpenseForm() {
@@ -130,35 +153,47 @@ export class ExpensesComponent implements AfterViewInit {
     return this.form.get('expenses') as FormArray;
   }
 
-  toggleExpenseAtIndex(i: number, event: Event) {
-    const expenseControl = this.expensesFormArray.at(i);
-    const expenseValue = this.expensesFormArray.at(i).getRawValue();
-    expenseControl.setValue({
+  toggleExpenseAtIndex(expense: AbstractControl<Expense>, event: Event) {
+    const expenseControl = this.getExpenseControl(expense);
+    const expenseValue = expenseControl?.getRawValue();
+    expenseControl?.setValue({
       ...expenseValue,
       isChecked: !expenseValue.isChecked,
     });
     event.stopPropagation();
   }
 
-  isExpenseItemChecked(i: number) {
-    const expenseValue = this.expensesFormArray.at(i).getRawValue();
-    return expenseValue.isChecked;
+  isExpenseItemChecked(expense: AbstractControl<Expense>) {
+    const expenseValue = this.getExpenseControl(expense);
+    return expenseValue?.getRawValue().isChecked;
   }
 
-  deleteExpenseByIndex(i: number, event: Event) {
-    this.expenseDeletionIsLoadingIndex.update(() => i);
-    const { weekId, id: expenseId } = this.expensesFormArray
-      .at(i)
-      .getRawValue();
-    this.monthsService
-      .deleteExpense(this.month()!.id, weekId, expenseId)
-      .pipe(finalize(() => this.stopDeletationLoading()))
-      .subscribe(() => this.toaster.success('Votre dépense a été supprimée !'));
+  private getExpenseControl(expense: AbstractControl<Expense, Expense>) {
+    return this.expensesFormArray.controls.find(
+      (control) => control.get('id')?.value === expense.get('id')?.value
+    );
+  }
+
+  deleteExpense(expense: AbstractControl<Expense>, event: Event) {
+    this.expenseDeletionIsLoadingIndex.update(
+      () => expense.get('id')?.value as string
+    );
+    const expenseValue = this.getExpenseControl(expense)?.getRawValue();
+    if (expenseValue) {
+      const { weekId, id: expenseId } = expenseValue;
+
+      this.monthsService
+        .deleteExpense(this.month()!.id, weekId, expenseId)
+        .pipe(finalize(() => this.stopDeletationLoading()))
+        .subscribe(() =>
+          this.toaster.success('Votre dépense a été supprimée !')
+        );
+    }
     event.stopPropagation();
   }
 
-  expenseDeletionIsLoadingByIndex(i: number) {
-    return this.expenseDeletionIsLoadingIndex() === i;
+  expenseDeletionIsLoadingByIndex(expense: AbstractControl<Expense>) {
+    return this.expenseDeletionIsLoadingIndex() === expense.get('id')?.value;
   }
 
   stopDeletationLoading() {
@@ -192,11 +227,11 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
-  deleteExpense(event: Event) {
-    this.expensesFormArray.removeAt(this.expenses.length - 1);
-    this.closeExpensesModal();
-    event.stopPropagation();
-  }
+  // deleteExpense(event: Event) {
+  //   this.expensesFormArray.removeAt(this.expenses.length - 1);
+  //   this.closeExpensesModal();
+  //   event.stopPropagation();
+  // }
 
   onSubmit() {
     this.formIsLoading = true;

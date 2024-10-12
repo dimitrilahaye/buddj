@@ -5,7 +5,35 @@
 .expenses-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+
+  &__week {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__week-name {
+    margin: 0;
+  }
+
+  &__balance {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+
+    span {
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    app-progress-bar {
+      flex: 1;
+    }
+  }
 }
 
 .expenses-submit {
@@ -124,4 +152,8 @@
     color: var(--dark-100);
     font-size: var(--text-10);
   }
+}
+
+.info {
+  font-size: 12px;
 }

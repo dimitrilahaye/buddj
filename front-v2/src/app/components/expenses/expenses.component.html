@@ -2,49 +2,73 @@
   @if(form && expensesFormArray.controls.length) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="expenses-list" formArrayName="expenses">
-      <app-item
-        *ngFor="let expense of expensesFormArray.controls; let i = index"
-        [formGroupName]="i"
-      >
-        <button
-          type="button"
-          [ngClass]="{
-            'expenses-list-item--checked': isExpenseItemChecked(i)
-          }"
-          class="expenses-list-item"
-          (click)="toggleExpenseAtIndex(i, $event)"
-        >
-          <span class="expenses-list-item__icon">
-            <i class="fa-solid fa-basket-shopping"></i>
-          </span>
-          <div
-            [ngClass]="{
-              'expenses-list-item__info--checked': isExpenseItemChecked(i)
-            }"
-            class="expenses-list-item__info"
-          >
-            <span class="expenses-list-item-info__label">{{
-              expense.get("label")?.value || "Label introuvable"
-            }}</span>
-            <span class="expenses-list-item-info__amount"
-              >{{ expense.get("amount")?.value || "Somme introuvable" }}€</span
-            >
+      <span>Solde prévisionnel : {{ forecastBalance | currency : "EUR" }}</span>
+      <ng-container *ngFor="let week of weeks">
+        <div class="expenses-list__week">
+          <h2 class="expenses-list__week-name">{{ week.name }}</h2>
+          <div class="expenses-list__balance">
+            <span>Solde :</span>
+            <app-progress-bar
+              [currentValue]="getCurrentBalanceByWeekName(week.name)"
+              [total]="200"
+            ></app-progress-bar>
           </div>
-
-          <button
-            class="expenses-list-item__delete"
-            type="button"
-            [disabled]="expenseDeletionIsLoadingByIndex(i)"
-            (click)="deleteExpenseByIndex(i, $event)"
+          @if (getExpensesFormGroupByWeekId(week.id).length === 0) {
+          <span class="info">Pas de dépenses pour cette semaine 😁</span> }
+          @else {
+          <app-item
+            *ngFor="
+              let expense of getExpensesFormGroupByWeekId(week.id);
+              let i = index
+            "
+            [formGroupName]="i"
           >
-            @if(expenseDeletionIsLoadingByIndex(i)) {
-            <ng-container *ngTemplateOutlet="loader"></ng-container>
-            } @else {
-            <i class="fa-solid fa-trash-can"></i>
-            }
-          </button>
-        </button>
-      </app-item>
+            <button
+              type="button"
+              [ngClass]="{
+                'expenses-list-item--checked': isExpenseItemChecked(expense)
+              }"
+              class="expenses-list-item"
+              (click)="toggleExpenseAtIndex(expense, $event)"
+            >
+              <span class="expenses-list-item__icon">
+                <i class="fa-solid fa-basket-shopping"></i>
+              </span>
+              <div
+                [ngClass]="{
+                  'expenses-list-item__info--checked':
+                    isExpenseItemChecked(expense)
+                }"
+                class="expenses-list-item__info"
+              >
+                <span class="expenses-list-item-info__label">
+                  {{ expense.get("label")?.value || "Label introuvable" }}</span
+                >
+                <span class="expenses-list-item-info__amount"
+                  >{{
+                    expense.get("amount")?.value || "Somme introuvable"
+                  }}€</span
+                >
+              </div>
+
+              <button
+                class="expenses-list-item__delete"
+                type="button"
+                [disabled]="expenseDeletionIsLoadingByIndex(expense)"
+                (click)="deleteExpense(expense, $event)"
+              >
+                @if(expenseDeletionIsLoadingByIndex(expense)) {
+                <ng-container *ngTemplateOutlet="loader"></ng-container>
+                } @else {
+                <i class="fa-solid fa-trash-can"></i>
+                }
+              </button>
+            </button>
+          </app-item>
+          }
+        </div>
+        <app-divider></app-divider>
+      </ng-container>
     </div>
     <div class="expenses-submit">
       <app-button
@@ -56,7 +80,7 @@
       ></app-button>
     </div>
   </form>
-  } @else { pas de dépenses actuellement }
+  } @else { <span class="info">Aucune dépense actuellement 😁</span> }
 </div>
 
 @if(addExpenseForm) {
