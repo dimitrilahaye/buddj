@@ -39,6 +39,8 @@ export class MenuFooterComponent {
   }
 
   navigateToMonthCreation() {
+    this.monthlyBudgetsStore.resetAskForNewOutflow();
+    this.monthlyBudgetsStore.resetAskForNewExpense();
     this.router.navigate(['month-creation']);
   }
 }
