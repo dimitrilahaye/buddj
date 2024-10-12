@@ -1,5 +1,7 @@
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 @if(plusOpen) {
-<div class="backdrop"></div>
+<div class="backdrop" (click)="toggle()"></div>
 }
 <div class="menu-footer">
   <div class="menu-footer__icons">
