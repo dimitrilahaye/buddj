@@ -102,6 +102,7 @@
         <app-divider></app-divider>
       </ng-container>
     </div>
+    @if(formUpdated) {
     <div class="expenses-submit">
       <app-button
         [type]="'submit'"
@@ -111,6 +112,7 @@
         [loading]="formIsLoading"
       ></app-button>
     </div>
+    }
   </form>
   } @else { <span class="info">Aucune dépense actuellement 😁</span> }
 </div>

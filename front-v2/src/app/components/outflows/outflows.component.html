@@ -58,6 +58,7 @@
         </app-item>
       </div>
     </div>
+    @if(formUpdated) {
     <div class="outflows-submit">
       <app-button
         [type]="'submit'"
@@ -67,6 +68,7 @@
         [loading]="formIsLoading"
       ></app-button>
     </div>
+    }
   </form>
   }
 </div>
