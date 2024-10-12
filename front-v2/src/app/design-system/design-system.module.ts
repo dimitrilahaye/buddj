@@ -10,6 +10,7 @@ import { ItemComponent } from './item/item/item.component';
 import { DividerComponent } from './divider/divider.component';
 import { LoaderComponent } from './loader/loader.component';
 import { AnimatedSpinnerComponent } from './animated-spinner/animated-spinner.component';
+import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { AnimatedSpinnerComponent } from './animated-spinner/animated-spinner.co
     DividerComponent,
     LoaderComponent,
     AnimatedSpinnerComponent,
+    ProgressBarComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -34,6 +36,7 @@ import { AnimatedSpinnerComponent } from './animated-spinner/animated-spinner.co
     DividerComponent,
     LoaderComponent,
     AnimatedSpinnerComponent,
+    ProgressBarComponent,
   ],
 })
 export class DesignSystemModule {}

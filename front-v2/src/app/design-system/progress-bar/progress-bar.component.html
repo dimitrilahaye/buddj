@@ -1,0 +1,10 @@
+<div class="progress-bar">
+  <span class="progress-bar__info">
+    {{ currentValue | currency : "EUR" }} sur
+    {{ total | currency : "EUR" }}
+  </span>
+  <div
+    class="progress-bar__fill {{ progressClass }}"
+    [style.width.%]="progressPercentage"
+  ></div>
+</div>
