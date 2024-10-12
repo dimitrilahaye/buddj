@@ -46,6 +46,7 @@ export class OutflowsComponent implements AfterViewInit {
   formIsLoading = false;
   addOutflowFormIsLoading = false;
   isOutflowsModalOpen = false;
+  formUpdated = false;
 
   constructor(
     private fb: FormBuilder,
@@ -65,6 +66,12 @@ export class OutflowsComponent implements AfterViewInit {
       () => {
         if (this.month()) {
           this.setForm();
+
+          this.form.valueChanges.subscribe(() => {
+            if (this.formUpdated === false) {
+              this.formUpdated = true;
+            }
+          });
         }
       },
       { injector: this.injector }
