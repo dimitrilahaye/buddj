@@ -52,6 +52,7 @@ export class ExpensesComponent implements AfterViewInit {
   isExpensesModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
   filtersState: FilterState = 'all';
+  formUpdated = false;
 
   constructor(
     private fb: FormBuilder,
@@ -70,6 +71,12 @@ export class ExpensesComponent implements AfterViewInit {
       () => {
         if (this.month()) {
           this.setForm();
+
+          this.form.valueChanges.subscribe(() => {
+            if (this.formUpdated === false) {
+              this.formUpdated = true;
+            }
+          });
         }
       },
       { injector: this.injector }
