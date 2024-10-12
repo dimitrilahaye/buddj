@@ -20,6 +20,7 @@ describe('OutflowsComponent', () => {
             getCurrent: () =>
               signal({ dashboard: { account: { currentBalance: 2000 } } }),
             getCurrentOutflows: () => signal([]),
+            askedForNewOutflow: () => signal(0),
           },
         },
       ],
