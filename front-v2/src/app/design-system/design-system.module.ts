@@ -9,6 +9,7 @@ import { TextComponent } from './input/text/text.component';
 import { ItemComponent } from './item/item/item.component';
 import { DividerComponent } from './divider/divider.component';
 import { LoaderComponent } from './loader/loader.component';
+import { AnimatedSpinnerComponent } from './animated-spinner/animated-spinner.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { LoaderComponent } from './loader/loader.component';
     ItemComponent,
     DividerComponent,
     LoaderComponent,
+    AnimatedSpinnerComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -31,6 +33,7 @@ import { LoaderComponent } from './loader/loader.component';
     ItemComponent,
     DividerComponent,
     LoaderComponent,
+    AnimatedSpinnerComponent,
   ],
 })
 export class DesignSystemModule {}
