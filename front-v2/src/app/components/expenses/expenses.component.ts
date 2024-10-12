@@ -31,6 +31,8 @@ import {
 import { finalize } from 'rxjs';
 import { HotToastService } from '@ngxpert/hot-toast';
 
+type FilterState = 'all' | 'checked' | 'unchecked';
+
 @Component({
   selector: 'app-expenses',
   standalone: true,
@@ -49,6 +51,7 @@ export class ExpensesComponent implements AfterViewInit {
   addExpenseFormIsLoading = false;
   isExpensesModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
+  filtersState: FilterState = 'all';
 
   constructor(
     private fb: FormBuilder,
@@ -82,6 +85,10 @@ export class ExpensesComponent implements AfterViewInit {
       },
       { injector: this.injector }
     );
+  }
+
+  filterIsActive(state: FilterState) {
+    return this.filtersState === state;
   }
 
   get forecastBalance() {
@@ -135,10 +142,23 @@ export class ExpensesComponent implements AfterViewInit {
     }
   }
 
+  updateFilterState(state: FilterState) {
+    this.filtersState = state;
+  }
+
   getExpensesFormGroupByWeekId(weekId: string) {
-    return this.expensesFormArray.controls.filter(
-      (control) => control.get('weekId')?.value === weekId
-    );
+    return this.expensesFormArray.controls
+      .filter((control) => control.get('weekId')?.value === weekId)
+      .filter((control) => {
+        switch (this.filtersState) {
+          case 'checked':
+            return control.get('isChecked')?.value === true;
+          case 'unchecked':
+            return control.get('isChecked')?.value === false;
+          default:
+            return control;
+        }
+      });
   }
 
   setAddExpenseForm() {
