@@ -33,6 +33,8 @@ export class ArchivedMonthsComponent implements OnInit {
   archivedMonths: Signal<MonthlyBudget[] | null> = signal(null);
   dataLoaded = false;
   unarchiveLoadingByMonthId: string | null = null;
+  deleteMonthLoading = false;
+  openMenuModal = false;
 
   constructor(
     private router: Router,
@@ -74,6 +76,20 @@ export class ArchivedMonthsComponent implements OnInit {
       .unarchiveMonth(month.id)
       .pipe(finalize(() => (this.unarchiveLoadingByMonthId = null)))
       .subscribe(() => this.toaster.success('Votre mois a été désarchivé !'));
+  }
+
+  toggle(event: Event) {
+    this.openMenuModal = !this.openMenuModal;
+    event.stopPropagation();
+  }
+
+  deleteMonth(month: MonthlyBudget, event: Event) {
+    event.stopPropagation();
+    this.deleteMonthLoading = true;
+    this.monthsService
+      .deleteMonth(month.id)
+      .pipe(finalize(() => (this.deleteMonthLoading = false)))
+      .subscribe(() => this.toaster.success('Votre mois a été supprimé !'));
   }
 
   isUnarchiveMonthLoadingById(monthId: string) {
