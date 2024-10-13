@@ -164,4 +164,14 @@ export class MonthsService implements MonthsServiceInterface {
         map(({ data }) => data)
       );
   }
+
+  deleteMonth(monthId: string): Observable<MonthlyBudget[]> {
+    return this.http
+      .delete<Response<MonthlyBudget[]>>(`${this.apiUrl}/months/${monthId}`, {})
+      .pipe(
+        tap(() => this.monthlyBudgetsStore.removeMonthFromArchives(monthId)),
+        tap(({ data }) => this.monthlyBudgetsStore.addMonths(data)),
+        map(({ data }) => data)
+      );
+  }
 }

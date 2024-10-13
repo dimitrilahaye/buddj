@@ -9,6 +9,16 @@
 <div class="archived-months">
   @if(hasArchivedMonths()) {
   <app-item *ngFor="let month of getArchivedMonths(); let i = index">
+    <app-modal [modalOpen]="openMenuModal" (click)="toggle($event)">
+      <app-button
+        [type]="'submit'"
+        [size]="'big'"
+        [variant]="'danger'"
+        [label]="'Supprimer le mois définitivement'"
+        [loading]="deleteMonthLoading"
+        (click)="deleteMonth(month, $event)"
+      ></app-button>
+    </app-modal>
     <button type="button" class="archived-months-list-item">
       <span class="archived-months-list-item__icon">
         <i class="fa-solid fa-calendar"></i>
@@ -36,7 +46,11 @@
         <i class="fa-solid fa-box-open"></i>
         }
       </button>
-      <button class="archived-months-list-item__delete" type="button">
+      <button
+        class="archived-months-list-item__delete"
+        type="button"
+        (click)="toggle($event)"
+      >
         <i class="fa-solid fa-trash-can"></i>
       </button>
     </button>
