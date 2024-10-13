@@ -1,0 +1,61 @@
+.modal {
+  &__container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+  }
+}
+
+.modal-container {
+  &__content {
+    &--fade-in-up {
+      opacity: 0;
+      animation: fadeInUp 0.2s ease-out forwards;
+    }
+
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    background: white;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: var(--radius-70);
+    z-index: 10;
+    height: fit-content;
+    width: fit-content;
+    box-shadow: 0 5px 10px 0;
+  }
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9;
+  background-color: rgba(183, 183, 183, 0.5);
+  backdrop-filter: blur(8px);
+  filter: blur(8px);
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
