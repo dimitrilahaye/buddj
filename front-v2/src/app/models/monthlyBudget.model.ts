@@ -23,6 +23,7 @@ export type DashboardWeeks = {
 
 export type DashboardWeeklyBudget = {
   weekName: string;
+  initialBalance: number;
   currentBalance: number;
 };
 

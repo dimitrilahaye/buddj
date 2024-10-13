@@ -1,5 +1,5 @@
 <div class="expenses">
-  @if(form && expensesFormArray.controls.length) {
+  @if(form && expensesFormArray) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="expenses-list" formArrayName="expenses">
       <span>Solde prévisionnel : {{ forecastBalance | currency : "EUR" }}</span>
@@ -42,7 +42,7 @@
             <span>Solde :</span>
             <app-progress-bar
               [currentValue]="getCurrentBalanceByWeekName(week.name)"
-              [total]="200"
+              [total]="getInitialBalanceByWeekName(week.name)"
             ></app-progress-bar>
           </div>
           @if (getExpensesFormGroupByWeekId(week.id).length === 0) {

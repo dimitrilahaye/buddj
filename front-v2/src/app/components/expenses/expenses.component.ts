@@ -106,10 +106,16 @@ export class ExpensesComponent implements AfterViewInit {
   }
 
   getCurrentBalanceByWeekName(weekName: string) {
-    return (
-      this.month()?.dashboard.weeks.weeklyBudgets.find(
-        (w) => w.weekName === weekName
-      )?.currentBalance ?? 0
+    return this.getDashboardWeeklyBudgetByName(weekName)?.currentBalance ?? 0;
+  }
+
+  getInitialBalanceByWeekName(weekName: string) {
+    return this.getDashboardWeeklyBudgetByName(weekName)?.initialBalance ?? 0;
+  }
+
+  private getDashboardWeeklyBudgetByName(weekName: string) {
+    return this.month()?.dashboard.weeks.weeklyBudgets.find(
+      (w) => w.weekName === weekName
     );
   }
 
