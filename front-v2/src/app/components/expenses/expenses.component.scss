@@ -9,6 +9,18 @@
   flex-direction: column;
   gap: 20px;
 
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  &__forecast {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
   &__filters {
     display: flex;
     flex-direction: row;
@@ -42,6 +54,15 @@
     app-progress-bar {
       flex: 1;
     }
+  }
+}
+
+.expenses-list-forecast {
+  &__title {
+    font-size: 10px;
+  }
+  &__amount {
+    font-weight: bold;
   }
 }
 
