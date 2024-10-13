@@ -169,6 +169,10 @@
     z-index: 10;
     height: fit-content;
     width: fit-content;
+
+    app-divider {
+      margin: 10px 0;
+    }
   }
 
   &__plus {
@@ -205,6 +209,10 @@
     color: white;
     border: none;
     border-radius: var(--radius-50);
+
+    &--danger {
+      background: var(--color-950);
+    }
   }
 }
 
@@ -214,6 +222,10 @@
   }
   &__label {
     @extend %text-10;
+
+    &--capitalize {
+      text-transform: capitalize;
+    }
   }
 }
 
