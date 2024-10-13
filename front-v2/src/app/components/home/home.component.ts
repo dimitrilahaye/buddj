@@ -99,6 +99,7 @@ export class HomeComponent {
 
   navigateToArchivedMonths(event: Event) {
     event.stopPropagation();
+    this.router.navigate(['archived-months']);
   }
 
   doNothing(event: Event) {

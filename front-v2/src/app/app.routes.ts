@@ -6,6 +6,7 @@ import { MonthCreationComponent } from './components/month-creation/month-creati
 import { monthTemplateResolver } from './resolvers/month-template.resolver';
 import { OutflowsComponent } from './components/outflows/outflows.component';
 import { ExpensesComponent } from './components/expenses/expenses.component';
+import { ArchivedMonthsComponent } from './components/archived-months/archived-months.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -37,5 +38,13 @@ export const routes: Routes = [
     resolve: {
       template: monthTemplateResolver,
     },
+  },
+  {
+    path: 'archived-months',
+    component: ArchivedMonthsComponent,
+    canActivate: [authGuard],
+    // resolve: {
+    //   archivedMonths: monthTemplateResolver,
+    // },
   },
 ];
