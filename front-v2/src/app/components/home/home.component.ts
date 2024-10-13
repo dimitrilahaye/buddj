@@ -36,7 +36,7 @@ import {
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  currentMonthlyBudget: Signal<MonthlyBudget | null> | null = null;
+  currentMonthlyBudget: Signal<MonthlyBudget | null>;
   isCurrentMonthTheFirst: Signal<boolean> = signal(true);
   isCurrentMonthTheLast: Signal<boolean> = signal(false);
   displayLoader = false;
@@ -59,12 +59,14 @@ export class HomeComponent {
             this.displayLoader = false;
           })
         )
-        .subscribe(() => {
-          this.initializeCurrentMonth();
-        });
-    } else {
-      this.initializeCurrentMonth();
+        .subscribe();
     }
+
+    this.currentMonthlyBudget = this.monthlyBudgetsStore.getCurrent();
+    this.isCurrentMonthTheFirst =
+      this.monthlyBudgetsStore.isCurrentMonthTheFirst();
+    this.isCurrentMonthTheLast =
+      this.monthlyBudgetsStore.isCurrentMonthTheLast();
   }
 
   toggle() {
@@ -100,11 +102,11 @@ export class HomeComponent {
   }
 
   get current() {
-    if (this.currentMonthlyBudget) {
-      return this.currentMonthlyBudget();
-    }
+    return this.currentMonthlyBudget();
+  }
 
-    return null;
+  get currentMonthDate() {
+    return new Date(this.current!.date).toDateString();
   }
 
   get currentOutflows() {

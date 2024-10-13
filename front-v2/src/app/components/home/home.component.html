@@ -1,6 +1,6 @@
 <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
-<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
-@if(plusOpen) {
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->@if(plusOpen
+&& current) {
 <div class="menu-footer-add__links-container" (click)="toggle()">
   <div
     class="menu-footer-add__links"
@@ -28,6 +28,18 @@
         >Ajouter une sortie mensuelle</span
       >
     </button>
+    <button class="menu-footer-add-links__link" type="button">
+      <i
+        class="menu-footer-add-links-link__icon fa-solid fa-calendar-xmark"
+      ></i>
+      <span class="menu-footer-add-links-link__label"
+        >Archiver
+        <span class="menu-footer-add-links-link__label--capitalize">{{
+          currentMonthDate | dateNormalize
+        }}</span></span
+      >
+    </button>
+    <app-divider></app-divider>
     <button
       class="menu-footer-add-links__link"
       (click)="navigateToMonthCreation()"
@@ -38,11 +50,26 @@
         >Créer un nouveau mois</span
       >
     </button>
+    <button class="menu-footer-add-links__link" type="button">
+      <i class="menu-footer-add-links-link__icon fa-solid fa-box-archive"></i>
+      <span class="menu-footer-add-links-link__label"
+        >Accéder aux mois archivés</span
+      >
+    </button>
+    <app-divider></app-divider>
+    <button
+      class="menu-footer-add-links__link menu-footer-add-links__link--danger"
+      type="button"
+    >
+      <i
+        class="menu-footer-add-links-link__icon fa-solid fa-right-from-bracket"
+      ></i>
+      <span class="menu-footer-add-links-link__label">Se déconnecter</span>
+    </button>
   </div>
 </div>
 <div class="backdrop"></div>
-} @if (displayLoader) { <app-loader></app-loader> } @if (currentMonthlyBudget &&
-current !== null) {
+} @if (displayLoader) { <app-loader></app-loader> } @if (current !== null) {
 <header class="header">
   <div class="header__month">
     <button
