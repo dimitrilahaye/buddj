@@ -1,30 +1,36 @@
 import { Component, Inject, signal, Signal } from '@angular/core';
-import { MenuFooterComponent } from '../menu-footer/menu-footer.component';
 import {
   MONTHLY_BUDGETS_STORE,
   MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets.store.interface';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgClass } from '@angular/common';
 import MonthsServiceInterface, {
   MONTHS_SERVICE,
 } from '../../services/months/months.service.interface';
 import { finalize } from 'rxjs';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { OutflowsComponent } from '../outflows/outflows.component';
-import { RouterOutlet } from '@angular/router';
+import {
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     RouterOutlet,
-    MenuFooterComponent,
     DateNormalizePipe,
     CurrencyPipe,
     DesignSystemModule,
     OutflowsComponent,
+    RouterLink,
+    RouterLinkActive,
+    NgClass,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -34,8 +40,10 @@ export class HomeComponent {
   isCurrentMonthTheFirst: Signal<boolean> = signal(true);
   isCurrentMonthTheLast: Signal<boolean> = signal(false);
   displayLoader = false;
+  plusOpen = false;
 
   constructor(
+    private router: Router,
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
     @Inject(MONTHS_SERVICE)
@@ -57,6 +65,30 @@ export class HomeComponent {
     } else {
       this.initializeCurrentMonth();
     }
+  }
+
+  toggle() {
+    this.plusOpen = !this.plusOpen;
+  }
+
+  navigateToExpenses(event: Event) {
+    this.monthlyBudgetsStore.askForNewExpense();
+    this.router.navigate(['/home', 'expenses']);
+    this.toggle();
+    event.stopPropagation();
+  }
+
+  navigateToOutflows(event: Event) {
+    this.monthlyBudgetsStore.askForNewOutflow();
+    this.router.navigate(['/home', 'outflows']);
+    this.toggle();
+    event.stopPropagation();
+  }
+
+  navigateToMonthCreation() {
+    this.monthlyBudgetsStore.resetAskForNewOutflow();
+    this.monthlyBudgetsStore.resetAskForNewExpense();
+    this.router.navigate(['month-creation']);
   }
 
   private initializeCurrentMonth() {
