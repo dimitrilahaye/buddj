@@ -50,6 +50,7 @@ export default interface MonthsServiceInterface {
   ): Observable<MonthlyBudget>;
   getArchivedMonths(): Observable<MonthlyBudget[]>;
   archiveMonth(monthId: string): Observable<MonthlyBudget>;
+  unarchiveMonth(monthId: string): Observable<MonthlyBudget[]>;
 }
 
 export const MONTHS_SERVICE = new InjectionToken<MonthsServiceInterface>(

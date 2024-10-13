@@ -90,6 +90,22 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     this.removeMonthFromList(month);
   }
 
+  removeMonthFromArchives(monthIdToRemove: string): void {
+    const monthToRemoveFromArchives = this._allArchivedMonths().find(
+      (m) => m.id === monthIdToRemove
+    );
+    this._allArchivedMonths.update((months) => {
+      return [...months]
+        .filter((m) => m.id !== monthIdToRemove)
+        .sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+    });
+    if (monthToRemoveFromArchives) {
+      this.addMonth(monthToRemoveFromArchives);
+    }
+  }
+
   addMonths(months: MonthlyBudget[]): void {
     this._all.update(() => {
       return [...months].sort(
