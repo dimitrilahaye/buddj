@@ -131,4 +131,13 @@ export class MonthsService implements MonthsServiceInterface {
         map(({ data }) => data)
       );
   }
+
+  getArchivedMonths(): Observable<MonthlyBudget[]> {
+    return this.http
+      .get<Response<MonthlyBudget[]>>(`${this.apiUrl}/months/archived`)
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.addArchivedMonths(data)),
+        map(({ data }) => data)
+      );
+  }
 }

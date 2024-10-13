@@ -48,6 +48,7 @@ export default interface MonthsServiceInterface {
     weeklyId: string,
     expense: AddExpense
   ): Observable<MonthlyBudget>;
+  getArchivedMonths(): Observable<MonthlyBudget[]>;
 }
 
 export const MONTHS_SERVICE = new InjectionToken<MonthsServiceInterface>(
