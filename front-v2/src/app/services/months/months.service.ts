@@ -140,4 +140,16 @@ export class MonthsService implements MonthsServiceInterface {
         map(({ data }) => data)
       );
   }
+
+  archiveMonth(monthId: string): Observable<MonthlyBudget> {
+    return this.http
+      .put<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/archive`,
+        {}
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.addMonthToArchives(data)),
+        map(({ data }) => data)
+      );
+  }
 }

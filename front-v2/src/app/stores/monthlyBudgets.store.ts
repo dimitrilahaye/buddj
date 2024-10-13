@@ -81,6 +81,15 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     });
   }
 
+  addMonthToArchives(month: MonthlyBudget): void {
+    this._allArchivedMonths.update((months) => {
+      return [...months, month].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    });
+    this.removeMonthFromList(month);
+  }
+
   addMonths(months: MonthlyBudget[]): void {
     this._all.update(() => {
       return [...months].sort(
@@ -179,6 +188,16 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
 
   resetAskForNewExpense(): void {
     this._askedForNewExpense.set(0);
+  }
+
+  private removeMonthFromList(month: MonthlyBudget) {
+    this._all.update((months) => {
+      return [...months]
+        .filter((m) => m.id !== month.id)
+        .sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+    });
   }
 
   private sortExpensesByLabel(expenses: Expense[]) {

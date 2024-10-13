@@ -211,6 +211,10 @@
     border: none;
     border-radius: var(--radius-50);
 
+    &:disabled {
+      opacity: 0.5;
+    }
+
     &--danger {
       background: var(--color-950);
     }
@@ -218,6 +222,15 @@
 }
 
 .menu-footer-add-links-link {
+  &__loader {
+    width: 100%;
+    color: var(--color-50);
+    height: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
   &__icon {
     font-size: 20px;
   }

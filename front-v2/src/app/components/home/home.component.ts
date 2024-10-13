@@ -5,7 +5,7 @@ import {
 } from '../../stores/monthlyBudgets.store.interface';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
-import { CurrencyPipe, NgClass } from '@angular/common';
+import { CommonModule, CurrencyPipe, NgClass } from '@angular/common';
 import MonthsServiceInterface, {
   MONTHS_SERVICE,
 } from '../../services/months/months.service.interface';
@@ -17,6 +17,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-home',
@@ -29,6 +30,7 @@ import {
     RouterLink,
     RouterLinkActive,
     NgClass,
+    CommonModule,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -39,9 +41,11 @@ export class HomeComponent {
   isCurrentMonthTheLast: Signal<boolean> = signal(false);
   displayLoader = false;
   plusOpen = false;
+  archiveLoading = false;
 
   constructor(
     private router: Router,
+    @Inject(HotToastService) private toaster: HotToastService,
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
     @Inject(MONTHS_SERVICE)
@@ -92,6 +96,14 @@ export class HomeComponent {
   }
 
   archiveCurrentMonth(event: Event) {
+    this.archiveLoading = true;
+    this.monthsService
+      .archiveMonth(this.currentMonthlyBudget()!.id)
+      .pipe(finalize(() => (this.archiveLoading = false)))
+      .subscribe(() => {
+        this.toaster.success('Votre mois a été archivé !');
+        this.router.navigate(['archived-months']);
+      });
     event.stopPropagation();
   }
 

@@ -14,6 +14,8 @@ export interface MonthlyBudgetsStoreInterface {
 
   getAllArchivedMonths(): Signal<MonthlyBudget[]>;
 
+  addMonthToArchives(month: MonthlyBudget): void;
+
   getCurrent(): Signal<MonthlyBudget | null>;
 
   getCurrentOutflows(): Signal<Outflow[] | null>;
