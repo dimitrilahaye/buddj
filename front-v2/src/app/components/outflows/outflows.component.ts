@@ -195,8 +195,9 @@ export class OutflowsComponent implements AfterViewInit {
     this.monthsService
       .updateOutflowsChecking(this.month()!.id, this.form.getRawValue())
       .pipe(finalize(() => (this.formIsLoading = false)))
-      .subscribe(() =>
-        this.toaster.success('Vos sorties mensuelles ont été modifiées !')
-      );
+      .subscribe(() => {
+        this.toaster.success('Vos sorties mensuelles ont été modifiées !');
+        this.formUpdated = false;
+      });
   }
 }
