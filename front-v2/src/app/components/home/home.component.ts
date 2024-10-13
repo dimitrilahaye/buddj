@@ -11,7 +11,6 @@ import MonthsServiceInterface, {
 } from '../../services/months/months.service.interface';
 import { finalize } from 'rxjs';
 import { DesignSystemModule } from '../../design-system/design-system.module';
-import { OutflowsComponent } from '../outflows/outflows.component';
 import {
   Router,
   RouterLink,
@@ -27,7 +26,6 @@ import {
     DateNormalizePipe,
     CurrencyPipe,
     DesignSystemModule,
-    OutflowsComponent,
     RouterLink,
     RouterLinkActive,
     NgClass,
