@@ -19,7 +19,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'outflows',
+        redirectTo: 'expenses',
         pathMatch: 'full',
       },
       {
