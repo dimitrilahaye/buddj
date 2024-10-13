@@ -206,7 +206,7 @@ function buildApi(
   router.get("/auth/logout", isLoggedIn, function (req, res, next) {
     req.logout(function (err) {
       if (err) return next(err);
-      res.sendStatus(200);
+      res.status(200).send({});
     });
   });
 

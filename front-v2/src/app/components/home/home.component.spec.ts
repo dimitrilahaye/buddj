@@ -6,6 +6,7 @@ import { signal } from '@angular/core';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
 import { of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { AUTHENTICATION_SERVICE } from '../../services/authentication/authentication.service.interface';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -27,6 +28,12 @@ describe('HomeComponent', () => {
             getCurrentOutflows: () => signal([]),
             isCurrentMonthTheFirst: () => signal(true),
             isCurrentMonthTheLast: () => signal(false),
+          },
+        },
+        {
+          provide: AUTHENTICATION_SERVICE,
+          useValue: {
+            logout: () => of(),
           },
         },
         {
