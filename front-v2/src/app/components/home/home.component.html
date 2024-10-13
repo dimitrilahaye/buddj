@@ -1,86 +1,75 @@
-<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
-<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->@if(plusOpen
-&& current) {
-<div class="menu-footer-add__links-container" (click)="toggle()">
-  <div
-    class="menu-footer-add__links"
-    [ngClass]="{ 'menu-footer-add__links--fade-in-up': plusOpen }"
-    (click)="doNothing($event)"
+ 
+ @if(current)
+{
+<app-modal [modalOpen]="openMenuModal" (click)="toggle($event)">
+  <button
+    class="menu-footer-add-links__link"
+    (click)="navigateToExpenses($event)"
+    type="button"
   >
-    <button
-      class="menu-footer-add-links__link"
-      (click)="navigateToExpenses($event)"
-      type="button"
+    <i class="menu-footer-add-links-link__icon fa-solid fa-basket-shopping"></i>
+    <span class="menu-footer-add-links-link__label">Ajouter une dépense</span>
+  </button>
+  <button
+    class="menu-footer-add-links__link"
+    (click)="navigateToOutflows($event)"
+    type="button"
+  >
+    <i
+      class="menu-footer-add-links-link__icon fa-solid fa-money-bill-transfer"
+    ></i>
+    <span class="menu-footer-add-links-link__label"
+      >Ajouter une sortie mensuelle</span
     >
-      <i
-        class="menu-footer-add-links-link__icon fa-solid fa-basket-shopping"
-      ></i>
-      <span class="menu-footer-add-links-link__label">Ajouter une dépense</span>
-    </button>
-    <button
-      class="menu-footer-add-links__link"
-      (click)="navigateToOutflows($event)"
-      type="button"
+  </button>
+  <app-divider></app-divider>
+  <button
+    class="menu-footer-add-links__link menu-footer-add-links__link--danger"
+    type="button"
+    [disabled]="archiveLoading"
+    (click)="archiveCurrentMonth($event)"
+  >
+    @if(archiveLoading) {
+    <ng-container *ngTemplateOutlet="loader"></ng-container>
+    } @else {
+    <i class="menu-footer-add-links-link__icon fa-solid fa-box-archive"></i>
+    <span class="menu-footer-add-links-link__label"
+      >Archiver
+      <span class="menu-footer-add-links-link__label--capitalize">{{
+        currentMonthDate | dateNormalize
+      }}</span></span
+    >}
+  </button>
+  <app-divider></app-divider>
+  <button
+    class="menu-footer-add-links__link"
+    (click)="navigateToMonthCreation()"
+    type="button"
+  >
+    <i class="menu-footer-add-links-link__icon fa-solid fa-calendar-plus"></i>
+    <span class="menu-footer-add-links-link__label">Créer un nouveau mois</span>
+  </button>
+  <button
+    class="menu-footer-add-links__link"
+    type="button"
+    (click)="navigateToArchivedMonths($event)"
+  >
+    <i class="menu-footer-add-links-link__icon fa-solid fa-box-archive"></i>
+    <span class="menu-footer-add-links-link__label"
+      >Accéder aux mois archivés</span
     >
-      <i
-        class="menu-footer-add-links-link__icon fa-solid fa-money-bill-transfer"
-      ></i>
-      <span class="menu-footer-add-links-link__label"
-        >Ajouter une sortie mensuelle</span
-      >
-    </button>
-    <app-divider></app-divider>
-    <button
-      class="menu-footer-add-links__link menu-footer-add-links__link--danger"
-      type="button"
-      [disabled]="archiveLoading"
-      (click)="archiveCurrentMonth($event)"
-    >
-      @if(archiveLoading) {
-      <ng-container *ngTemplateOutlet="loader"></ng-container>
-      } @else {
-      <i class="menu-footer-add-links-link__icon fa-solid fa-box-archive"></i>
-      <span class="menu-footer-add-links-link__label"
-        >Archiver
-        <span class="menu-footer-add-links-link__label--capitalize">{{
-          currentMonthDate | dateNormalize
-        }}</span></span
-      >}
-    </button>
-    <app-divider></app-divider>
-    <button
-      class="menu-footer-add-links__link"
-      (click)="navigateToMonthCreation()"
-      type="button"
-    >
-      <i class="menu-footer-add-links-link__icon fa-solid fa-calendar-plus"></i>
-      <span class="menu-footer-add-links-link__label"
-        >Créer un nouveau mois</span
-      >
-    </button>
-    <button
-      class="menu-footer-add-links__link"
-      type="button"
-      (click)="navigateToArchivedMonths($event)"
-    >
-      <i class="menu-footer-add-links-link__icon fa-solid fa-box-archive"></i>
-      <span class="menu-footer-add-links-link__label"
-        >Accéder aux mois archivés</span
-      >
-    </button>
-    <app-divider></app-divider>
-    <button
-      class="menu-footer-add-links__link menu-footer-add-links__link--danger"
-      type="button"
-    >
-      <i
-        class="menu-footer-add-links-link__icon fa-solid fa-right-from-bracket"
-      ></i>
-      <span class="menu-footer-add-links-link__label">Se déconnecter</span>
-    </button>
-  </div>
-</div>
-<div class="backdrop"></div>
+  </button>
+  <app-divider></app-divider>
+  <button
+    class="menu-footer-add-links__link menu-footer-add-links__link--danger"
+    type="button"
+  >
+    <i
+      class="menu-footer-add-links-link__icon fa-solid fa-right-from-bracket"
+    ></i>
+    <span class="menu-footer-add-links-link__label">Se déconnecter</span>
+  </button>
+</app-modal>
 } @if (displayLoader) { <app-loader></app-loader> } @if (current !== null) {
 <header class="header">
   <div class="header__month">
@@ -134,9 +123,9 @@
       <i class="fa-solid fa-money-bill-transfer"></i>
     </button>
     <button
-      (click)="toggle()"
+      (click)="toggle($event)"
       class="menu-footer-add__plus"
-      [ngClass]="{ 'menu-footer-add__plus--rotate': plusOpen }"
+      [ngClass]="{ 'menu-footer-add__plus--rotate': openMenuModal }"
       type="button"
       aria-label="Afficher le menu de création"
     >
