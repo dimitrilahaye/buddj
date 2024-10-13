@@ -1,0 +1,31 @@
+@import "../../../styles/variables";
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  box-sizing: border-box;
+  align-items: flex-start;
+  background: white;
+
+  button {
+    border: 0;
+    background: none;
+    margin: none;
+    font-size: 30px;
+    color: var(--color-950);
+  }
+}
+
+.archived-months {
+  margin-top: 40px;
+}
+
+.info {
+  font-size: 12px;
+}

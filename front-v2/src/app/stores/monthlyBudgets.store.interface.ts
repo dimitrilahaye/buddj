@@ -8,7 +8,11 @@ export interface MonthlyBudgetsStoreInterface {
 
   addMonths(months: MonthlyBudget[]): void;
 
+  addArchivedMonths(months: MonthlyBudget[]): void;
+
   getAll(): Signal<MonthlyBudget[]>;
+
+  getAllArchivedMonths(): Signal<MonthlyBudget[]>;
 
   getCurrent(): Signal<MonthlyBudget | null>;
 

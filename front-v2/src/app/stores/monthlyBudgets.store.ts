@@ -27,6 +27,8 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
   // expenses management
   private _currentExpenses = signal<Expense[]>([]);
   private _askedForNewExpense: WritableSignal<number> = signal(0);
+  // archived months management
+  private _allArchivedMonths = signal<MonthlyBudget[]>([]);
 
   constructor() {
     effect(
@@ -133,6 +135,18 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     }
 
     return this.getCurrent();
+  }
+
+  addArchivedMonths(months: MonthlyBudget[]): void {
+    this._allArchivedMonths.update(() => {
+      return [...months].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    });
+  }
+
+  getAllArchivedMonths(): Signal<MonthlyBudget[]> {
+    return this._allArchivedMonths.asReadonly();
   }
 
   getCurrentOutflows(): Signal<Outflow[]> {
