@@ -1,4 +1,7 @@
-<div class="expenses">
+<div
+  class="expenses"
+  [ngStyle]="{ 'padding-bottom': formUpdated ? '80px' : 0 }"
+>
   @if(form && expensesFormArray) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="expenses-list" formArrayName="expenses">
