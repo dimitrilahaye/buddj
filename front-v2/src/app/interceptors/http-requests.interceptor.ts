@@ -22,9 +22,13 @@ export const httpRequestsInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(newReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      const errorMessage = error.error.message || 'An unknown error occurred';
+      const errorMessage = error?.error?.message || 'An unknown error occurred';
 
-      toaster.error(errorMessage);
+      if (error.status === 401) {
+        toaster.error("Vous n'êtes pas connectés");
+      } else {
+        toaster.error(errorMessage);
+      }
 
       return throwError(() => new Error(errorMessage));
     })
