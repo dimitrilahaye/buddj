@@ -5,6 +5,7 @@
   <div
     class="menu-footer-add__links"
     [ngClass]="{ 'menu-footer-add__links--fade-in-up': plusOpen }"
+    (click)="doNothing($event)"
   >
     <button
       class="menu-footer-add-links__link"
@@ -32,6 +33,7 @@
     <button
       class="menu-footer-add-links__link menu-footer-add-links__link--danger"
       type="button"
+      (click)="archiveCurrentMonth($event)"
     >
       <i class="menu-footer-add-links-link__icon fa-solid fa-box-archive"></i>
       <span class="menu-footer-add-links-link__label"
@@ -52,7 +54,11 @@
         >Créer un nouveau mois</span
       >
     </button>
-    <button class="menu-footer-add-links__link" type="button">
+    <button
+      class="menu-footer-add-links__link"
+      type="button"
+      (click)="navigateToArchivedMonths($event)"
+    >
       <i class="menu-footer-add-links-link__icon fa-solid fa-box-archive"></i>
       <span class="menu-footer-add-links-link__label"
         >Accéder aux mois archivés</span

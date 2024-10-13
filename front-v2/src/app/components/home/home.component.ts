@@ -93,12 +93,16 @@ export class HomeComponent {
     this.router.navigate(['month-creation']);
   }
 
-  private initializeCurrentMonth() {
-    this.currentMonthlyBudget = this.monthlyBudgetsStore.getCurrent();
-    this.isCurrentMonthTheFirst =
-      this.monthlyBudgetsStore.isCurrentMonthTheFirst();
-    this.isCurrentMonthTheLast =
-      this.monthlyBudgetsStore.isCurrentMonthTheLast();
+  archiveCurrentMonth(event: Event) {
+    event.stopPropagation();
+  }
+
+  navigateToArchivedMonths(event: Event) {
+    event.stopPropagation();
+  }
+
+  doNothing(event: Event) {
+    event.stopPropagation();
   }
 
   get current() {
