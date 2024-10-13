@@ -29,10 +29,6 @@
   gap: 10px;
 }
 
-.info {
-  font-size: 12px;
-}
-
 .archived-months-list {
   display: flex;
   flex-direction: column;
@@ -127,8 +123,4 @@
   &__loader {
     color: var(--color-950);
   }
-}
-
-.info {
-  font-size: 12px;
 }
