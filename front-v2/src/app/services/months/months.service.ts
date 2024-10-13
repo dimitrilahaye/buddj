@@ -77,7 +77,7 @@ export class MonthsService implements MonthsServiceInterface {
   ): Observable<MonthlyBudget> {
     return this.http
       .put<Response<MonthlyBudget>>(
-        `${this.apiUrl}/months/${monthId}outflows/checking`,
+        `${this.apiUrl}/months/${monthId}/outflows/checking`,
         data
       )
       .pipe(
