@@ -40,7 +40,7 @@ export class HomeComponent {
   isCurrentMonthTheFirst: Signal<boolean> = signal(true);
   isCurrentMonthTheLast: Signal<boolean> = signal(false);
   displayLoader = false;
-  plusOpen = false;
+  openMenuModal = false;
   archiveLoading = false;
 
   constructor(
@@ -71,21 +71,22 @@ export class HomeComponent {
       this.monthlyBudgetsStore.isCurrentMonthTheLast();
   }
 
-  toggle() {
-    this.plusOpen = !this.plusOpen;
+  toggle(event: Event) {
+    setTimeout(() => {
+      this.openMenuModal = !this.openMenuModal;
+    }, 0);
+    event.stopPropagation();
   }
 
   navigateToExpenses(event: Event) {
     this.monthlyBudgetsStore.askForNewExpense();
     this.router.navigate(['/home', 'expenses']);
-    this.toggle();
     event.stopPropagation();
   }
 
   navigateToOutflows(event: Event) {
     this.monthlyBudgetsStore.askForNewOutflow();
     this.router.navigate(['/home', 'outflows']);
-    this.toggle();
     event.stopPropagation();
   }
 
