@@ -278,8 +278,9 @@ export class ExpensesComponent implements AfterViewInit {
     this.monthsService
       .updateExpensesChecking(this.month()!.id, data)
       .pipe(finalize(() => (this.formIsLoading = false)))
-      .subscribe(() =>
-        this.toaster.success('Vos dépenses ont été modifiées !')
-      );
+      .subscribe(() => {
+        this.toaster.success('Vos dépenses ont été modifiées !');
+        this.formUpdated = false;
+      });
   }
 }
