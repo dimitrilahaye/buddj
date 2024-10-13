@@ -1,4 +1,7 @@
-<div class="outflows">
+<div
+  class="outflows"
+  [ngStyle]="{ 'padding-bottom': formUpdated ? '80px' : 0 }"
+>
   @if(form && outflowsFormArray.controls.length) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="outflows-list">
