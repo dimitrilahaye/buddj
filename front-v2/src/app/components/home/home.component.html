@@ -1,4 +1,47 @@
-@if (displayLoader) { <app-loader></app-loader> } @if (currentMonthlyBudget &&
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+@if(plusOpen) {
+<div class="menu-footer-add__links-container" (click)="toggle()">
+  <div
+    class="menu-footer-add__links"
+    [ngClass]="{ 'menu-footer-add__links--fade-in-up': plusOpen }"
+  >
+    <button
+      class="menu-footer-add-links__link"
+      (click)="navigateToExpenses($event)"
+      type="button"
+    >
+      <i
+        class="menu-footer-add-links-link__icon fa-solid fa-basket-shopping"
+      ></i>
+      <span class="menu-footer-add-links-link__label">Ajouter une dépense</span>
+    </button>
+    <button
+      class="menu-footer-add-links__link"
+      (click)="navigateToOutflows($event)"
+      type="button"
+    >
+      <i
+        class="menu-footer-add-links-link__icon fa-solid fa-money-bill-transfer"
+      ></i>
+      <span class="menu-footer-add-links-link__label"
+        >Ajouter une sortie mensuelle</span
+      >
+    </button>
+    <button
+      class="menu-footer-add-links__link"
+      (click)="navigateToMonthCreation()"
+      type="button"
+    >
+      <i class="menu-footer-add-links-link__icon fa-solid fa-calendar-plus"></i>
+      <span class="menu-footer-add-links-link__label"
+        >Créer un nouveau mois</span
+      >
+    </button>
+  </div>
+</div>
+<div class="backdrop"></div>
+} @if (displayLoader) { <app-loader></app-loader> } @if (currentMonthlyBudget &&
 current !== null) {
 <header class="header">
   <div class="header__month">
@@ -34,6 +77,33 @@ current !== null) {
       }}</span>
     </div>
   </div>
+  <div class="header__menu">
+    <button
+      type="button"
+      class="header-menu__item"
+      [routerLink]="['/home/expenses']"
+      [routerLinkActive]="'header-menu__item--active'"
+    >
+      <i class="fa-solid fa-basket-shopping"></i>
+    </button>
+    <button
+      type="button"
+      class="header-menu__item"
+      [routerLink]="['/home/outflows']"
+      [routerLinkActive]="'header-menu__item--active'"
+    >
+      <i class="fa-solid fa-money-bill-transfer"></i>
+    </button>
+    <button
+      (click)="toggle()"
+      class="menu-footer-add__plus"
+      [ngClass]="{ 'menu-footer-add__plus--rotate': plusOpen }"
+      type="button"
+      aria-label="Afficher le menu de création"
+    >
+      <i class="fa-solid fa-gear"></i>
+    </button>
+  </div>
 </header>
 }
 <div class="content">
@@ -42,5 +112,3 @@ current !== null) {
 @if(!current) { pas de mois } @if(!currentOutflows()?.length) { pas de sorties
 mensuelles }
 <!-- } @else { pas de mois } -->
-
-<app-menu-footer></app-menu-footer>

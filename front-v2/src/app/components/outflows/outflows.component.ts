@@ -83,9 +83,10 @@ export class OutflowsComponent implements AfterViewInit {
           this.monthlyBudgetsStore.askedForNewOutflow();
         if (timesNewOutflowHasBeenAsked > 0) {
           this.openOutflowsModal();
+          this.monthlyBudgetsStore.resetAskForNewOutflow();
         }
       },
-      { injector: this.injector }
+      { injector: this.injector, allowSignalWrites: true }
     );
   }
 
