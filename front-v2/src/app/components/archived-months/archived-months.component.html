@@ -8,9 +8,44 @@
 </div>
 <div class="archived-months">
   @if(hasArchivedMonths()) {
-  {{ getArchivedMonths().length }}
+  <app-item *ngFor="let month of getArchivedMonths(); let i = index">
+    <button type="button" class="archived-months-list-item">
+      <span class="archived-months-list-item__icon">
+        <i class="fa-solid fa-calendar"></i>
+      </span>
+      <div class="archived-months-list-item__info">
+        <span class="archived-months-list-item-info__label">
+          {{ getMonthDate(month) | dateNormalize }}</span
+        >
+      </div>
+
+      <button
+        class="archived-months-list-item__unarchive"
+        type="button"
+        [disabled]="isUnarchiveMonthLoadingById(month.id)"
+        (click)="unarchiveMonth(month)"
+      >
+        @if(isUnarchiveMonthLoadingById(month.id)) {
+        <span class="archived-months-list-item-unarchive__loader">
+          <app-animated-spinner
+            [width]="20"
+            [height]="20"
+          ></app-animated-spinner>
+        </span>
+        } @else {
+        <i class="fa-solid fa-box-open"></i>
+        }
+      </button>
+      <button class="archived-months-list-item__delete" type="button">
+        <i class="fa-solid fa-trash-can"></i>
+      </button>
+    </button>
+  </app-item>
   } @else {
   <span class="info">Aucun mois archivés pour le moment 😁</span>
   }
 </div>
 }
+
+<!-- désarchiver <i class="fa-solid fa-box-open"></i> -->
+<!-- supprimer <i class="fa-solid fa-trash-can"></i> -->
