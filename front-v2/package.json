@@ -6,12 +6,12 @@
     "start": "ng serve --port 5173",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
-    "build:dev": "ng build --configuration development",
-    "build": "ng build  --configuration production",
-    "watch": "ng build --watch --configuration development",
+    "build:dev": "rm -rf dist && ng build --configuration development",
+    "build": "rm -rf dist && ng build  --configuration production",
+    "watch": "rm -rf dist && ng build --watch --configuration development",
     "test": "ng test --browsers=Chrome",
     "test:headless": "ng test --watch=false --browsers=ChromeHeadless",
-    "build:prod": "ng build --configuration production --base-href https://buddj.app/"
+    "build:prod": "rm -rf dist && ng build --configuration production --base-href https://buddj.app/"
   },
   "private": true,
   "dependencies": {
