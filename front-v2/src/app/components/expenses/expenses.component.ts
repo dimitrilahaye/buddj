@@ -88,9 +88,10 @@ export class ExpensesComponent implements AfterViewInit {
           this.monthlyBudgetsStore.askedForNewExpense();
         if (timesNewExpenseHasBeenAsked > 0) {
           this.openExpensesModal();
+          this.monthlyBudgetsStore.resetAskForNewExpense();
         }
       },
-      { injector: this.injector }
+      { injector: this.injector, allowSignalWrites: true }
     );
   }
 
