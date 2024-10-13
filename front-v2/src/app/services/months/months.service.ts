@@ -152,4 +152,16 @@ export class MonthsService implements MonthsServiceInterface {
         map(({ data }) => data)
       );
   }
+
+  unarchiveMonth(monthId: string): Observable<MonthlyBudget[]> {
+    return this.http
+      .put<Response<MonthlyBudget[]>>(
+        `${this.apiUrl}/months/${monthId}/unarchive`,
+        {}
+      )
+      .pipe(
+        tap(() => this.monthlyBudgetsStore.removeMonthFromArchives(monthId)),
+        map(({ data }) => data)
+      );
+  }
 }
