@@ -113,10 +113,11 @@
 }
 
 .content {
-  height: auto;
+  height: 70%;
   margin-top: 170px;
   overflow: auto;
-  padding-bottom: 40px;
+  padding: 5px 5px;
+  box-sizing: border-box;
 }
 
 .menu-footer-icons-icon {
