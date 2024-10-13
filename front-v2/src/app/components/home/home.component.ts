@@ -87,12 +87,14 @@ export class HomeComponent {
   navigateToExpenses(event: Event) {
     this.monthlyBudgetsStore.askForNewExpense();
     this.router.navigate(['/home', 'expenses']);
+    this.toggle(event);
     event.stopPropagation();
   }
 
   navigateToOutflows(event: Event) {
     this.monthlyBudgetsStore.askForNewOutflow();
     this.router.navigate(['/home', 'outflows']);
+    this.toggle(event);
     event.stopPropagation();
   }
 
