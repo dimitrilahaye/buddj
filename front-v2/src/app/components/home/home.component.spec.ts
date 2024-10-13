@@ -5,6 +5,7 @@ import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interfa
 import { signal } from '@angular/core';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
 import { of } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -14,6 +15,10 @@ describe('HomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {},
+        },
         {
           provide: MONTHLY_BUDGETS_STORE,
           useValue: {

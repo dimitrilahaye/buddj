@@ -59,8 +59,7 @@
             ></app-progress-bar>
           </div>
           @if (getExpensesFormGroupByWeekId(week.id).length === 0) {
-          <span class="info">Pas de dépenses pour cette semaine 😁</span> }
-          @else {
+          <app-info>Pas de dépenses pour cette semaine 😁</app-info> } @else {
           <app-item
             *ngFor="
               let expense of getExpensesFormGroupByWeekId(week.id);
@@ -127,7 +126,7 @@
     </div>
     }
   </form>
-  } @else { <span class="info">Aucune dépense actuellement 😁</span> }
+  } @else { <app-info>Aucune dépense actuellement 😁</app-info> }
 </div>
 
 @if(addExpenseForm) {
