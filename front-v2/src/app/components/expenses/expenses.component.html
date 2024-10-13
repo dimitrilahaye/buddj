@@ -2,38 +2,48 @@
   @if(form && expensesFormArray) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="expenses-list" formArrayName="expenses">
-      <span>Solde prévisionnel : {{ forecastBalance | currency : "EUR" }}</span>
-      <div class="expenses-list__filters">
-        <button
-          (click)="updateFilterState('all')"
-          [ngClass]="{
-            'expenses-list-filters__filter--active': filterIsActive('all')
-          }"
-          type="button"
-          class="expenses-list-filters__filter"
-        >
-          <i class="fa-solid fa-list"></i>
-        </button>
-        <button
-          (click)="updateFilterState('unchecked')"
-          [ngClass]="{
-            'expenses-list-filters__filter--active': filterIsActive('unchecked')
-          }"
-          type="button"
-          class="expenses-list-filters__filter"
-        >
-          <i class="fa-solid fa-square"></i>
-        </button>
-        <button
-          (click)="updateFilterState('checked')"
-          [ngClass]="{
-            'expenses-list-filters__filter--active': filterIsActive('checked')
-          }"
-          type="button"
-          class="expenses-list-filters__filter"
-        >
-          <i class="fa-solid fa-square-check"></i>
-        </button>
+      <div class="expenses-list__header">
+        <div class="expenses-list__forecast">
+          <span class="expenses-list-forecast__title"
+            >Budget restant à la fin du mois :
+          </span>
+          <span class="expenses-list-forecast__amount">{{
+            forecastBalance | currency : "EUR"
+          }}</span>
+        </div>
+        <div class="expenses-list__filters">
+          <button
+            (click)="updateFilterState('all')"
+            [ngClass]="{
+              'expenses-list-filters__filter--active': filterIsActive('all')
+            }"
+            type="button"
+            class="expenses-list-filters__filter"
+          >
+            <i class="fa-solid fa-list"></i>
+          </button>
+          <button
+            (click)="updateFilterState('unchecked')"
+            [ngClass]="{
+              'expenses-list-filters__filter--active':
+                filterIsActive('unchecked')
+            }"
+            type="button"
+            class="expenses-list-filters__filter"
+          >
+            <i class="fa-solid fa-square"></i>
+          </button>
+          <button
+            (click)="updateFilterState('checked')"
+            [ngClass]="{
+              'expenses-list-filters__filter--active': filterIsActive('checked')
+            }"
+            type="button"
+            class="expenses-list-filters__filter"
+          >
+            <i class="fa-solid fa-square-check"></i>
+          </button>
+        </div>
       </div>
       <ng-container *ngFor="let week of weeks">
         <div class="expenses-list__week">
