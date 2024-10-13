@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 export interface AuthenticationServiceInterface {
   login(): void;
   isAuthenticated(): Observable<boolean>;
+  logout(): Observable<void>;
 }
 
 export const AUTHENTICATION_SERVICE =

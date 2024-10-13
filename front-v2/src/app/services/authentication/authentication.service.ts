@@ -26,4 +26,8 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       })
     );
   }
+
+  logout(): Observable<void> {
+    return this.http.get<void>(`${this.apiUrl}/auth/logout`);
+  }
 }
