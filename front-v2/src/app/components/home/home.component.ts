@@ -18,6 +18,10 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { HotToastService } from '@ngxpert/hot-toast';
+import {
+  AUTHENTICATION_SERVICE,
+  AuthenticationServiceInterface,
+} from '../../services/authentication/authentication.service.interface';
 
 @Component({
   selector: 'app-home',
@@ -49,7 +53,9 @@ export class HomeComponent {
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
     @Inject(MONTHS_SERVICE)
-    private monthsService: MonthsServiceInterface
+    private monthsService: MonthsServiceInterface,
+    @Inject(AUTHENTICATION_SERVICE)
+    private authenticationService: AuthenticationServiceInterface
   ) {
     const allMonths = this.monthlyBudgetsStore.getAll();
     if (!allMonths().length) {
@@ -111,6 +117,19 @@ export class HomeComponent {
   navigateToArchivedMonths(event: Event) {
     event.stopPropagation();
     this.router.navigate(['archived-months']);
+  }
+
+  logout(event: Event) {
+    event.stopPropagation();
+    this.authenticationService
+      .logout()
+      .pipe(
+        finalize(() => {
+          this.toaster.success('Vous avez été déconnectés !');
+          this.router.navigate(['login']);
+        })
+      )
+      .subscribe();
   }
 
   doNothing(event: Event) {
