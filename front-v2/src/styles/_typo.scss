@@ -3,20 +3,33 @@
   font-optical-sizing: auto;
 }
 %title-3 {
+  color: var(--dark-100);
   font-size: var(--title-3);
   font-weight: bold;
 }
 %title-20 {
+  color: var(--dark-100);
   font-size: var(--title-20);
   font-weight: bold;
 }
 %title-30 {
+  color: var(--dark-100);
   font-size: var(--title-30);
   font-weight: bold;
 }
 %text-5 {
+  color: var(--dark-100);
   font-size: var(--text-5);
 }
+%text-7 {
+  color: var(--dark-100);
+  font-size: var(--text-7);
+}
 %text-10 {
+  color: var(--dark-100);
   font-size: var(--text-10);
+}
+%text-30 {
+  color: var(--dark-100);
+  font-size: var(--text-30);
 }

@@ -86,6 +86,7 @@
 
   &__title {
     @extend %title-20;
+    color: white;
 
     text-transform: capitalize;
   }
@@ -194,6 +195,8 @@
   }
   &__label {
     @extend %text-10;
+
+    color: white;
 
     &--capitalize {
       text-transform: capitalize;
