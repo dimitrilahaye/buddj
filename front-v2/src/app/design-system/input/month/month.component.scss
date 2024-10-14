@@ -6,6 +6,7 @@
     @extend %input;
 
     position: relative;
+    height: 35px;
 
     &[type="month"]::-webkit-inner-spin-button,
     &[type="month"]::-webkit-calendar-picker-indicator {
@@ -13,7 +14,6 @@
       bottom: 0;
       color: transparent;
       cursor: pointer;
-      height: auto;
       left: 0;
       position: absolute;
       right: 0;
