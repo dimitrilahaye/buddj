@@ -153,6 +153,7 @@
         [formGroup]="addExpenseForm"
         formControlName="label"
         [required]="true"
+        [placeholder]="'Libellé'"
       ></app-input-text>
 
       <!-- amount -->
@@ -161,6 +162,7 @@
         formControlName="amount"
         [required]="true"
         [step]="'0.01'"
+        [placeholder]="'Montant'"
       ></app-input-number>
 
       <div class="modal-container__actions">
