@@ -1,3 +1,5 @@
+@import "../../../styles/typo";
+
 .progress-bar {
   position: relative;
   display: flex;
@@ -9,8 +11,8 @@
   height: 20px;
 
   &__info {
+    @extend %text-5;
     position: absolute;
-    font-size: 10px;
     padding: 0 10px;
   }
 

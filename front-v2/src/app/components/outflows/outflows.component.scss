@@ -1,3 +1,6 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
 .outflows-list {
   display: flex;
   flex-direction: column;
@@ -55,6 +58,7 @@
 
   &__info {
     &--checked {
+      color: var(--dark-100);
       text-decoration: line-through;
     }
 
@@ -84,10 +88,10 @@
 
 .outflows-list-item-info {
   &__label {
-    font-size: 12px;
+    @extend %text-7;
   }
   &__amount {
-    font-size: 15px;
+    @extend %text-10;
     font-weight: bold;
   }
 }
