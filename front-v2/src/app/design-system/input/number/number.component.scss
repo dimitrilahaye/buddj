@@ -14,8 +14,8 @@
     }
   }
   &__error-message {
+    @extend %text-7;
     color: red;
-    font-size: 12px;
     margin-top: 4px;
   }
 }

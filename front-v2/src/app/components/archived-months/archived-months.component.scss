@@ -1,4 +1,5 @@
 @import "../../../styles/variables";
+@import "../../../styles/typo";
 
 .header {
   position: fixed;
@@ -14,10 +15,11 @@
   background: white;
 
   button {
+    @extend %text-30;
+
     border: 0;
     background: none;
     margin: none;
-    font-size: 30px;
     color: var(--color-950);
   }
 }
@@ -107,8 +109,8 @@
 
 .archived-months-list-item-info {
   &__label {
-    font-size: 12px;
-    font-size: 15px;
+    @extend %text-10;
+
     font-weight: bold;
   }
 }
