@@ -66,6 +66,9 @@
 
 .expenses-list-filters {
   &__filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 15px;
     color: var(--color-950);
     border: 0;
