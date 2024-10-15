@@ -1,0 +1,112 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
+.numpad {
+  &__amount {
+    @extend %title-10;
+
+    background-color: var(--light-100);
+    padding: 12px;
+    text-align: right;
+    box-sizing: border-box;
+    height: 50px;
+  }
+  &__container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 5px 5px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "seven height nine refresh"
+      "four five six cancel"
+      "one two three submit"
+      "zero zero dot submit";
+    padding-top: 3px;
+    border: 3px solid white;
+
+    div {
+      button {
+        @extend %text-20;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        padding: 0;
+        background-color: var(--light-100);
+        width: 100%;
+        height: 50px;
+      }
+    }
+
+    .zero {
+      grid-area: zero;
+    }
+
+    .dot {
+      grid-area: dot;
+    }
+
+    .submit {
+      grid-area: submit;
+      button {
+        background-color: var(--color-950);
+        height: 100%;
+        color: white;
+      }
+    }
+
+    .cancel {
+      grid-area: cancel;
+      button {
+        color: white;
+        background-color: var(--light-200);
+      }
+    }
+
+    .refresh {
+      grid-area: refresh;
+      button {
+        color: white;
+        background-color: var(--light-200);
+      }
+    }
+
+    .seven {
+      grid-area: seven;
+    }
+
+    .height {
+      grid-area: height;
+    }
+
+    .nine {
+      grid-area: nine;
+    }
+
+    .four {
+      grid-area: four;
+    }
+
+    .five {
+      grid-area: five;
+    }
+
+    .six {
+      grid-area: six;
+    }
+
+    .one {
+      grid-area: one;
+    }
+
+    .two {
+      grid-area: two;
+    }
+
+    .three {
+      grid-area: three;
+    }
+  }
+}

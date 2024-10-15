@@ -7,6 +7,11 @@
   font-size: var(--title-3);
   font-weight: bold;
 }
+%title-10 {
+  color: var(--dark-100);
+  font-size: var(--title-10);
+  font-weight: bold;
+}
 %title-20 {
   color: var(--dark-100);
   font-size: var(--title-20);
@@ -28,6 +33,10 @@
 %text-10 {
   color: var(--dark-100);
   font-size: var(--text-10);
+}
+%text-20 {
+  color: var(--dark-100);
+  font-size: var(--text-20);
 }
 %text-30 {
   color: var(--dark-100);

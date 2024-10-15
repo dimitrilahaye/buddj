@@ -22,6 +22,7 @@
     <!-- month starting balance -->
     <app-input-number
       [formGroup]="form"
+      (click)="openNumpad(form.controls['startingBalance'])"
       formControlName="startingBalance"
       [required]="true"
       [placeholder]="'Solde initial'"
@@ -162,6 +163,7 @@
 
       <!-- amount -->
       <app-input-number
+        (click)="openNumpad(outflowsFormGroup.controls['amount'])"
         [formGroup]="outflowsFormGroup"
         formControlName="amount"
         [required]="true"
@@ -209,6 +211,7 @@
 
       <!-- initial balance -->
       <app-input-number
+        (click)="openNumpad(weeklyBudgetsFormGroup.controls['initialBalance'])"
         [formGroup]="weeklyBudgetsFormGroup"
         formControlName="initialBalance"
         [required]="true"
@@ -224,5 +227,18 @@
       </div>
     </div>
   </form>
+</app-sliding-modal>
+}
+
+<!-- 
+  ##################### NUMPAD #####################
+   -->
+
+@if(amountValueControl !== null) {
+<app-sliding-modal [isOpen]="isNumpadModalOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="amountValue"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
 </app-sliding-modal>
 }

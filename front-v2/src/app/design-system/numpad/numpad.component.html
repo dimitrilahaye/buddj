@@ -1,0 +1,53 @@
+<div class="numpad">
+  <div class="numpad__amount">{{ updatedValue() }}</div>
+  <div class="numpad__container">
+    <div class="zero">
+      <button type="button" (click)="updateValue('0', $event)">0</button>
+    </div>
+    <div class="dot">
+      <button type="button" (click)="updateValue(',', $event)">,</button>
+    </div>
+    <div class="submit">
+      <button type="button" (click)="submit($event)">
+        <i class="fa-solid fa-check"></i>
+      </button>
+    </div>
+    <div class="cancel">
+      <button type="button" (click)="cancel($event)">
+        <i class="fa-solid fa-delete-left"></i>
+      </button>
+    </div>
+    <div class="refresh">
+      <button type="button" (click)="refresh($event)">
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+      </button>
+    </div>
+    <div class="seven">
+      <button type="button" (click)="updateValue('7', $event)">7</button>
+    </div>
+    <div class="height">
+      <button type="button" (click)="updateValue('8', $event)">8</button>
+    </div>
+    <div class="nine">
+      <button type="button" (click)="updateValue('9', $event)">9</button>
+    </div>
+    <div class="four">
+      <button type="button" (click)="updateValue('4', $event)">4</button>
+    </div>
+    <div class="five">
+      <button type="button" (click)="updateValue('5', $event)">5</button>
+    </div>
+    <div class="six">
+      <button type="button" (click)="updateValue('6', $event)">6</button>
+    </div>
+    <div class="one">
+      <button type="button" (click)="updateValue('1', $event)">1</button>
+    </div>
+    <div class="two">
+      <button type="button" (click)="updateValue('2', $event)">2</button>
+    </div>
+    <div class="three">
+      <button type="button" (click)="updateValue('3', $event)">3</button>
+    </div>
+  </div>
+</div>

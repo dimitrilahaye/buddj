@@ -52,6 +52,8 @@ export class ExpensesComponent implements AfterViewInit {
   expenseDelationModalIsOpen = false;
   deleteExpenseFormIsLoading = false;
   expenseToDelete: (Expense & { weekId: string }) | null = null;
+  isNumpadModalOpen = false;
+  amountValueControl: AbstractControl<any, any> | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -274,6 +276,26 @@ export class ExpensesComponent implements AfterViewInit {
       this.addExpenseForm!.markAllAsTouched();
     }
     event.stopPropagation();
+  }
+
+  closeNumpad(event: Event) {
+    this.isNumpadModalOpen = false;
+    event.stopPropagation();
+  }
+
+  openNumpad(control: AbstractControl) {
+    this.amountValueControl = control;
+    this.isNumpadModalOpen = true;
+  }
+
+  get amountValue() {
+    return '' + this.amountValueControl?.value;
+  }
+
+  updateAmountValue(value: string) {
+    this.amountValueControl?.patchValue(Number(value.replace(',', '.')));
+    this.isNumpadModalOpen = false;
+    this.amountValueControl = null;
   }
 
   onSubmit() {

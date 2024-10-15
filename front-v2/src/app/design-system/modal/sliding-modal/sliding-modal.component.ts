@@ -11,13 +11,13 @@ export class SlidingModalComponent {
   isOpen = false;
   canClose = input(true);
 
-  close = output();
+  close = output<Event>();
 
-  closeModal() {
+  closeModal(event: Event) {
     if (this.canClose()) {
       this.isOpen = false;
       setTimeout(() => {
-        this.close.emit();
+        this.close.emit(event);
       }, 300);
     }
   }

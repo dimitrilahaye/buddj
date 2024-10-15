@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MonthTemplate } from '../../models/monthTemplate.model';
 import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
@@ -32,9 +33,13 @@ export class MonthCreationComponent implements OnInit {
   form!: FormGroup;
   template: MonthTemplate | null = null;
   isOutflowsModalOpen = false;
+  isNumpadModalOpen = false;
   isWeeklyBudgetsModalOpen = false;
   selectedOutflowIndex: number | null = null;
   selectedWeeklyBudgetIndex: number | null = null;
+  creationLoader = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  amountValueControl: AbstractControl<any, any> | null = null;
 
   newMonth: Month = {
     month: new Date(),
@@ -42,7 +47,6 @@ export class MonthCreationComponent implements OnInit {
     weeklyBudgets: [],
     outflows: [],
   };
-  creationLoader = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -257,6 +261,26 @@ export class MonthCreationComponent implements OnInit {
     const currentDay = new Date().getDate();
     const dateValue = val ? new Date(`${val}-${currentDay}`) : null;
     return dateValue?.toISOString() ?? null;
+  }
+
+  closeNumpad(event: Event) {
+    this.isNumpadModalOpen = false;
+    event.stopPropagation();
+  }
+
+  openNumpad(control: AbstractControl) {
+    this.amountValueControl = control;
+    this.isNumpadModalOpen = true;
+  }
+
+  get amountValue() {
+    return '' + this.amountValueControl?.value;
+  }
+
+  updateAmountValue(value: string) {
+    this.amountValueControl?.patchValue(Number(value.replace(',', '.')));
+    this.isNumpadModalOpen = false;
+    this.amountValueControl = null;
   }
 
   onSubmit() {

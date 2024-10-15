@@ -49,6 +49,9 @@ export class OutflowsComponent implements AfterViewInit {
   deleteOutflowFormIsLoading = false;
   outflowDelationModalIsOpen = false;
   outflowToDelete: Outflow | null = null;
+  isNumpadModalOpen = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  amountValueControl: AbstractControl<any, any> | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -195,6 +198,26 @@ export class OutflowsComponent implements AfterViewInit {
       this.addOutflowForm!.markAllAsTouched();
     }
     event.stopPropagation();
+  }
+
+  closeNumpad(event: Event) {
+    this.isNumpadModalOpen = false;
+    event.stopPropagation();
+  }
+
+  openNumpad(control: AbstractControl) {
+    this.amountValueControl = control;
+    this.isNumpadModalOpen = true;
+  }
+
+  get amountValue() {
+    return '' + this.amountValueControl?.value;
+  }
+
+  updateAmountValue(value: string) {
+    this.amountValueControl?.patchValue(Number(value.replace(',', '.')));
+    this.isNumpadModalOpen = false;
+    this.amountValueControl = null;
   }
 
   onSubmit() {
