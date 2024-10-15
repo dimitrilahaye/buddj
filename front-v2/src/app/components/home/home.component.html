@@ -1,4 +1,4 @@
-<app-modal [modalOpen]="openMenuModal" (click)="toggle($event)">
+<app-modal [modalOpen]="openMenuModal" (click)="toggleMenuModal($event)">
   @if(current) {
   <button
     class="menu-footer-add-links__link"
@@ -24,8 +24,7 @@
   <button
     class="menu-footer-add-links__link menu-footer-add-links__link--danger"
     type="button"
-    [disabled]="archiveLoading"
-    (click)="archiveCurrentMonth($event)"
+    (click)="toggleArchiveCurrentMonthModal($event)"
   >
     @if(archiveLoading) {
     <ng-container *ngTemplateOutlet="loader"></ng-container>
@@ -69,6 +68,19 @@
     ></i>
     <span class="menu-footer-add-links-link__label">Se déconnecter</span>
   </button>
+</app-modal>
+<app-modal
+  [modalOpen]="confirmArchiveModalIsOpen"
+  (click)="toggleArchiveCurrentMonthModal($event)"
+>
+  <app-button
+    [type]="'submit'"
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Archiver le mois'"
+    [loading]="archiveLoading"
+    (click)="archiveCurrentMonth($event)"
+  ></app-button>
 </app-modal>
 @if (displayLoader) { <app-loader></app-loader> }
 <header class="header">
@@ -125,7 +137,7 @@
       <i class="fa-solid fa-money-bill-transfer"></i>
     </button>
     <button
-      (click)="toggle($event)"
+      (click)="toggleMenuModal($event)"
       class="menu-footer-add__plus"
       [ngClass]="{ 'menu-footer-add__plus--rotate': openMenuModal }"
       type="button"

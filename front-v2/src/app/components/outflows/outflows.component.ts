@@ -6,11 +6,11 @@ import {
   Injector,
   signal,
   Signal,
-  WritableSignal,
 } from '@angular/core';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { MonthlyBudget, Outflow } from '../../models/monthlyBudget.model';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
@@ -42,11 +42,13 @@ export class OutflowsComponent implements AfterViewInit {
 
   form!: FormGroup;
   addOutflowForm: FormGroup | null = null;
-  outflowDeletionIsLoadingIndex: WritableSignal<number | null> = signal(null);
   formIsLoading = false;
   addOutflowFormIsLoading = false;
   isOutflowsModalOpen = false;
   formUpdated = false;
+  deleteOutflowFormIsLoading = false;
+  outflowDelationModalIsOpen = false;
+  outflowToDelete: Outflow | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -133,29 +135,40 @@ export class OutflowsComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
+  openOutflowDelationModal(outflow: AbstractControl<Outflow>, event: Event) {
+    this.outflowDelationModalIsOpen = true;
+    this.outflowToDelete = outflow.getRawValue();
+    event.stopPropagation();
+  }
+
+  closeOutflowDelationModal(event: Event) {
+    this.outflowDelationModalIsOpen = false;
+    this.outflowToDelete = null;
+    event.stopPropagation();
+  }
+
   isOutflowItemChecked(i: number) {
     const outflowValue = this.outflowsFormArray.at(i).getRawValue();
     return outflowValue.isChecked;
   }
 
-  deleteOutflowByIndex(i: number, event: Event) {
-    this.outflowDeletionIsLoadingIndex.update(() => i);
-    const outflowToDelete = this.outflowsFormArray.at(i).getRawValue();
-    this.monthsService
-      .deleteOutflow(this.month()!.id, outflowToDelete.id)
-      .pipe(finalize(() => this.stopDeletationLoading()))
-      .subscribe(() =>
-        this.toaster.success('Votre sortie mensuelle a été supprimée !')
-      );
+  deleteOutflow(event: Event) {
+    this.deleteOutflowFormIsLoading = true;
+    const outflowId = this.outflowToDelete?.id;
+    if (outflowId) {
+      this.monthsService
+        .deleteOutflow(this.month()!.id, outflowId)
+        .pipe(
+          finalize(() => {
+            this.deleteOutflowFormIsLoading = false;
+            this.closeOutflowDelationModal(event);
+          })
+        )
+        .subscribe(() =>
+          this.toaster.success('Votre sortie mensuelle a été supprimée !')
+        );
+    }
     event.stopPropagation();
-  }
-
-  outflowDeletionIsLoadingByIndex(i: number) {
-    return this.outflowDeletionIsLoadingIndex() === i;
-  }
-
-  stopDeletationLoading() {
-    this.outflowDeletionIsLoadingIndex.update(() => null);
   }
 
   openOutflowsModal() {
@@ -181,12 +194,6 @@ export class OutflowsComponent implements AfterViewInit {
     } else {
       this.addOutflowForm!.markAllAsTouched();
     }
-    event.stopPropagation();
-  }
-
-  deleteOutflow(event: Event) {
-    this.outflowsFormArray.removeAt(this.outflows.length - 1);
-    this.closeOutflowsModal();
     event.stopPropagation();
   }
 

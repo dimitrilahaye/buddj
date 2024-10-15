@@ -7,7 +7,6 @@ import {
   Injector,
   signal,
   Signal,
-  WritableSignal,
 } from '@angular/core';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { MonthlyBudget, Expense } from '../../models/monthlyBudget.model';
@@ -44,13 +43,15 @@ export class ExpensesComponent implements AfterViewInit {
 
   form!: FormGroup;
   addExpenseForm: FormGroup | null = null;
-  expenseDeletionIsLoadingIndex: WritableSignal<string | null> = signal(null);
   formIsLoading = false;
   addExpenseFormIsLoading = false;
   isExpensesModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
   filtersState = 0;
   formUpdated = false;
+  expenseDelationModalIsOpen = false;
+  deleteExpenseFormIsLoading = false;
+  expenseToDelete: (Expense & { weekId: string }) | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -105,6 +106,18 @@ export class ExpensesComponent implements AfterViewInit {
 
   get weekButtons() {
     return [1, 2, 3, 4, 5];
+  }
+
+  openExpenseDelationModal(expense: AbstractControl<Expense>, event: Event) {
+    this.expenseDelationModalIsOpen = true;
+    this.expenseToDelete = expense.getRawValue();
+    event.stopPropagation();
+  }
+
+  closeExpenseDelationModal(event: Event) {
+    this.expenseDelationModalIsOpen = false;
+    this.expenseToDelete = null;
+    event.stopPropagation();
   }
 
   getCurrentBalanceByWeekName(weekName: string) {
@@ -210,19 +223,17 @@ export class ExpensesComponent implements AfterViewInit {
     );
   }
 
-  deleteExpense(expense: AbstractControl<Expense>, event: Event) {
-    this.expenseDeletionIsLoadingIndex.update(
-      () => expense.get('id')?.value as string
-    );
-    const expenseValue = this.getExpenseControl(expense)?.getRawValue();
-    if (expenseValue) {
-      const { weekId, id: expenseId } = expenseValue;
+  deleteExpense(event: Event) {
+    this.deleteExpenseFormIsLoading = true;
+    if (this.expenseToDelete) {
+      const { weekId, id: expenseId } = this.expenseToDelete;
 
       this.monthsService
         .deleteExpense(this.month()!.id, weekId, expenseId)
         .pipe(
           finalize(() => {
-            this.stopDeletationLoading();
+            this.deleteExpenseFormIsLoading = false;
+            this.closeExpenseDelationModal(event);
             this.filtersState = 0;
           })
         )
@@ -231,14 +242,6 @@ export class ExpensesComponent implements AfterViewInit {
         );
     }
     event.stopPropagation();
-  }
-
-  expenseDeletionIsLoadingByIndex(expense: AbstractControl<Expense>) {
-    return this.expenseDeletionIsLoadingIndex() === expense.get('id')?.value;
-  }
-
-  stopDeletationLoading() {
-    this.expenseDeletionIsLoadingIndex.update(() => null);
   }
 
   openExpensesModal() {
