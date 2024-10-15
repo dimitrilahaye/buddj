@@ -20,6 +20,7 @@
     <div class="outflows-list">
       <app-input-number
         [formGroup]="form"
+        (click)="openNumpad(form.controls['currentBalance'])"
         formControlName="currentBalance"
         [required]="true"
         [placeholder]="'Solde actuel'"
@@ -102,6 +103,7 @@
 
       <!-- amount -->
       <app-input-number
+        (click)="openNumpad(addOutflowForm.controls['amount'])"
         [formGroup]="addOutflowForm"
         formControlName="amount"
         [required]="true"
@@ -121,6 +123,13 @@
       </div>
     </div>
   </form>
+</app-sliding-modal>
+} @if(amountValueControl !== null) {
+<app-sliding-modal [isOpen]="isNumpadModalOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="amountValue"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
 </app-sliding-modal>
 }
 

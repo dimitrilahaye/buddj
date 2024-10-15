@@ -146,6 +146,7 @@
 
       <!-- amount -->
       <app-input-number
+        (click)="openNumpad(addExpenseForm.controls['amount'])"
         [formGroup]="addExpenseForm"
         formControlName="amount"
         [required]="true"
@@ -165,6 +166,18 @@
       </div>
     </div>
   </form>
+</app-sliding-modal>
+}
+<!-- 
+  ##################### NUMPAD #####################
+   -->
+
+@if(amountValueControl !== null) {
+<app-sliding-modal [isOpen]="isNumpadModalOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="amountValue"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
 </app-sliding-modal>
 }
 
