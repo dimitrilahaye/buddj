@@ -13,6 +13,7 @@ import { AnimatedSpinnerComponent } from './animated-spinner/animated-spinner.co
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ModalComponent } from './modal/modal/modal.component';
 import { InfoComponent } from './info/info.component';
+import { NumpadComponent } from './numpad/numpad.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { InfoComponent } from './info/info.component';
     ProgressBarComponent,
     ModalComponent,
     InfoComponent,
+    NumpadComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -43,6 +45,7 @@ import { InfoComponent } from './info/info.component';
     ProgressBarComponent,
     ModalComponent,
     InfoComponent,
+    NumpadComponent,
   ],
 })
 export class DesignSystemModule {}
