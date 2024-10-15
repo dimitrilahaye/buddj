@@ -72,15 +72,15 @@
     align-items: center;
     font-size: 15px;
     color: var(--color-950);
-    border: 0;
+    border: 1px solid var(--color-950);
     background: none;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
 
     &--active {
       background-color: var(--color-950);
       color: white;
-      border-radius: 50%;
-      height: 30px;
-      width: 30px;
     }
   }
 }
