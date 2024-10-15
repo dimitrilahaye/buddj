@@ -35,11 +35,10 @@
   ##################### STEP 2 #####################
    -->
   <div
-    #outflowsContainer
     class="month-creation__step month-creation__step--step2"
     formArrayName="outflows"
   >
-    <div #addNewOutflowButton class="month-creation-step__add-outflow">
+    <div class="month-creation-step__add-outflow">
       <app-button
         (click)="addNewOutflow($event)"
         [size]="'big'"
@@ -117,15 +116,24 @@
       >Solde prévisionnel : <strong>{{ forecastBalance }}€</strong></span
     >
     <div class="month-creation-footer__actions">
-      <app-button
-        [size]="'big'"
-        [variant]="'danger'"
-        [label]="'Réinitialiser'"
+      <button
+        class="month-creation-footer-actions__action"
+        type="button"
+        (click)="addNewOutflow($event)"
+      >
+        <i class="fa-solid fa-plus"></i>
+      </button>
+      <button
+        class="month-creation-footer-actions__action"
+        type="button"
         (click)="resetForm($event)"
-      ></app-button>
+      >
+        <i class="fa-solid fa-rotate"></i>
+      </button>
       <app-button
         [type]="'submit'"
         [size]="'big'"
+        [variant]="'danger'"
         [label]="'Créer'"
         [loading]="creationLoader"
       ></app-button>

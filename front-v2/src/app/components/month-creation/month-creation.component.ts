@@ -1,12 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Inject,
-  OnInit,
-  Renderer2,
-  ViewChild,
-} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MonthTemplate } from '../../models/monthTemplate.model';
 import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
@@ -35,10 +27,7 @@ import { HotToastService } from '@ngxpert/hot-toast';
   templateUrl: './month-creation.component.html',
   styleUrl: './month-creation.component.scss',
 })
-export class MonthCreationComponent implements OnInit, AfterViewInit {
-  @ViewChild('outflowsContainer') outflowsContainer!: ElementRef;
-  @ViewChild('addNewOutflowButton') addNewOutflowButton!: ElementRef;
-
+export class MonthCreationComponent implements OnInit {
   dataLoaded = false;
   form!: FormGroup;
   template: MonthTemplate | null = null;
@@ -59,35 +48,10 @@ export class MonthCreationComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
-    private renderer: Renderer2,
     @Inject(HotToastService) private toaster: HotToastService,
     @Inject(MONTHS_SERVICE)
     private monthsService: MonthsServiceInterface
   ) {}
-
-  ngAfterViewInit(): void {
-    if (this.dataLoaded) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            this.renderer.setStyle(
-              this.addNewOutflowButton.nativeElement,
-              'display',
-              'flex'
-            );
-          } else {
-            this.renderer.setStyle(
-              this.addNewOutflowButton.nativeElement,
-              'display',
-              'none'
-            );
-          }
-        });
-      });
-
-      observer.observe(this.outflowsContainer.nativeElement);
-    }
-  }
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
