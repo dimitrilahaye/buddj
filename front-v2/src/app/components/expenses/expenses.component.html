@@ -1,3 +1,15 @@
+<app-modal
+  [modalOpen]="expenseDelationModalIsOpen"
+  (click)="closeExpenseDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer la dépense définitivement'"
+    [loading]="deleteExpenseFormIsLoading"
+    (click)="deleteExpense($event)"
+  ></app-button>
+</app-modal>
 <div
   class="expenses"
   [ngStyle]="{ 'padding-bottom': formUpdated ? '80px' : 0 }"
@@ -79,14 +91,9 @@
               <button
                 class="expenses-list-item__delete"
                 type="button"
-                [disabled]="expenseDeletionIsLoadingByIndex(expense)"
-                (click)="deleteExpense(expense, $event)"
+                (click)="openExpenseDelationModal(expense, $event)"
               >
-                @if(expenseDeletionIsLoadingByIndex(expense)) {
-                <ng-container *ngTemplateOutlet="loader"></ng-container>
-                } @else {
                 <i class="fa-solid fa-trash-can"></i>
-                }
               </button>
             </button>
           </app-item>

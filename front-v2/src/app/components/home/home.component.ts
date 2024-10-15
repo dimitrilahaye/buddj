@@ -46,6 +46,7 @@ export class HomeComponent {
   displayLoader = false;
   openMenuModal = false;
   archiveLoading = false;
+  confirmArchiveModalIsOpen = false;
 
   constructor(
     private router: Router,
@@ -77,7 +78,7 @@ export class HomeComponent {
       this.monthlyBudgetsStore.isCurrentMonthTheLast();
   }
 
-  toggle(event: Event) {
+  toggleMenuModal(event: Event) {
     setTimeout(() => {
       this.openMenuModal = !this.openMenuModal;
     }, 0);
@@ -87,14 +88,14 @@ export class HomeComponent {
   navigateToExpenses(event: Event) {
     this.monthlyBudgetsStore.askForNewExpense();
     this.router.navigate(['/home', 'expenses']);
-    this.toggle(event);
+    this.toggleMenuModal(event);
     event.stopPropagation();
   }
 
   navigateToOutflows(event: Event) {
     this.monthlyBudgetsStore.askForNewOutflow();
     this.router.navigate(['/home', 'outflows']);
-    this.toggle(event);
+    this.toggleMenuModal(event);
     event.stopPropagation();
   }
 
@@ -102,6 +103,14 @@ export class HomeComponent {
     this.monthlyBudgetsStore.resetAskForNewOutflow();
     this.monthlyBudgetsStore.resetAskForNewExpense();
     this.router.navigate(['month-creation']);
+  }
+
+  toggleArchiveCurrentMonthModal(event: Event) {
+    this.confirmArchiveModalIsOpen = !this.confirmArchiveModalIsOpen;
+    if (this.confirmArchiveModalIsOpen) {
+      this.toggleMenuModal(event);
+    }
+    event.stopPropagation();
   }
 
   archiveCurrentMonth(event: Event) {
