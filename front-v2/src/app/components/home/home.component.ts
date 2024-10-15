@@ -60,15 +60,7 @@ export class HomeComponent {
   ) {
     const allMonths = this.monthlyBudgetsStore.getAll();
     if (!allMonths().length) {
-      this.displayLoader = true;
-      this.monthsService
-        .getUnarchivedMonths()
-        .pipe(
-          finalize(() => {
-            this.displayLoader = false;
-          })
-        )
-        .subscribe();
+      this.getUnarchivedMonths();
     }
 
     this.currentMonthlyBudget = this.monthlyBudgetsStore.getCurrent();
@@ -76,6 +68,18 @@ export class HomeComponent {
       this.monthlyBudgetsStore.isCurrentMonthTheFirst();
     this.isCurrentMonthTheLast =
       this.monthlyBudgetsStore.isCurrentMonthTheLast();
+  }
+
+  getUnarchivedMonths() {
+    this.displayLoader = true;
+    this.monthsService
+      .getUnarchivedMonths()
+      .pipe(
+        finalize(() => {
+          this.displayLoader = false;
+        })
+      )
+      .subscribe();
   }
 
   toggleMenuModal(event: Event) {
