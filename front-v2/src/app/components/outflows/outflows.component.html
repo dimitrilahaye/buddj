@@ -1,3 +1,16 @@
+<app-modal
+  [modalOpen]="outflowDelationModalIsOpen"
+  (click)="closeOutflowDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer la sortie définitivement'"
+    [loading]="deleteOutflowFormIsLoading"
+    (click)="deleteOutflow($event)"
+  ></app-button>
+</app-modal>
+
 <div
   class="outflows"
   [ngStyle]="{ 'padding-bottom': formUpdated ? '80px' : 0 }"
@@ -48,14 +61,9 @@
             <button
               class="outflows-list-item__delete"
               type="button"
-              [disabled]="outflowDeletionIsLoadingByIndex(i)"
-              (click)="deleteOutflowByIndex(i, $event)"
+              (click)="openOutflowDelationModal(outflow, $event)"
             >
-              @if(outflowDeletionIsLoadingByIndex(i)) {
-              <ng-container *ngTemplateOutlet="loader"></ng-container>
-              } @else {
               <i class="fa-solid fa-trash-can"></i>
-              }
             </button>
           </button>
         </app-item>
