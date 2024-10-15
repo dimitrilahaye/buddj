@@ -15,37 +15,18 @@
           }}</span>
         </div>
         <div class="expenses-list__filters">
-          <button
-            (click)="updateFilterState('all')"
-            [ngClass]="{
-              'expenses-list-filters__filter--active': filterIsActive('all')
-            }"
-            type="button"
-            class="expenses-list-filters__filter"
-          >
-            <i class="fa-solid fa-list"></i>
-          </button>
-          <button
-            (click)="updateFilterState('unchecked')"
-            [ngClass]="{
-              'expenses-list-filters__filter--active':
-                filterIsActive('unchecked')
-            }"
-            type="button"
-            class="expenses-list-filters__filter"
-          >
-            <i class="fa-solid fa-square"></i>
-          </button>
-          <button
-            (click)="updateFilterState('checked')"
-            [ngClass]="{
-              'expenses-list-filters__filter--active': filterIsActive('checked')
-            }"
-            type="button"
-            class="expenses-list-filters__filter"
-          >
-            <i class="fa-solid fa-square-check"></i>
-          </button>
+          <ng-container *ngFor="let week of weekButtons">
+            <button
+              (click)="updateFilterState(week)"
+              [ngClass]="{
+                'expenses-list-filters__filter--active': filterIsActive(week)
+              }"
+              type="button"
+              class="expenses-list-filters__filter"
+            >
+              <span>{{ week }}</span>
+            </button>
+          </ng-container>
         </div>
       </div>
       <ng-container *ngFor="let week of weeks">
@@ -59,7 +40,7 @@
             ></app-progress-bar>
           </div>
           @if (getExpensesFormGroupByWeekId(week.id).length === 0) {
-          <app-info>Pas de dépenses pour cette semaine 😁</app-info> } @else {
+          <app-info>Pas de dépenses à afficher 😁</app-info> } @else {
           <app-item
             *ngFor="
               let expense of getExpensesFormGroupByWeekId(week.id);

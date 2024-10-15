@@ -31,8 +31,6 @@ import {
 import { finalize } from 'rxjs';
 import { HotToastService } from '@ngxpert/hot-toast';
 
-type FilterState = 'all' | 'checked' | 'unchecked';
-
 @Component({
   selector: 'app-expenses',
   standalone: true,
@@ -51,7 +49,7 @@ export class ExpensesComponent implements AfterViewInit {
   addExpenseFormIsLoading = false;
   isExpensesModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
-  filtersState: FilterState = 'all';
+  filtersState = 0;
   formUpdated = false;
 
   constructor(
@@ -95,14 +93,18 @@ export class ExpensesComponent implements AfterViewInit {
     );
   }
 
-  filterIsActive(state: FilterState) {
-    return this.filtersState === state;
+  filterIsActive(week: number) {
+    return this.filtersState === week;
   }
 
   get forecastBalance() {
     return (
       this.month()?.dashboard.weeks.forecastBalance ?? 'ERROR: forecast balance'
     );
+  }
+
+  get weekButtons() {
+    return [1, 2, 3, 4, 5];
   }
 
   getCurrentBalanceByWeekName(weekName: string) {
@@ -156,23 +158,23 @@ export class ExpensesComponent implements AfterViewInit {
     }
   }
 
-  updateFilterState(state: FilterState) {
-    this.filtersState = state;
+  updateFilterState(week: number) {
+    if (this.filtersState === week) {
+      this.filtersState = 0;
+    } else {
+      this.filtersState = week;
+    }
   }
 
   getExpensesFormGroupByWeekId(weekId: string) {
-    return this.expensesFormArray.controls
-      .filter((control) => control.get('weekId')?.value === weekId)
-      .filter((control) => {
-        switch (this.filtersState) {
-          case 'checked':
-            return control.get('isChecked')?.value === true;
-          case 'unchecked':
-            return control.get('isChecked')?.value === false;
-          default:
-            return control;
-        }
-      });
+    return this.expensesFormArray.controls.filter((expense) => {
+      const expenseWeekId = expense.get('weekId')?.value;
+      if (this.filtersState === 0) {
+        return expenseWeekId === weekId;
+      }
+      const selectedWeek = this.weeks[this.filtersState - 1];
+      return expenseWeekId === weekId && expenseWeekId === selectedWeek.id;
+    });
   }
 
   setAddExpenseForm() {
@@ -218,7 +220,12 @@ export class ExpensesComponent implements AfterViewInit {
 
       this.monthsService
         .deleteExpense(this.month()!.id, weekId, expenseId)
-        .pipe(finalize(() => this.stopDeletationLoading()))
+        .pipe(
+          finalize(() => {
+            this.stopDeletationLoading();
+            this.filtersState = 0;
+          })
+        )
         .subscribe(() =>
           this.toaster.success('Votre dépense a été supprimée !')
         );
@@ -250,7 +257,12 @@ export class ExpensesComponent implements AfterViewInit {
       this.addExpenseFormIsLoading = true;
       this.monthsService
         .addExpense(this.month()!.id, weekId, data)
-        .pipe(finalize(() => (this.addExpenseFormIsLoading = false)))
+        .pipe(
+          finalize(() => {
+            this.addExpenseFormIsLoading = false;
+            this.filtersState = 0;
+          })
+        )
         .subscribe(() => {
           this.closeExpensesModal();
           this.toaster.success('Votre dépense a été ajoutée !');
@@ -260,12 +272,6 @@ export class ExpensesComponent implements AfterViewInit {
     }
     event.stopPropagation();
   }
-
-  // deleteExpense(event: Event) {
-  //   this.expensesFormArray.removeAt(this.expenses.length - 1);
-  //   this.closeExpensesModal();
-  //   event.stopPropagation();
-  // }
 
   onSubmit() {
     this.formIsLoading = true;
@@ -283,7 +289,12 @@ export class ExpensesComponent implements AfterViewInit {
     };
     this.monthsService
       .updateExpensesChecking(this.month()!.id, data)
-      .pipe(finalize(() => (this.formIsLoading = false)))
+      .pipe(
+        finalize(() => {
+          this.formIsLoading = false;
+          this.filtersState = 0;
+        })
+      )
       .subscribe(() => {
         this.toaster.success('Vos dépenses ont été modifiées !');
         this.formUpdated = false;
