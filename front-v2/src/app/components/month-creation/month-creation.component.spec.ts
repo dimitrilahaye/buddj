@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
-import { Renderer2 } from '@angular/core';
 import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
 
 describe('MonthCreationComponent', () => {
@@ -33,7 +32,6 @@ describe('MonthCreationComponent', () => {
         },
         Router,
         FormBuilder,
-        Renderer2,
       ],
     }).compileComponents();
 
