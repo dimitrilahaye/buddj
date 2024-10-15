@@ -87,8 +87,12 @@
   &__title {
     @extend %title-20;
     color: white;
-
     text-transform: capitalize;
+    background: none;
+    border: none;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0;
   }
 }
 
