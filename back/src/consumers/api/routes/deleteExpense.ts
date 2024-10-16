@@ -1,25 +1,32 @@
-import {Router} from "express";
+import { Router } from "express";
 import DeleteExpense from "../../../core/usecases/DeleteExpense.js";
-import DeleteExpenseCommand from "../commands/DeleteExpenseCommand.js";
-import {MonthDtoBuilder} from "../dtos/monthDto.js";
+import { MonthDtoBuilder } from "../dtos/monthDto.js";
+import { DeleteExpenseDeserializer } from "../deserializers/deleteExpense.js";
 
 type DeleteExpenseDeps = {
-    deleteExpenseUsecase: DeleteExpense,
-    monthDto: MonthDtoBuilder,
+  deleteExpenseUsecase: DeleteExpense;
+  monthDto: MonthDtoBuilder;
+  deserializer: DeleteExpenseDeserializer;
+};
+
+function deleteExpense(
+  router: Router,
+  { deleteExpenseUsecase, monthDto, deserializer }: DeleteExpenseDeps
+) {
+  return router.delete(
+    "/months/:monthId/weekly/:weeklyId/expenses/:expenseId",
+    async (req, res, next) => {
+      try {
+        const { params } = req;
+        const command = deserializer(params);
+        const month = await deleteExpenseUsecase.execute(command);
+        const dto = monthDto(month);
+        res.status(200).send({ success: true, data: dto });
+      } catch (e) {
+        next(e);
+      }
+    }
+  );
 }
 
-function deleteExpense(router: Router, {deleteExpenseUsecase, monthDto}: DeleteExpenseDeps) {
-    return router.delete('/months/:monthId/weekly/:weeklyId/expenses/:expenseId', async (req, res, next) => {
-        try {
-            const {params} = req;
-            const command = DeleteExpenseCommand.toCommand(params);
-            const month = await deleteExpenseUsecase.execute(command);
-            const dto = monthDto(month);
-            res.status(200).send({success: true, data: dto});
-        } catch (e) {
-            next(e);
-        }
-    });
-}
-
-export {deleteExpense};
+export { deleteExpense };

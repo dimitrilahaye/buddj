@@ -1,4 +1,4 @@
-import env from './env-vars.js';
+import env from "./env-vars.js";
 
 import dbClient from "./providers/persistence/db.js";
 import typeormDataSource from "./providers/persistence/typeormConfig.js";
@@ -24,17 +24,27 @@ import AccountOutflowFactory from "./core/factories/AccountOutflowFactory.js";
 import GetArchivedMonths from "./core/usecases/GetArchivedMonths.js";
 import UnarchiveMonth from "./core/usecases/UnarchiveMonth.js";
 import DeleteMonth from "./core/usecases/DeleteMonth.js";
+import addOutflowDeserializer from "./consumers/api/deserializers/addOutflow.js";
+import addWeeklyExpenseDeserializer from "./consumers/api/deserializers/addWeeklyExpense.js";
+import archiveMonthDeserializer from "./consumers/api/deserializers/archiveMonth.js";
+import deleteExpenseDeserializer from "./consumers/api/deserializers/deleteExpense.js";
+import deleteMonthDeserializer from "./consumers/api/deserializers/deleteMonth.js";
+import deleteOutflowDeserializer from "./consumers/api/deserializers/deleteOutflow.js";
+import monthCreationDeserializer from "./consumers/api/deserializers/monthCreation.js";
+import unarchiveMonthDeserializer from "./consumers/api/deserializers/unarchiveMonth.js";
+import manageExpenseCheckingDeserializer from "./consumers/api/deserializers/manageExpenseChecking.js";
+import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/manageOutflowChecking.js";
 
 // persistence
 
 await typeormDataSource.initialize();
 
 const client = dbClient({
-    user: env.dbUser,
-    database: env.dbName,
-    port: env.dbPort,
-    host: env.dbUrl,
-    password: env.dbPassword,
+  user: env.dbUser,
+  database: env.dbName,
+  port: env.dbPort,
+  host: env.dbUrl,
+  password: env.dbPassword,
 });
 
 const userRepository = new UserRepository(client);
@@ -61,13 +71,22 @@ const getUnarchivedMonthsUsecase = new GetUnarchivedMonths(monthRepository);
 
 const getArchivedMonthsUsecase = new GetArchivedMonths(monthRepository);
 
-const manageExpensesCheckingUsecase = new ManageExpensesChecking(monthRepository);
+const manageExpensesCheckingUsecase = new ManageExpensesChecking(
+  monthRepository
+);
 
-const manageOutflowsCheckingUsecase = new ManageOutflowsChecking(monthRepository);
+const manageOutflowsCheckingUsecase = new ManageOutflowsChecking(
+  monthRepository
+);
 
-const getMonthCreationTemplateUsecase = new GetMonthCreationTemplate(monthCreationTemplateRepository);
+const getMonthCreationTemplateUsecase = new GetMonthCreationTemplate(
+  monthCreationTemplateRepository
+);
 
-const addWeeklyExpenseUsecase = new AddWeeklyExpense(weeklyExpenseFactory, monthRepository);
+const addWeeklyExpenseUsecase = new AddWeeklyExpense(
+  weeklyExpenseFactory,
+  monthRepository
+);
 
 const archiveMonthUsecase = new ArchiveMonth(monthRepository);
 
@@ -84,21 +103,31 @@ const deleteOutflowUsecase = new DeleteOutflow(monthRepository);
 const addOutflowUsecase = new AddOutflow(outflowFactory, monthRepository);
 
 export {
-    client as dbClient,
-    userRepository,
-    monthDto,
-    getMonthCreationTemplateUsecase,
-    createNewMonthUsecase,
-    getUnarchivedMonthsUsecase,
-    addWeeklyExpenseUsecase,
-    manageExpensesCheckingUsecase,
-    manageOutflowsCheckingUsecase,
-    archiveMonthUsecase,
-    deleteExpenseUsecase,
-    updateExpenseUsecase,
-    deleteOutflowUsecase,
-    addOutflowUsecase,
-    getArchivedMonthsUsecase,
-    unarchiveMonthUsecase,
-    deleteMonthUsecase,
-}
+  client as dbClient,
+  userRepository,
+  monthDto,
+  getMonthCreationTemplateUsecase,
+  createNewMonthUsecase,
+  getUnarchivedMonthsUsecase,
+  addWeeklyExpenseUsecase,
+  manageExpensesCheckingUsecase,
+  manageOutflowsCheckingUsecase,
+  archiveMonthUsecase,
+  deleteExpenseUsecase,
+  updateExpenseUsecase,
+  deleteOutflowUsecase,
+  addOutflowUsecase,
+  getArchivedMonthsUsecase,
+  unarchiveMonthUsecase,
+  deleteMonthUsecase,
+  addOutflowDeserializer,
+  addWeeklyExpenseDeserializer,
+  archiveMonthDeserializer,
+  deleteExpenseDeserializer,
+  deleteMonthDeserializer,
+  deleteOutflowDeserializer,
+  manageExpenseCheckingDeserializer,
+  manageOutflowCheckingDeserializer,
+  monthCreationDeserializer,
+  unarchiveMonthDeserializer,
+};
