@@ -1,16 +1,15 @@
 import { Router, Response, Request } from "express";
-import UpdateExpenseCommand from "../commands/UpdateExpenseCommand.js";
 import { MonthDtoBuilder } from "../dtos/monthDto.js";
 import GetArchivedMonths from "../../../core/usecases/GetArchivedMonths.js";
 
-type UpdateExpenseDeps = {
+type GetArchivedMonthsDeps = {
   getArchivedMonthsUsecase: GetArchivedMonths;
   monthDto: MonthDtoBuilder;
 };
 
 function getArchivedMonths(
   router: Router,
-  { getArchivedMonthsUsecase, monthDto }: UpdateExpenseDeps
+  { getArchivedMonthsUsecase, monthDto }: GetArchivedMonthsDeps
 ) {
   return router.get(
     "/months/archived",

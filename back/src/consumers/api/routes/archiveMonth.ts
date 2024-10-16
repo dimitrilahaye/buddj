@@ -1,25 +1,29 @@
-import {Router} from "express";
+import { Router } from "express";
 import ArchiveMonth from "../../../core/usecases/ArchiveMonth.js";
-import ArchiveMonthCommand from "../commands/ArchiveMonthCommand.js";
-import {MonthDtoBuilder} from "../dtos/monthDto.js";
+import { MonthDtoBuilder } from "../dtos/monthDto.js";
+import { ArchiveMonthDeserializer } from "../deserializers/archiveMonth.js";
 
 type ArchiveMonthDeps = {
-    archiveMonthUsecase: ArchiveMonth
-    monthDto: MonthDtoBuilder,
+  archiveMonthUsecase: ArchiveMonth;
+  monthDto: MonthDtoBuilder;
+  deserializer: ArchiveMonthDeserializer;
+};
+
+function archiveMonth(
+  router: Router,
+  { archiveMonthUsecase, monthDto, deserializer }: ArchiveMonthDeps
+) {
+  return router.put("/months/:monthId/archive", async (req, res, next) => {
+    try {
+      const { params } = req;
+      const command = deserializer(params);
+      const month = await archiveMonthUsecase.execute(command);
+      const dto = monthDto(month);
+      res.status(200).send({ success: true, data: dto });
+    } catch (e) {
+      next(e);
+    }
+  });
 }
 
-function archiveMonth(router: Router, {archiveMonthUsecase, monthDto}: ArchiveMonthDeps) {
-    return router.put('/months/:monthId/archive', async (req, res, next) => {
-        try {
-            const {params} = req;
-            const command = ArchiveMonthCommand.toCommand(params);
-            const month = await archiveMonthUsecase.execute(command);
-            const dto = monthDto(month);
-            res.status(200).send({success: true, data: dto});
-        } catch (e) {
-            next(e);
-        }
-    });
-}
-
-export {archiveMonth};
+export { archiveMonth };
