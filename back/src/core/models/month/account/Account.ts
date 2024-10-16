@@ -1,109 +1,133 @@
 import AccountOutflow from "./AccountOutflow.js";
 import WeeklyBudget from "./WeeklyBudget.js";
-import {AccountOutflowsError, AccountWeeklyBudgetsError} from "../../../errors/AccountErrors.js";
+import {
+  AccountOutflowsError,
+  AccountWeeklyBudgetsError,
+} from "../../../errors/AccountErrors.js";
 import WeeklyExpense from "./WeeklyExpense.js";
-import {WeeklyBudgetNotFoundError} from "../../../errors/WeeklyBudgetErrors.js";
-import {AccountOutflowNotFoundError} from "../../../errors/AccountOuflowErrors.js";
+import { WeeklyBudgetNotFoundError } from "../../../errors/WeeklyBudgetErrors.js";
+import { AccountOutflowNotFoundError } from "../../../errors/AccountOuflowErrors.js";
 
 export default class Account {
+  id: string;
+  currentBalance: number;
+  outflows: AccountOutflow[];
+  weeklyBudgets: WeeklyBudget[];
+
+  constructor(props: {
     id: string;
     currentBalance: number;
     outflows: AccountOutflow[];
     weeklyBudgets: WeeklyBudget[];
-
-    constructor(props: {
-        id: string,
-        currentBalance: number,
-        outflows: AccountOutflow[],
-        weeklyBudgets: WeeklyBudget[]
-    }) {
-        if (props.weeklyBudgets.length !== 5) {
-            throw new AccountWeeklyBudgetsError();
-        }
-        if (props.outflows.length === 0) {
-            throw new AccountOutflowsError();
-        }
-        this.id = props.id;
-        this.currentBalance = props.currentBalance;
-        this.outflows = props.outflows;
-        this.weeklyBudgets = props.weeklyBudgets;
+  }) {
+    if (props.weeklyBudgets.length !== 5) {
+      throw new AccountWeeklyBudgetsError();
     }
-
-    addExpenseToWeeklyBudget(weeklyId: string, expense: WeeklyExpense) {
-        const weekly = this.findWeeklyBudgetById(weeklyId);
-        weekly.addExpense(expense);
+    if (props.outflows.length === 0) {
+      throw new AccountOutflowsError();
     }
+    this.id = props.id;
+    this.currentBalance = props.currentBalance;
+    this.outflows = props.outflows;
+    this.weeklyBudgets = props.weeklyBudgets;
+  }
 
-    deleteExpenseFromWeeklyBudget(weeklyId: string, expenseId: string) {
-        const weekly = this.findWeeklyBudgetById(weeklyId);
-        weekly.deleteExpenseById(expenseId);
-    }
+  addExpenseToWeeklyBudget(weeklyId: string, expense: WeeklyExpense) {
+    const weekly = this.findWeeklyBudgetById(weeklyId);
+    weekly.addExpense(expense);
+  }
 
-    deleteOutflow(outflowId: string) {
-        this.outflows = this.outflows.filter((outflow) => outflow.id !== outflowId);
-    }
+  deleteExpenseFromWeeklyBudget(weeklyId: string, expenseId: string) {
+    const weekly = this.findWeeklyBudgetById(weeklyId);
+    weekly.deleteExpenseById(expenseId);
+  }
 
-    addOutflow(outflow: AccountOutflow) {
-        this.outflows.push(outflow);
-    }
+  deleteOutflow(outflowId: string) {
+    this.outflows = this.outflows.filter((outflow) => outflow.id !== outflowId);
+  }
 
-    updateExpenseAmountFromWeeklyBudget(weeklyId: string, expenseId: string, amount: number) {
-        const weekly = this.findWeeklyBudgetById(weeklyId);
-        weekly.updateExpenseAmount(expenseId, amount);
-    }
+  addOutflow(outflow: AccountOutflow) {
+    this.outflows.push(outflow);
+  }
 
-    updateExpenseLabelFromWeeklyBudget(weeklyId: string, expenseId: string, label: string) {
-        const weekly = this.findWeeklyBudgetById(weeklyId);
-        weekly.updateExpenseLabel(expenseId, label);
-    }
+  /**
+   * @deprecated
+   */
+  updateExpenseAmountFromWeeklyBudget(
+    weeklyId: string,
+    expenseId: string,
+    amount: number
+  ) {
+    const weekly = this.findWeeklyBudgetById(weeklyId);
+    weekly.updateExpenseAmount(expenseId, amount);
+  }
 
-    checkExpense(weeklyId: string, expenseId: string) {
-        const weekly = this.findWeeklyBudgetById(weeklyId);
-        weekly.checkExpense(expenseId);
-    }
+  /**
+   * @deprecated
+   */
+  updateExpenseLabelFromWeeklyBudget(
+    weeklyId: string,
+    expenseId: string,
+    label: string
+  ) {
+    const weekly = this.findWeeklyBudgetById(weeklyId);
+    weekly.updateExpenseLabel(expenseId, label);
+  }
 
-    uncheckExpense(weeklyId: string, expenseId: string) {
-        const weekly = this.findWeeklyBudgetById(weeklyId);
-        weekly.uncheckExpense(expenseId);
-    }
+  checkExpense(weeklyId: string, expenseId: string) {
+    const weekly = this.findWeeklyBudgetById(weeklyId);
+    weekly.checkExpense(expenseId);
+  }
 
-    checkOutflow(outflowId: string) {
-        const outflow = this.findAccountOutflowById(outflowId);
-        outflow.check();
-    }
+  uncheckExpense(weeklyId: string, expenseId: string) {
+    const weekly = this.findWeeklyBudgetById(weeklyId);
+    weekly.uncheckExpense(expenseId);
+  }
 
-    uncheckOutflow(outflowId: string) {
-        const outflow = this.findAccountOutflowById(outflowId);
-        outflow.uncheck();
-    }
+  checkOutflow(outflowId: string) {
+    const outflow = this.findAccountOutflowById(outflowId);
+    outflow.check();
+  }
 
-    updateExpenseWeeklyBudget(originalWeeklyId: string, newWeeklyId: string, expenseId: string) {
-        if (originalWeeklyId === newWeeklyId) {
-            return;
-        }
-        const originalWeekly = this.findWeeklyBudgetById(originalWeeklyId);
-        const expense = originalWeekly.findExpenseById(expenseId);
-        this.deleteExpenseFromWeeklyBudget(originalWeeklyId, expenseId);
-        this.addExpenseToWeeklyBudget(newWeeklyId, expense);
-    }
+  uncheckOutflow(outflowId: string) {
+    const outflow = this.findAccountOutflowById(outflowId);
+    outflow.uncheck();
+  }
 
-    updateCurrentBalance(currentBalance: number) {
-        this.currentBalance = currentBalance;
+  /**
+   * @deprecated
+   */
+  updateExpenseWeeklyBudget(
+    originalWeeklyId: string,
+    newWeeklyId: string,
+    expenseId: string
+  ) {
+    if (originalWeeklyId === newWeeklyId) {
+      return;
     }
+    const originalWeekly = this.findWeeklyBudgetById(originalWeeklyId);
+    const expense = originalWeekly.findExpenseById(expenseId);
+    this.deleteExpenseFromWeeklyBudget(originalWeeklyId, expenseId);
+    this.addExpenseToWeeklyBudget(newWeeklyId, expense);
+  }
 
-    private findWeeklyBudgetById(weeklyId: string) {
-        const weekly = this.weeklyBudgets.find((budget) => budget.id === weeklyId);
-        if (weekly === undefined) {
-            throw new WeeklyBudgetNotFoundError();
-        }
-        return weekly;
-    }
+  updateCurrentBalance(currentBalance: number) {
+    this.currentBalance = currentBalance;
+  }
 
-    private findAccountOutflowById(outflowId: string) {
-        const outflow = this.outflows.find((outflow) => outflow.id === outflowId);
-        if (!outflow) {
-            throw new AccountOutflowNotFoundError();
-        }
-        return outflow;
+  private findWeeklyBudgetById(weeklyId: string) {
+    const weekly = this.weeklyBudgets.find((budget) => budget.id === weeklyId);
+    if (weekly === undefined) {
+      throw new WeeklyBudgetNotFoundError();
     }
+    return weekly;
+  }
+
+  private findAccountOutflowById(outflowId: string) {
+    const outflow = this.outflows.find((outflow) => outflow.id === outflowId);
+    if (!outflow) {
+      throw new AccountOutflowNotFoundError();
+    }
+    return outflow;
+  }
 }

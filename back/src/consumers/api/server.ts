@@ -15,7 +15,7 @@ import GetMonthCreationTemplate from "../../core/usecases/GetMonthCreationTempla
 import errorHandler from "./errorHandler.js";
 import { createNewMonth } from "./routes/createNewMonth.js";
 import CreateNewMonth from "../../core/usecases/CreateNewMonth.js";
-import { getUnarchivedMonths } from "./routes/GetUnarchivedMonths.js";
+import { getUnarchivedMonths } from "./routes/getUnarchivedMonths.js";
 import GetUnarchivedMonths from "../../core/usecases/GetUnarchivedMonths.js";
 import { addWeeklyExpense } from "./routes/addWeeklyExpense.js";
 import AddWeeklyExpense from "../../core/usecases/AddWeeklyExpense.js";
@@ -40,6 +40,16 @@ import UnarchiveMonth from "../../core/usecases/UnarchiveMonth.js";
 import { unarchiveMonth } from "./routes/unarchiveMonth.js";
 import DeleteMonth from "../../core/usecases/DeleteMonth.js";
 import { deleteMonth } from "./routes/deleteMonth.js";
+import { AddOutflowDeserializer } from "./deserializers/addOutflow.js";
+import { AddWeeklyExpenseDeserializer } from "./deserializers/addWeeklyExpense.js";
+import { ArchiveMonthDeserializer } from "./deserializers/archiveMonth.js";
+import { DeleteExpenseDeserializer } from "./deserializers/deleteExpense.js";
+import { DeleteMonthDeserializer } from "./deserializers/deleteMonth.js";
+import { DeleteOutflowDeserializer } from "./deserializers/deleteOutflow.js";
+import { MonthCreationDeserializer } from "./deserializers/monthCreation.js";
+import { UnarchiveMonthDeserializer } from "./deserializers/unarchiveMonth.js";
+import { ManageExpensesCheckingDeserializer } from "./deserializers/manageExpenseChecking.js";
+import { ManageOutflowsCheckingDeserializer } from "./deserializers/manageOutflowChecking.js";
 
 declare global {
   namespace Express {
@@ -72,6 +82,7 @@ type Vars = {
   dbUser: string;
   dbPassword: string;
   dbName: string;
+  template: any;
 };
 
 type SetupPassport = (api: Express) => void;
@@ -93,6 +104,16 @@ export type Deps = {
   getArchivedMonthsUsecase: GetArchivedMonths;
   unarchiveMonthUsecase: UnarchiveMonth;
   deleteMonthUsecase: DeleteMonth;
+  addOutflowDeserializer: AddOutflowDeserializer;
+  addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
+  archiveMonthDeserializer: ArchiveMonthDeserializer;
+  deleteExpenseDeserializer: DeleteExpenseDeserializer;
+  deleteMonthDeserializer: DeleteMonthDeserializer;
+  deleteOutflowDeserializer: DeleteOutflowDeserializer;
+  manageExpenseCheckingDeserializer: ManageExpensesCheckingDeserializer;
+  manageOutflowCheckingDeserializer: ManageOutflowsCheckingDeserializer;
+  monthCreationDeserializer: MonthCreationDeserializer;
+  unarchiveMonthDeserializer: UnarchiveMonthDeserializer;
 };
 
 function buildApi(
@@ -114,6 +135,16 @@ function buildApi(
     getArchivedMonthsUsecase,
     unarchiveMonthUsecase,
     deleteMonthUsecase,
+    addOutflowDeserializer,
+    addWeeklyExpenseDeserializer,
+    archiveMonthDeserializer,
+    deleteExpenseDeserializer,
+    deleteMonthDeserializer,
+    deleteOutflowDeserializer,
+    manageExpenseCheckingDeserializer,
+    manageOutflowCheckingDeserializer,
+    monthCreationDeserializer,
+    unarchiveMonthDeserializer,
   }: Deps
 ) {
   const api = express();
@@ -212,22 +243,79 @@ function buildApi(
 
   api.use(isLoggedIn);
 
-  api.use(deleteMonth(router, { deleteMonthUsecase, monthDto }));
-  api.use(getArchivedMonths(router, { getArchivedMonthsUsecase, monthDto }));
-  api.use(addOutflow(router, { addOutflowUsecase, monthDto }));
-  api.use(deleteOutflow(router, { deleteOutflowUsecase, monthDto }));
-  api.use(updateExpense(router, { updateExpenseUsecase, monthDto }));
-  api.use(deleteExpense(router, { deleteExpenseUsecase, monthDto }));
-  api.use(unarchiveMonth(router, { unarchiveMonthUsecase, monthDto }));
-  api.use(archiveMonth(router, { archiveMonthUsecase, monthDto }));
   api.use(
-    manageOutflowsChecking(router, { manageOutflowsCheckingUsecase, monthDto })
+    deleteMonth(router, {
+      deleteMonthUsecase,
+      monthDto,
+      deserializer: deleteMonthDeserializer,
+    })
   );
-  api.use(manageExpensesChecking(router, { manageExpensesCheckingUsecase }));
-  api.use(addWeeklyExpense(router, { addWeeklyExpenseUsecase }));
+  api.use(getArchivedMonths(router, { getArchivedMonthsUsecase, monthDto }));
+  api.use(
+    addOutflow(router, {
+      addOutflowUsecase,
+      monthDto,
+      deserializer: addOutflowDeserializer,
+    })
+  );
+  api.use(
+    deleteOutflow(router, {
+      deleteOutflowUsecase,
+      monthDto,
+      deserializer: deleteOutflowDeserializer,
+    })
+  );
+  api.use(
+    deleteExpense(router, {
+      deleteExpenseUsecase,
+      monthDto,
+      deserializer: deleteExpenseDeserializer,
+    })
+  );
+  api.use(
+    unarchiveMonth(router, {
+      unarchiveMonthUsecase,
+      monthDto,
+      deserializer: unarchiveMonthDeserializer,
+    })
+  );
+  api.use(
+    archiveMonth(router, {
+      archiveMonthUsecase,
+      monthDto,
+      deserializer: archiveMonthDeserializer,
+    })
+  );
+  api.use(
+    manageOutflowsChecking(router, {
+      manageOutflowsCheckingUsecase,
+      monthDto,
+      deserializer: manageOutflowCheckingDeserializer,
+    })
+  );
+  api.use(
+    manageExpensesChecking(router, {
+      manageExpensesCheckingUsecase,
+      deserializer: manageExpenseCheckingDeserializer,
+    })
+  );
+  api.use(
+    addWeeklyExpense(router, {
+      addWeeklyExpenseUsecase,
+      deserializer: addWeeklyExpenseDeserializer,
+    })
+  );
   api.use(getMonthTemplate(router, { getMonthCreationTemplateUsecase }));
   api.use(getUnarchivedMonths(router, { getUnarchivedMonthsUsecase }));
-  api.use(createNewMonth(router, { createNewMonthUsecase }));
+  api.use(
+    createNewMonth(router, {
+      createNewMonthUsecase,
+      deserializer: monthCreationDeserializer,
+    })
+  );
+
+  /** @deprecated */
+  api.use(updateExpense(router, { updateExpenseUsecase, monthDto }));
 
   router.get("/me", isLoggedIn, async (req, res) => {
     try {
