@@ -1,5 +1,3 @@
-// dotenv said "dotenv provides its own type definitions, so you don't need @types/dotenv installed!" but warning is still there...
-// @ts-ignore
 import { configDotenv } from "dotenv";
 import "reflect-metadata";
 
