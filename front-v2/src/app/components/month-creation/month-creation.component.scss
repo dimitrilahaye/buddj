@@ -56,7 +56,7 @@
     gap: 10px;
     height: auto;
     width: 100%;
-    padding: 20px;
+    padding: 10px 20px;
     bottom: 0;
     left: 0;
     background: var(--color-800);
@@ -86,9 +86,9 @@
   &__forecast-balance {
     border-radius: var(--radius-50);
     background-color: var(--light-60);
-    padding: 10px;
+    padding: 5px 10px;
     box-sizing: border-box;
-    font-size: var(--text-10);
+    font-size: var(--text-7);
   }
   &__actions {
     display: flex;
