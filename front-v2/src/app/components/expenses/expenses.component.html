@@ -121,7 +121,7 @@
 <app-sliding-modal
   [isOpen]="isExpensesModalOpen"
   [canClose]="!addExpenseFormIsLoading"
-  (close)="closeExpensesModal()"
+  (close)="closeExpensesModal($event)"
 >
   <form [formGroup]="addExpenseForm" (ngSubmit)="submitExpenseModal($event)">
     <div class="modal-container">
@@ -132,7 +132,11 @@
         id="weekId"
       >
         <option disabled value="">Choisir la semaine</option>
-        <option *ngFor="let week of weeks" [value]="week.id">
+        <option
+          *ngFor="let week of weeks"
+          [value]="week.id"
+          (click)="$event.stopPropagation()"
+        >
           {{ week.name }}
         </option>
       </select>
@@ -146,7 +150,7 @@
 
       <!-- amount -->
       <app-input-number
-        (click)="openNumpad(addExpenseForm.controls['amount'])"
+        (click)="openNumpad(addExpenseForm.controls['amount'], $event)"
         [formGroup]="addExpenseForm"
         formControlName="amount"
         [required]="true"

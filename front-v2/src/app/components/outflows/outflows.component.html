@@ -20,7 +20,7 @@
     <div class="outflows-list">
       <app-input-number
         [formGroup]="form"
-        (click)="openNumpad(form.controls['currentBalance'])"
+        (click)="openNumpad(form.controls['currentBalance'], $event)"
         formControlName="currentBalance"
         [required]="true"
         [placeholder]="'Solde actuel'"
@@ -103,7 +103,7 @@
 
       <!-- amount -->
       <app-input-number
-        (click)="openNumpad(addOutflowForm.controls['amount'])"
+        (click)="openNumpad(addOutflowForm.controls['amount'], $event)"
         [formGroup]="addOutflowForm"
         formControlName="amount"
         [required]="true"

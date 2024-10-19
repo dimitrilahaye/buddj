@@ -205,9 +205,10 @@ export class OutflowsComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
-  openNumpad(control: AbstractControl) {
+  openNumpad(control: AbstractControl, event: Event) {
     this.amountValueControl = control;
     this.isNumpadModalOpen = true;
+    event.stopPropagation();
   }
 
   get amountValue() {

@@ -251,8 +251,9 @@ export class ExpensesComponent implements AfterViewInit {
     this.setAddExpenseForm();
   }
 
-  closeExpensesModal() {
+  closeExpensesModal(event: Event) {
     this.isExpensesModalOpen = false;
+    event.stopPropagation();
   }
 
   submitExpenseModal(event: Event) {
@@ -269,7 +270,7 @@ export class ExpensesComponent implements AfterViewInit {
           })
         )
         .subscribe(() => {
-          this.closeExpensesModal();
+          this.closeExpensesModal(event);
           this.toaster.success('Votre dépense a été ajoutée !');
         });
     } else {
@@ -283,9 +284,10 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
-  openNumpad(control: AbstractControl) {
+  openNumpad(control: AbstractControl, event: Event) {
     this.amountValueControl = control;
     this.isNumpadModalOpen = true;
+    event.stopPropagation();
   }
 
   get amountValue() {
