@@ -22,6 +22,8 @@
     "db:prepare": "npm run db:drop && npm run db:migrate",
     "db:prepare:test": "NODE_ENV=test npm run db:prepare",
     "test": "NODE_ENV=test mocha --timeout 15000",
+    "test:unit": "NODE_ENV=test mocha --timeout 15000 --grep 'Unit'",
+    "test:integration": "NODE_ENV=test mocha --timeout 15000 --grep 'Integration'",
     "test:full": "npm run db:prepare:test && npm run test"
   },
   "engines": {
