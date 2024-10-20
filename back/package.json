@@ -21,9 +21,9 @@
     "db:migrate:prod": "NODE_ENV=production npm run db:migrate",
     "db:prepare": "npm run db:drop && npm run db:migrate",
     "db:prepare:test": "NODE_ENV=test npm run db:prepare",
-    "test": "NODE_ENV=test mocha --timeout 15000",
-    "test:unit": "NODE_ENV=test mocha --timeout 15000 --grep 'Unit'",
-    "test:integration": "NODE_ENV=test mocha --timeout 15000 --grep 'Integration'",
+    "test": "NODE_ENV=test mocha",
+    "test:unit": "cross-env MOCHA_TEST=unit NODE_ENV=test mocha --grep 'Unit'",
+    "test:integration": "NODE_ENV=test mocha --grep 'Integration'",
     "test:full": "npm run db:prepare:test && npm run test"
   },
   "engines": {
@@ -64,6 +64,7 @@
     "@types/uuid": "^10.0.0",
     "chai": "^4.5.0",
     "chai-as-promised": "^8.0.0",
+    "cross-env": "^7.0.3",
     "esbuild": "^0.24.0",
     "mocha": "^10.8.2",
     "sinon": "^19.0.2",
