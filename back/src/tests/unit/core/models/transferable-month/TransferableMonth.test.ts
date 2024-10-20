@@ -88,7 +88,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
 
           .set.weeklyBudget("Semaine 1")
           .currentBalance(-10)
-          .get();
+          .getTransferable();
 
         // when
         transferableMonth.transferRemainingBalance
@@ -120,7 +120,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
 
           .set.weeklyBudget("Semaine 1")
           .currentBalance(20)
-          .get();
+          .getTransferable();
 
         // when
         transferableMonth.transferRemainingBalance
@@ -156,7 +156,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
 
           .set.weeklyBudget("Semaine 2")
           .currentBalance(-10)
-          .get();
+          .getTransferable();
 
         // when
         transferableMonth.transferRemainingBalance
