@@ -57,7 +57,11 @@ export default class TransferableMonthBuilder {
     };
   }
 
-  get() {
+  getTransferable() {
     return new TransferableMonth(this.month);
+  }
+
+  getMonth() {
+    return this.month;
   }
 }
