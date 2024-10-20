@@ -37,7 +37,9 @@ import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/man
 
 // persistence
 
-await typeormDataSource.initialize();
+if (process.env.MOCHA_TEST !== "unit") {
+  await typeormDataSource.initialize();
+}
 
 const client = dbClient({
   user: env.dbUser,
