@@ -62,6 +62,10 @@ describe("Unit | Consumers | Validators | Koi", () => {
         when: "when we test a not nil value",
         test: () => Koi.validate("whatever").notNil(),
       },
+      {
+        when: "when we test a list",
+        test: () => Koi.validate("whenever").oneOf("wherever", "whenever"),
+      },
     ];
     testCases.forEach((testCase) => {
       it(`should not throw error ${testCase.when}`, () => {
@@ -145,6 +149,12 @@ describe("Unit | Consumers | Validators | Koi", () => {
         when: "when we test a not nil value which is undefined",
         test: () => Koi.validate(undefined).notNil(),
         message: "ValidatorError: [undefined] is null or undefined",
+      },
+      {
+        when: "when we test a value which is not in the list",
+        test: () => Koi.validate("nope").oneOf<string>("wherever", "whenever"),
+        message:
+          "ValidatorError: [nope] is not contain in list [wherever, whenever]",
       },
     ];
     testCases.forEach((testCase) => {
