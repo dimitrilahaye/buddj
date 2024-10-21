@@ -8,18 +8,8 @@ const errorHandler = (
 ) => {
   let statusCode: number;
   switch (error.name) {
-    case "MonthCreationCommandError":
-    case "AddWeeklyExpenseCommandError":
-    case "ManageExpensesCheckingCommandError":
-    case "ManageOutflowsCheckingCommandError":
-    case "ArchiveMonthCommandError":
-    case "DeleteExpenseCommandError":
-    case "DeleteOutflowCommandError":
+    /** @deprecated */
     case "UpdateExpenseCommandError":
-    case "AddOutflowCommandError":
-    case "UnarchiveMonthCommandError":
-    case "DeleteMonthCommandError":
-
     case "DeserializationError":
       statusCode = 400;
       break;
@@ -27,6 +17,8 @@ const errorHandler = (
     case "WeeklyBudgetNotFoundError":
     case "WeeklyExpenseNotFoundError":
     case "AccountOutflowNotFoundError":
+    case "TransferableAccountNotFoundError":
+    case "TransferableWeeklyBudgetNotFoundError":
       statusCode = 404;
       break;
     case "AccountInitialBalanceError":
@@ -34,6 +26,7 @@ const errorHandler = (
     case "AccountOutflowsError":
     case "WeeklyBudgetInitialBalanceError":
     case "WeeklyExpenseAmountError":
+    case "TransferRemainingBalanceIntoMonthError":
       statusCode = 422;
       break;
     case "MonthCreationTemplateWeeklyBudgetError":

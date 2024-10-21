@@ -96,6 +96,15 @@ class Validator {
     }
     return this;
   }
+
+  oneOf<T>(...values: T[]) {
+    if (values.includes(this.value) === false) {
+      throw new ValidatorError(
+        `[${this.value}] is not contain in list [${values.join(", ")}]`
+      );
+    }
+    return this;
+  }
 }
 
 export default class Koi {

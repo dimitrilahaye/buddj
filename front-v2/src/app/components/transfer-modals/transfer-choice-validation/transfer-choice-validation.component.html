@@ -1,0 +1,12 @@
+<app-modal [modalOpen]="openMenuModal" (click)="toggle($event)">
+  <div class="transfer-choice-validation">
+    Transfert de {{ transferSourceLabel }} vers
+    {{ validationData?.information }}
+    <app-button
+      [size]="'big'"
+      [variant]="'danger'"
+      [label]="'Valider le transfert'"
+      (click)="submit($event)"
+    ></app-button>
+  </div>
+</app-modal>
