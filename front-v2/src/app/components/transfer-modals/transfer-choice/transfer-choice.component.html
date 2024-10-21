@@ -1,0 +1,29 @@
+@if(currentMonth()) {
+<app-modal [modalOpen]="openMenuModal" (click)="toggle($event)">
+  <div class="transfer-choice">
+    <div class="transfer-choice__title">
+      Transférer {{ transferAmount | currency : "EUR" }} ({{
+        transferSourceLabel
+      }}) vers
+    </div>
+    <div class="transfer-choice__choices">
+      <ng-container *ngFor="let button of buttons">
+        <app-button
+          [variant]="'danger'"
+          [label]="button.information"
+          (click)="openTransferChoiceModal(button, $event)"
+        ></app-button>
+      </ng-container>
+    </div>
+  </div>
+</app-modal>
+} @if(validationData) {
+<app-transfer-choice-validation
+  [openMenuModal]="transferChoiceModalIsOpen"
+  [validationData]="validationData"
+  [fromValidationAccount]="fromValidationAccount"
+  [fromValidationWeeklyBudget]="fromValidationWeeklyBudget"
+  (toggleModal)="closeTransferChoiceModal($event)"
+  (submitted)="submitTransfert($event)"
+></app-transfer-choice-validation>
+}
