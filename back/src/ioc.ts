@@ -24,6 +24,7 @@ import AccountOutflowFactory from "./core/factories/AccountOutflowFactory.js";
 import GetArchivedMonths from "./core/usecases/GetArchivedMonths.js";
 import UnarchiveMonth from "./core/usecases/UnarchiveMonth.js";
 import DeleteMonth from "./core/usecases/DeleteMonth.js";
+import TransferRemainingBalanceIntoMonth from "./core/usecases/TransferRemainingBalanceIntoMonth.js";
 import addOutflowDeserializer from "./consumers/api/deserializers/addOutflow.js";
 import addWeeklyExpenseDeserializer from "./consumers/api/deserializers/addWeeklyExpense.js";
 import archiveMonthDeserializer from "./consumers/api/deserializers/archiveMonth.js";
@@ -34,6 +35,7 @@ import monthCreationDeserializer from "./consumers/api/deserializers/monthCreati
 import unarchiveMonthDeserializer from "./consumers/api/deserializers/unarchiveMonth.js";
 import manageExpenseCheckingDeserializer from "./consumers/api/deserializers/manageExpenseChecking.js";
 import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/manageOutflowChecking.js";
+import transferRemainingBalanceIntoMonthDeserializer from "./consumers/api/deserializers/transferRemainingBalanceIntoMonth.js";
 
 // persistence
 
@@ -104,6 +106,9 @@ const deleteOutflowUsecase = new DeleteOutflow(monthRepository);
 
 const addOutflowUsecase = new AddOutflow(outflowFactory, monthRepository);
 
+const transferRemainingBalanceIntoMonthUsecase =
+  new TransferRemainingBalanceIntoMonth(monthRepository);
+
 export {
   client as dbClient,
   userRepository,
@@ -122,6 +127,7 @@ export {
   getArchivedMonthsUsecase,
   unarchiveMonthUsecase,
   deleteMonthUsecase,
+  transferRemainingBalanceIntoMonthUsecase,
   addOutflowDeserializer,
   addWeeklyExpenseDeserializer,
   archiveMonthDeserializer,
@@ -132,4 +138,5 @@ export {
   manageOutflowCheckingDeserializer,
   monthCreationDeserializer,
   unarchiveMonthDeserializer,
+  transferRemainingBalanceIntoMonthDeserializer,
 };
