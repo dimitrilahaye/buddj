@@ -1,3 +1,5 @@
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
 <app-modal
   [modalOpen]="expenseDelationModalIsOpen"
   (click)="closeExpenseDelationModal($event)"
@@ -43,7 +45,12 @@
       </div>
       <ng-container *ngFor="let week of weeks">
         <div class="expenses-list__week">
-          <h2 class="expenses-list__week-name">{{ week.name }}</h2>
+          <h2
+            class="expenses-list__week-name"
+            (click)="openTransferChoiceModal(week, $event)"
+          >
+            {{ week.name }}
+          </h2>
           <div class="expenses-list__balance">
             <span>Solde :</span>
             <app-progress-bar
@@ -190,3 +197,15 @@
     <app-animated-spinner [width]="20" [height]="20"></app-animated-spinner>
   </span>
 </ng-template>
+
+<!-- 
+  ##################### TRANSFER MODAL #####################
+   -->
+@if (fromAccountTransfer || fromWeeklyBudgetTransfer) {
+<app-transfer-choice
+  [openMenuModal]="transferChoiceModalIsOpen"
+  [fromWeeklyBudget]="fromWeeklyBudgetTransfer"
+  (toggleModal)="closeTransferChoiceModal($event)"
+  (submitted)="submitTransfer($event)"
+></app-transfer-choice>
+}

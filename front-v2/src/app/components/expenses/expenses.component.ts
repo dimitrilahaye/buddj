@@ -9,7 +9,12 @@ import {
   Signal,
 } from '@angular/core';
 import { DesignSystemModule } from '../../design-system/design-system.module';
-import { MonthlyBudget, Expense } from '../../models/monthlyBudget.model';
+import {
+  MonthlyBudget,
+  Expense,
+  Account,
+  WeeklyBudget,
+} from '../../models/monthlyBudget.model';
 import {
   AbstractControl,
   FormArray,
@@ -29,11 +34,17 @@ import {
 } from '../../stores/monthlyBudgets.store.interface';
 import { finalize } from 'rxjs';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { TransferChoiceComponent } from '../transfer-modals/transfer-choice/transfer-choice.component';
 
 @Component({
   selector: 'app-expenses',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, DesignSystemModule],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    DesignSystemModule,
+    TransferChoiceComponent,
+  ],
   templateUrl: './expenses.component.html',
   styleUrl: './expenses.component.scss',
 })
@@ -54,6 +65,10 @@ export class ExpensesComponent implements AfterViewInit {
   expenseToDelete: (Expense & { weekId: string }) | null = null;
   isNumpadModalOpen = false;
   amountValueControl: AbstractControl<any, any> | null = null;
+
+  transferChoiceModalIsOpen = false;
+  fromAccountTransfer: Account | null = null;
+  fromWeeklyBudgetTransfer: WeeklyBudget | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -94,6 +109,18 @@ export class ExpensesComponent implements AfterViewInit {
       },
       { injector: this.injector, allowSignalWrites: true }
     );
+  }
+
+  closeTransferChoiceModal(event: Event) {
+    this.transferChoiceModalIsOpen = false;
+    event.stopPropagation();
+  }
+
+  openTransferChoiceModal(week: any, event: Event) {
+    this.fromWeeklyBudgetTransfer =
+      this.month()?.account.weeklyBudgets.find((w) => w.id === week.id) ?? null;
+    this.transferChoiceModalIsOpen = true;
+    event.stopPropagation();
   }
 
   filterIsActive(week: number) {
@@ -326,5 +353,15 @@ export class ExpensesComponent implements AfterViewInit {
         this.toaster.success('Vos dépenses ont été modifiées !');
         this.formUpdated = false;
       });
+  }
+
+  submitTransfer(data: {
+    monthId: string;
+    fromType: 'account' | 'weekly-budget';
+    fromId: string;
+    toType: 'account' | 'weekly-budget';
+    toId: string;
+  }) {
+    console.info(data);
   }
 }
