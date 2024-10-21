@@ -43,7 +43,7 @@
     "@testing-library/dom": "^10.0.0",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/user-event": "^14.5.2",
-    "@types/jasmine": "~5.1.0",
+    "@types/jasmine": "~5.1.4",
     "angular-eslint": "18.3.1",
     "eslint": "^9.9.1",
     "jasmine-core": "~5.2.0",
