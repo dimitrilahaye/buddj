@@ -50,6 +50,9 @@ import { MonthCreationDeserializer } from "./deserializers/monthCreation.js";
 import { UnarchiveMonthDeserializer } from "./deserializers/unarchiveMonth.js";
 import { ManageExpensesCheckingDeserializer } from "./deserializers/manageExpenseChecking.js";
 import { ManageOutflowsCheckingDeserializer } from "./deserializers/manageOutflowChecking.js";
+import TransferRemainingBalanceIntoMonth from "../../core/usecases/TransferRemainingBalanceIntoMonth.js";
+import { TransferRemainingBalanceIntoMonthDeserializer } from "./deserializers/transferRemainingBalanceIntoMonth.js";
+import { transferRemainingBalanceIntoMonth } from "./routes/transferRemainingBalanceIntoMonth.js";
 
 declare global {
   namespace Express {
@@ -104,6 +107,7 @@ export type Deps = {
   getArchivedMonthsUsecase: GetArchivedMonths;
   unarchiveMonthUsecase: UnarchiveMonth;
   deleteMonthUsecase: DeleteMonth;
+  transferRemainingBalanceIntoMonthUsecase: TransferRemainingBalanceIntoMonth;
   addOutflowDeserializer: AddOutflowDeserializer;
   addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
   archiveMonthDeserializer: ArchiveMonthDeserializer;
@@ -114,6 +118,7 @@ export type Deps = {
   manageOutflowCheckingDeserializer: ManageOutflowsCheckingDeserializer;
   monthCreationDeserializer: MonthCreationDeserializer;
   unarchiveMonthDeserializer: UnarchiveMonthDeserializer;
+  transferRemainingBalanceIntoMonthDeserializer: TransferRemainingBalanceIntoMonthDeserializer;
 };
 
 function buildApi(
@@ -135,6 +140,7 @@ function buildApi(
     getArchivedMonthsUsecase,
     unarchiveMonthUsecase,
     deleteMonthUsecase,
+    transferRemainingBalanceIntoMonthUsecase,
     addOutflowDeserializer,
     addWeeklyExpenseDeserializer,
     archiveMonthDeserializer,
@@ -145,6 +151,7 @@ function buildApi(
     manageOutflowCheckingDeserializer,
     monthCreationDeserializer,
     unarchiveMonthDeserializer,
+    transferRemainingBalanceIntoMonthDeserializer,
   }: Deps
 ) {
   const api = express();
@@ -311,6 +318,13 @@ function buildApi(
     createNewMonth(router, {
       createNewMonthUsecase,
       deserializer: monthCreationDeserializer,
+    })
+  );
+  api.use(
+    transferRemainingBalanceIntoMonth(router, {
+      transferRemainingBalanceIntoMonthUsecase,
+      deserializer: transferRemainingBalanceIntoMonthDeserializer,
+      monthDto,
     })
   );
 
