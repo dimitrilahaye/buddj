@@ -11,7 +11,6 @@ const errorHandler = (
     /** @deprecated */
     case "UpdateExpenseCommandError":
     case "DeserializationError":
-    case "TransferRemainingBalanceIntoMonthError":
       statusCode = 400;
       break;
     case "MonthNotFoundError":
@@ -27,6 +26,7 @@ const errorHandler = (
     case "AccountOutflowsError":
     case "WeeklyBudgetInitialBalanceError":
     case "WeeklyExpenseAmountError":
+    case "TransferRemainingBalanceIntoMonthError":
       statusCode = 422;
       break;
     case "MonthCreationTemplateWeeklyBudgetError":

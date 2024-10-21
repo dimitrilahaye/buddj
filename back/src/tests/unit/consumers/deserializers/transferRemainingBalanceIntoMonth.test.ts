@@ -1,7 +1,7 @@
 import expect from "../../../test-helpers.js";
 import deserializer from "../../../../consumers/api/deserializers/transferRemainingBalanceIntoMonth.js";
 
-describe.only("Unit | Consumers | deserializers | transferRemainingBalanceIntoMonth", function () {
+describe("Unit | Consumers | deserializers | transferRemainingBalanceIntoMonth", function () {
   describe("from weekly budget to account", function () {
     const params = {
       monthId: "ebf6aae9-5664-4e40-974f-9b373524d031",
