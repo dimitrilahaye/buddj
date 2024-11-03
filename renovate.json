@@ -1,6 +1,6 @@
 {
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "timezone": "Europe/Paris",
   "schedule": [
@@ -12,7 +12,7 @@
       "matchDatasources": [
         "npm"
       ],
-      "stabilityDays": 5,
+      "minimumReleaseAge": "5 days",
       "internalChecksFilter": "strict"
     }
   ]
