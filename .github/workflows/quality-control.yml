@@ -10,7 +10,7 @@ jobs:
   back_checks:
     name: Back ~ Quality Checks
     runs-on: ubuntu-latest
-    container: node:20.18.0-bookworm-slim
+    container: node:22.11.0-bookworm-slim
 
     services:
       postgres:
