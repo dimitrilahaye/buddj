@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-numpad',
   templateUrl: './numpad.component.html',
   styleUrl: './numpad.component.scss',
