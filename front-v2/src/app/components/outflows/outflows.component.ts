@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AfterViewInit,
   Component,
@@ -8,7 +9,12 @@ import {
   Signal,
 } from '@angular/core';
 import { DesignSystemModule } from '../../design-system/design-system.module';
-import { MonthlyBudget, Outflow } from '../../models/monthlyBudget.model';
+import {
+  Account,
+  MonthlyBudget,
+  Outflow,
+  WeeklyBudget,
+} from '../../models/monthlyBudget.model';
 import {
   AbstractControl,
   FormArray,
@@ -28,11 +34,17 @@ import {
 } from '../../stores/monthlyBudgets.store.interface';
 import { finalize } from 'rxjs';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { TransferChoiceComponent } from '../transfer-modals/transfer-choice/transfer-choice.component';
 
 @Component({
   selector: 'app-outflows',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, DesignSystemModule],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    DesignSystemModule,
+    TransferChoiceComponent,
+  ],
   templateUrl: './outflows.component.html',
   styleUrl: './outflows.component.scss',
 })
@@ -50,8 +62,12 @@ export class OutflowsComponent implements AfterViewInit {
   outflowDelationModalIsOpen = false;
   outflowToDelete: Outflow | null = null;
   isNumpadModalOpen = false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   amountValueControl: AbstractControl<any, any> | null = null;
+
+  transferChoiceModalIsOpen = false;
+  fromAccountTransfer: Account | null = null;
+  fromWeeklyBudgetTransfer: WeeklyBudget | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -219,6 +235,27 @@ export class OutflowsComponent implements AfterViewInit {
     this.amountValueControl?.patchValue(Number(value.replace(',', '.')));
     this.isNumpadModalOpen = false;
     this.amountValueControl = null;
+  }
+
+  closeTransferChoiceModal(event: Event) {
+    this.transferChoiceModalIsOpen = false;
+    event.stopPropagation();
+  }
+
+  openTransferChoiceModal(event: Event) {
+    this.fromAccountTransfer = this.month()?.account ?? null;
+    this.transferChoiceModalIsOpen = true;
+    event.stopPropagation();
+  }
+
+  submitTransfer(data: {
+    monthId: string;
+    fromType: 'account' | 'weekly-budget';
+    fromId: string;
+    toType: 'account' | 'weekly-budget';
+    toId: string;
+  }) {
+    console.info(data);
   }
 
   onSubmit() {

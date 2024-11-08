@@ -18,15 +18,25 @@
   @if(form && outflowsFormArray.controls.length) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="outflows-list">
-      <app-input-number
-        [formGroup]="form"
-        (click)="openNumpad(form.controls['currentBalance'], $event)"
-        formControlName="currentBalance"
-        [required]="true"
-        [placeholder]="'Solde actuel'"
-        [size]="'big'"
-        [step]="'0.01'"
-      ></app-input-number>
+      <div class="outflows-list__header">
+        <app-input-number
+          class="outflows-list-header__amount"
+          [formGroup]="form"
+          (click)="openNumpad(form.controls['currentBalance'], $event)"
+          formControlName="currentBalance"
+          [required]="true"
+          [placeholder]="'Solde actuel'"
+          [size]="'big'"
+          [step]="'0.01'"
+        ></app-input-number>
+        <button
+          class="outflows-list-header__transfer"
+          type="button"
+          (click)="openTransferChoiceModal($event)"
+        >
+          <i class="fa-solid fa-right-left"></i>
+        </button>
+      </div>
       <div class="outflows-list" formArrayName="outflows">
         <app-item
           *ngFor="let outflow of outflowsFormArray.controls; let i = index"
@@ -138,3 +148,15 @@
     <app-animated-spinner [width]="20" [height]="20"></app-animated-spinner>
   </span>
 </ng-template>
+
+<!-- 
+  ##################### TRANSFER MODAL #####################
+   -->
+@if (fromAccountTransfer || fromWeeklyBudgetTransfer) {
+<app-transfer-choice
+  [openMenuModal]="transferChoiceModalIsOpen"
+  [fromAccount]="fromAccountTransfer"
+  (toggleModal)="closeTransferChoiceModal($event)"
+  (submitted)="submitTransfer($event)"
+></app-transfer-choice>
+}
