@@ -43,6 +43,12 @@ export interface MonthlyBudgetsStoreInterface {
   askForNewExpense(): void;
 
   resetAskForNewExpense(): void;
+
+  get askedForTransferModalClose(): WritableSignal<number>;
+
+  askForTransferModalClose(): void;
+
+  resetAskForTransferModalClose(): void;
 }
 
 export const MONTHLY_BUDGETS_STORE =

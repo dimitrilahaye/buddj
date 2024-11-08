@@ -47,6 +47,8 @@ export class TransferChoiceComponent implements OnInit {
   @Input()
   openMenuModal = false;
   @Input()
+  isLoading = false;
+  @Input()
   fromAccount: Account | null = null;
   @Input()
   fromWeeklyBudget: WeeklyBudget | null = null;
@@ -173,7 +175,9 @@ export class TransferChoiceComponent implements OnInit {
   }
 
   closeTransferChoiceModal(event: Event) {
-    this.transferChoiceModalIsOpen = false;
+    if (!this.isLoading) {
+      this.transferChoiceModalIsOpen = false;
+    }
     event.stopPropagation();
   }
 

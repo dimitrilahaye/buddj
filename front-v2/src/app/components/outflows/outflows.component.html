@@ -156,6 +156,7 @@
 <app-transfer-choice
   [openMenuModal]="transferChoiceModalIsOpen"
   [fromAccount]="fromAccountTransfer"
+  [isLoading]="transferIsLoading"
   (toggleModal)="closeTransferChoiceModal($event)"
   (submitted)="submitTransfer($event)"
 ></app-transfer-choice>

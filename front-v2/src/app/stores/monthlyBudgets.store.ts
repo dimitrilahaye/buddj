@@ -29,6 +29,8 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
   private _askedForNewExpense: WritableSignal<number> = signal(0);
   // archived months management
   private _allArchivedMonths = signal<MonthlyBudget[]>([]);
+  // transfers management
+  private _askedForTransferModalClose: WritableSignal<number> = signal(0);
 
   constructor() {
     effect(
@@ -204,6 +206,18 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
 
   resetAskForNewExpense(): void {
     this._askedForNewExpense.set(0);
+  }
+
+  get askedForTransferModalClose(): WritableSignal<number> {
+    return this._askedForTransferModalClose;
+  }
+
+  askForTransferModalClose(): void {
+    this._askedForTransferModalClose.update((value) => value + 1);
+  }
+
+  resetAskForTransferModalClose(): void {
+    this._askedForTransferModalClose.set(0);
   }
 
   private removeMonthFromList(month: MonthlyBudget) {

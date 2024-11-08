@@ -1,6 +1,8 @@
 import {
   Component,
+  effect,
   Inject,
+  Injector,
   Input,
   OnInit,
   output,
@@ -32,6 +34,8 @@ export class TransferChoiceValidationComponent implements OnInit {
   @Input()
   openMenuModal = false;
   @Input()
+  isLoading = false;
+  @Input()
   validationData: ValidationData | null = null;
   @Input()
   fromValidationAccount: Account | null = null;
@@ -49,12 +53,25 @@ export class TransferChoiceValidationComponent implements OnInit {
   currentMonth: Signal<MonthlyBudget | null> = signal(null);
 
   constructor(
+    private injector: Injector,
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetStore: MonthlyBudgetsStoreInterface
   ) {}
 
   ngOnInit(): void {
     this.currentMonth = this.monthlyBudgetStore.getCurrent();
+
+    effect(
+      () => {
+        const timesNewExpenseHasBeenAsked =
+          this.monthlyBudgetStore.askedForTransferModalClose();
+        if (timesNewExpenseHasBeenAsked > 0) {
+          this.openMenuModal = false;
+          this.monthlyBudgetStore.resetAskForTransferModalClose();
+        }
+      },
+      { injector: this.injector, allowSignalWrites: true }
+    );
   }
 
   get transferSourceLabel() {
