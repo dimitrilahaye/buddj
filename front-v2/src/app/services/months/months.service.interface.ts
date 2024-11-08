@@ -52,6 +52,13 @@ export default interface MonthsServiceInterface {
   archiveMonth(monthId: string): Observable<MonthlyBudget>;
   unarchiveMonth(monthId: string): Observable<MonthlyBudget[]>;
   deleteMonth(monthId: string): Observable<MonthlyBudget[]>;
+  transferRemainingBalanceIntoMonth(
+    monthId: string,
+    fromType: 'account' | 'weekly-budget',
+    fromId: string,
+    toType: 'account' | 'weekly-budget',
+    toId: string
+  ): Observable<MonthlyBudget>;
 }
 
 export const MONTHS_SERVICE = new InjectionToken<MonthsServiceInterface>(

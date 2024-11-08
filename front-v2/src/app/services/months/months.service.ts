@@ -174,4 +174,22 @@ export class MonthsService implements MonthsServiceInterface {
         map(({ data }) => data)
       );
   }
+
+  transferRemainingBalanceIntoMonth(
+    monthId: string,
+    fromType: 'account' | 'weekly-budget',
+    fromId: string,
+    toType: 'account' | 'weekly-budget',
+    toId: string
+  ): Observable<MonthlyBudget> {
+    return this.http
+      .put<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/transfer/from/${fromType}/${fromId}/to/${toType}/${toId}`,
+        undefined
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(({ data }) => data)
+      );
+  }
 }
