@@ -11,3 +11,19 @@
     gap: 10px;
   }
 }
+
+.transfer-choice-choices {
+  &__label {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+  }
+}
+
+.transfer-choice-choices-label {
+  &__detail {
+    font-size: 10px;
+    font-style: italic;
+  }
+}

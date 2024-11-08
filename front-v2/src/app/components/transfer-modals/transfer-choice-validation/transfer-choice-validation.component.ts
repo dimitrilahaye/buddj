@@ -15,10 +15,10 @@ import {
 } from '../../../stores/monthlyBudgets.store.interface';
 import {
   Account,
-  DashboardWeeklyBudget,
   MonthlyBudget,
   WeeklyBudget,
 } from '../../../models/monthlyBudget.model';
+import { ValidationData } from '../transfer-choice/transfer-choice.component';
 
 @Component({
   selector: 'app-transfer-choice-validation',
@@ -32,11 +32,7 @@ export class TransferChoiceValidationComponent implements OnInit {
   @Input()
   openMenuModal = false;
   @Input()
-  validationData: {
-    data: Account | (DashboardWeeklyBudget & { id: string });
-    type: 'Account' | 'WeeklyBudget';
-    information: string;
-  } | null = null;
+  validationData: ValidationData | null = null;
   @Input()
   fromValidationAccount: Account | null = null;
   @Input()

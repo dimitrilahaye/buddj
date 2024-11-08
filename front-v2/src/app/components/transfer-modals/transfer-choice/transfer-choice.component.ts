@@ -21,10 +21,13 @@ import {
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { TransferChoiceValidationComponent } from '../transfer-choice-validation/transfer-choice-validation.component';
 
-interface ValidationData {
+export interface ValidationData {
   data: Account | (DashboardWeeklyBudget & { id: string });
   type: 'Account' | 'WeeklyBudget';
-  information: string;
+  information: {
+    target: string;
+    detail: string;
+  };
 }
 
 @Component({
@@ -140,26 +143,29 @@ export class TransferChoiceComponent implements OnInit {
   }
 
   private getWeekTransferInformation(weeklyBudget: DashboardWeeklyBudget) {
-    return (
-      weeklyBudget.weekName +
-      ` (${this.currencyPipe.transform(
+    return {
+      target: weeklyBudget.weekName,
+      detail: `(${this.currencyPipe.transform(
         weeklyBudget.currentBalance,
         'EUR'
       )} » ${this.currencyPipe.transform(
         weeklyBudget.currentBalance + this.transferAmount!,
         'EUR'
-      )})`
-    );
+      )})`,
+    };
   }
 
   private getAccountTransfertInformation(account: Account) {
-    return `Solde courant (${this.currencyPipe.transform(
-      account.currentBalance,
-      'EUR'
-    )} » ${this.currencyPipe.transform(
-      account.currentBalance + this.transferAmount!,
-      'EUR'
-    )})`;
+    return {
+      target: `Solde courant`,
+      detail: `(${this.currencyPipe.transform(
+        account.currentBalance,
+        'EUR'
+      )} » ${this.currencyPipe.transform(
+        account.currentBalance + this.transferAmount!,
+        'EUR'
+      )})`,
+    };
   }
 
   closeTransferChoiceModal(event: Event) {
@@ -167,14 +173,7 @@ export class TransferChoiceComponent implements OnInit {
     event.stopPropagation();
   }
 
-  openTransferChoiceModal(
-    button: {
-      data: Account | (DashboardWeeklyBudget & { id: string });
-      type: 'Account' | 'WeeklyBudget';
-      information: string;
-    },
-    event: Event
-  ) {
+  openTransferChoiceModal(button: ValidationData, event: Event) {
     this.transferChoiceModalIsOpen = true;
     this.validationData = button;
     if (this.fromAccount) {
