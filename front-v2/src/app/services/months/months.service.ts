@@ -177,6 +177,7 @@ export class MonthsService implements MonthsServiceInterface {
 
   transferRemainingBalanceIntoMonth(
     monthId: string,
+    amount: number,
     fromType: 'account' | 'weekly-budget',
     fromId: string,
     toType: 'account' | 'weekly-budget',
@@ -185,7 +186,7 @@ export class MonthsService implements MonthsServiceInterface {
     return this.http
       .put<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/transfer/from/${fromType}/${fromId}/to/${toType}/${toId}`,
-        undefined
+        { amount }
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),

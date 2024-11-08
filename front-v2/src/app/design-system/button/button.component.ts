@@ -12,6 +12,7 @@ export class ButtonComponent {
   size = input<'big' | 'middle'>('middle');
   variant = input<'default' | 'danger'>('default');
   loading = input(false);
+  disabled = input(false);
   click = output<Event>();
 
   get className() {

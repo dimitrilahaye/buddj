@@ -1,9 +1,18 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/input";
+
 .transfer-choice {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px;
   box-sizing: border-box;
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
   &__choices {
     display: flex;
@@ -23,7 +32,30 @@
 
 .transfer-choice-choices-label {
   &__detail {
-    font-size: 10px;
+    font-size: var(--text-5);
     font-style: italic;
   }
+}
+
+.transfer-choice-title {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__info {
+    background: var(--color-100);
+    border-radius: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    color: var(--dark-100);
+    text-align: center;
+  }
+}
+
+#amount {
+  @extend %input;
+
+  height: 35px;
 }

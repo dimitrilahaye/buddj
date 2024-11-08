@@ -208,18 +208,6 @@ export class MonthlyBudgetsStore implements MonthlyBudgetsStoreInterface {
     this._askedForNewExpense.set(0);
   }
 
-  get askedForTransferModalClose(): WritableSignal<number> {
-    return this._askedForTransferModalClose;
-  }
-
-  askForTransferModalClose(): void {
-    this._askedForTransferModalClose.update((value) => value + 1);
-  }
-
-  resetAskForTransferModalClose(): void {
-    this._askedForTransferModalClose.set(0);
-  }
-
   private removeMonthFromList(month: MonthlyBudget) {
     this._all.update((months) => {
       return [...months]

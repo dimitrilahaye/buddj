@@ -2,15 +2,33 @@
 <app-modal [modalOpen]="openMenuModal" (click)="toggle($event)">
   <div class="transfer-choice">
     <div class="transfer-choice__title">
-      Transférer {{ transferAmount | currency : "EUR" }} ({{
-        transferSourceLabel
-      }}) vers
+      <div class="transfer-choice-title__form">
+        <label for="amount">Montant à transférer :</label>
+        <input
+          id="amount"
+          type="text"
+          [value]="amount"
+          (input)="onInputChange($event)"
+          (focus)="openNumpad($event)"
+          placeholder="Montant"
+          inputmode="none"
+          autocomplete="off"
+          readonly
+        />
+      </div>
+      <div class="transfer-choice-title__info">
+        Transférer {{ amount | currency : "EUR" }} ({{ transferSourceLabel }})
+        <br />
+        vers
+      </div>
     </div>
     <div class="transfer-choice__choices">
       <ng-container *ngFor="let button of buttons">
         <app-button
           [variant]="'danger'"
-          (click)="openTransferChoiceModal(button, $event)"
+          [disabled]="amount === 0"
+          [loading]="isLoading && validationData?.data?.id === button.data.id"
+          (click)="submitTransfert(button, $event)"
         >
           <div class="transfer-choice-choices__label">
             <span class="transfer-choice-choices-label__target">{{
@@ -25,8 +43,8 @@
     </div>
   </div>
 </app-modal>
-} @if(validationData) {
-<app-transfer-choice-validation
+}
+<!-- <app-transfer-choice-validation
   [openMenuModal]="transferChoiceModalIsOpen"
   [validationData]="validationData"
   [fromValidationAccount]="fromValidationAccount"
@@ -34,5 +52,17 @@
   [isLoading]="isLoading"
   (toggleModal)="closeTransferChoiceModal($event)"
   (submitted)="submitTransfert($event)"
-></app-transfer-choice-validation>
+></app-transfer-choice-validation> -->
+
+<!-- 
+  ##################### NUMPAD #####################
+   -->
+
+@if(numpadIsOpen) {
+<app-sliding-modal [isOpen]="numpadIsOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="amount.toString()"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
+</app-sliding-modal>
 }

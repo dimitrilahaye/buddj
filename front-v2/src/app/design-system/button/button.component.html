@@ -1,6 +1,6 @@
 <button
   role="button"
-  [disabled]="loading()"
+  [disabled]="disabled() || loading()"
   [class]="className"
   [type]="type()"
   (click)="onClick($event)"
