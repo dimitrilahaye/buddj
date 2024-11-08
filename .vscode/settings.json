@@ -1,0 +1,9 @@
+{
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnSave": true,
+    "biome.enabled": false,
+    "biome.searchInPath": false,
+    "notebook.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.defaultFoldingRangeProvider": "dbaeumer.vscode-eslint",
+    "eslint.format.enable": true,
+}
