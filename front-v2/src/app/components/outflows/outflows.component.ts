@@ -256,12 +256,25 @@ export class OutflowsComponent implements AfterViewInit {
     toType: 'account' | 'weekly-budget';
     toId: string;
   }) {
+    const { monthId, fromType, fromId, toType, toId } = data;
     this.transferIsLoading = true;
-    setTimeout(() => {
-      this.transferIsLoading = false;
-      this.monthlyBudgetsStore.askForTransferModalClose();
-      console.info(data);
-    }, 2000);
+    this.monthsService
+      .transferRemainingBalanceIntoMonth(
+        monthId,
+        fromType,
+        fromId,
+        toType,
+        toId
+      )
+      .pipe(
+        finalize(() => {
+          this.transferIsLoading = false;
+          this.monthlyBudgetsStore.askForTransferModalClose();
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success("Votre transfer s'est bien déroulé !");
+      });
   }
 
   onSubmit() {
