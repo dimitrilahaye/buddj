@@ -3,20 +3,20 @@ import {
   TransferableWeeklyBudgetNotFoundError,
 } from "../../errors/TransferableMonthErrors.js";
 import Month from "../month/Month.js";
-import TransferRemainingBalanceBuilder from "./builder/TransferRemainingBalanceBuilder.js";
+import TransferBalanceBuilder from "./builder/TransferBalanceBuilder.js";
 import TransferableAccount from "./TransferableAccount.js";
 import TransferableWeeklyBudget from "./TransferableWeeklyBudget.js";
 
 export default class TransferableMonth {
-  public readonly builder: TransferRemainingBalanceBuilder;
+  public builder: TransferBalanceBuilder | null = null;
   month: Month;
 
   constructor(month: Month) {
     this.month = month;
-    this.builder = new TransferRemainingBalanceBuilder(this);
   }
 
-  get transferRemainingBalance() {
+  transferBalance(amount: number) {
+    this.builder = new TransferBalanceBuilder(this, amount);
     return this.builder;
   }
 

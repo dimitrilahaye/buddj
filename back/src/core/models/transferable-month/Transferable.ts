@@ -1,5 +1,5 @@
 interface Transferable {
-  transferRemainingBalanceTo(to: Transferable);
+  transferBalanceTo(to: Transferable, amount: number);
   processTransfer(amount: number);
 }
 

@@ -1,29 +1,30 @@
-import { TransferRemainingBalanceIntoMonthCommand } from "../../../core/usecases/TransferRemainingBalanceIntoMonth.js";
+import { TransferBalanceIntoMonthCommand } from "../../../core/usecases/TransferBalanceIntoMonth.js";
 import Koi from "../validators/Koi.js";
 import SerializationError from "../errors/DeserializationError.js";
 
-export type TransferRemainingBalanceIntoMonthDeserializer = (
-  params: any
-) => TransferRemainingBalanceIntoMonthCommand;
+export type TransferBalanceIntoMonthDeserializer = (
+  params: any,
+  body: any
+) => TransferBalanceIntoMonthCommand;
 
-const deserializer: TransferRemainingBalanceIntoMonthDeserializer = (
+const deserializer: TransferBalanceIntoMonthDeserializer = (
+  body: any,
   params: any
 ) => {
   try {
+    Koi.validate(body.amount).number();
     Koi.validate(params.monthId).uuid();
     Koi.validate(params.fromType).oneOf<string>("weekly-budget", "account");
     Koi.validate(params.fromId).uuid();
     Koi.validate(params.toType).oneOf<string>("weekly-budget", "account");
     Koi.validate(params.toId).uuid();
   } catch (e: any) {
-    throw new SerializationError(
-      "transferRemainingBalanceIntoMonth",
-      e.message
-    );
+    throw new SerializationError("transferBalanceIntoMonth", e.message);
   }
 
   let command = {
     monthId: params.monthId,
+    amount: body.amount,
   };
 
   if (params.fromType === "weekly-budget") {
@@ -32,9 +33,9 @@ const deserializer: TransferRemainingBalanceIntoMonthDeserializer = (
     command["fromAccountId"] = params.fromId;
   }
   if (params.toType === "weekly-budget") {
-    command["toWeeklyBudgetId"] = params.fromId;
+    command["toWeeklyBudgetId"] = params.toId;
   } else if (params.toType === "account") {
-    command["toAccountId"] = params.fromId;
+    command["toAccountId"] = params.toId;
   }
 
   return command;

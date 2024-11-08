@@ -1,6 +1,6 @@
 import { beforeEach } from "mocha";
 import expect from "../../../test-helpers.js";
-import TransferRemainingBalanceIntoMonth from "../../../../core/usecases/TransferRemainingBalanceIntoMonth.js";
+import TransferBalanceIntoMonth from "../../../../core/usecases/TransferBalanceIntoMonth.js";
 import { MonthNotFoundError } from "../../../../core/errors/MonthErrors.js";
 import { monthRepositoryStub, resetStubs } from "./test-helpers.js";
 import TransferableMonthBuilder from "../../../utils/models/TransferableMonthBuilder.js";
@@ -8,13 +8,13 @@ import {
   TransferableAccountNotFoundError,
   TransferableWeeklyBudgetNotFoundError,
 } from "../../../../core/errors/TransferableMonthErrors.js";
-import { TransferRemainingBalanceIntoMonthError } from "../../../../core/errors/TransferRemainingBalanceIntoMonthErrors.js";
+import { TransferBalanceIntoMonthError } from "../../../../core/errors/TransferBalanceIntoMonthErrors.js";
 
-describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function () {
-  let usecase: TransferRemainingBalanceIntoMonth;
+describe("Unit | Core | Usecases | TransferBalanceIntoMonth", function () {
+  let usecase: TransferBalanceIntoMonth;
 
   beforeEach(() => {
-    usecase = new TransferRemainingBalanceIntoMonth(monthRepositoryStub);
+    usecase = new TransferBalanceIntoMonth(monthRepositoryStub);
     resetStubs();
   });
 
@@ -28,6 +28,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
         await expect(
           usecase.execute({
             monthId: "month-id",
+            amount: 20,
             fromAccountId: "account-uuid",
             toWeeklyBudgetId: "semaine-1-uuid",
           })
@@ -58,6 +59,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
           await expect(
             usecase.execute({
               monthId: "month-id",
+              amount: 20,
               fromAccountId: "not-existing-account",
               toWeeklyBudgetId: "semaine-1-uuid",
             })
@@ -81,6 +83,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
           await expect(
             usecase.execute({
               monthId: "month-id",
+              amount: 20,
               fromAccountId: "account-uuid",
               toWeeklyBudgetId: "not-existing-week",
             })
@@ -88,7 +91,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
         });
       });
     });
-    it.only("should return an updated month", async function () {
+    it("should return an updated month", async function () {
       // given
       const transferableMonthBuilder = new TransferableMonthBuilder();
       const transferableMonth = transferableMonthBuilder.set.account
@@ -106,6 +109,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
       // when
       const month = await usecase.execute({
         monthId: "month-id",
+        amount: 20,
         fromAccountId: "account-uuid",
         toWeeklyBudgetId: "semaine-1-uuid",
       });
@@ -117,9 +121,9 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
       if (!weeklyBudget) {
         return expect.fail("WeeklyBudget should be found");
       }
-      expect(month.account.currentBalance).to.be.equal(0);
-      expect(weeklyBudget.initialBalance).to.be.equal(180);
-      expect(weeklyBudget.currentBalance).to.be.equal(0);
+      expect(month.account.currentBalance).to.be.equal(-20);
+      expect(weeklyBudget.initialBalance).to.be.equal(220);
+      expect(weeklyBudget.currentBalance).to.be.equal(40);
 
       expect(
         monthRepositoryStub.updateAccountCurrentBalance
@@ -149,6 +153,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
       // when
       const month = await usecase.execute({
         monthId: "month-id",
+        amount: 20,
         fromWeeklyBudgetId: "semaine-1-uuid",
         toAccountId: "account-uuid",
       });
@@ -160,7 +165,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
       if (!weeklyBudget) {
         return expect.fail("WeeklyBudget should be found");
       }
-      expect(month.account.currentBalance).to.be.equal(10);
+      expect(month.account.currentBalance).to.be.equal(-10);
       expect(weeklyBudget.initialBalance).to.be.equal(180);
       expect(weeklyBudget.currentBalance).to.be.equal(0);
 
@@ -194,6 +199,7 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
       // when
       const month = await usecase.execute({
         monthId: "month-id",
+        amount: 20,
         fromWeeklyBudgetId: "semaine-1-uuid",
         toWeeklyBudgetId: "semaine-2-uuid",
       });
@@ -244,10 +250,11 @@ describe("Unit | Core | Usecases | TransferRemainingBalanceIntoMonth", function 
         await expect(
           usecase.execute({
             monthId: "month-id",
+            amount: 20,
             fromAccountId: "account-1-uuid",
             toAccountId: "account-2-uuid",
           })
-        ).to.be.rejectedWith(TransferRemainingBalanceIntoMonthError);
+        ).to.be.rejectedWith(TransferBalanceIntoMonthError);
       });
     });
   });

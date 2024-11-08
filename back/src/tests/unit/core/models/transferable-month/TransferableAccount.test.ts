@@ -65,7 +65,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableAccount", func
     });
   });
 
-  describe("#transferRemainingBalanceTo", function () {
+  describe("#transferBalanceTo", function () {
     describe("when account current balance is positive", function () {
       it("should increase the weekly budget current balance", function () {
         // given
@@ -88,12 +88,10 @@ describe("Unit | Core | Models | Transferable Month | TransferableAccount", func
         const [weeklyBudget] = weeklyBudgets;
 
         // when
-        transferableAccount.transferRemainingBalanceTo(
-          transferableWeeklyBudget
-        );
+        transferableAccount.transferBalanceTo(transferableWeeklyBudget, 20);
 
         // then
-        expect(account.currentBalance).to.be.equal(0);
+        expect(account.currentBalance).to.be.equal(20);
         expect(weeklyBudget.initialBalance).to.be.equal(220);
         expect(weeklyBudget.currentBalance).to.be.equal(10);
       });
@@ -106,7 +104,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableAccount", func
         const { accountInstances, weeklyBudgetInstances } =
           transferableBuilder.set
             .account("account-uuid")
-            .currentBalance(-10)
+            .currentBalance(10)
             .set.weeklyBudget("semaine-1-uuid")
             .initialBalance(200)
             .set.weeklyBudget("semaine-1-uuid")
@@ -121,14 +119,12 @@ describe("Unit | Core | Models | Transferable Month | TransferableAccount", func
         const [weeklyBudget] = weeklyBudgets;
 
         // when
-        transferableAccount.transferRemainingBalanceTo(
-          transferableWeeklyBudget
-        );
+        transferableAccount.transferBalanceTo(transferableWeeklyBudget, 10);
 
         // then
-        expect(account.currentBalance).to.be.equal(0);
-        expect(weeklyBudget.initialBalance).to.be.equal(190);
-        expect(weeklyBudget.currentBalance).to.be.equal(100);
+        expect(account.currentBalance).to.be.equal(10);
+        expect(weeklyBudget.initialBalance).to.be.equal(210);
+        expect(weeklyBudget.currentBalance).to.be.equal(120);
       });
     });
   });

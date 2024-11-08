@@ -1,5 +1,4 @@
 import Transferable from "../Transferable.js";
-import TransferableAccount from "../TransferableAccount.js";
 import TransferableMonth from "../TransferableMonth.js";
 import TransferableWeeklyBudget from "../TransferableWeeklyBudget.js";
 
@@ -11,13 +10,15 @@ type ToAccount = {
   account: (id: string) => () => void;
 };
 
-export default class TransferRemainingBalanceBuilder {
+export default class TransferBalanceBuilder {
   private month: TransferableMonth;
   private fromData: Transferable | null = null;
   private toData: Transferable | null = null;
+  private amount: number;
 
-  constructor(month: TransferableMonth) {
+  constructor(month: TransferableMonth, amount: number) {
     this.month = month;
+    this.amount = amount;
   }
 
   from() {
@@ -41,12 +42,12 @@ export default class TransferRemainingBalanceBuilder {
         weeklyBudget: (id: string) => {
           this.toData = this.month.findWeeklyBudgetById(id);
 
-          this.transferRemainingBalance();
+          this.transferBalance();
         },
         account: (id: string) => {
           this.toData = this.month.findAccountById(id);
 
-          this.transferRemainingBalance();
+          this.transferBalance();
         },
       } as any as T extends TransferableWeeklyBudget
         ? ToWeeklyBudget
@@ -56,12 +57,12 @@ export default class TransferRemainingBalanceBuilder {
       weeklyBudget: (id: string) => {
         this.toData = this.month.findWeeklyBudgetById(id);
 
-        this.transferRemainingBalance();
+        this.transferBalance();
       },
     } as any as T extends TransferableWeeklyBudget ? ToWeeklyBudget : ToAccount;
   }
 
-  private transferRemainingBalance() {
-    this.fromData.transferRemainingBalanceTo(this.toData);
+  private transferBalance() {
+    this.fromData.transferBalanceTo(this.toData, this.amount);
   }
 }

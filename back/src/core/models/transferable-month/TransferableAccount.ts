@@ -19,28 +19,13 @@ export default class TransferableAccount implements Transferable {
     );
   }
 
-  transferRemainingBalanceTo(to: Transferable) {
-    to.processTransfer(this.account.currentBalance);
-    if (this.account.currentBalance >= 0) {
-      this.account.updateCurrentBalance(
-        this.account.currentBalance - this.account.currentBalance
-      );
-    }
-    if (this.account.currentBalance < 0) {
-      this.account.updateCurrentBalance(
-        this.account.currentBalance + Math.abs(this.account.currentBalance)
-      );
-    }
+  transferBalanceTo(to: Transferable, amount: number) {
+    to.processTransfer(amount);
+    //this.account.updateCurrentBalance(this.account.currentBalance - amount);
   }
 
-  processTransfer(amount: number) {
-    if (amount >= 0) {
-      this.account.updateCurrentBalance(this.account.currentBalance + amount);
-    }
-    if (amount < 0) {
-      this.account.updateCurrentBalance(
-        this.account.currentBalance - Math.abs(amount)
-      );
-    }
+  processTransfer(_amount: number) {
+    //this.account.updateCurrentBalance(this.account.currentBalance + amount);
+    return;
   }
 }
