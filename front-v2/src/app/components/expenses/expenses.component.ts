@@ -69,6 +69,7 @@ export class ExpensesComponent implements AfterViewInit {
   transferChoiceModalIsOpen = false;
   fromAccountTransfer: Account | null = null;
   fromWeeklyBudgetTransfer: WeeklyBudget | null = null;
+  transferIsLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -362,6 +363,11 @@ export class ExpensesComponent implements AfterViewInit {
     toType: 'account' | 'weekly-budget';
     toId: string;
   }) {
-    console.info(data);
+    this.transferIsLoading = true;
+    setTimeout(() => {
+      this.transferIsLoading = false;
+      this.monthlyBudgetsStore.askForTransferModalClose();
+      console.info(data);
+    }, 2000);
   }
 }

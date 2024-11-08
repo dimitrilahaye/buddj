@@ -1,5 +1,3 @@
- 
- 
 <app-modal
   [modalOpen]="expenseDelationModalIsOpen"
   (click)="closeExpenseDelationModal($event)"
@@ -211,6 +209,7 @@
 <app-transfer-choice
   [openMenuModal]="transferChoiceModalIsOpen"
   [fromWeeklyBudget]="fromWeeklyBudgetTransfer"
+  [isLoading]="transferIsLoading"
   (toggleModal)="closeTransferChoiceModal($event)"
   (submitted)="submitTransfer($event)"
 ></app-transfer-choice>

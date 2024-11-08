@@ -62,12 +62,13 @@ export class OutflowsComponent implements AfterViewInit {
   outflowDelationModalIsOpen = false;
   outflowToDelete: Outflow | null = null;
   isNumpadModalOpen = false;
-   
+
   amountValueControl: AbstractControl<any, any> | null = null;
 
   transferChoiceModalIsOpen = false;
   fromAccountTransfer: Account | null = null;
   fromWeeklyBudgetTransfer: WeeklyBudget | null = null;
+  transferIsLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -255,7 +256,12 @@ export class OutflowsComponent implements AfterViewInit {
     toType: 'account' | 'weekly-budget';
     toId: string;
   }) {
-    console.info(data);
+    this.transferIsLoading = true;
+    setTimeout(() => {
+      this.transferIsLoading = false;
+      this.monthlyBudgetsStore.askForTransferModalClose();
+      console.info(data);
+    }, 2000);
   }
 
   onSubmit() {
