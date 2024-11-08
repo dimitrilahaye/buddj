@@ -19,11 +19,15 @@ import {
   MonthlyBudgetsStoreInterface,
 } from '../../../stores/monthlyBudgets.store.interface';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { TransferChoiceValidationComponent } from '../transfer-choice-validation/transfer-choice-validation.component';
+import {
+  TransferChoiceValidationComponent,
+  TransferData,
+} from '../transfer-choice-validation/transfer-choice-validation.component';
 
 export interface ValidationData {
   data: Account | (DashboardWeeklyBudget & { id: string });
   type: 'Account' | 'WeeklyBudget';
+  amount: number;
   information: {
     target: string;
     detail: string;
@@ -53,19 +57,15 @@ export class TransferChoiceComponent implements OnInit {
   @Input()
   fromWeeklyBudget: WeeklyBudget | null = null;
   toggleModal = output<Event>();
-  submitted = output<{
-    monthId: string;
-    fromType: 'account' | 'weekly-budget';
-    fromId: string;
-    toType: 'account' | 'weekly-budget';
-    toId: string;
-  }>();
+  submitted = output<TransferData>();
 
   transferChoiceModalIsOpen = false;
   currentMonth: Signal<MonthlyBudget | null> = signal(null);
   validationData: ValidationData | null = null;
   fromValidationAccount: Account | null = null;
   fromValidationWeeklyBudget: WeeklyBudget | null = null;
+  amount = 0;
+  numpadIsOpen = false;
 
   constructor(
     @Inject(MONTHLY_BUDGETS_STORE)
@@ -77,18 +77,28 @@ export class TransferChoiceComponent implements OnInit {
     this.currentMonth = this.monthlyBudgetStore.getCurrent();
   }
 
+  onInputChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.amount = +inputElement.value;
+  }
+
+  openNumpad(event: Event): void {
+    this.numpadIsOpen = true;
+    event.stopPropagation();
+  }
+
+  closeNumpad(event: Event) {
+    this.numpadIsOpen = false;
+    event.stopPropagation();
+  }
+
+  updateAmountValue(value: string) {
+    this.amount = Number(value.replace(',', '.'));
+    this.numpadIsOpen = false;
+  }
+
   get transferAmount() {
-    if (this.fromAccount) {
-      return this.fromAccount.currentBalance;
-    }
-    if (this.fromWeeklyBudget) {
-      const fromWeeklyBudget =
-        this.currentMonth()!.dashboard.weeks.weeklyBudgets.find(
-          (w) => w.weekName === this.fromWeeklyBudget!.name
-        );
-      return fromWeeklyBudget?.currentBalance;
-    }
-    throw new Error('You need to set fromAccount or fromWeeklyBudget Input');
+    return this.amount;
   }
 
   get transferSourceLabel() {
@@ -110,7 +120,8 @@ export class TransferChoiceComponent implements OnInit {
           );
           return {
             data: { ...w, id: week!.id },
-            type: 'Account',
+            type: 'WeeklyBudget',
+            amount: this.amount,
             information: this.getWeekTransferInformation(w),
           };
         })
@@ -130,6 +141,7 @@ export class TransferChoiceComponent implements OnInit {
           return {
             data: { ...w, id: week!.id },
             type: 'WeeklyBudget',
+            amount: this.amount,
             information: this.getWeekTransferInformation(w),
           };
         })
@@ -139,6 +151,7 @@ export class TransferChoiceComponent implements OnInit {
         {
           data: this.currentMonth()!.account,
           type: 'Account',
+          amount: this.amount,
           information: this.getAccountTransfertInformation(
             this.currentMonth()!.account
           ),
@@ -161,14 +174,17 @@ export class TransferChoiceComponent implements OnInit {
     };
   }
 
-  private getAccountTransfertInformation(account: Account) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private getAccountTransfertInformation(_account: Account) {
+    const forecastBalance =
+      this.currentMonth()!.dashboard.account.forecastBalance;
     return {
       target: `Solde courant`,
       detail: `(${this.currencyPipe.transform(
-        account.currentBalance,
+        forecastBalance,
         'EUR'
       )} » ${this.currencyPipe.transform(
-        account.currentBalance + this.transferAmount!,
+        forecastBalance + this.transferAmount!,
         'EUR'
       )})`,
     };
@@ -194,17 +210,14 @@ export class TransferChoiceComponent implements OnInit {
   }
 
   toggle(event: Event) {
+    this.amount = 0;
     this.toggleModal.emit(event);
     event.stopPropagation();
   }
 
-  submitTransfert(data: {
-    monthId: string;
-    fromType: 'account' | 'weekly-budget';
-    fromId: string;
-    toType: 'account' | 'weekly-budget';
-    toId: string;
-  }) {
+  submitTransfert(data: TransferData) {
+    this.amount = 0;
+    this.transferChoiceModalIsOpen = false;
     this.submitted.emit(data);
   }
 }

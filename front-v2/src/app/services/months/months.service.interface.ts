@@ -54,6 +54,7 @@ export default interface MonthsServiceInterface {
   deleteMonth(monthId: string): Observable<MonthlyBudget[]>;
   transferRemainingBalanceIntoMonth(
     monthId: string,
+    amount: number,
     fromType: 'account' | 'weekly-budget',
     fromId: string,
     toType: 'account' | 'weekly-budget',
