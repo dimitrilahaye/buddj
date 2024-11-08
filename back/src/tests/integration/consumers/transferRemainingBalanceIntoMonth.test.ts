@@ -1,16 +1,15 @@
 import http from "node:http";
 import request from "supertest";
-import sinon, { SinonStub } from "sinon";
+import sinon from "sinon";
 import { afterEach, beforeEach } from "mocha";
 import { authenticate, expect, mockedServer } from "./test-helpers.js";
 import * as deps from "../../../ioc.js";
 import { TransferRemainingBalanceIntoMonthCommand } from "../../../core/usecases/TransferRemainingBalanceIntoMonth.js";
-import { MonthNotFoundError } from "../../../core/errors/MonthErrors.js";
 import { Deps } from "../../../consumers/api/server.js";
 import { TransferableAccountNotFoundError } from "../../../core/errors/TransferableMonthErrors.js";
 import { TransferRemainingBalanceIntoMonthError } from "../../../core/errors/TransferRemainingBalanceIntoMonthErrors.js";
 
-describe.only("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/:fromType/:fromId/to/:toType/:toId", function () {
+describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/:fromType/:fromId/to/:toType/:toId", function () {
   let server: http.Server;
 
   describe("When user is authenticated", function () {
