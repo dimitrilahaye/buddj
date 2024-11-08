@@ -6,6 +6,39 @@
   flex-direction: column;
   gap: 10px;
   padding-bottom: 40px;
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.outflows-list-header {
+  &__amount {
+    flex: 1;
+  }
+
+  &__transfer {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    border: 0;
+    background: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    color: white;
+    background-color: var(--color-950);
+    border-radius: 50%;
+    padding: 10px;
+    height: 30px;
+    width: 30px;
+    box-sizing: border-box;
+  }
 }
 
 .outflows-submit {

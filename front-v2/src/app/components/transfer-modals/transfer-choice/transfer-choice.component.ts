@@ -101,16 +101,20 @@ export class TransferChoiceComponent implements OnInit {
 
   get buttons(): ValidationData[] {
     if (this.fromAccount) {
-      return this.currentMonth()!.dashboard.weeks.weeklyBudgets.map((w) => {
-        const week = this.currentMonth()?.account.weeklyBudgets.find(
-          (week) => week.name === w.weekName
-        );
-        return {
-          data: { ...w, id: week!.id },
-          type: 'Account',
-          information: this.getWeekTransferInformation(w),
-        };
-      });
+      return this.currentMonth()!
+        .dashboard.weeks.weeklyBudgets.map((w) => {
+          const week = this.currentMonth()?.account.weeklyBudgets.find(
+            (week) => week.name === w.weekName
+          );
+          return {
+            data: { ...w, id: week!.id },
+            type: 'Account',
+            information: this.getWeekTransferInformation(w),
+          };
+        })
+        .sort((a, b) =>
+          a.data.weekName.localeCompare(b.data.weekName)
+        ) as ValidationData[];
     }
     if (this.fromWeeklyBudget) {
       const otherWeeklyBudgets = this.currentMonth()!
