@@ -1,6 +1,7 @@
 import { Component, Input, output } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-modal',
   templateUrl: './modal.component.html',
   styleUrl: './modal.component.scss',
