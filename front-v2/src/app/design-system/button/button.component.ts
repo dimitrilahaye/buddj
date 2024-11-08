@@ -7,7 +7,7 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './button.component.scss',
 })
 export class ButtonComponent {
-  label = input.required<string>();
+  label = input<string | null>(null);
   type = input<string>('button');
   size = input<'big' | 'middle'>('middle');
   variant = input<'default' | 'danger'>('default');

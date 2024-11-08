@@ -8,7 +8,14 @@
   @if (loading()) {
   <ng-container *ngTemplateOutlet="loader"></ng-container>
   } @else {
-  <span class="button__label">{{ label() }}</span>
+  <span class="button__label" *ngIf="label(); else content">
+    {{ label() }}
+  </span>
+  <ng-template #content>
+    <span class="button__label">
+      <ng-content></ng-content>
+    </span>
+  </ng-template>
   }
 </button>
 
