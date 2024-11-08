@@ -26,7 +26,7 @@ const errorHandler = (
     case "AccountOutflowsError":
     case "WeeklyBudgetInitialBalanceError":
     case "WeeklyExpenseAmountError":
-    case "TransferRemainingBalanceIntoMonthError":
+    case "TransferBalanceIntoMonthError":
       statusCode = 422;
       break;
     case "MonthCreationTemplateWeeklyBudgetError":

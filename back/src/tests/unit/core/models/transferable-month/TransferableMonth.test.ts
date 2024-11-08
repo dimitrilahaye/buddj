@@ -1,5 +1,5 @@
 import expect from "../../../../test-helpers.js";
-import TransferRemainingBalanceBuilder from "../../../../../core/models/transferable-month/builder/TransferRemainingBalanceBuilder.js";
+import TransferBalanceBuilder from "../../../../../core/models/transferable-month/builder/TransferBalanceBuilder.js";
 import TransferableMonth from "../../../../../core/models/transferable-month/TransferableMonth.js";
 import TransferableAccount from "../../../../../core/models/transferable-month/TransferableAccount.js";
 import TransferableWeeklyBudget from "../../../../../core/models/transferable-month/TransferableWeeklyBudget.js";
@@ -19,8 +19,8 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
       const transferableMonth = getTransferableMonth();
 
       // then
-      expect(transferableMonth.transferRemainingBalance).instanceOf(
-        TransferRemainingBalanceBuilder
+      expect(transferableMonth.transferBalance(20)).instanceOf(
+        TransferBalanceBuilder
       );
     });
   });
@@ -75,7 +75,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
     });
   });
 
-  describe("#transferRemainingBalance", function () {
+  describe("#transferBalanceTo", function () {
     describe("from account to weekly budget", function () {
       it("should perform transfer", function () {
         // given
@@ -91,7 +91,8 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
           .getTransferable();
 
         // when
-        transferableMonth.transferRemainingBalance
+        transferableMonth
+          .transferBalance(20)
           .from()
           .account("account-uuid")
           .to<TransferableWeeklyBudget>()
@@ -102,7 +103,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
         const weeklyBudget =
           transferableMonth.findWeeklyBudgetById("semaine-1-uuid");
 
-        expect(account.account.currentBalance).to.be.equal(0);
+        expect(account.account.currentBalance).to.be.equal(20);
         expect(weeklyBudget.weeklyBudget.initialBalance).to.be.equal(220);
         expect(weeklyBudget.weeklyBudget.currentBalance).to.be.equal(10);
       });
@@ -113,7 +114,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
         // given
         const transferableMonthBuilder = new TransferableMonthBuilder();
         const transferableMonth = transferableMonthBuilder.set.account
-          .currentBalance(-10)
+          .currentBalance(1000)
 
           .set.weeklyBudget("Semaine 1")
           .initialBalance(200)
@@ -123,7 +124,8 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
           .getTransferable();
 
         // when
-        transferableMonth.transferRemainingBalance
+        transferableMonth
+          .transferBalance(10)
           .from()
           .weeklyBudget("semaine-1-uuid")
           .to<TransferableAccount>()
@@ -134,9 +136,9 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
         const weeklyBudget =
           transferableMonth.findWeeklyBudgetById("semaine-1-uuid");
 
-        expect(account.account.currentBalance).to.be.equal(10);
-        expect(weeklyBudget.weeklyBudget.initialBalance).to.be.equal(180);
-        expect(weeklyBudget.weeklyBudget.currentBalance).to.be.equal(0);
+        expect(account.account.currentBalance).to.be.equal(1000);
+        expect(weeklyBudget.weeklyBudget.initialBalance).to.be.equal(190);
+        expect(weeklyBudget.weeklyBudget.currentBalance).to.be.equal(10);
       });
     });
 
@@ -159,7 +161,8 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
           .getTransferable();
 
         // when
-        transferableMonth.transferRemainingBalance
+        transferableMonth
+          .transferBalance(20)
           .from()
           .weeklyBudget("semaine-1-uuid")
           .to<TransferableWeeklyBudget>()

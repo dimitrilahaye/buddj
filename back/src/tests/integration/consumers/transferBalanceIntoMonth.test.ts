@@ -4,10 +4,10 @@ import sinon from "sinon";
 import { afterEach, beforeEach } from "mocha";
 import { authenticate, expect, mockedServer } from "./test-helpers.js";
 import * as deps from "../../../ioc.js";
-import { TransferRemainingBalanceIntoMonthCommand } from "../../../core/usecases/TransferRemainingBalanceIntoMonth.js";
+import { TransferBalanceIntoMonthCommand } from "../../../core/usecases/TransferBalanceIntoMonth.js";
 import { Deps } from "../../../consumers/api/server.js";
 import { TransferableAccountNotFoundError } from "../../../core/errors/TransferableMonthErrors.js";
-import { TransferRemainingBalanceIntoMonthError } from "../../../core/errors/TransferRemainingBalanceIntoMonthErrors.js";
+import { TransferBalanceIntoMonthError } from "../../../core/errors/TransferBalanceIntoMonthErrors.js";
 
 describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/:fromType/:fromId/to/:toType/:toId", function () {
   let server: http.Server;
@@ -19,29 +19,33 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
 
     it("should return a 200 on happy path", async function () {
       // given
-      const command: TransferRemainingBalanceIntoMonthCommand = {
-        monthId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
-        fromAccountId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
-        toWeeklyBudgetId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+      const command: TransferBalanceIntoMonthCommand = {
+        monthId: "262e7d82-89bf-4810-bdb4-6ab30bd6e28e",
+        amount: 20,
+        fromAccountId: "6d9cdb2c-305e-4b9f-bab5-f583d6427006",
+        toWeeklyBudgetId: "4da627b9-c6f4-49bf-8ef5-76bfb2fc4efc",
       };
       const params = {
         monthId: command.monthId,
         fromType: "account",
-        fromId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        fromId: "6d9cdb2c-305e-4b9f-bab5-f583d6427006",
         toType: "weekly-budget",
-        toId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        toId: "4da627b9-c6f4-49bf-8ef5-76bfb2fc4efc",
+      };
+      const body = {
+        amount: 20,
       };
       const updatedMonth = Symbol("updatedMonth");
       const dto = "dto";
       const depsStub: Deps = {
         ...deps,
         monthDto: sinon.stub().withArgs(updatedMonth).returns(dto),
-        transferRemainingBalanceIntoMonthDeserializer: sinon
+        transferBalanceIntoMonthDeserializer: sinon
           .stub()
-          .withArgs(params)
+          .withArgs(body, params)
           .returns(command),
       };
-      depsStub.transferRemainingBalanceIntoMonthUsecase.execute = sinon
+      depsStub.transferBalanceIntoMonthUsecase.execute = sinon
         .stub()
         .withArgs(command)
         .resolves(updatedMonth);
@@ -55,15 +59,16 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
         .put(
           `/months/${monthId}/transfer/from/${fromType}/${fromId}/to/${toType}/${toId}`
         )
+        .send(body)
         .set("Cookie", cookie);
 
       // then
       expect(
-        depsStub.transferRemainingBalanceIntoMonthDeserializer
-      ).calledOnceWithExactly(params);
+        depsStub.transferBalanceIntoMonthDeserializer
+      ).calledOnceWithExactly(body, params);
       expect(depsStub.monthDto).has.been.calledOnceWith(updatedMonth);
       expect(
-        depsStub.transferRemainingBalanceIntoMonthUsecase.execute
+        depsStub.transferBalanceIntoMonthUsecase.execute
       ).calledOnceWithExactly(command);
 
       expect(response.statusCode).to.be.equal(200);
@@ -78,7 +83,10 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
         fromType: "account",
         fromId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
         toType: "weekly-budget",
-        toId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        toId: "4da627b9-c6f4-49bf-8ef5-76bfb2fc4efc",
+      };
+      const body = {
+        amount: 20,
       };
 
       server = mockedServer({ isAuthenticated: true }, deps);
@@ -90,6 +98,7 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
         .put(
           `/months/${monthId}/transfer/from/${fromType}/${fromId}/to/${toType}/${toId}`
         )
+        .send(body)
         .set("Cookie", cookie);
 
       // then
@@ -100,11 +109,14 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
     it("should return 404 error if a model is not found", async function () {
       // given
       const params = {
-        monthId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        monthId: "262e7d82-89bf-4810-bdb4-6ab30bd6e28e",
         fromType: "account",
         fromId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
         toType: "weekly-budget",
-        toId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        toId: "4da627b9-c6f4-49bf-8ef5-76bfb2fc4efc",
+      };
+      const body = {
+        amount: 20,
       };
       const updatedMonth = Symbol("updatedMonth");
       const dto = "dto";
@@ -112,7 +124,7 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
         ...deps,
         monthDto: sinon.stub().withArgs(updatedMonth).returns(dto),
       };
-      depsStub.transferRemainingBalanceIntoMonthUsecase.execute = sinon
+      depsStub.transferBalanceIntoMonthUsecase.execute = sinon
         .stub()
         .throwsException(new TransferableAccountNotFoundError());
 
@@ -125,6 +137,7 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
         .put(
           `/months/${monthId}/transfer/from/${fromType}/${fromId}/to/${toType}/${toId}`
         )
+        .send(body)
         .set("Cookie", cookie);
 
       // then
@@ -135,11 +148,14 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
     it("should return 422 error if a business error is encountered", async function () {
       // given
       const params = {
-        monthId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        monthId: "262e7d82-89bf-4810-bdb4-6ab30bd6e28e",
         fromType: "account",
         fromId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
         toType: "weekly-budget",
-        toId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        toId: "4da627b9-c6f4-49bf-8ef5-76bfb2fc4efc",
+      };
+      const body = {
+        amount: 20,
       };
       const updatedMonth = Symbol("updatedMonth");
       const dto = "dto";
@@ -147,9 +163,9 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
         ...deps,
         monthDto: sinon.stub().withArgs(updatedMonth).returns(dto),
       };
-      depsStub.transferRemainingBalanceIntoMonthUsecase.execute = sinon
+      depsStub.transferBalanceIntoMonthUsecase.execute = sinon
         .stub()
-        .throwsException(new TransferRemainingBalanceIntoMonthError());
+        .throwsException(new TransferBalanceIntoMonthError());
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);
@@ -160,6 +176,7 @@ describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/
         .put(
           `/months/${monthId}/transfer/from/${fromType}/${fromId}/to/${toType}/${toId}`
         )
+        .send(body)
         .set("Cookie", cookie);
 
       // then

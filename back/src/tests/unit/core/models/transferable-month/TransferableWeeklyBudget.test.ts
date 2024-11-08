@@ -24,7 +24,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableWeeklyBudget",
     });
   });
 
-  describe("#transferRemainingBalanceTo", function () {
+  describe("#transferBalanceTo", function () {
     describe("an account", function () {
       describe("when weekly budget current balance is positive", function () {
         it("should increase the account current balance", function () {
@@ -49,14 +49,12 @@ describe("Unit | Core | Models | Transferable Month | TransferableWeeklyBudget",
           const [weeklyBudget] = weeklyBudgets;
 
           // when
-          transferableWeeklyBudget.transferRemainingBalanceTo(
-            transferableAccount
-          );
+          transferableWeeklyBudget.transferBalanceTo(transferableAccount, 20);
 
           // then
-          expect(account.currentBalance).to.be.equal(30);
-          expect(weeklyBudget.initialBalance).to.be.equal(190);
-          expect(weeklyBudget.currentBalance).to.be.equal(0);
+          expect(account.currentBalance).to.be.equal(20);
+          expect(weeklyBudget.initialBalance).to.be.equal(180);
+          expect(weeklyBudget.currentBalance).to.be.equal(-10);
         });
       });
 
@@ -83,14 +81,12 @@ describe("Unit | Core | Models | Transferable Month | TransferableWeeklyBudget",
           const [weeklyBudget] = weeklyBudgets;
 
           // when
-          transferableWeeklyBudget.transferRemainingBalanceTo(
-            transferableAccount
-          );
+          transferableWeeklyBudget.transferBalanceTo(transferableAccount, 20);
 
           // then
-          expect(account.currentBalance).to.be.equal(10);
-          expect(weeklyBudget.initialBalance).to.be.equal(210);
-          expect(weeklyBudget.currentBalance).to.be.equal(0);
+          expect(account.currentBalance).to.be.equal(20);
+          expect(weeklyBudget.initialBalance).to.be.equal(180);
+          expect(weeklyBudget.currentBalance).to.be.equal(-30);
         });
       });
     });
@@ -119,16 +115,17 @@ describe("Unit | Core | Models | Transferable Month | TransferableWeeklyBudget",
           const [fromWeeklyBudget, toWeeklyBudget] = weeklyBudgets;
 
           // when
-          fromTransferableWeeklyBudget.transferRemainingBalanceTo(
-            toTransferableWeeklyBudget
+          fromTransferableWeeklyBudget.transferBalanceTo(
+            toTransferableWeeklyBudget,
+            20
           );
 
           // then
-          expect(fromWeeklyBudget.initialBalance).to.be.equal(190);
-          expect(fromWeeklyBudget.currentBalance).to.be.equal(0);
+          expect(fromWeeklyBudget.initialBalance).to.be.equal(180);
+          expect(fromWeeklyBudget.currentBalance).to.be.equal(-10);
 
-          expect(toWeeklyBudget.initialBalance).to.be.equal(210);
-          expect(toWeeklyBudget.currentBalance).to.be.equal(190);
+          expect(toWeeklyBudget.initialBalance).to.be.equal(220);
+          expect(toWeeklyBudget.currentBalance).to.be.equal(200);
         });
       });
 
@@ -155,16 +152,17 @@ describe("Unit | Core | Models | Transferable Month | TransferableWeeklyBudget",
           const [fromWeeklyBudget, toWeeklyBudget] = weeklyBudgets;
 
           // when
-          fromTransferableWeeklyBudget.transferRemainingBalanceTo(
-            toTransferableWeeklyBudget
+          fromTransferableWeeklyBudget.transferBalanceTo(
+            toTransferableWeeklyBudget,
+            20
           );
 
           // then
-          expect(fromWeeklyBudget.initialBalance).to.be.equal(210);
-          expect(fromWeeklyBudget.currentBalance).to.be.equal(0);
+          expect(fromWeeklyBudget.initialBalance).to.be.equal(180);
+          expect(fromWeeklyBudget.currentBalance).to.be.equal(-30);
 
-          expect(toWeeklyBudget.initialBalance).to.be.equal(190);
-          expect(toWeeklyBudget.currentBalance).to.be.equal(170);
+          expect(toWeeklyBudget.initialBalance).to.be.equal(220);
+          expect(toWeeklyBudget.currentBalance).to.be.equal(200);
         });
       });
     });
