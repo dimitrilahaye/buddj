@@ -7,15 +7,14 @@
 >
   @if (loading()) {
   <ng-container *ngTemplateOutlet="loader"></ng-container>
-  } @else {
-  <span class="button__label" *ngIf="label(); else content">
+  } @else if(label()) {
+  <span class="button__label">
     {{ label() }}
   </span>
-  <ng-template #content>
-    <span class="button__label">
-      <ng-content></ng-content>
-    </span>
-  </ng-template>
+  } @else {
+  <span class="button__label">
+    <ng-content></ng-content>
+  </span>
   }
 </button>
 
