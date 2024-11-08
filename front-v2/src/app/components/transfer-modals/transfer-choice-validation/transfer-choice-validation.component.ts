@@ -22,6 +22,15 @@ import {
 } from '../../../models/monthlyBudget.model';
 import { ValidationData } from '../transfer-choice/transfer-choice.component';
 
+export interface TransferData {
+  monthId: string;
+  amount: number;
+  fromType: 'account' | 'weekly-budget';
+  fromId: string;
+  toType: 'account' | 'weekly-budget';
+  toId: string;
+}
+
 @Component({
   selector: 'app-transfer-choice-validation',
   standalone: true,
@@ -42,13 +51,7 @@ export class TransferChoiceValidationComponent implements OnInit {
   @Input()
   fromValidationWeeklyBudget: WeeklyBudget | null = null;
   toggleModal = output<Event>();
-  submitted = output<{
-    monthId: string;
-    fromType: 'account' | 'weekly-budget';
-    fromId: string;
-    toType: 'account' | 'weekly-budget';
-    toId: string;
-  }>();
+  submitted = output<TransferData>();
 
   currentMonth: Signal<MonthlyBudget | null> = signal(null);
 
@@ -92,9 +95,9 @@ export class TransferChoiceValidationComponent implements OnInit {
   }
 
   submit(event: Event) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data: any = {
+    const data: Partial<TransferData> = {
       monthId: this.currentMonth()?.id,
+      amount: this.validationData?.amount,
     };
     if (this.fromValidationAccount) {
       data['fromType'] = 'account';
@@ -112,7 +115,8 @@ export class TransferChoiceValidationComponent implements OnInit {
       data['toType'] = 'weekly-budget';
       data['toId'] = this.validationData.data.id;
     }
-    this.submitted.emit(data);
+    this.openMenuModal = false;
+    this.submitted.emit(data as TransferData);
     event.stopPropagation();
   }
 }

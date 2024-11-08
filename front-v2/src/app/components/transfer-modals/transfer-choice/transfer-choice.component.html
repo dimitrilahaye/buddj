@@ -2,9 +2,22 @@
 <app-modal [modalOpen]="openMenuModal" (click)="toggle($event)">
   <div class="transfer-choice">
     <div class="transfer-choice__title">
-      Transférer {{ transferAmount | currency : "EUR" }} ({{
-        transferSourceLabel
-      }}) vers
+      <div class="transfer-choice-title__form">
+        <label for="amount">Montant à transférer :</label>
+        <input
+          id="amount"
+          type="text"
+          [value]="amount"
+          (input)="onInputChange($event)"
+          (focus)="openNumpad($event)"
+          placeholder="Montant"
+        />
+      </div>
+      <div class="transfer-choice-title__info">
+        Transférer {{ amount | currency : "EUR" }} ({{ transferSourceLabel }})
+        <br />
+        vers
+      </div>
     </div>
     <div class="transfer-choice__choices">
       <ng-container *ngFor="let button of buttons">
@@ -35,4 +48,17 @@
   (toggleModal)="closeTransferChoiceModal($event)"
   (submitted)="submitTransfert($event)"
 ></app-transfer-choice-validation>
+}
+
+<!-- 
+  ##################### NUMPAD #####################
+   -->
+
+@if(numpadIsOpen) {
+<app-sliding-modal [isOpen]="numpadIsOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="amount.toString()"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
+</app-sliding-modal>
 }

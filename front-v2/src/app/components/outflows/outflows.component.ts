@@ -35,6 +35,7 @@ import {
 import { finalize } from 'rxjs';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { TransferChoiceComponent } from '../transfer-modals/transfer-choice/transfer-choice.component';
+import { TransferData } from '../transfer-modals/transfer-choice-validation/transfer-choice-validation.component';
 
 @Component({
   selector: 'app-outflows',
@@ -249,18 +250,13 @@ export class OutflowsComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
-  submitTransfer(data: {
-    monthId: string;
-    fromType: 'account' | 'weekly-budget';
-    fromId: string;
-    toType: 'account' | 'weekly-budget';
-    toId: string;
-  }) {
-    const { monthId, fromType, fromId, toType, toId } = data;
+  submitTransfer(data: TransferData) {
+    const { monthId, amount, fromType, fromId, toType, toId } = data;
     this.transferIsLoading = true;
     this.monthsService
       .transferRemainingBalanceIntoMonth(
         monthId,
+        amount,
         fromType,
         fromId,
         toType,
