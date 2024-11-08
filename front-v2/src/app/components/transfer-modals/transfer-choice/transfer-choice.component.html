@@ -10,9 +10,17 @@
       <ng-container *ngFor="let button of buttons">
         <app-button
           [variant]="'danger'"
-          [label]="button.information"
           (click)="openTransferChoiceModal(button, $event)"
-        ></app-button>
+        >
+          <div class="transfer-choice-choices__label">
+            <span class="transfer-choice-choices-label__target">{{
+              button.information.target
+            }}</span>
+            <span class="transfer-choice-choices-label__detail">{{
+              button.information.detail
+            }}</span>
+          </div>
+        </app-button>
       </ng-container>
     </div>
   </div>
