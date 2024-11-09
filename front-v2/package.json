@@ -31,7 +31,7 @@
     "@use-gesture/vanilla": "10.3.1",
     "ngxtension": "4.0.0",
     "rxjs": "~7.8.1",
-    "tslib": "^2.8.0",
+    "tslib": "^2.8.1",
     "zone.js": "~0.14.10"
   },
   "devDependencies": {
