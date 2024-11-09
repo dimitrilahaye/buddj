@@ -1,4 +1,4 @@
-import { Component, Input, output } from '@angular/core';
+import { Component, input, Input, output } from '@angular/core';
 
 @Component({
   standalone: false,
@@ -9,6 +9,7 @@ import { Component, Input, output } from '@angular/core';
 export class ModalComponent {
   @Input()
   modalOpen = false;
+  cssClassString = input<string>('');
   click = output<Event>();
 
   onClick(event: Event) {

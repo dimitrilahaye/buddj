@@ -1,7 +1,7 @@
 <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
 <!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 @if(modalOpen) {
-<div class="modal__container" (click)="onClick($event)">
+<div class="modal__container {{ cssClassString() }}" (click)="onClick($event)">
   <div
     class="modal-container__content"
     [ngClass]="{ 'modal-container__content--fade-in-up': modalOpen }"

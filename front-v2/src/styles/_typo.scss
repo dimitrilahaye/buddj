@@ -2,6 +2,13 @@
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
 }
+%ellipsis {
+  // white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
+}
 %title-3 {
   color: var(--dark-100);
   font-size: var(--title-3);

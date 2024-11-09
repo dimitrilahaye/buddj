@@ -227,3 +227,64 @@
     transform: rotate(60deg);
   }
 }
+::ng-deep app-modal {  
+  .menu-modal {
+    .modal-container__content {
+      padding: 20px;
+      width: 90%;
+    }
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  &__category {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.menu-category {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    justify-content: space-between;
+  }
+
+  &__title {
+    @extend %title-3;
+    
+    &--capitalize {
+      text-transform: capitalize;
+    }
+  }
+}
+
+.menu-category-actions {
+  &__action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 30%;
+  }
+}
+
+.menu-category-actions-action {
+  &__label {
+    @extend %text-5;
+    @extend %ellipsis;
+
+    width: 70%;
+    text-align: center;
+  }
+}
