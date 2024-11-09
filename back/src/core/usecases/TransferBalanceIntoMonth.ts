@@ -25,14 +25,6 @@ export default class TransferBalanceIntoMonth {
     fromWeeklyBudgetId,
     toAccountId,
   }: TransferBalanceIntoMonthCommand): Promise<Month> {
-    console.info({
-      monthId,
-      amount,
-      fromAccountId,
-      toWeeklyBudgetId,
-      fromWeeklyBudgetId,
-      toAccountId,
-    });
     const month = await this.monthRepository.getTransferableById(monthId);
     if (!month) {
       throw new MonthNotFoundError();
