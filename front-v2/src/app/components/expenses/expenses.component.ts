@@ -59,7 +59,7 @@ export class ExpensesComponent implements AfterViewInit {
   addExpenseFormIsLoading = false;
   isExpensesModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
-  filtersState = 0;
+  filters: number[] = [1, 2, 3, 4, 5];
   formUpdated = false;
   expenseDelationModalIsOpen = false;
   deleteExpenseFormIsLoading = false;
@@ -126,7 +126,7 @@ export class ExpensesComponent implements AfterViewInit {
   }
 
   filterIsActive(week: number) {
-    return this.filtersState === week;
+    return this.filters.includes(week);
   }
 
   get forecastBalance() {
@@ -203,21 +203,21 @@ export class ExpensesComponent implements AfterViewInit {
   }
 
   updateFilterState(week: number) {
-    if (this.filtersState === week) {
-      this.filtersState = 0;
+    if (this.filters.includes(week)) {
+      this.filters = this.filters.filter((f) => f !== week);
     } else {
-      this.filtersState = week;
+      this.filters.push(week);
     }
   }
 
   getExpensesFormGroupByWeekId(weekId: string) {
     return this.expensesFormArray.controls.filter((expense) => {
       const expenseWeekId = expense.get('weekId')?.value;
-      if (this.filtersState === 0) {
-        return expenseWeekId === weekId;
+      const weekNumber = this.weeks.findIndex((w) => w.id === weekId);
+      if (this.filters.length === 0) {
+        return false;
       }
-      const selectedWeek = this.weeks[this.filtersState - 1];
-      return expenseWeekId === weekId && expenseWeekId === selectedWeek.id;
+      return expenseWeekId === weekId && this.filters.includes(weekNumber + 1);
     });
   }
 
@@ -265,7 +265,6 @@ export class ExpensesComponent implements AfterViewInit {
           finalize(() => {
             this.deleteExpenseFormIsLoading = false;
             this.closeExpenseDelationModal(event);
-            this.filtersState = 0;
           })
         )
         .subscribe(() =>
@@ -295,7 +294,6 @@ export class ExpensesComponent implements AfterViewInit {
         .pipe(
           finalize(() => {
             this.addExpenseFormIsLoading = false;
-            this.filtersState = 0;
           })
         )
         .subscribe(() => {
@@ -348,7 +346,6 @@ export class ExpensesComponent implements AfterViewInit {
       .pipe(
         finalize(() => {
           this.formIsLoading = false;
-          this.filtersState = 0;
         })
       )
       .subscribe(() => {
