@@ -1,0 +1,36 @@
+@import "../../../styles/variables";
+
+.icon {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    border: 0;
+    background: none;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: var(--color-950);
+    border-radius: 50%;
+    padding: 10px;
+    font-size: 25px;
+    height: 45px;
+    width: 45px;
+    box-sizing: border-box;
+
+    &:disabled {
+        opacity: 0.5;
+    }
+
+    &--default {
+        background-color: var(--color-800);
+    }
+
+    &--danger {
+    background-color: var(--color-950);
+    }
+
+    &__loader {
+        color: var(--color-50);
+    }
+}

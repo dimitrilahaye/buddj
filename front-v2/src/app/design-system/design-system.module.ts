@@ -14,6 +14,7 @@ import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ModalComponent } from './modal/modal/modal.component';
 import { InfoComponent } from './info/info.component';
 import { NumpadComponent } from './numpad/numpad.component';
+import { ButtonIconComponent } from './button-icon/button-icon.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { NumpadComponent } from './numpad/numpad.component';
     ModalComponent,
     InfoComponent,
     NumpadComponent,
+    ButtonIconComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -46,6 +48,7 @@ import { NumpadComponent } from './numpad/numpad.component';
     ModalComponent,
     InfoComponent,
     NumpadComponent,
+    ButtonIconComponent,
   ],
 })
 export class DesignSystemModule {}
