@@ -34,6 +34,9 @@ export class NumpadComponent implements OnInit {
         return val;
       }
       if (val === '0') {
+        if (appendValue === ',') {
+          return val + appendValue;
+        }
         return appendValue;
       }
       return val + appendValue;
