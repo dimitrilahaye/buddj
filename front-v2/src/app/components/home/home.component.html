@@ -175,34 +175,34 @@
     </div>
   </div>
   }
-  <div class="header__menu">
-    <button
-      type="button"
-      class="header-menu__item"
-      [routerLink]="['/home/expenses']"
-      [routerLinkActive]="'header-menu__item--active'"
-    >
-      <i class="fa-solid fa-basket-shopping"></i>
-    </button>
-    <button
-      type="button"
-      class="header-menu__item"
-      [routerLink]="['/home/outflows']"
-      [routerLinkActive]="'header-menu__item--active'"
-    >
-      <i class="fa-solid fa-money-bill-transfer"></i>
-    </button>
-    <button
-      (click)="toggleMenuModal($event)"
-      class="menu-footer-add__plus"
-      [ngClass]="{ 'menu-footer-add__plus--rotate': openMenuModal }"
-      type="button"
-      aria-label="Afficher le menu de création"
-    >
-      <i class="fa-solid fa-gear"></i>
-    </button>
-  </div>
 </header>
+<nav class="nav">
+  <button
+    type="button"
+    class="nav__item"
+    [routerLink]="['/home/expenses']"
+    [routerLinkActive]="'nav__item--active'"
+  >
+    <i class="fa-solid fa-basket-shopping"></i>
+  </button>
+  <button
+    type="button"
+    class="nav__item"
+    [routerLink]="['/home/outflows']"
+    [routerLinkActive]="'nav__item--active'"
+  >
+    <i class="fa-solid fa-money-bill-transfer"></i>
+  </button>
+  <button
+    (click)="toggleMenuModal($event)"
+    class="nav-footer-add__plus"
+    [ngClass]="{ 'nav-footer-add__plus--rotate': openMenuModal }"
+    type="button"
+    aria-label="Afficher le menu de création"
+  >
+    <i class="fa-solid fa-gear"></i>
+  </button>
+</nav>
 <div class="content">
   @if(!current) { <app-info>Aucun mois pour le moment 😁</app-info> } @else
   {<router-outlet />}
