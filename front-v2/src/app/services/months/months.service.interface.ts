@@ -26,32 +26,32 @@ export interface UpdateExpensesChecking {
 }
 
 export default interface MonthsServiceInterface {
-  createMonth(month: Month): Observable<MonthlyBudget>;
-  getUnarchivedMonths(): Observable<MonthlyBudget[]>;
-  deleteOutflow(monthId: string, outflowId: string): Observable<MonthlyBudget>;
+  createMonth(month: Month): Observable<void>;
+  getUnarchivedMonths(): Observable<void>;
+  deleteOutflow(monthId: string, outflowId: string): Observable<void>;
   updateOutflowsChecking(
     monthId: string,
     data: UpdateOutflowsChecking
-  ): Observable<MonthlyBudget>;
-  addOutflow(monthId: string, outflow: AddOutflow): Observable<MonthlyBudget>;
+  ): Observable<void>;
+  addOutflow(monthId: string, outflow: AddOutflow): Observable<void>;
   updateExpensesChecking(
     monthId: string,
     data: UpdateExpensesChecking
-  ): Observable<MonthlyBudget>;
+  ): Observable<void>;
   deleteExpense(
     monthId: string,
     weeklyId: string,
     expenseId: string
-  ): Observable<MonthlyBudget>;
+  ): Observable<void>;
   addExpense(
     monthId: string,
     weeklyId: string,
     expense: AddExpense
-  ): Observable<MonthlyBudget>;
+  ): Observable<void>;
   getArchivedMonths(): Observable<MonthlyBudget[]>;
-  archiveMonth(monthId: string): Observable<MonthlyBudget>;
-  unarchiveMonth(monthId: string): Observable<MonthlyBudget[]>;
-  deleteMonth(monthId: string): Observable<MonthlyBudget[]>;
+  archiveMonth(monthId: string): Observable<void>;
+  unarchiveMonth(monthId: string): Observable<void>;
+  deleteMonth(monthId: string): Observable<void>;
   transferRemainingBalanceIntoMonth(
     monthId: string,
     amount: number,
@@ -59,7 +59,7 @@ export default interface MonthsServiceInterface {
     fromId: string,
     toType: 'account' | 'weekly-budget',
     toId: string
-  ): Observable<MonthlyBudget>;
+  ): Observable<void>;
 }
 
 export const MONTHS_SERVICE = new InjectionToken<MonthsServiceInterface>(

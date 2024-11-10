@@ -30,36 +30,36 @@ export class MonthsService implements MonthsServiceInterface {
     this.apiUrl = environment.apiUrl;
   }
 
-  createMonth(month: Month): Observable<MonthlyBudget> {
+  createMonth(month: Month): Observable<void> {
     return this.http
       .post<Response<MonthlyBudget>>(`${this.apiUrl}/months`, month)
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
-  getUnarchivedMonths(): Observable<MonthlyBudget[]> {
+  getUnarchivedMonths(): Observable<void> {
     return this.http
       .get<Response<MonthlyBudget[]>>(`${this.apiUrl}/months/unarchived`)
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.addMonths(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
-  deleteOutflow(monthId: string, outflowId: string): Observable<MonthlyBudget> {
+  deleteOutflow(monthId: string, outflowId: string): Observable<void> {
     return this.http
       .delete<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/outflows/${outflowId}`
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
-  addOutflow(monthId: string, outflow: AddOutflow): Observable<MonthlyBudget> {
+  addOutflow(monthId: string, outflow: AddOutflow): Observable<void> {
     return this.http
       .post<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/outflows/`,
@@ -67,14 +67,14 @@ export class MonthsService implements MonthsServiceInterface {
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
   updateOutflowsChecking(
     monthId: string,
     data: UpdateOutflowsChecking
-  ): Observable<MonthlyBudget> {
+  ): Observable<void> {
     return this.http
       .put<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/outflows/checking`,
@@ -82,14 +82,14 @@ export class MonthsService implements MonthsServiceInterface {
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
   updateExpensesChecking(
     monthId: string,
     data: UpdateExpensesChecking
-  ): Observable<MonthlyBudget> {
+  ): Observable<void> {
     return this.http
       .put<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/expenses/checking`,
@@ -97,7 +97,7 @@ export class MonthsService implements MonthsServiceInterface {
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
@@ -105,14 +105,14 @@ export class MonthsService implements MonthsServiceInterface {
     monthId: string,
     weeklyId: string,
     expenseId: string
-  ): Observable<MonthlyBudget> {
+  ): Observable<void> {
     return this.http
       .delete<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/weekly/${weeklyId}/expenses/${expenseId}`
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
@@ -120,7 +120,7 @@ export class MonthsService implements MonthsServiceInterface {
     monthId: string,
     weeklyId: string,
     expense: AddExpense
-  ): Observable<MonthlyBudget> {
+  ): Observable<void> {
     return this.http
       .post<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/weeks/${weeklyId}/expenses`,
@@ -128,7 +128,7 @@ export class MonthsService implements MonthsServiceInterface {
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
@@ -141,7 +141,7 @@ export class MonthsService implements MonthsServiceInterface {
       );
   }
 
-  archiveMonth(monthId: string): Observable<MonthlyBudget> {
+  archiveMonth(monthId: string): Observable<void> {
     return this.http
       .put<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/archive`,
@@ -149,11 +149,11 @@ export class MonthsService implements MonthsServiceInterface {
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.addMonthToArchives(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
-  unarchiveMonth(monthId: string): Observable<MonthlyBudget[]> {
+  unarchiveMonth(monthId: string): Observable<void> {
     return this.http
       .put<Response<MonthlyBudget[]>>(
         `${this.apiUrl}/months/${monthId}/unarchive`,
@@ -161,17 +161,17 @@ export class MonthsService implements MonthsServiceInterface {
       )
       .pipe(
         tap(() => this.monthlyBudgetsStore.removeMonthFromArchives(monthId)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
-  deleteMonth(monthId: string): Observable<MonthlyBudget[]> {
+  deleteMonth(monthId: string): Observable<void> {
     return this.http
       .delete<Response<MonthlyBudget[]>>(`${this.apiUrl}/months/${monthId}`, {})
       .pipe(
         tap(() => this.monthlyBudgetsStore.removeMonthFromArchives(monthId)),
         tap(({ data }) => this.monthlyBudgetsStore.addMonths(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 
@@ -182,7 +182,7 @@ export class MonthsService implements MonthsServiceInterface {
     fromId: string,
     toType: 'account' | 'weekly-budget',
     toId: string
-  ): Observable<MonthlyBudget> {
+  ): Observable<void> {
     return this.http
       .put<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/transfer/from/${fromType}/${fromId}/to/${toType}/${toId}`,
@@ -190,7 +190,7 @@ export class MonthsService implements MonthsServiceInterface {
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
-        map(({ data }) => data)
+        map(() => void 0)
       );
   }
 }
