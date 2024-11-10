@@ -7,6 +7,7 @@ import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
 import { of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { AUTHENTICATION_SERVICE } from '../../services/authentication/authentication.service.interface';
+import { TOASTER_SERVICE } from '../../services/toaster.service.interface';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -41,6 +42,10 @@ describe('HomeComponent', () => {
           useValue: {
             getUnarchivedMonths: () => of([]),
           },
+        },
+        {
+          provide: TOASTER_SERVICE,
+          useValue: {},
         },
       ],
     }).compileComponents();

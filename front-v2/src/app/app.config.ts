@@ -23,6 +23,8 @@ import { MonthsService } from './services/months/months.service';
 import { MONTHS_SERVICE } from './services/months/months.service.interface';
 import { MonthlyBudgetsStore } from './stores/monthlyBudgets.store';
 import { MONTHLY_BUDGETS_STORE } from './stores/monthlyBudgets.store.interface';
+import { TOASTER_SERVICE } from './services/toaster.service.interface';
+import { ToasterService } from './services/toaster.service';
 
 registerLocaleData(localeFr);
 
@@ -55,6 +57,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MONTHLY_BUDGETS_STORE,
       useClass: MonthlyBudgetsStore,
+    },
+    {
+      provide: TOASTER_SERVICE,
+      useClass: ToasterService,
     },
   ],
 };

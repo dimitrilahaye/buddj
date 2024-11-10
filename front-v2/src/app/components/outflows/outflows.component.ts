@@ -33,9 +33,11 @@ import {
   MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets.store.interface';
 import { finalize } from 'rxjs';
-import { HotToastService } from '@ngxpert/hot-toast';
 import { TransferChoiceComponent } from '../transfer-modals/transfer-choice/transfer-choice.component';
 import { TransferData } from '../transfer-modals/transfer-choice/transfer-choice.component';
+import ToasterServiceInterface, {
+  TOASTER_SERVICE,
+} from '../../services/toaster.service.interface';
 
 @Component({
   selector: 'app-outflows',
@@ -78,7 +80,7 @@ export class OutflowsComponent implements AfterViewInit {
     private monthsService: MonthsServiceInterface,
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
-    @Inject(HotToastService) private toaster: HotToastService
+    @Inject(TOASTER_SERVICE) private toaster: ToasterServiceInterface
   ) {}
 
   ngAfterViewInit(): void {

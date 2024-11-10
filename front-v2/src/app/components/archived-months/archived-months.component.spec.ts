@@ -5,6 +5,7 @@ import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interfa
 import { signal } from '@angular/core';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
 import { of } from 'rxjs';
+import { TOASTER_SERVICE } from '../../services/toaster.service.interface';
 
 describe('ArchivedMonthsComponent', () => {
   let component: ArchivedMonthsComponent;
@@ -25,6 +26,10 @@ describe('ArchivedMonthsComponent', () => {
           useValue: {
             unarchiveMonth: () => of(),
           },
+        },
+        {
+          provide: TOASTER_SERVICE,
+          useValue: {},
         },
       ],
     }).compileComponents();

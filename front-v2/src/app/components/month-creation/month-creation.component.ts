@@ -19,7 +19,9 @@ import MonthsServiceInterface, {
   MONTHS_SERVICE,
 } from '../../services/months/months.service.interface';
 import { finalize } from 'rxjs';
-import { HotToastService } from '@ngxpert/hot-toast';
+import ToasterServiceInterface, {
+  TOASTER_SERVICE,
+} from '../../services/toaster.service.interface';
 
 @Component({
   selector: 'app-month-creation',
@@ -52,7 +54,7 @@ export class MonthCreationComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
-    @Inject(HotToastService) private toaster: HotToastService,
+    @Inject(TOASTER_SERVICE) private toaster: ToasterServiceInterface,
     @Inject(MONTHS_SERVICE)
     private monthsService: MonthsServiceInterface
   ) {}

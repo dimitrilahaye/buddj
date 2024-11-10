@@ -17,11 +17,13 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { HotToastService } from '@ngxpert/hot-toast';
 import {
   AUTHENTICATION_SERVICE,
   AuthenticationServiceInterface,
 } from '../../services/authentication/authentication.service.interface';
+import ToasterServiceInterface, {
+  TOASTER_SERVICE,
+} from '../../services/toaster.service.interface';
 
 @Component({
   selector: 'app-home',
@@ -50,7 +52,7 @@ export class HomeComponent {
 
   constructor(
     private router: Router,
-    @Inject(HotToastService) private toaster: HotToastService,
+    @Inject(TOASTER_SERVICE) private toaster: ToasterServiceInterface,
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
     @Inject(MONTHS_SERVICE)

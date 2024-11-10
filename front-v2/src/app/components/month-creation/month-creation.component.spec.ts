@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
 import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
+import { TOASTER_SERVICE } from '../../services/toaster.service.interface';
 
 describe('MonthCreationComponent', () => {
   let component: MonthCreationComponent;
@@ -28,6 +29,10 @@ describe('MonthCreationComponent', () => {
         { provide: MONTHS_SERVICE, useValue: {} },
         {
           provide: MONTHLY_BUDGETS_STORE,
+          useValue: {},
+        },
+        {
+          provide: TOASTER_SERVICE,
           useValue: {},
         },
         Router,

@@ -19,8 +19,10 @@ import { CommonModule } from '@angular/common';
 import MonthsServiceInterface, {
   MONTHS_SERVICE,
 } from '../../services/months/months.service.interface';
-import { HotToastService } from '@ngxpert/hot-toast';
 import { finalize } from 'rxjs';
+import ToasterServiceInterface, {
+  TOASTER_SERVICE,
+} from '../../services/toaster.service.interface';
 
 @Component({
   selector: 'app-archived-months',
@@ -43,7 +45,7 @@ export class ArchivedMonthsComponent implements OnInit {
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
     @Inject(MONTHS_SERVICE)
     private monthsService: MonthsServiceInterface,
-    @Inject(HotToastService) private toaster: HotToastService
+    @Inject(TOASTER_SERVICE) private toaster: ToasterServiceInterface
   ) {}
 
   ngOnInit(): void {
