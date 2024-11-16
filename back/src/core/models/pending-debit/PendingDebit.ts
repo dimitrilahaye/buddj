@@ -13,7 +13,7 @@ export default class PendingDebit {
   readonly monthDate: Date;
   readonly label: string;
   readonly amount: number;
-  readonly type: string;
+  readonly type: "outflow" | "expense";
 
   constructor(props: PendingDebitProps) {
     this.id = props.id;
@@ -21,7 +21,7 @@ export default class PendingDebit {
     this.monthDate = props.monthDate;
     this.amount = props.amount;
     this.type = props.type;
-    const date = new Date("2022-01-01");
+    const date = props.monthDate;
     const options = { year: "numeric", month: "short" };
     const formattedDate = date.toLocaleDateString(
       "fr-FR",

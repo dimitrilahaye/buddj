@@ -9,13 +9,15 @@ export default class TransferableMonthBuilder {
 
   constructor() {
     const monthBuilder = new MonthBuilder();
-    this.month = monthBuilder.add.outflow(
-      new AccountOutflow({
-        id: "outflow-1-uuid",
-        amount: 190,
-        label: "my outflow",
-      })
-    ).get;
+    this.month = monthBuilder.add
+      .outflow(
+        new AccountOutflow({
+          id: "outflow-1-uuid",
+          amount: 190,
+          label: "my outflow",
+        })
+      )
+      .get();
   }
 
   get set() {
