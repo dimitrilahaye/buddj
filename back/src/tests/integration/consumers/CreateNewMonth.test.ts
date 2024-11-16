@@ -24,6 +24,7 @@ describe("Integration | Consumers | Routes | POST /months", function () {
       const body = {
         month: new Date(),
         startingBalance: 2000,
+        pendingDebits: [],
         outflows: [
           {
             label: "outlfow",
@@ -77,6 +78,7 @@ describe("Integration | Consumers | Routes | POST /months", function () {
             amount: 10.05,
           },
         ],
+        pendingDebits: [],
         weeklyBudgets: [
           {
             name: "Semaine 1",
@@ -130,6 +132,7 @@ describe("Integration | Consumers | Routes | POST /months", function () {
       const body = {
         month: new Date(),
         startingBalance: -2000,
+        pendingDebits: [],
         outflows: [
           {
             label: "outlfow",

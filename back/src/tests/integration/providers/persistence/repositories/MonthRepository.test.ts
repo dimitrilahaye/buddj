@@ -32,6 +32,16 @@ describe("Integration | Providers | Persistence | Repositories | MonthRepository
       const newMonth = monthFactory.create({
         date: new Date(),
         initialBalance: 2000,
+        pendingDebits: [
+          {
+            id: "8d2eead7-f41d-4e6c-9c52-d0f81c22a21b",
+            monthId: "a8ac22b1-0090-494a-a3fe-9ec2526cf8d1",
+            monthDate: new Date(),
+            label: "label",
+            amount: 10,
+            type: "outflow",
+          },
+        ],
         outflows: [
           {
             label: "outlfow",
@@ -68,7 +78,7 @@ describe("Integration | Providers | Persistence | Repositories | MonthRepository
       // then
       expect(persistedMonth).to.be.instanceof(Month);
       expect(persistedMonth.id).to.be.equal(newMonth.id);
-      expect(persistedMonth.account.outflows).to.have.lengthOf(1);
+      expect(persistedMonth.account.outflows).to.have.lengthOf(2);
       expect(persistedMonth.account.weeklyBudgets).to.have.lengthOf(5);
     });
   });
