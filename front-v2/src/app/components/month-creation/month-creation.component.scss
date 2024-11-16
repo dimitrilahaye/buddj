@@ -42,6 +42,13 @@
       flex-direction: row;
     }
 
+    &--step_debits {
+      padding: 20px;
+      border: var(--color-700) 2px solid;
+      border-radius: 20px;
+      box-sizing: content-box;
+    }
+
     &--step3 {
       padding-bottom: 40px;
     }
@@ -106,6 +113,15 @@
 }
 
 .month-creation-step {
+  &__info {
+    background: var(--color-100);
+    border-radius: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    color: var(--dark-100);
+    text-align: center;
+  }
+
   &__add-outflow {
     display: none;
     position: sticky;

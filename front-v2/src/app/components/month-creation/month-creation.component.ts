@@ -1,6 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MonthTemplate } from '../../models/monthTemplate.model';
+import {
+  MonthCreationTemplate,
+  MonthTemplate,
+  PendingDebit,
+} from '../../models/monthTemplate.model';
 import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
 import {
   AbstractControl,
@@ -33,7 +37,7 @@ import ToasterServiceInterface, {
 export class MonthCreationComponent implements OnInit {
   dataLoaded = false;
   form!: FormGroup;
-  template: MonthTemplate | null = null;
+  template: MonthCreationTemplate | null = null;
   isOutflowsModalOpen = false;
   isNumpadModalOpen = false;
   isWeeklyBudgetsModalOpen = false;
@@ -51,21 +55,24 @@ export class MonthCreationComponent implements OnInit {
   };
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private fb: FormBuilder,
-    @Inject(TOASTER_SERVICE) private toaster: ToasterServiceInterface,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly fb: FormBuilder,
+    @Inject(TOASTER_SERVICE) private readonly toaster: ToasterServiceInterface,
     @Inject(MONTHS_SERVICE)
-    private monthsService: MonthsServiceInterface
+    private readonly monthsService: MonthsServiceInterface
   ) {}
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
       this.template = {
         ...data['template'],
-        outflows: (data['template'] as MonthTemplate).outflows.sort((a, b) =>
-          a.label.localeCompare(b.label)
-        ),
+        template: {
+          ...data['template'].template,
+          outflows: (data['template'].template as MonthTemplate).outflows.sort(
+            (a, b) => a.label.localeCompare(b.label)
+          ),
+        },
       };
       this.setNewMonthData();
 
@@ -85,6 +92,7 @@ export class MonthCreationComponent implements OnInit {
         this.newMonth.startingBalance,
         [Validators.required, amountValidator()],
       ],
+      debits: this.fb.array([]),
       outflows: this.fb.array([]),
       weeklyBudgets: this.fb.array([]),
     });
@@ -93,6 +101,7 @@ export class MonthCreationComponent implements OnInit {
     this.newMonth.weeklyBudgets.forEach((weeklyBudget) =>
       this.addWeeklyBudgets(weeklyBudget)
     );
+    this.template?.pendingDebits.forEach((debit) => this.addDebit(debit));
   }
 
   backToHome() {
@@ -127,10 +136,16 @@ export class MonthCreationComponent implements OnInit {
       },
       0
     );
+    const totalDebits = (this.form.value.debits as PendingDebit[]).reduce(
+      (total, { amount }) => {
+        return total + amount;
+      },
+      0
+    );
 
     const forecastBalance =
       (this.form.value as Month).startingBalance -
-      (totalOutflows + totalWeeklyBudgets);
+      (totalOutflows + totalWeeklyBudgets + totalDebits);
 
     return forecastBalance.toFixed(2);
   }
@@ -142,15 +157,28 @@ export class MonthCreationComponent implements OnInit {
   }
 
   private setNewMonthData() {
-    this.newMonth.month = new Date(this.template!.month);
-    this.newMonth.startingBalance = this.template!.startingBalance;
-    this.newMonth.weeklyBudgets = this.template!.weeklyBudgets;
-    this.newMonth.outflows = this.template!.outflows;
+    this.newMonth.month = new Date(this.template!.template.month);
+    this.newMonth.startingBalance = this.template!.template.startingBalance;
+    this.newMonth.weeklyBudgets = this.template!.template.weeklyBudgets;
+    this.newMonth.outflows = this.template!.template.outflows;
   }
 
   /*
   ################ Outflows managment ################
   */
+
+  addDebit(debit: PendingDebit) {
+    const debitGroup = this.fb.group({
+      label: [debit.label, Validators.required],
+      amount: [debit.amount, [Validators.required, amountValidator()]],
+      type: [{ value: debit.type, disabled: true }],
+    });
+    this.debits.push(debitGroup);
+  }
+
+  get debits(): FormArray {
+    return this.form.get('debits') as FormArray;
+  }
 
   addOutflow(outflow: Outflow) {
     const outflowGroup = this.fb.group({

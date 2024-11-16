@@ -16,3 +16,17 @@ export type Outflow = {
   label: string;
   isChecked: boolean;
 };
+
+export type PendingDebit = {
+  id: string;
+  monthId: string;
+  monthDate: Date;
+  label: string;
+  amount: number;
+  type: 'outflow' | 'expense';
+};
+
+export type MonthCreationTemplate = {
+  template: MonthTemplate;
+  pendingDebits: PendingDebit[];
+};

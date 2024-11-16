@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import MonthTemplatesServiceInterface from './monthTemplates.service.interface';
 import { map, Observable } from 'rxjs';
-import { MonthTemplate } from '../../models/monthTemplate.model';
+import { MonthCreationTemplate } from '../../models/monthTemplate.model';
 import { Response } from '../../models/response.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -16,9 +16,9 @@ export class MonthTemplatesService implements MonthTemplatesServiceInterface {
     this.apiUrl = environment.apiUrl;
   }
 
-  getTemplate(): Observable<MonthTemplate> {
+  getTemplate(): Observable<MonthCreationTemplate> {
     return this.http
-      .get<Response<MonthTemplate>>(`${this.apiUrl}/months/template`)
+      .get<Response<MonthCreationTemplate>>(`${this.apiUrl}/months/template`)
       .pipe(map(({ data }) => data));
   }
 }

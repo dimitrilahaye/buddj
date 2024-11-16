@@ -15,8 +15,11 @@ describe('MonthCreationComponent', () => {
   const activatedRouteStub = {
     data: of({
       template: {
-        month: new Date(),
-        outflows: [],
+        template: {
+          month: new Date(),
+          outflows: [],
+        },
+        pendingDebits: [],
       },
     }),
   };
