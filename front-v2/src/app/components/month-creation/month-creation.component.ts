@@ -46,6 +46,7 @@ export class MonthCreationComponent implements OnInit {
   creationLoader = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   amountValueControl: AbstractControl<any, any> | null = null;
+  takeIntoAccountPendingDebits = true;
 
   newMonth: Month = {
     month: new Date(),
@@ -80,6 +81,11 @@ export class MonthCreationComponent implements OnInit {
 
       this.dataLoaded = true;
     });
+  }
+
+  togglePendingDebits(event: Event) {
+    this.takeIntoAccountPendingDebits = !this.takeIntoAccountPendingDebits;
+    event.preventDefault();
   }
 
   private setForm() {
@@ -142,9 +148,13 @@ export class MonthCreationComponent implements OnInit {
       return total + amount;
     }, 0);
 
-    const forecastBalance =
-      (this.form.value as Month).startingBalance -
-      (totalOutflows + totalWeeklyBudgets + totalDebits);
+    let total = totalOutflows + totalWeeklyBudgets;
+
+    if (this.takeIntoAccountPendingDebits) {
+      total += totalDebits;
+    }
+
+    const forecastBalance = (this.form.value as Month).startingBalance - total;
 
     return forecastBalance.toFixed(2);
   }

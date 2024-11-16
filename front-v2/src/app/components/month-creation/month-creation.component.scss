@@ -208,3 +208,11 @@
     }
   }
 }
+
+.month-creation-step-info {
+  &__link {
+    @extend %text-7;
+
+    color: var(--color-800);
+  }
+}

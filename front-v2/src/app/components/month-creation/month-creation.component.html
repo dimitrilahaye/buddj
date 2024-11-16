@@ -47,7 +47,17 @@
     <div class="month-creation-step__info">
       Voici les dépenses des mois précédents qui n'ont pas encore été prélevées.
       <br />
+      <a
+        (click)="togglePendingDebits($event)"
+        class="month-creation-step-info__link"
+        href="#"
+      >
+        @if(takeIntoAccountPendingDebits) { Ne pas les prendre en compte dans le
+        solde prévisionnel } @else { Les prendre en compte dans le solde
+        prévisionnel }
+      </a>
     </div>
+    @if(takeIntoAccountPendingDebits) {
     <app-item
       *ngFor="let debit of pendingDebits.controls; let i = index"
       [formGroupName]="i"
@@ -66,6 +76,7 @@
         </div>
       </div>
     </app-item>
+    }
   </div>
   }
   <div
