@@ -35,6 +35,37 @@
   <!-- 
   ##################### STEP 2 #####################
    -->
+
+  <!-- 
+  ##################### PENDING DEBITS #####################
+   -->
+  <div
+    class="month-creation__step month-creation__step--step_debits"
+    formArrayName="debits"
+  >
+    <div class="month-creation-step__info">
+      Voici les dépenses des mois précédents qui n'ont pas encore été prélevées.
+      <br />
+    </div>
+    <app-item
+      *ngFor="let debit of debits.controls; let i = index"
+      [formGroupName]="i"
+    >
+      <div class="month-creation-item">
+        <span class="month-creation-item__icon">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+        <div class="month-creation-item__info">
+          <span class="month-creation-item-info__label">{{
+            debit.get("label")?.value
+          }}</span>
+          <span class="month-creation-item-info__amount"
+            >{{ debit.get("amount")?.value }}€</span
+          >
+        </div>
+      </div>
+    </app-item>
+  </div>
   <div
     class="month-creation__step month-creation__step--step2"
     formArrayName="outflows"

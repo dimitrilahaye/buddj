@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ResolveFn } from '@angular/router';
-import { MonthTemplate } from '../../models/monthTemplate.model';
+import { MonthCreationTemplate } from '../../models/monthTemplate.model';
 import { inject } from '@angular/core';
 import { MONTH_TEMPLATES_SERVICE } from '../../services/monthTemplates/monthTemplates.service.interface';
 
-export const monthTemplateResolver: ResolveFn<MonthTemplate> = (
+export const monthTemplateResolver: ResolveFn<MonthCreationTemplate> = (
   route,
   state
 ) => {

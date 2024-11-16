@@ -1,9 +1,9 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MonthTemplate } from '../../models/monthTemplate.model';
+import { MonthCreationTemplate } from '../../models/monthTemplate.model';
 
 export default interface MonthTemplatesServiceInterface {
-  getTemplate(): Observable<MonthTemplate>;
+  getTemplate(): Observable<MonthCreationTemplate>;
 }
 
 export const MONTH_TEMPLATES_SERVICE =
