@@ -36,6 +36,7 @@ import unarchiveMonthDeserializer from "./consumers/api/deserializers/unarchiveM
 import manageExpenseCheckingDeserializer from "./consumers/api/deserializers/manageExpenseChecking.js";
 import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/manageOutflowChecking.js";
 import transferBalanceIntoMonthDeserializer from "./consumers/api/deserializers/transferBalanceIntoMonth.js";
+import PendingDebitRepository from "./providers/persistence/repositories/PendingDebitRepository.js";
 
 // persistence
 
@@ -56,6 +57,8 @@ const userRepository = new UserRepository(client);
 const monthRepository = new MonthRepository();
 
 const monthCreationTemplateRepository = new MonthCreationTemplateRepository();
+
+const pendingDebitRepository = new PendingDebitRepository();
 
 // services
 
@@ -84,7 +87,8 @@ const manageOutflowsCheckingUsecase = new ManageOutflowsChecking(
 );
 
 const getMonthCreationTemplateUsecase = new GetMonthCreationTemplate(
-  monthCreationTemplateRepository
+  monthCreationTemplateRepository,
+  pendingDebitRepository
 );
 
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(
