@@ -8,35 +8,45 @@ import Month from "../../../core/models/month/Month.js";
 const idProvider = new IdProvider();
 
 export default class MonthBuilder {
+  fakeId = false;
   builtOutflows: AccountOutflow[] = [];
-  builtWeeklyBudgets = [
-    new WeeklyBudget({
-      id: idProvider.get(),
-      name: "Semaine 1",
-      initialBalance: 200,
-    }),
-    new WeeklyBudget({
-      id: idProvider.get(),
-      name: "Semaine 2",
-      initialBalance: 200,
-    }),
-    new WeeklyBudget({
-      id: idProvider.get(),
-      name: "Semaine 3",
-      initialBalance: 200,
-    }),
-    new WeeklyBudget({
-      id: idProvider.get(),
-      name: "Semaine 4",
-      initialBalance: 200,
-    }),
-    new WeeklyBudget({
-      id: idProvider.get(),
-      name: "Semaine 5",
-      initialBalance: 200,
-    }),
-  ];
+  builtWeeklyBudgets: WeeklyBudget[] = [];
   builtAccountCurrentBalance = 2000;
+
+  constructor(fakeId = false) {
+    this.fakeId = fakeId;
+    this.prepareWeeklyBudgets();
+  }
+
+  private prepareWeeklyBudgets() {
+    this.builtWeeklyBudgets = [
+      new WeeklyBudget({
+        id: this.fakeId ? "semaine-1-uuid" : idProvider.get(),
+        name: "Semaine 1",
+        initialBalance: 200,
+      }),
+      new WeeklyBudget({
+        id: this.fakeId ? "semaine-2-uuid" : idProvider.get(),
+        name: "Semaine 2",
+        initialBalance: 200,
+      }),
+      new WeeklyBudget({
+        id: this.fakeId ? "semaine-3-uuid" : idProvider.get(),
+        name: "Semaine 3",
+        initialBalance: 200,
+      }),
+      new WeeklyBudget({
+        id: this.fakeId ? "semaine-4-uuid" : idProvider.get(),
+        name: "Semaine 4",
+        initialBalance: 200,
+      }),
+      new WeeklyBudget({
+        id: this.fakeId ? "semaine-5-uuid" : idProvider.get(),
+        name: "Semaine 5",
+        initialBalance: 200,
+      }),
+    ];
+  }
 
   get set() {
     return {
@@ -77,11 +87,11 @@ export default class MonthBuilder {
 
   get(date?: Date) {
     return new Month({
-      id: idProvider.get(),
+      id: this.fakeId ? "month-uuid" : idProvider.get(),
       date: date ?? new Date(),
       isArchived: false,
       account: new Account({
-        id: idProvider.get(),
+        id: this.fakeId ? "account-uuid" : idProvider.get(),
         currentBalance: this.builtAccountCurrentBalance,
         outflows: this.builtOutflows,
         weeklyBudgets: this.builtWeeklyBudgets,

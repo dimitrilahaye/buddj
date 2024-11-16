@@ -185,7 +185,7 @@ describe("Unit | Core | Models | Transferable Month | TransferableMonth", functi
 });
 
 function getTransferableMonth() {
-  const monthBuilder = new MonthBuilder();
+  const monthBuilder = new MonthBuilder(true);
   const month = monthBuilder.set
     .accountCurrentBalance(10)
     .set.weeklyBudgetInitialBalance(200)

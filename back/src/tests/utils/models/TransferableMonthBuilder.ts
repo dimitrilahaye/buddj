@@ -8,7 +8,7 @@ export default class TransferableMonthBuilder {
   month: Month;
 
   constructor() {
-    const monthBuilder = new MonthBuilder();
+    const monthBuilder = new MonthBuilder(true);
     this.month = monthBuilder.add
       .outflow(
         new AccountOutflow({
