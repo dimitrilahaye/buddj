@@ -1,34 +1,37 @@
+import IdProvider from "../../../providers/IdProvider.js";
 import Account from "../../../core/models/month/account/Account.js";
 import AccountOutflow from "../../../core/models/month/account/AccountOutflow.js";
 import WeeklyBudget from "../../../core/models/month/account/WeeklyBudget.js";
 import WeeklyExpense from "../../../core/models/month/account/WeeklyExpense.js";
 import Month from "../../../core/models/month/Month.js";
 
+const idProvider = new IdProvider();
+
 export default class MonthBuilder {
   builtOutflows: AccountOutflow[] = [];
   builtWeeklyBudgets = [
     new WeeklyBudget({
-      id: "semaine-1-uuid",
+      id: idProvider.get(),
       name: "Semaine 1",
       initialBalance: 200,
     }),
     new WeeklyBudget({
-      id: "semaine-2-uuid",
+      id: idProvider.get(),
       name: "Semaine 2",
       initialBalance: 200,
     }),
     new WeeklyBudget({
-      id: "semaine-3-uuid",
+      id: idProvider.get(),
       name: "Semaine 3",
       initialBalance: 200,
     }),
     new WeeklyBudget({
-      id: "semaine-4-uuid",
+      id: idProvider.get(),
       name: "Semaine 4",
       initialBalance: 200,
     }),
     new WeeklyBudget({
-      id: "semaine-5-uuid",
+      id: idProvider.get(),
       name: "Semaine 5",
       initialBalance: 200,
     }),
@@ -72,13 +75,13 @@ export default class MonthBuilder {
     };
   }
 
-  get get() {
+  get(date?: Date) {
     return new Month({
-      id: "month-uuid",
-      date: new Date(),
+      id: idProvider.get(),
+      date: date ?? new Date(),
       isArchived: false,
       account: new Account({
-        id: "account-uuid",
+        id: idProvider.get(),
         currentBalance: this.builtAccountCurrentBalance,
         outflows: this.builtOutflows,
         weeklyBudgets: this.builtWeeklyBudgets,

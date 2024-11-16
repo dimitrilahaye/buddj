@@ -205,7 +205,8 @@ function getTransferableMonth() {
         label: "my expense",
       })
     )
-    .toWeek("Semaine 1").get;
+    .toWeek("Semaine 1")
+    .get();
 
   return new TransferableMonth(month);
 }
