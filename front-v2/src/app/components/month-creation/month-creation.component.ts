@@ -142,11 +142,7 @@ export class MonthCreationComponent implements OnInit {
       },
       0
     );
-    const totalDebits = (
-      this.form.value.pendingDebits as PendingDebit[]
-    ).reduce((total, { amount }) => {
-      return total + amount;
-    }, 0);
+    const totalDebits = this.getPendingDebitsTotal();
 
     let total = totalOutflows + totalWeeklyBudgets;
 
@@ -157,6 +153,15 @@ export class MonthCreationComponent implements OnInit {
     const forecastBalance = (this.form.value as Month).startingBalance - total;
 
     return forecastBalance.toFixed(2);
+  }
+
+  getPendingDebitsTotal() {
+    return (this.form.value.pendingDebits as PendingDebit[]).reduce(
+      (total, { amount }) => {
+        return total + amount;
+      },
+      0
+    );
   }
 
   resetForm(event: Event) {

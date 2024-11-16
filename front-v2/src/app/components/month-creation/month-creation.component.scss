@@ -210,6 +210,9 @@
 }
 
 .month-creation-step-info {
+  &__total {
+    @extend %text-7;
+  }
   &__link {
     @extend %text-7;
 

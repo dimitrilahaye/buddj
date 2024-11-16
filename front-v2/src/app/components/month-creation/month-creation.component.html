@@ -47,6 +47,10 @@
     <div class="month-creation-step__info">
       Voici les dépenses des mois précédents qui n'ont pas encore été prélevées.
       <br />
+      <span class="month-creation-step-info__total">
+        Total : {{ getPendingDebitsTotal() | currency : "EUR" }}
+      </span>
+      <br />
       <a
         (click)="togglePendingDebits($event)"
         class="month-creation-step-info__link"
