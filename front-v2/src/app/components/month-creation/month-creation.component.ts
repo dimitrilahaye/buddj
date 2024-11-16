@@ -92,7 +92,7 @@ export class MonthCreationComponent implements OnInit {
         this.newMonth.startingBalance,
         [Validators.required, amountValidator()],
       ],
-      debits: this.fb.array([]),
+      pendingDebits: this.fb.array([]),
       outflows: this.fb.array([]),
       weeklyBudgets: this.fb.array([]),
     });
@@ -136,12 +136,11 @@ export class MonthCreationComponent implements OnInit {
       },
       0
     );
-    const totalDebits = (this.form.value.debits as PendingDebit[]).reduce(
-      (total, { amount }) => {
-        return total + amount;
-      },
-      0
-    );
+    const totalDebits = (
+      this.form.value.pendingDebits as PendingDebit[]
+    ).reduce((total, { amount }) => {
+      return total + amount;
+    }, 0);
 
     const forecastBalance =
       (this.form.value as Month).startingBalance -
@@ -172,12 +171,15 @@ export class MonthCreationComponent implements OnInit {
       label: [debit.label, Validators.required],
       amount: [debit.amount, [Validators.required, amountValidator()]],
       type: [{ value: debit.type, disabled: true }],
+      id: [{ value: debit.id, disabled: true }],
+      monthId: [{ value: debit.monthId, disabled: true }],
+      monthDate: [{ value: debit.monthDate, disabled: true }],
     });
-    this.debits.push(debitGroup);
+    this.pendingDebits.push(debitGroup);
   }
 
-  get debits(): FormArray {
-    return this.form.get('debits') as FormArray;
+  get pendingDebits(): FormArray {
+    return this.form.get('pendingDebits') as FormArray;
   }
 
   addOutflow(outflow: Outflow) {
@@ -287,7 +289,7 @@ export class MonthCreationComponent implements OnInit {
     return this.weeklyBudgets.at(this.selectedWeeklyBudgetIndex!) as FormGroup;
   }
 
-  private formatToDate(val: string | null) {
+  private formatToDate(val: string | Date | null) {
     const currentDay = new Date().getDate();
     const dateValue = val ? new Date(`${val}-${currentDay}`) : null;
     return dateValue?.toISOString() ?? null;
@@ -315,9 +317,12 @@ export class MonthCreationComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
-      const newMonth = this.form.getRawValue();
-      newMonth.month = this.formatToDate(newMonth.month);
-      this.createNewMonth(newMonth);
+      const raw = this.form.getRawValue();
+      const month: Month & { pendingDebits: PendingDebit[] } = {
+        ...raw,
+        month: this.formatToDate(raw.month),
+      };
+      this.createNewMonth(month);
     } else {
       console.log('Form is invalid');
     }
