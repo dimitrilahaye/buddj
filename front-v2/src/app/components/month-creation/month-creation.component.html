@@ -111,6 +111,10 @@
           >
         </div>
 
+        <app-toggle-visibility-button
+          [index]="i"
+          (clicked)="toggleVisibilityForOutflowWithIndex(i)"
+        ></app-toggle-visibility-button>
         <button
           class="month-creation-item__edit"
           type="button"

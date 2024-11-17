@@ -26,11 +26,17 @@ import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster.service.interface';
+import { ToggleVisibilityButtonComponent } from './toggle-visibility-button/toggle-visibility-button.component';
 
 @Component({
   selector: 'app-month-creation',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, DesignSystemModule],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    DesignSystemModule,
+    ToggleVisibilityButtonComponent,
+  ],
   templateUrl: './month-creation.component.html',
   styleUrl: './month-creation.component.scss',
 })
@@ -47,6 +53,7 @@ export class MonthCreationComponent implements OnInit {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   amountValueControl: AbstractControl<any, any> | null = null;
   takeIntoAccountPendingDebits = true;
+  outflowsRemovedFromForecastBalance: number[] = [];
 
   newMonth: Month = {
     month: new Date(),
@@ -86,6 +93,15 @@ export class MonthCreationComponent implements OnInit {
   togglePendingDebits(event: Event) {
     this.takeIntoAccountPendingDebits = !this.takeIntoAccountPendingDebits;
     event.preventDefault();
+  }
+
+  toggleVisibilityForOutflowWithIndex(index: number) {
+    if (this.outflowsRemovedFromForecastBalance.includes(index)) {
+      this.outflowsRemovedFromForecastBalance =
+        this.outflowsRemovedFromForecastBalance.filter((i) => i !== index);
+    } else {
+      this.outflowsRemovedFromForecastBalance.push(index);
+    }
   }
 
   private setForm() {
@@ -130,7 +146,12 @@ export class MonthCreationComponent implements OnInit {
   }
 
   get forecastBalance() {
-    const totalOutflows = (this.form.value as Month).outflows.reduce(
+    const outflowsTakenIntoAccount = (this.form.value as Month).outflows.filter(
+      (_outflow, i) => {
+        return !this.outflowsRemovedFromForecastBalance.includes(i);
+      }
+    );
+    const totalOutflows = outflowsTakenIntoAccount.reduce(
       (total, { amount }) => {
         return total + amount;
       },
