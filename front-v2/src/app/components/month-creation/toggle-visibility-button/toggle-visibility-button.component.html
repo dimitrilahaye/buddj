@@ -1,0 +1,12 @@
+<button
+  class="toggle_visibility"
+  [ngClass]="{ 'toggle_visibility--closed': open === false }"
+  type="button"
+  (click)="toggle()"
+>
+  @if(open === true) {
+  <i class="fa-solid fa-eye-slash"></i>
+  } @else {
+  <i class="fa-solid fa-eye"></i>
+  }
+</button>
