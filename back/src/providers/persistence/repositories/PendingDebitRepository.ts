@@ -51,8 +51,6 @@ export default class TypeOrmPendingDebitRepository
 
     const results = [...outflowResults, ...expenseResults];
 
-    console.info(JSON.stringify(results, null, 2));
-
     return results.map((result) => {
       return new PendingDebit({
         id: result.expense_id ?? result.outflow_id,
