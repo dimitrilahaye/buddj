@@ -56,6 +56,9 @@ import { transferBalanceIntoMonth } from "./routes/transferBalanceIntoMonth.js";
 import GetYearlyOutflows from "../../core/usecases/GetYearlyOutflows.js";
 import { getYearlyOutflows } from "./routes/getYearlyOutflows.js";
 import { YearlyOutflowsDtoBuilder } from "./dtos/yearlyOutflowsDto.js";
+import AddYearlyOutflow from "../../core/usecases/AddYearlyOutflow.js";
+import { AddYearlyOutflowDeserializer } from "./deserializers/addYearlyOutflow.js";
+import { addYearlyOutflow } from "./routes/addYearlyOutflow.js";
 
 declare global {
   namespace Express {
@@ -113,6 +116,7 @@ export type Deps = {
   deleteMonthUsecase: DeleteMonth;
   transferBalanceIntoMonthUsecase: TransferBalanceIntoMonth;
   getYearlyOutflowsUsecase: GetYearlyOutflows;
+  addYearlyOutflowUsecase: AddYearlyOutflow;
   addOutflowDeserializer: AddOutflowDeserializer;
   addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
   archiveMonthDeserializer: ArchiveMonthDeserializer;
@@ -124,6 +128,7 @@ export type Deps = {
   monthCreationDeserializer: MonthCreationDeserializer;
   unarchiveMonthDeserializer: UnarchiveMonthDeserializer;
   transferBalanceIntoMonthDeserializer: TransferBalanceIntoMonthDeserializer;
+  addYearlyOutflowDeserializer: AddYearlyOutflowDeserializer;
 };
 
 function buildApi(
@@ -148,6 +153,7 @@ function buildApi(
     deleteMonthUsecase,
     transferBalanceIntoMonthUsecase,
     getYearlyOutflowsUsecase,
+    addYearlyOutflowUsecase,
     addOutflowDeserializer,
     addWeeklyExpenseDeserializer,
     archiveMonthDeserializer,
@@ -158,6 +164,7 @@ function buildApi(
     manageOutflowCheckingDeserializer,
     monthCreationDeserializer,
     unarchiveMonthDeserializer,
+    addYearlyOutflowDeserializer,
     transferBalanceIntoMonthDeserializer,
   }: Deps
 ) {
@@ -337,6 +344,13 @@ function buildApi(
   api.use(
     getYearlyOutflows(router, {
       getYearlyOutflows: getYearlyOutflowsUsecase,
+      yearlyOutflowsDto,
+    })
+  );
+  api.use(
+    addYearlyOutflow(router, {
+      addYearlyOutflow: addYearlyOutflowUsecase,
+      deserializer: addYearlyOutflowDeserializer,
       yearlyOutflowsDto,
     })
   );
