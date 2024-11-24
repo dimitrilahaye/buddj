@@ -53,6 +53,9 @@ import { ManageOutflowsCheckingDeserializer } from "./deserializers/manageOutflo
 import TransferBalanceIntoMonth from "../../core/usecases/TransferBalanceIntoMonth.js";
 import { TransferBalanceIntoMonthDeserializer } from "./deserializers/transferBalanceIntoMonth.js";
 import { transferBalanceIntoMonth } from "./routes/transferBalanceIntoMonth.js";
+import GetYearlyOutflows from "../../core/usecases/GetYearlyOutflows.js";
+import { getYearlyOutflows } from "./routes/getYearlyOutflows.js";
+import { YearlyOutflowsDtoBuilder } from "./dtos/yearlyOutflowsDto.js";
 
 declare global {
   namespace Express {
@@ -93,6 +96,7 @@ type SetupPassport = (api: Express) => void;
 export type Deps = {
   userRepository: UserRepository;
   monthDto: MonthDtoBuilder;
+  yearlyOutflowsDto: YearlyOutflowsDtoBuilder;
   getMonthCreationTemplateUsecase: GetMonthCreationTemplate;
   createNewMonthUsecase: CreateNewMonth;
   getUnarchivedMonthsUsecase: GetUnarchivedMonths;
@@ -108,6 +112,7 @@ export type Deps = {
   unarchiveMonthUsecase: UnarchiveMonth;
   deleteMonthUsecase: DeleteMonth;
   transferBalanceIntoMonthUsecase: TransferBalanceIntoMonth;
+  getYearlyOutflowsUsecase: GetYearlyOutflows;
   addOutflowDeserializer: AddOutflowDeserializer;
   addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
   archiveMonthDeserializer: ArchiveMonthDeserializer;
@@ -126,6 +131,7 @@ function buildApi(
   setupPassport: SetupPassport,
   {
     monthDto,
+    yearlyOutflowsDto,
     getMonthCreationTemplateUsecase,
     getUnarchivedMonthsUsecase,
     createNewMonthUsecase,
@@ -141,6 +147,7 @@ function buildApi(
     unarchiveMonthUsecase,
     deleteMonthUsecase,
     transferBalanceIntoMonthUsecase,
+    getYearlyOutflowsUsecase,
     addOutflowDeserializer,
     addWeeklyExpenseDeserializer,
     archiveMonthDeserializer,
@@ -325,6 +332,12 @@ function buildApi(
       transferBalanceIntoMonthUsecase,
       deserializer: transferBalanceIntoMonthDeserializer,
       monthDto,
+    })
+  );
+  api.use(
+    getYearlyOutflows(router, {
+      getYearlyOutflows: getYearlyOutflowsUsecase,
+      yearlyOutflowsDto,
     })
   );
 

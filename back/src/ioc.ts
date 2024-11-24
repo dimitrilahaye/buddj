@@ -16,6 +16,7 @@ import ManageExpensesChecking from "./core/usecases/ManageExpensesChecking.js";
 import ManageOutflowsChecking from "./core/usecases/ManageOutflowsChecking.js";
 import ArchiveMonth from "./core/usecases/ArchiveMonth.js";
 import monthDto from "./consumers/api/dtos/monthDto.js";
+import yearlyOutflowsDto from "./consumers/api/dtos/yearlyOutflowsDto.js";
 import DeleteExpense from "./core/usecases/DeleteExpense.js";
 import UpdateExpense from "./core/usecases/UpdateExpense.js";
 import DeleteOutflow from "./core/usecases/DeleteOutflow.js";
@@ -37,6 +38,8 @@ import manageExpenseCheckingDeserializer from "./consumers/api/deserializers/man
 import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/manageOutflowChecking.js";
 import transferBalanceIntoMonthDeserializer from "./consumers/api/deserializers/transferBalanceIntoMonth.js";
 import PendingDebitRepository from "./providers/persistence/repositories/PendingDebitRepository.js";
+import YearlyOutflowRepository from "./providers/persistence/repositories/YearlyOutflowRepository.js";
+import GetYearlyOutflows from "./core/usecases/GetYearlyOutflows.js";
 
 // persistence
 
@@ -59,6 +62,8 @@ const monthRepository = new MonthRepository();
 const monthCreationTemplateRepository = new MonthCreationTemplateRepository();
 
 const pendingDebitRepository = new PendingDebitRepository();
+
+const yearlyOutflowRepository = new YearlyOutflowRepository();
 
 // services
 
@@ -114,10 +119,13 @@ const transferBalanceIntoMonthUsecase = new TransferBalanceIntoMonth(
   monthRepository
 );
 
+const getYearlyOutflowsUsecase = new GetYearlyOutflows(yearlyOutflowRepository);
+
 export {
   client as dbClient,
   userRepository,
   monthDto,
+  yearlyOutflowsDto,
   getMonthCreationTemplateUsecase,
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
@@ -133,6 +141,7 @@ export {
   unarchiveMonthUsecase,
   deleteMonthUsecase,
   transferBalanceIntoMonthUsecase,
+  getYearlyOutflowsUsecase,
   addOutflowDeserializer,
   addWeeklyExpenseDeserializer,
   archiveMonthDeserializer,
