@@ -6,7 +6,7 @@ import {
   YearlyOutflowsIdDoesNotExistError,
 } from "../../../../../core/errors/YearlyOutflowsErrors.js";
 
-describe.only("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
+describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
   describe("#constructor", () => {
     it("should return a yearly outflows list with right data", () => {
       // given
