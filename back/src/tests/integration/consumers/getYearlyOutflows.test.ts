@@ -23,7 +23,7 @@ describe("Integration | Consumers | Routes | GET /yearly-outflows", function () 
       };
       depsStub.getYearlyOutflowsUsecase.execute = sinon
         .stub()
-        .resolves([foundList]);
+        .resolves(foundList);
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);

@@ -37,9 +37,11 @@ import unarchiveMonthDeserializer from "./consumers/api/deserializers/unarchiveM
 import manageExpenseCheckingDeserializer from "./consumers/api/deserializers/manageExpenseChecking.js";
 import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/manageOutflowChecking.js";
 import transferBalanceIntoMonthDeserializer from "./consumers/api/deserializers/transferBalanceIntoMonth.js";
+import addYearlyOutflowDeserializer from "./consumers/api/deserializers/addYearlyOutflow.js";
 import PendingDebitRepository from "./providers/persistence/repositories/PendingDebitRepository.js";
 import YearlyOutflowRepository from "./providers/persistence/repositories/YearlyOutflowRepository.js";
 import GetYearlyOutflows from "./core/usecases/GetYearlyOutflows.js";
+import AddYearlyOutflow from "./core/usecases/AddYearlyOutflow.js";
 
 // persistence
 
@@ -121,6 +123,8 @@ const transferBalanceIntoMonthUsecase = new TransferBalanceIntoMonth(
 
 const getYearlyOutflowsUsecase = new GetYearlyOutflows(yearlyOutflowRepository);
 
+const addYearlyOutflowUsecase = new AddYearlyOutflow(yearlyOutflowRepository);
+
 export {
   client as dbClient,
   userRepository,
@@ -142,6 +146,7 @@ export {
   deleteMonthUsecase,
   transferBalanceIntoMonthUsecase,
   getYearlyOutflowsUsecase,
+  addYearlyOutflowUsecase,
   addOutflowDeserializer,
   addWeeklyExpenseDeserializer,
   archiveMonthDeserializer,
@@ -153,4 +158,5 @@ export {
   monthCreationDeserializer,
   unarchiveMonthDeserializer,
   transferBalanceIntoMonthDeserializer,
+  addYearlyOutflowDeserializer,
 };
