@@ -5,7 +5,7 @@ import { afterEach, beforeEach } from "mocha";
 import { authenticate, expect, mockedServer } from "./test-helpers.js";
 import * as deps from "../../../ioc.js";
 
-describe.only("Integration | Consumers | Routes | GET /yearly-outflows", function () {
+describe("Integration | Consumers | Routes | GET /yearly-outflows", function () {
   let server: http.Server;
 
   describe("When user is authenticated", function () {
