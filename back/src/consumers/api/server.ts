@@ -59,6 +59,9 @@ import { YearlyOutflowsDtoBuilder } from "./dtos/yearlyOutflowsDto.js";
 import AddYearlyOutflow from "../../core/usecases/AddYearlyOutflow.js";
 import { AddYearlyOutflowDeserializer } from "./deserializers/addYearlyOutflow.js";
 import { addYearlyOutflow } from "./routes/addYearlyOutflow.js";
+import RemoveYearlyOutflow from "../../core/usecases/RemoveYearlyOutflow.js";
+import { removeYearlyOutflow } from "./routes/removeYearlyOutflow.js";
+import { RemoveYearlyOutflowDeserializer } from "./deserializers/removeYearlyOutflow.js";
 
 declare global {
   namespace Express {
@@ -117,6 +120,7 @@ export type Deps = {
   transferBalanceIntoMonthUsecase: TransferBalanceIntoMonth;
   getYearlyOutflowsUsecase: GetYearlyOutflows;
   addYearlyOutflowUsecase: AddYearlyOutflow;
+  removeYearlyOutflowUsecase: RemoveYearlyOutflow;
   addOutflowDeserializer: AddOutflowDeserializer;
   addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
   archiveMonthDeserializer: ArchiveMonthDeserializer;
@@ -129,6 +133,7 @@ export type Deps = {
   unarchiveMonthDeserializer: UnarchiveMonthDeserializer;
   transferBalanceIntoMonthDeserializer: TransferBalanceIntoMonthDeserializer;
   addYearlyOutflowDeserializer: AddYearlyOutflowDeserializer;
+  removeYearlyOutflowDeserializer: RemoveYearlyOutflowDeserializer;
 };
 
 function buildApi(
@@ -154,6 +159,7 @@ function buildApi(
     transferBalanceIntoMonthUsecase,
     getYearlyOutflowsUsecase,
     addYearlyOutflowUsecase,
+    removeYearlyOutflowUsecase,
     addOutflowDeserializer,
     addWeeklyExpenseDeserializer,
     archiveMonthDeserializer,
@@ -166,6 +172,7 @@ function buildApi(
     unarchiveMonthDeserializer,
     addYearlyOutflowDeserializer,
     transferBalanceIntoMonthDeserializer,
+    removeYearlyOutflowDeserializer,
   }: Deps
 ) {
   const api = express();
@@ -351,6 +358,13 @@ function buildApi(
     addYearlyOutflow(router, {
       addYearlyOutflow: addYearlyOutflowUsecase,
       deserializer: addYearlyOutflowDeserializer,
+      yearlyOutflowsDto,
+    })
+  );
+  api.use(
+    removeYearlyOutflow(router, {
+      removeYearlyOutflow: removeYearlyOutflowUsecase,
+      deserializer: removeYearlyOutflowDeserializer,
       yearlyOutflowsDto,
     })
   );
