@@ -24,6 +24,12 @@ const pendingDebitRepositoryStub = {
   getAll: sinon.stub(),
 };
 
+const yearlyOutflowRepositoryStub = {
+  getAll: sinon.stub(),
+  add: sinon.stub(),
+  remove: sinon.stub(),
+};
+
 function resetStubs() {
   monthRepositoryStub.addExpenseToWeeklyBudget.reset();
   monthRepositoryStub.addOutflow.reset();
@@ -43,6 +49,14 @@ function resetStubs() {
   monthRepositoryStub.getTransferableById.reset();
   monthRepositoryStub.updateWeeklyBudgetInitialBalance.reset();
   pendingDebitRepositoryStub.getAll.reset();
+  yearlyOutflowRepositoryStub.getAll.reset();
+  yearlyOutflowRepositoryStub.add.reset();
+  yearlyOutflowRepositoryStub.remove.reset();
 }
 
-export { monthRepositoryStub, pendingDebitRepositoryStub, resetStubs };
+export {
+  monthRepositoryStub,
+  pendingDebitRepositoryStub,
+  yearlyOutflowRepositoryStub,
+  resetStubs,
+};

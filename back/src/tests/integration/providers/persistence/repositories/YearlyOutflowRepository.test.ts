@@ -9,7 +9,7 @@ import { YearlyOutflowDao } from "../../../../../providers/persistence/entities/
 const repository = new TypeOrmYearlyOutflowRepository();
 const idProvider = new IdProvider();
 
-describe.only("Integration | Providers | Persistence | Repositories | YearlyOutflowRepository", function () {
+describe("Integration | Providers | Persistence | Repositories | YearlyOutflowRepository", function () {
   afterEach(async () => {
     await clearDB();
   });
