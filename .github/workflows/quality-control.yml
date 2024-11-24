@@ -2,9 +2,9 @@ name: Buddj ~ Quality control
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   back_checks:
@@ -18,46 +18,44 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Back ~ Use Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+    - name: Back ~ Use Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
 
-      - name: Back ~ Install
-        working-directory: ./back
-        run: npm install
+    - name: Back ~ Install
+      working-directory: ./back
+      run: npm install
 
-      - name: Back ~ ESLint checks
-        working-directory: ./back
-        run: npm run lint
+    - name: Back ~ ESLint checks
+      working-directory: ./back
+      run: npm run lint
 
-      - name: Back ~ Tests
-        working-directory: ./back
-        run: npm run test:full
-        env:
-          DB_URL_TEST: postgres
-          DB_PORT_TEST: 5432
-          DB_USER_TEST: postgres
-          DB_PASSWORD_TEST: postgres
-          DB_NAME_TEST: postgres
-          PORT: ${{ secrets.PORT }}
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
-          SCOPES: ${{ secrets.SCOPES }}
-          SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          FRONT_URL: ${{ secrets.FRONT_URL }}
-          FRONT_REDIRECT_URL: ${{ secrets.FRONT_REDIRECT_URL }}
-          TEMPLATE: ${{ secrets.TEMPLATE }}
+    - name: Back ~ Tests
+      working-directory: ./back
+      run: npm run test:full
+      env:
+        DB_URL_TEST: postgres
+        DB_PORT_TEST: 5432
+        DB_USER_TEST: postgres
+        DB_PASSWORD_TEST: postgres
+        DB_NAME_TEST: postgres
+        PORT: ${{ secrets.PORT }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+        SCOPES: ${{ secrets.SCOPES }}
+        SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
+        SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        FRONT_URL: ${{ secrets.FRONT_URL }}
+        FRONT_REDIRECT_URL: ${{ secrets.FRONT_REDIRECT_URL }}
+        TEMPLATE: ${{ secrets.TEMPLATE }}
+        YEARLY: ${{ secrets.YEARLY }}
 
   front_checks:
     name: Front ~ Quality Checks
@@ -65,61 +63,61 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Front ~ Use Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+    - name: Front ~ Use Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
 
-      - name: Front ~ Install
-        working-directory: ./front-v2
-        run: npm install
+    - name: Front ~ Install
+      working-directory: ./front-v2
+      run: npm install
 
-      - name: Front ~ Generate environment.ts
-        working-directory: ./front-v2
-        run: |
-          cp src/environments/environment.template.ts src/environments/environment.ts
-          sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.ts
-          sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.ts
+    - name: Front ~ Generate environment.ts
+      working-directory: ./front-v2
+      run: |
+        cp src/environments/environment.template.ts src/environments/environment.ts
+        sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.ts
+        sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.ts
 
-      - name: Front ~ Generate environment.production.ts
-        working-directory: ./front-v2
-        run: |
-          cp src/environments/environment.template.ts src/environments/environment.production.ts
-          sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.production.ts
-          sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.production.ts
+    - name: Front ~ Generate environment.production.ts
+      working-directory: ./front-v2
+      run: |
+        cp src/environments/environment.template.ts src/environments/environment.production.ts
+        sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.production.ts
+        sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.production.ts
 
-      - name: Back ~ ESLint checks
-        working-directory: ./front-v2
-        run: npm run lint
+    - name: Back ~ ESLint checks
+      working-directory: ./front-v2
+      run: npm run lint
 
-      - name: Front ~ Tests
-        working-directory: ./front-v2
-        run: npm run test:headless
+    - name: Front ~ Tests
+      working-directory: ./front-v2
+      run: npm run test:headless
 
   back_CD:
     name: Back ~ Deployment
-    needs: [back_checks, front_checks]
+    needs: [ back_checks, front_checks ]
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Deploy
-        env:
-          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_API }}
-        run: curl "$deploy_url"
+    - name: Deploy
+      env:
+        deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_API }}
+      run: curl "$deploy_url"
 
   front_CD:
     name: Front ~ Deployment
-    needs: [back_checks, front_checks, back_CD]
+    needs: [ back_checks, front_checks, back_CD ]
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Deploy
-        env:
-          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP }}
-        run: curl "$deploy_url"
+    - name: Deploy
+      env:
+        deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP }}
+      run: curl "$deploy_url"
