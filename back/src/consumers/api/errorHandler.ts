@@ -19,6 +19,7 @@ const errorHandler = (
     case "AccountOutflowNotFoundError":
     case "TransferableAccountNotFoundError":
     case "TransferableWeeklyBudgetNotFoundError":
+    case "YearlyOutflowsIdDoesNotExistError":
       statusCode = 404;
       break;
     case "AccountInitialBalanceError":
@@ -27,6 +28,7 @@ const errorHandler = (
     case "WeeklyBudgetInitialBalanceError":
     case "WeeklyExpenseAmountError":
     case "TransferBalanceIntoMonthError":
+    case "YearlyOutflowsAddError":
       statusCode = 422;
       break;
     case "MonthCreationTemplateWeeklyBudgetError":
