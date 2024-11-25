@@ -19,7 +19,7 @@ export default class YearlyOutflows {
     const total = this.list.reduce((previous, current) => {
       return previous + current.amount;
     }, 0);
-    return total / 12;
+    return Number((total / 12).toFixed(2));
   }
 
   add(outflow: YearlyOutflow) {
