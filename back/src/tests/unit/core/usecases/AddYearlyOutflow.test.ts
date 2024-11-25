@@ -11,12 +11,23 @@ describe("Unit | Core | Usecases | AddYearlyOutflow", function () {
     const listAddSpy = sinon.spy(foundList, "add");
     yearlyOutflowRepositoryStub.getAll.resolves(foundList);
     yearlyOutflowRepositoryStub.add.resolves(foundList);
-    const usecase = new AddYearlyOutflow(yearlyOutflowRepositoryStub);
+    const expectedId = "uuid";
+    const idProvider = {
+      get: sinon.stub<any, string>(),
+    };
+    idProvider.get.returns(expectedId);
+    const usecase = new AddYearlyOutflow(
+      yearlyOutflowRepositoryStub,
+      idProvider
+    );
     const command = {
-      id: "id",
       label: "label",
       amount: 10,
       month: 1,
+    };
+    const expectedOutflow = {
+      ...command,
+      id: expectedId,
     };
 
     // when
@@ -24,9 +35,10 @@ describe("Unit | Core | Usecases | AddYearlyOutflow", function () {
 
     // then
     expect(yearlyOutflowRepositoryStub.getAll).to.have.been.calledOnce;
-    expect(listAddSpy).to.have.been.calledWithExactly(command);
+    expect(idProvider.get).to.have.been.calledOnce;
+    expect(listAddSpy).to.have.been.calledWithExactly(expectedOutflow);
     expect(yearlyOutflowRepositoryStub.add).to.have.been.calledWithExactly(
-      command
+      expectedOutflow
     );
     expect(list).to.deep.equal(foundList);
   });
