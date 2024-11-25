@@ -1,3 +1,15 @@
+<app-modal
+  [modalOpen]="outflowDelationModalIsOpen"
+  (click)="closeOutflowDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer la sortie définitivement'"
+    [loading]="removeIsLoading"
+    (click)="removeYearlyOutflow($event)"
+  ></app-button>
+</app-modal>
 @if(!dataLoaded) {
 <app-loader></app-loader>
 } @if(dataLoaded && form) {
@@ -35,6 +47,61 @@
   <!-- 
   ##################### STEP 2 #####################
    -->
+
+  <!-- 
+  ##################### YEARLY OUTFLOWS #####################
+   -->
+  @if (yearlyOutflowsControls.controls.length > 0) {
+  <div
+    class="month-creation__step month-creation__step--step_debits"
+    formArrayName="yearlyOutflows"
+  >
+    <div class="month-creation-step__info">
+      Voici les sorties annuelles qui concernent le mois sélectionné
+      <br />
+      <span class="month-creation-step-info__total">
+        Total : {{ getYearlyOutflowsTotal() | currency : "EUR" }}
+      </span>
+      <br />
+      <a
+        (click)="toggleYearlyOutflows($event)"
+        class="month-creation-step-info__link"
+        href="#"
+      >
+        @if(takeIntoAccountYearlyOutflows) { Ne pas les prendre en compte dans
+        le solde prévisionnel } @else { Les prendre en compte dans le solde
+        prévisionnel }
+      </a>
+    </div>
+    @if(takeIntoAccountYearlyOutflows) {
+    <app-item
+      *ngFor="let outflow of yearlyOutflowsControls.controls; let i = index"
+      [formGroupName]="i"
+    >
+      <div class="month-creation-item">
+        <span class="month-creation-item__icon">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+        <div class="month-creation-item__info">
+          <span class="month-creation-item-info__label">{{
+            outflow.get("label")?.value
+          }}</span>
+          <span class="month-creation-item-info__amount"
+            >{{ outflow.get("amount")?.value }}€</span
+          >
+        </div>
+        <button
+          class="month-creation-item__delete"
+          type="button"
+          (click)="openOutflowDelationModal(i, $event)"
+        >
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    </app-item>
+    }
+  </div>
+  }
 
   <!-- 
   ##################### PENDING DEBITS #####################

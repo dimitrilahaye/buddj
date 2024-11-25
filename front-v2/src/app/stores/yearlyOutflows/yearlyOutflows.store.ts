@@ -1,5 +1,8 @@
 import { Injectable, Signal, signal } from '@angular/core';
-import { YearlyOutflows } from '../../models/yearlyOutflow.model';
+import {
+  YearlyOutflow,
+  YearlyOutflows,
+} from '../../models/yearlyOutflow.model';
 import { YearlyOutflowsStoreInterface } from './yearlyOutflows.store.interface';
 
 @Injectable({
@@ -16,5 +19,12 @@ export class YearlyOutflowsStore implements YearlyOutflowsStoreInterface {
     this._all.update(() => {
       return outflows;
     });
+  }
+
+  getOutflowForMonth(month: number): Signal<YearlyOutflow[]> {
+    if (this._all() === null) {
+      return signal([]);
+    }
+    return signal(this._all()![month]);
   }
 }
