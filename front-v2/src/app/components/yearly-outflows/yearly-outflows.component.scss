@@ -54,7 +54,14 @@
 
 .outflows-month {
     &__title {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+        
+      span {
         @extend %title-10;
+      }
     }
 }
 
@@ -135,4 +142,10 @@
     &__loader {
       color: var(--color-50);
     }
+  }
+
+  .modal-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }

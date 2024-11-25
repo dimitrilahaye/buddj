@@ -13,21 +13,30 @@
     background-color: var(--color-950);
     border-radius: 50%;
     padding: 10px;
-    font-size: 25px;
-    height: 45px;
-    width: 45px;
     box-sizing: border-box;
 
     &:disabled {
         opacity: 0.5;
     }
 
-    &--default {
+    &--variant-default {
         background-color: var(--color-800);
     }
 
-    &--danger {
+    &--variant-danger {
     background-color: var(--color-950);
+    }
+
+    &--size-default {
+        font-size: 25px;
+        height: 45px;
+        width: 45px;
+    }
+
+    &--size-small {
+        font-size: 15px;
+        height: 30px;
+        width: 30px;
     }
 
     &__loader {
