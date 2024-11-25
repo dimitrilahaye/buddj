@@ -57,6 +57,59 @@ export class YearlyOutflowsComponent {
     this.outflows = this.yearlyOutflowsStore.getAll();
   }
 
+  get months() {
+    return [
+      {
+        month: 1,
+        label: 'Janvier',
+      },
+      {
+        month: 2,
+        label: 'Février',
+      },
+      {
+        month: 3,
+        label: 'Mars',
+      },
+      {
+        month: 4,
+        label: 'Avril',
+      },
+      {
+        month: 5,
+        label: 'Mai',
+      },
+      {
+        month: 6,
+        label: 'Juin',
+      },
+      {
+        month: 7,
+        label: 'Juillet',
+      },
+      {
+        month: 8,
+        label: 'Août',
+      },
+      {
+        month: 9,
+        label: 'Septembre',
+      },
+      {
+        month: 10,
+        label: 'Octobre',
+      },
+      {
+        month: 11,
+        label: 'Novembre',
+      },
+      {
+        month: 12,
+        label: 'Décembre',
+      },
+    ];
+  }
+
   getOutflowsForMonth(month: number) {
     return this.outflows()![month];
   }
