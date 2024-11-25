@@ -21,485 +21,53 @@
   <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
   } @else {
 
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Janvier</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(1, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows__list">
-      @if (getOutflowsForMonth(1).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(1); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
+  <ng-container *ngFor="let month of months">
+    <section class="outflows__month">
+      <div class="outflows-month__title">
+        <span>{{ month.label }}</span>
+        <app-button-icon
+          icon="fa-plus"
+          size="small"
+          (click)="addOutflowToMonth(month.month, $event)"
+        ></app-button-icon>
+      </div>
+      <div class="outflows__list">
+        @if (getOutflowsForMonth(month.month).length === 0) {
+        <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
+        } @else {
+        <app-item
+          *ngFor="
+            let outflow of getOutflowsForMonth(month.month);
+            let i = index
+          "
+        >
+          <button type="button" class="outflows-list-item">
+            <span class="outflows-list-item__icon">
+              <i class="fa-solid fa-calendar-days"></i>
+            </span>
+            <div class="outflows-list-item__info">
+              <span class="outflows-list-item-info__label">
+                {{ outflow.label }}</span
+              >
+              <span class="outflows-list-item-info__amount">{{
+                outflow.amount | currency : "EUR"
+              }}</span>
+            </div>
 
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Février</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(2, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(2).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(2); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
+            <button
+              class="outflows-list-item__delete"
+              type="button"
+              (click)="openOutflowDelationModal(outflow, $event)"
             >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
           </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Mars</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(3, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(3).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(3); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Avril</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(4, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(4).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(4); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Mai</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(5, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(5).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(5); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Juin</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(6, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(6).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(6); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Juillet</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(7, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(7).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(7); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Août</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(8, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(8).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(8); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Septembre</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(9, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(9).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(9); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Octobre</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(10, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(10).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(10); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Novembre</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(11, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(11).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(11); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section class="outflows__month">
-    <div class="outflows-month__title">
-      <span>Décembre</span>
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        (click)="addOutflowToMonth(12, $event)"
-      ></app-button-icon>
-    </div>
-    <div class="outflows-list">
-      @if (getOutflowsForMonth(12).length === 0) {
-      <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
-      } @else {
-      <app-item *ngFor="let outflow of getOutflowsForMonth(12); let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
-          </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
-            (click)="openOutflowDelationModal(outflow, $event)"
-          >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
+        </app-item>
+        }
+      </div>
+    </section>
+    <app-divider></app-divider>
+  </ng-container>
   }
 </div>
 
