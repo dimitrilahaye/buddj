@@ -125,7 +125,10 @@ const transferBalanceIntoMonthUsecase = new TransferBalanceIntoMonth(
 
 const getYearlyOutflowsUsecase = new GetYearlyOutflows(yearlyOutflowRepository);
 
-const addYearlyOutflowUsecase = new AddYearlyOutflow(yearlyOutflowRepository);
+const addYearlyOutflowUsecase = new AddYearlyOutflow(
+  yearlyOutflowRepository,
+  idProvider
+);
 
 const removeYearlyOutflowUsecase = new RemoveYearlyOutflow(
   yearlyOutflowRepository
