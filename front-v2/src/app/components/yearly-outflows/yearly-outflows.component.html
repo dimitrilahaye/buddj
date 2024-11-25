@@ -20,7 +20,7 @@
   @if(!outflows()) {
   <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
   } @else {
-
+  <div>Total par mois : {{ totalAmountByMonth | currency : "EUR" }}</div>
   <ng-container *ngFor="let month of months">
     <section class="outflows__month">
       <div class="outflows-month__title">
