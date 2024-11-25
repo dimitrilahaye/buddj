@@ -1,3 +1,16 @@
+<app-modal
+  [modalOpen]="outflowDelationModalIsOpen"
+  (click)="closeOutflowDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer la sortie définitivement'"
+    [loading]="removeIsLoading"
+    (click)="removeOutflow($event)"
+  ></app-button>
+</app-modal>
+
 <div class="header">
   <button type="button" (click)="backToHome()">
     <i class="fa-solid fa-circle-xmark"></i>
@@ -28,7 +41,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -57,7 +74,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -86,7 +107,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -115,7 +140,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -144,7 +173,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -173,7 +206,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -202,7 +239,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -231,7 +272,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -260,7 +305,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -289,7 +338,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -318,7 +371,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
@@ -347,7 +404,11 @@
             }}</span>
           </div>
 
-          <button class="outflows-list-item__delete" type="button">
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </button>
