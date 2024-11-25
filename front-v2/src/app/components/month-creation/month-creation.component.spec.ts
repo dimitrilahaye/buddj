@@ -5,8 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
-import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
-import { TOASTER_SERVICE } from '../../services/toaster.service.interface';
+import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
+import { TOASTER_SERVICE } from '../../services/toaster/toaster.service.interface';
 
 describe('MonthCreationComponent', () => {
   let component: MonthCreationComponent;

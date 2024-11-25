@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExpensesComponent } from './expenses.component';
 import { signal } from '@angular/core';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
-import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
-import { TOASTER_SERVICE } from '../../services/toaster.service.interface';
+import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
+import { TOASTER_SERVICE } from '../../services/toaster/toaster.service.interface';
 
 describe('ExpensesComponent', () => {
   let component: ExpensesComponent;

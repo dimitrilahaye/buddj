@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { TOASTER_SERVICE } from '../services/toaster.service.interface';
+import { TOASTER_SERVICE } from '../services/toaster/toaster.service.interface';
 
 export const httpRequestsInterceptor: HttpInterceptorFn = (req, next) => {
   const toaster = inject(TOASTER_SERVICE);

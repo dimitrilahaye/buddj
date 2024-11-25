@@ -21,10 +21,14 @@ import { MONTH_TEMPLATES_SERVICE } from './services/monthTemplates/monthTemplate
 import { httpRequestsInterceptor } from './interceptors/http-requests.interceptor';
 import { MonthsService } from './services/months/months.service';
 import { MONTHS_SERVICE } from './services/months/months.service.interface';
-import { MonthlyBudgetsStore } from './stores/monthlyBudgets.store';
-import { MONTHLY_BUDGETS_STORE } from './stores/monthlyBudgets.store.interface';
-import { TOASTER_SERVICE } from './services/toaster.service.interface';
-import { ToasterService } from './services/toaster.service';
+import { MonthlyBudgetsStore } from './stores/monthlyBudgets/monthlyBudgets.store';
+import { MONTHLY_BUDGETS_STORE } from './stores/monthlyBudgets/monthlyBudgets.store.interface';
+import { TOASTER_SERVICE } from './services/toaster/toaster.service.interface';
+import { ToasterService } from './services/toaster/toaster.service';
+import { YEARLY_OUTFLOWS_SERVICE } from './services/yearlyOutflows/yearly-outflows.service.interface';
+import { YearlyOutflowsService } from './services/yearlyOutflows/yearly-outflows.service';
+import { YEARLY_OUTFLOWS_STORE } from './stores/yearlyOutflows/yearlyOutflows.store.interface';
+import { YearlyOutflowsStore } from './stores/yearlyOutflows/yearlyOutflows.store';
 
 registerLocaleData(localeFr);
 
@@ -57,6 +61,14 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MONTHLY_BUDGETS_STORE,
       useClass: MonthlyBudgetsStore,
+    },
+    {
+      provide: YEARLY_OUTFLOWS_SERVICE,
+      useClass: YearlyOutflowsService,
+    },
+    {
+      provide: YEARLY_OUTFLOWS_STORE,
+      useClass: YearlyOutflowsStore,
     },
     {
       provide: TOASTER_SERVICE,

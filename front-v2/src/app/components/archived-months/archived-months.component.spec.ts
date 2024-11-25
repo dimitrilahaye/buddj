@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ArchivedMonthsComponent } from './archived-months.component';
-import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
+import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { signal } from '@angular/core';
 import { MONTHS_SERVICE } from '../../services/months/months.service.interface';
 import { of } from 'rxjs';
-import { TOASTER_SERVICE } from '../../services/toaster.service.interface';
+import { TOASTER_SERVICE } from '../../services/toaster/toaster.service.interface';
 
 describe('ArchivedMonthsComponent', () => {
   let component: ArchivedMonthsComponent;

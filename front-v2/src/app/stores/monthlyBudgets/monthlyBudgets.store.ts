@@ -11,7 +11,7 @@ import {
   MonthlyBudget,
   Outflow,
   WeeklyBudget,
-} from '../models/monthlyBudget.model';
+} from '../../models/monthlyBudget.model';
 
 @Injectable({
   providedIn: 'root',

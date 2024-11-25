@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MonthsService } from './months.service';
 import { HttpClient, HttpHandler } from '@angular/common/http';
-import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets.store.interface';
+import { MONTHLY_BUDGETS_STORE } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 
 describe('MonthsService', () => {
   let service: MonthsService;

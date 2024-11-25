@@ -8,6 +8,8 @@ import { OutflowsComponent } from './components/outflows/outflows.component';
 import { ExpensesComponent } from './components/expenses/expenses.component';
 import { ArchivedMonthsComponent } from './components/archived-months/archived-months.component';
 import { archivedMonthsResolver } from './resolvers/archived-months/archived-months.resolver';
+import { YearlyOutflowsComponent } from './components/yearly-outflows/yearly-outflows.component';
+import { yearlyOutflowsResolver } from './resolvers/yearly-outflows/yearly-outflows.resolver';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -46,6 +48,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     resolve: {
       archivedMonths: archivedMonthsResolver,
+    },
+  },
+  {
+    path: 'yearly-outflows',
+    component: YearlyOutflowsComponent,
+    canActivate: [authGuard],
+    resolve: {
+      yearlyOutflows: yearlyOutflowsResolver,
     },
   },
 ];

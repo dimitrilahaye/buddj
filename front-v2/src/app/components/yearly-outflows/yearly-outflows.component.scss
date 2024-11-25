@@ -1,0 +1,138 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    box-sizing: border-box;
+    align-items: flex-start;
+    background: white;
+
+    button {
+        @extend %text-30;
+
+        border: 0;
+        background: none;
+        margin: none;
+        color: var(--color-950);
+    }
+}
+
+.content {
+    margin-top: 40px;
+    height: 100%;
+    overflow: auto;
+    padding: 5px;
+    padding-bottom: 40px;
+    box-sizing: border-box;
+}
+
+.outflows {
+    &__month {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 5px 0;
+        margin: 5px;
+    }
+}
+
+.outflows {
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding-bottom: 10px;
+    }
+}
+
+.outflows-month {
+    &__title {
+        @extend %title-10;
+    }
+}
+
+.outflows-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.outflows-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+    border: none;
+    background: none;
+    padding: 0;
+  
+    &--checked {
+      opacity: 0.3;
+    }
+  
+    &__icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 10px;
+      height: 10px;
+      padding: 20px;
+      border-radius: 50%;
+      background: var(--color-950);
+      font-size: 20px;
+      color: var(--color-100);
+    }
+  
+    &__info {
+      &--checked {
+        color: var(--dark-100);
+        text-decoration: line-through;
+      }
+  
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      flex: 1;
+    }
+  
+    &__delete {
+      &:disabled {
+        opacity: 0.5;
+      }
+  
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 10px;
+      height: 10px;
+      padding: 20px;
+      border-radius: 50%;
+      background: var(--color-900);
+      color: var(--color-100);
+      border: 3px solid var(--color-100);
+    }
+  }
+  
+  .outflows-list-item-info {
+    &__label {
+      @extend %text-7;
+    }
+    &__amount {
+      @extend %text-10;
+      font-weight: bold;
+    }
+  }
+  
+  .outflows-list-item-delete {
+    &__loader {
+      color: var(--color-50);
+    }
+  }
