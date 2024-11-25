@@ -33,6 +33,33 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
     });
   });
 
+  describe("#getMonthlyProjectsAmount", () => {
+    it("should return the total for the monthly projects", () => {
+      // given
+      const outflows = [
+        new YearlyOutflow({
+          id: "id1",
+          month: 1,
+          label: "label",
+          amount: 110,
+        }),
+        new YearlyOutflow({
+          id: "id2",
+          month: 1,
+          label: "label",
+          amount: 10,
+        }),
+      ];
+      const yearlyOutflows = new YearlyOutflows(outflows);
+
+      // when
+      const total = yearlyOutflows.getMonthlyProjectsAmount();
+
+      // then
+      expect(total).to.be.equal(10);
+    });
+  });
+
   describe("#add", () => {
     describe("When month is not correct", () => {
       it("should throw an error", () => {

@@ -97,7 +97,8 @@ const manageOutflowsCheckingUsecase = new ManageOutflowsChecking(
 
 const getMonthCreationTemplateUsecase = new GetMonthCreationTemplate(
   monthCreationTemplateRepository,
-  pendingDebitRepository
+  pendingDebitRepository,
+  yearlyOutflowRepository
 );
 
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(

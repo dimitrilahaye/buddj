@@ -20,6 +20,10 @@ const monthRepositoryStub = {
   updateWeeklyBudgetInitialBalance: sinon.stub(),
 };
 
+const monthCreationTemplateRepositoryStub = {
+  getNewMonthTemplate: sinon.stub(),
+};
+
 const pendingDebitRepositoryStub = {
   getAll: sinon.stub(),
 };
@@ -52,11 +56,13 @@ function resetStubs() {
   yearlyOutflowRepositoryStub.getAll.reset();
   yearlyOutflowRepositoryStub.add.reset();
   yearlyOutflowRepositoryStub.remove.reset();
+  monthCreationTemplateRepositoryStub.getNewMonthTemplate.reset();
 }
 
 export {
   monthRepositoryStub,
   pendingDebitRepositoryStub,
   yearlyOutflowRepositoryStub,
+  monthCreationTemplateRepositoryStub,
   resetStubs,
 };

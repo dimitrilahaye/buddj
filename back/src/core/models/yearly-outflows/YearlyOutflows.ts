@@ -15,6 +15,13 @@ export default class YearlyOutflows {
     return this.list;
   }
 
+  getMonthlyProjectsAmount() {
+    const total = this.list.reduce((previous, current) => {
+      return previous + current.amount;
+    }, 0);
+    return total / 12;
+  }
+
   add(outflow: YearlyOutflow) {
     if (outflow.month < 1 || outflow.month > 12) {
       throw new YearlyOutflowsAddError();
