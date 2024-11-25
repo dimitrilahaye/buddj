@@ -25,7 +25,7 @@
     "@angular/router": "^18.2.11",
     "@angular/service-worker": "^18.2.11",
     "@fortawesome/angular-fontawesome": "^0.15.0",
-    "@fortawesome/fontawesome-free": "^6.6.0",
+    "@fortawesome/fontawesome-free": "^6.7.1",
     "@ngneat/overview": "^6.0.0",
     "@ngxpert/hot-toast": "^3.0.2",
     "@use-gesture/vanilla": "10.3.1",
