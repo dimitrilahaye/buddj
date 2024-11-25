@@ -9,12 +9,13 @@ import { Component, input, output } from '@angular/core';
 export class ButtonIconComponent {
   icon = input<string | null>(null);
   variant = input<'default' | 'danger'>('default');
+  size = input<'default' | 'small'>('default');
   loading = input(false);
   disabled = input(false);
   click = output<Event>();
 
   get className() {
-    return `icon icon--${this.variant()}`;
+    return `icon icon--variant-${this.variant()} icon--size-${this.size()}`;
   }
 
   onClick(event: Event) {

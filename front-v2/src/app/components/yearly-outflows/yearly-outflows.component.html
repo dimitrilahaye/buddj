@@ -22,7 +22,14 @@
   } @else {
 
   <section class="outflows__month">
-    <div class="outflows-month__title">Janvier</div>
+    <div class="outflows-month__title">
+      <span>Janvier</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(1, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows__list">
       @if (getOutflowsForMonth(1).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -55,7 +62,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Février</div>
+    <div class="outflows-month__title">
+      <span>Février</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(2, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(2).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -88,7 +102,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Mars</div>
+    <div class="outflows-month__title">
+      <span>Mars</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(3, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(3).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -121,7 +142,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Avril</div>
+    <div class="outflows-month__title">
+      <span>Avril</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(4, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(4).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -154,7 +182,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Mai</div>
+    <div class="outflows-month__title">
+      <span>Mai</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(5, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(5).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -187,7 +222,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Juin</div>
+    <div class="outflows-month__title">
+      <span>Juin</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(6, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(6).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -220,7 +262,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Juillet</div>
+    <div class="outflows-month__title">
+      <span>Juillet</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(7, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(7).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -253,7 +302,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Août</div>
+    <div class="outflows-month__title">
+      <span>Août</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(8, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(8).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -286,7 +342,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Septembre</div>
+    <div class="outflows-month__title">
+      <span>Septembre</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(9, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(9).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -319,7 +382,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Octobre</div>
+    <div class="outflows-month__title">
+      <span>Octobre</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(10, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(10).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -352,7 +422,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Novembre</div>
+    <div class="outflows-month__title">
+      <span>Novembre</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(11, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(11).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -385,7 +462,14 @@
   </section>
   <app-divider></app-divider>
   <section class="outflows__month">
-    <div class="outflows-month__title">Décembre</div>
+    <div class="outflows-month__title">
+      <span>Décembre</span>
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflowToMonth(12, $event)"
+      ></app-button-icon>
+    </div>
     <div class="outflows-list">
       @if (getOutflowsForMonth(12).length === 0) {
       <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
@@ -418,3 +502,54 @@
   </section>
   }
 </div>
+
+<!-- 
+  ##################### ADD YEARLY OUTFLOW #####################
+   -->
+@if(addOutflowForm) {
+<app-sliding-modal
+  [isOpen]="isOutflowsModalOpen"
+  [canClose]="!addOutflowFormIsLoading"
+  (close)="closeOutflowsModal()"
+>
+  <form [formGroup]="addOutflowForm" (ngSubmit)="submitOutflowModal($event)">
+    <div class="modal-container">
+      <!-- label -->
+      <app-input-text
+        [formGroup]="addOutflowForm"
+        formControlName="label"
+        [required]="true"
+        [placeholder]="'Libellé'"
+      ></app-input-text>
+
+      <!-- amount -->
+      <app-input-number
+        (click)="openNumpad(addOutflowForm.controls['amount'], $event)"
+        [formGroup]="addOutflowForm"
+        formControlName="amount"
+        [required]="true"
+        [step]="'0.01'"
+        [placeholder]="'Montant'"
+      ></app-input-number>
+
+      <div class="modal-container__actions">
+        <app-button
+          class="login-page__login-button"
+          [type]="'submit'"
+          [variant]="'danger'"
+          [label]="'Ajouter cette sortie annuelle'"
+          [loading]="addOutflowFormIsLoading"
+          (click)="submitOutflowModal($event)"
+        ></app-button>
+      </div>
+    </div>
+  </form>
+</app-sliding-modal>
+} @if(amountValueControl !== null) {
+<app-sliding-modal [isOpen]="isNumpadModalOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="amountValue"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
+</app-sliding-modal>
+}

@@ -17,11 +17,19 @@ import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { amountValidator } from '../../validators/amount.validator';
 
 @Component({
   selector: 'app-yearly-outflows',
   standalone: true,
-  imports: [DesignSystemModule, CommonModule],
+  imports: [DesignSystemModule, CommonModule, ReactiveFormsModule],
   templateUrl: './yearly-outflows.component.html',
   styleUrl: './yearly-outflows.component.scss',
 })
@@ -30,8 +38,15 @@ export class YearlyOutflowsComponent {
   removeIsLoading = false;
   outflowDelationModalIsOpen = false;
   outflowToDelete: YearlyOutflow | null = null;
+  addOutflowForm: FormGroup | null = null;
+  isOutflowsModalOpen = false;
+  addOutflowFormIsLoading = false;
+  isNumpadModalOpen = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  amountValueControl: AbstractControl<any, any> | null = null;
 
   constructor(
+    private readonly fb: FormBuilder,
     private readonly router: Router,
     @Inject(YEARLY_OUTFLOWS_STORE)
     private readonly yearlyOutflowsStore: YearlyOutflowsStoreInterface,
@@ -46,6 +61,24 @@ export class YearlyOutflowsComponent {
     return this.outflows()![month];
   }
 
+  addOutflowToMonth(month: number, event: Event) {
+    event.stopPropagation();
+    this.isOutflowsModalOpen = true;
+    this.setAddOutflowForm(month);
+  }
+
+  setAddOutflowForm(month: number) {
+    this.addOutflowForm = this.fb.group({
+      month: [{ value: month, disabled: true }], // hidden
+      label: [null, Validators.required],
+      amount: [0, [Validators.required, amountValidator()]],
+    });
+  }
+
+  closeOutflowsModal() {
+    this.isOutflowsModalOpen = false;
+  }
+
   openOutflowDelationModal(outflow: YearlyOutflow, event: Event) {
     this.outflowDelationModalIsOpen = true;
     this.outflowToDelete = outflow;
@@ -55,6 +88,44 @@ export class YearlyOutflowsComponent {
   closeOutflowDelationModal(event: Event) {
     this.outflowDelationModalIsOpen = false;
     this.outflowToDelete = null;
+    event.stopPropagation();
+  }
+
+  openNumpad(control: AbstractControl, event: Event) {
+    this.amountValueControl = control;
+    this.isNumpadModalOpen = true;
+    event.stopPropagation();
+  }
+
+  closeNumpad(event: Event) {
+    this.isNumpadModalOpen = false;
+    event.stopPropagation();
+  }
+
+  get amountValue() {
+    return '' + this.amountValueControl?.value;
+  }
+
+  updateAmountValue(value: string) {
+    this.amountValueControl?.patchValue(Number(value.replace(',', '.')));
+    this.isNumpadModalOpen = false;
+    this.amountValueControl = null;
+  }
+
+  submitOutflowModal(event: Event) {
+    event.preventDefault();
+    if (this.addOutflowForm && this.addOutflowForm!.valid) {
+      this.addOutflowFormIsLoading = true;
+      this.yearlyOutflowsService
+        .add(this.addOutflowForm.getRawValue())
+        .pipe(finalize(() => (this.addOutflowFormIsLoading = false)))
+        .subscribe(() => {
+          this.closeOutflowsModal();
+          this.toaster.success('Votre sortie annuelle a été ajoutée !');
+        });
+    } else {
+      this.addOutflowForm!.markAllAsTouched();
+    }
     event.stopPropagation();
   }
 
