@@ -25,7 +25,7 @@ import MonthsServiceInterface, {
 import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
-} from '../../services/toaster.service.interface';
+} from '../../services/toaster/toaster.service.interface';
 import { ToggleVisibilityButtonComponent } from './toggle-visibility-button/toggle-visibility-button.component';
 
 @Component({

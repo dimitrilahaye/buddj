@@ -2,7 +2,7 @@ import { Component, Inject, signal, Signal } from '@angular/core';
 import {
   MONTHLY_BUDGETS_STORE,
   MonthlyBudgetsStoreInterface,
-} from '../../stores/monthlyBudgets.store.interface';
+} from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
 import { CommonModule, CurrencyPipe, NgClass } from '@angular/common';
@@ -23,7 +23,7 @@ import {
 } from '../../services/authentication/authentication.service.interface';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
-} from '../../services/toaster.service.interface';
+} from '../../services/toaster/toaster.service.interface';
 
 @Component({
   selector: 'app-home',
@@ -134,6 +134,11 @@ export class HomeComponent {
   navigateToArchivedMonths(event: Event) {
     event.stopPropagation();
     this.router.navigate(['archived-months']);
+  }
+
+  navigateToYearlyOutlfows(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['yearly-outflows']);
   }
 
   logout(event: Event) {

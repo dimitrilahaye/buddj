@@ -12,7 +12,7 @@ import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import {
   MONTHLY_BUDGETS_STORE,
   MonthlyBudgetsStoreInterface,
-} from '../../stores/monthlyBudgets.store.interface';
+} from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
 import { CommonModule } from '@angular/common';
@@ -22,7 +22,7 @@ import MonthsServiceInterface, {
 import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
-} from '../../services/toaster.service.interface';
+} from '../../services/toaster/toaster.service.interface';
 
 @Component({
   selector: 'app-archived-months',

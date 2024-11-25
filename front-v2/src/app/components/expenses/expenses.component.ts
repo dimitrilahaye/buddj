@@ -31,13 +31,13 @@ import MonthsServiceInterface, {
 import {
   MONTHLY_BUDGETS_STORE,
   MonthlyBudgetsStoreInterface,
-} from '../../stores/monthlyBudgets.store.interface';
+} from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { finalize } from 'rxjs';
 import { TransferChoiceComponent } from '../transfer-modals/transfer-choice/transfer-choice.component';
 import { TransferData } from '../transfer-modals/transfer-choice/transfer-choice.component';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
-} from '../../services/toaster.service.interface';
+} from '../../services/toaster/toaster.service.interface';
 
 @Component({
   selector: 'app-expenses',
