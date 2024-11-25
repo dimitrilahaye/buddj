@@ -6,7 +6,7 @@ import { YearlyOutflowsStoreInterface } from './yearlyOutflows.store.interface';
   providedIn: 'root',
 })
 export class YearlyOutflowsStore implements YearlyOutflowsStoreInterface {
-  private _all = signal<YearlyOutflows | null>(null);
+  private readonly _all = signal<YearlyOutflows | null>(null);
 
   getAll(): Signal<YearlyOutflows | null> {
     return this._all.asReadonly();
