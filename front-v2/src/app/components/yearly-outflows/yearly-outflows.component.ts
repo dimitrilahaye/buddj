@@ -110,6 +110,19 @@ export class YearlyOutflowsComponent {
     ];
   }
 
+  get totalAmountByMonth() {
+    const yearlyOutflows = this.outflows()!;
+    let total = 0;
+    for (const monthKey in yearlyOutflows) {
+      const month = parseInt(monthKey, 10);
+      const outflows = yearlyOutflows[month];
+      total += outflows.reduce((prev, curr) => {
+        return prev + curr.amount;
+      }, 0);
+    }
+    return total / 12;
+  }
+
   getOutflowsForMonth(month: number) {
     return this.outflows()![month];
   }
