@@ -13,7 +13,7 @@ import { Response } from '../../models/response.model';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import {
   MONTHLY_BUDGETS_STORE,
-  MonthlyBudgetsStoreInterface,
+  type MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 
 @Injectable({

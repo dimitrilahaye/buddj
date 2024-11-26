@@ -16,7 +16,7 @@ import {
 } from '../../../models/monthlyBudget.model';
 import {
   MONTHLY_BUDGETS_STORE,
-  MonthlyBudgetsStoreInterface,
+  type MonthlyBudgetsStoreInterface,
 } from '../../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
