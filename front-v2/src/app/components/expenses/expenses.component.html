@@ -41,7 +41,7 @@
           </ng-container>
         </div>
       </div>
-      <ng-container *ngFor="let week of weeks">
+      <ng-container *ngFor="let week of weeks; let i = index">
         <div class="expenses-list__week">
           <div class="expenses-list__week__header">
             <h2 class="expenses-list__week-name">
@@ -53,6 +53,20 @@
               (click)="openExpensesModal(week.id)"
             >
               <i class="fa-solid fa-plus"></i>
+            </button>
+            <button
+              class="expenses-list__week-hide"
+              [ngClass]="{
+                'expenses-list__week-hide--hidden': !filterIsActive(i + 1)
+              }"
+              type="button"
+              (click)="updateFilterState(i + 1)"
+            >
+              @if(!filterIsActive(i + 1)) {
+              <i class="fa-solid fa-eye"></i>
+              } @else {
+              <i class="fa-solid fa-eye-slash"></i>
+              }
             </button>
             <button
               class="expenses-list__week-transfer"
