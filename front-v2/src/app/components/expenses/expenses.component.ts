@@ -223,9 +223,9 @@ export class ExpensesComponent implements AfterViewInit {
     });
   }
 
-  setAddExpenseForm() {
+  setAddExpenseForm(weekId?: string) {
     this.addExpenseForm = this.fb.group({
-      weekId: ['', Validators.required],
+      weekId: [weekId ?? '', Validators.required],
       label: [null, Validators.required],
       amount: [0, [Validators.required, amountValidator()]],
     });
@@ -276,9 +276,9 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
-  openExpensesModal() {
+  openExpensesModal(weekId?: string) {
     this.isExpensesModalOpen = true;
-    this.setAddExpenseForm();
+    this.setAddExpenseForm(weekId);
   }
 
   closeExpensesModal(event: Event) {

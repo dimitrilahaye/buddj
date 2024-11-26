@@ -48,6 +48,13 @@
               {{ week.name }}
             </h2>
             <button
+              class="expenses-list__week-add"
+              type="button"
+              (click)="openExpensesModal(week.id)"
+            >
+              <i class="fa-solid fa-plus"></i>
+            </button>
+            <button
               class="expenses-list__week-transfer"
               type="button"
               (click)="openTransferChoiceModal(week, $event)"
