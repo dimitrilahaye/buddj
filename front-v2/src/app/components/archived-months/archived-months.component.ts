@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import {
   MONTHLY_BUDGETS_STORE,
-  MonthlyBudgetsStoreInterface,
+  type MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';

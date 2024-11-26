@@ -1,7 +1,7 @@
 import { Component, Inject, signal, Signal } from '@angular/core';
 import {
   MONTHLY_BUDGETS_STORE,
-  MonthlyBudgetsStoreInterface,
+  type MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';

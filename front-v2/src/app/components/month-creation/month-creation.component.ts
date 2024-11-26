@@ -29,7 +29,7 @@ import ToasterServiceInterface, {
 import { ToggleVisibilityButtonComponent } from './toggle-visibility-button/toggle-visibility-button.component';
 import {
   YEARLY_OUTFLOWS_STORE,
-  YearlyOutflowsStoreInterface,
+  type YearlyOutflowsStoreInterface,
 } from '../../stores/yearlyOutflows/yearlyOutflows.store.interface';
 import { YearlyOutflow } from '../../models/yearlyOutflow.model';
 
