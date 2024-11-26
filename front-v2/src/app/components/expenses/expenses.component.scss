@@ -41,7 +41,14 @@
       gap: 10px;
     }
 
+    &-hide {
+      &--hidden {
+        opacity: 0.5;
+      }
+    }
+
     &-add,
+    &-hide,
     &-transfer {
       display: flex;
       flex-direction: row;
