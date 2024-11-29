@@ -27,23 +27,24 @@
           }}</span>
         </div>
         <div class="expenses-list__filters">
-          <ng-container *ngFor="let week of weekButtons">
-            <button
-              (click)="updateFilterState(week)"
-              [ngClass]="{
-                'expenses-list-filters__filter--active': filterIsActive(week)
-              }"
-              type="button"
-              class="expenses-list-filters__filter"
-            >
-              <span>{{ week }}</span>
-            </button>
-          </ng-container>
+          <a href="#" (click)="toggleBudgetsUnfolded($event)">{{
+            unfoldBudgetsLabel
+          }}</a>
         </div>
       </div>
       <ng-container *ngFor="let week of weeks; let i = index">
         <div class="expenses-list__week">
           <div class="expenses-list__week__header">
+            <button
+              class="expenses-list__week-hide"
+              [ngClass]="{
+                'expenses-list__week-hide--folded': !filterIsActive(i + 1)
+              }"
+              type="button"
+              (click)="updateFilterState(i + 1)"
+            >
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
             <h2 class="expenses-list__week-name">
               {{ week.name }}
             </h2>
@@ -55,20 +56,6 @@
               <i class="fa-solid fa-plus"></i>
             </button>
             <button
-              class="expenses-list__week-hide"
-              [ngClass]="{
-                'expenses-list__week-hide--hidden': !filterIsActive(i + 1)
-              }"
-              type="button"
-              (click)="updateFilterState(i + 1)"
-            >
-              @if(!filterIsActive(i + 1)) {
-              <i class="fa-solid fa-eye"></i>
-              } @else {
-              <i class="fa-solid fa-eye-slash"></i>
-              }
-            </button>
-            <button
               class="expenses-list__week-transfer"
               type="button"
               (click)="openTransferChoiceModal(week, $event)"
@@ -76,6 +63,8 @@
               <i class="fa-solid fa-right-left"></i>
             </button>
           </div>
+
+          <div class="expenses-list__infos">{{ geBudgetsInfos(week.id) }}</div>
           <div class="expenses-list__balance">
             <span>Solde :</span>
             <app-progress-bar
@@ -83,7 +72,8 @@
               [total]="getInitialBalanceByWeekName(week.name)"
             ></app-progress-bar>
           </div>
-          @if (getExpensesFormGroupByWeekId(week.id).length === 0) {
+          @if (getExpensesFormGroupByWeekId(week.id).length === 0 &&
+          filterIsActive(i + 1)) {
           <app-info>Pas de dépenses à afficher 😁</app-info> } @else {
           <app-item
             *ngFor="
