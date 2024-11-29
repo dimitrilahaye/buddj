@@ -39,11 +39,18 @@
       display: flex;
       flex-direction: row;
       gap: 10px;
+      padding-left: 10px;
     }
 
     &-hide {
-      &--hidden {
-        opacity: 0.5;
+      .fa-chevron-right {
+        transform: rotate(90deg);
+        transition: transform 0.3s ease;
+      }
+      &--folded {
+        .fa-chevron-right {
+          transform: rotate(0deg);
+        }
       }
     }
 
@@ -67,8 +74,21 @@
       width: 30px;
       box-sizing: border-box;
     }
+    &-hide {
+      color: var(--color-800);
+      background-color: transparent;
+      padding: 0;
+      gap: 0;
+      width: 0px;
+      border-radius: 0;
+    }
   }
 
+  &__infos {
+    @extend %text-5;
+
+    font-weight: bold;
+  }
 
   &__balance {
     display: flex;
@@ -235,5 +255,13 @@
     padding: 0 12px;
     color: var(--dark-100);
     font-size: var(--text-10);
+  }
+}
+
+.expenses-list-filters {
+  &__link {
+    @extend %text-7;
+
+    color: var(--color-800);
   }
 }

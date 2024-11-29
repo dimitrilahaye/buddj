@@ -74,6 +74,8 @@ export class ExpensesComponent implements AfterViewInit {
   fromWeeklyBudgetTransfer: WeeklyBudget | null = null;
   transferIsLoading = false;
 
+  budgetsUnfolded = false;
+
   constructor(
     private fb: FormBuilder,
     private injector: Injector,
@@ -137,8 +139,27 @@ export class ExpensesComponent implements AfterViewInit {
     );
   }
 
-  get weekButtons() {
-    return [1, 2, 3, 4, 5];
+  get unfoldBudgetsLabel() {
+    return this.budgetsUnfolded ? 'Tout replier' : 'Tout déplier';
+  }
+
+  geBudgetsInfos(weekId: string) {
+    const expensesForWeekId = this.getExpensesByWeekId(weekId);
+    const totalExpenses = expensesForWeekId.length;
+    const checkedExpenses = expensesForWeekId.filter(
+      (e) => !e.isChecked
+    ).length;
+    return `${checkedExpenses} non-prélevées / ${totalExpenses}`;
+  }
+
+  toggleBudgetsUnfolded(event: Event) {
+    event.preventDefault();
+    this.budgetsUnfolded = !this.budgetsUnfolded;
+    if (this.budgetsUnfolded) {
+      this.filters = [1, 2, 3, 4, 5];
+    } else {
+      this.filters = [];
+    }
   }
 
   openExpenseDelationModal(expense: AbstractControl<Expense>, event: Event) {
@@ -184,6 +205,8 @@ export class ExpensesComponent implements AfterViewInit {
       });
 
       this.expenses()!.forEach((expense) => this.addExpense(expense));
+
+      this.filters = [];
     }
   }
 
@@ -221,6 +244,16 @@ export class ExpensesComponent implements AfterViewInit {
       }
       return expenseWeekId === weekId && this.filters.includes(weekNumber + 1);
     });
+  }
+
+  getExpensesByWeekId(weekId: string) {
+    const budget = this.month()!.account.weeklyBudgets.find(
+      (w) => w.id === weekId
+    );
+    if (budget) {
+      return budget.expenses;
+    }
+    return [];
   }
 
   setAddExpenseForm(weekId?: string) {
