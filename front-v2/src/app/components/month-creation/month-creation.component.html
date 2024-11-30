@@ -1,6 +1,6 @@
 <app-modal
-  [modalOpen]="outflowDelationModalIsOpen"
-  (click)="closeOutflowDelationModal($event)"
+  [modalOpen]="yearlyOutflowDelationModalIsOpen"
+  (click)="closeYearlyOutflowDelationModal($event)"
 >
   <app-button
     [size]="'big'"
@@ -8,6 +8,18 @@
     [label]="'Supprimer la sortie définitivement'"
     [loading]="removeIsLoading"
     (click)="removeYearlyOutflow($event)"
+  ></app-button>
+</app-modal>
+<app-modal
+  [modalOpen]="pendingDebitDelationModalIsOpen"
+  (click)="closePendingDebitDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer la sortie définitivement'"
+    [loading]="removeIsLoading"
+    (click)="removePendingDebit($event)"
   ></app-button>
 </app-modal>
 @if(!dataLoaded) {
@@ -93,7 +105,7 @@
         <button
           class="month-creation-item__delete"
           type="button"
-          (click)="openOutflowDelationModal(i, $event)"
+          (click)="openYearlyOutflowDelationModal(i, $event)"
         >
           <i class="fa-solid fa-trash-can"></i>
         </button>
@@ -145,6 +157,13 @@
             >{{ debit.get("amount")?.value }}€</span
           >
         </div>
+        <button
+          class="month-creation-item__delete"
+          type="button"
+          (click)="openPendingDebitDelationModal(i, $event)"
+        >
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
       </div>
     </app-item>
     }

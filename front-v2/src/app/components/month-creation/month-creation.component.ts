@@ -59,10 +59,12 @@ export class MonthCreationComponent implements OnInit {
   amountValueControl: AbstractControl<any, any> | null = null;
   takeIntoAccountPendingDebits = true;
   outflowsRemovedFromForecastBalance: number[] = [];
-  outflowDelationModalIsOpen = false;
+  yearlyOutflowDelationModalIsOpen = false;
+  pendingDebitDelationModalIsOpen = false;
   outflowToDelete: AbstractControl<YearlyOutflow> | null = null;
   removeIsLoading = false;
   selectedYearlyOutflowIndex: number | null = null;
+  selectedPendingDebitIndex: number | null = null;
 
   newMonth: Month = {
     month: new Date(),
@@ -341,14 +343,14 @@ export class MonthCreationComponent implements OnInit {
     return this.outflows.at(this.selectedOutflowIndex!) as FormGroup;
   }
 
-  openOutflowDelationModal(index: number, event: Event) {
-    this.outflowDelationModalIsOpen = true;
+  openYearlyOutflowDelationModal(index: number, event: Event) {
+    this.yearlyOutflowDelationModalIsOpen = true;
     this.selectedYearlyOutflowIndex = index;
     event.stopPropagation();
   }
 
-  closeOutflowDelationModal(event: Event) {
-    this.outflowDelationModalIsOpen = false;
+  closeYearlyOutflowDelationModal(event: Event) {
+    this.yearlyOutflowDelationModalIsOpen = false;
     this.selectedYearlyOutflowIndex = null;
     event.stopPropagation();
   }
@@ -356,7 +358,27 @@ export class MonthCreationComponent implements OnInit {
   removeYearlyOutflow(event: Event) {
     if (this.selectedYearlyOutflowIndex !== null) {
       this.yearlyOutflowsControls.removeAt(this.selectedYearlyOutflowIndex);
-      this.closeOutflowDelationModal(event);
+      this.closeYearlyOutflowDelationModal(event);
+    }
+    event.stopPropagation();
+  }
+
+  openPendingDebitDelationModal(index: number, event: Event) {
+    this.pendingDebitDelationModalIsOpen = true;
+    this.selectedPendingDebitIndex = index;
+    event.stopPropagation();
+  }
+
+  closePendingDebitDelationModal(event: Event) {
+    this.pendingDebitDelationModalIsOpen = false;
+    this.selectedPendingDebitIndex = null;
+    event.stopPropagation();
+  }
+
+  removePendingDebit(event: Event) {
+    if (this.selectedPendingDebitIndex !== null) {
+      this.pendingDebits.removeAt(this.selectedPendingDebitIndex);
+      this.closePendingDebitDelationModal(event);
     }
     event.stopPropagation();
   }
