@@ -1,1 +1,24 @@
-<p>monthly-templates works!</p>
+<app-header-back-to-home></app-header-back-to-home>
+
+<div class="content">
+  @if(templates.length === 0) {
+  <app-info>Aucun template pour le moment 😁</app-info>
+  } @else {
+  <section class="content__template" *ngFor="let template of templates">
+    <div class="content-template__content">
+      <div class="content-template-content__title">
+        {{ template.name }}&nbsp;<span
+          class="content-template-content-title__infos"
+          >{{ getDefaultInfo(template) }}</span
+        >
+      </div>
+      <app-button-icon
+        icon="fa-eye"
+        size="small"
+        (click)="goToTemplatePage(template.id, $event)"
+      ></app-button-icon>
+    </div>
+    <app-divider></app-divider>
+  </section>
+  }
+</div>

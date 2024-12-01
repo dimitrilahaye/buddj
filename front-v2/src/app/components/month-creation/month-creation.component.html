@@ -25,11 +25,7 @@
 @if(!dataLoaded) {
 <app-loader></app-loader>
 } @if(dataLoaded && form) {
-<div class="header">
-  <button type="button" (click)="backToHome()">
-    <i class="fa-solid fa-circle-xmark"></i>
-  </button>
-</div>
+<app-header-back-to-home></app-header-back-to-home>
 <form class="month-creation" [formGroup]="form" (ngSubmit)="onSubmit()">
   <!-- 
     ##################### STEP 1 #####################

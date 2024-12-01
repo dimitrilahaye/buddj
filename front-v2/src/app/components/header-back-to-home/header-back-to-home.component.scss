@@ -1,0 +1,25 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    box-sizing: border-box;
+    align-items: flex-start;
+    background: white;
+
+    button {
+        @extend %text-30;
+
+        border: 0;
+        background: none;
+        margin: none;
+        color: var(--color-950);
+    }
+}
