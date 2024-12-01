@@ -8,10 +8,9 @@
     <app-button-icon
       icon="fa-edit"
       size="small"
-      (click)="editTitle($event)"
+      (click)="openTemplateNameModal($event)"
     ></app-button-icon>
   </div>
-  <div class="total">total: {{ total | currency : "EUR" }}</div>
   <div class="template__infos">
     <app-toggle-button
       (toggleChange)="defaultChanged($event)"
@@ -25,7 +24,7 @@
       <app-button-icon
         icon="fa-plus"
         size="small"
-        (click)="addOutflow($event)"
+        (click)="openAddOutflowModal()"
       ></app-button-icon>
     </div>
     <div class="outflows__list">
@@ -65,7 +64,7 @@
       <app-button-icon
         icon="fa-plus"
         size="small"
-        (click)="addBudget($event)"
+        (click)="openAddBudgetModal()"
       ></app-button-icon>
     </div>
     <div class="outflows__list">
@@ -100,3 +99,174 @@
   </section>
   }
 </div>
+
+<!-- 
+  ##################### FOOTER #####################
+-->
+<div class="month-creation__footer">
+  <span class="month-creation-footer__forecast-balance"
+    >Total : <strong>{{ total | currency : "EUR" }}</strong></span
+  >
+  <div class="month-creation-footer__actions">
+    <button
+      class="month-creation-footer-actions__action"
+      type="button"
+      (click)="resetForm($event)"
+    >
+      <i class="fa-solid fa-rotate"></i>
+    </button>
+    <app-button
+      [type]="'submit'"
+      [size]="'big'"
+      [variant]="'danger'"
+      [label]="'Sauvegarder'"
+      (click)="submitTemplate()"
+    ></app-button>
+  </div>
+</div>
+
+<!-- 
+  ##################### UPDATE NAME #####################
+-->
+<app-sliding-modal
+  [isOpen]="isTemplateNameModalOpen"
+  (close)="cancelNameUpdate($event)"
+>
+  <div class="modal">
+    <input
+      class="input"
+      type="text"
+      [required]="true"
+      [value]="editingTemplate?.name"
+      placeholder="Nom"
+      (input)="updateTemplateName($event)"
+    />
+    <div class="modal__actions">
+      <app-button
+        [label]="'Annuler'"
+        [variant]="'danger'"
+        (click)="cancelNameUpdate($event)"
+      ></app-button>
+      <app-button
+        [label]="'Valider'"
+        (click)="closeTemplateNameModal($event)"
+      ></app-button>
+    </div>
+  </div>
+</app-sliding-modal>
+
+<!-- 
+  ##################### REMOVE OUTFLOW #####################
+-->
+<app-modal
+  [modalOpen]="isRemoveOutflowModalOpen"
+  (click)="closeOutflowDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer la sortie mensuelle'"
+    (click)="removeOutflow($event)"
+  ></app-button>
+</app-modal>
+
+<!-- 
+  ##################### REMOVE BUDGET #####################
+-->
+<app-modal
+  [modalOpen]="isRemoveBudgetModalOpen"
+  (click)="closeBudgetDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer le budget'"
+    (click)="removeBudget($event)"
+  ></app-button>
+</app-modal>
+
+<!-- 
+  ##################### ADD OUTFLOW #####################
+-->
+<app-sliding-modal
+  [isOpen]="isAddOutflowModalOpen"
+  (close)="closeAddOutflowModal($event)"
+>
+  <div class="modal">
+    <!-- outflow label -->
+    <input
+      class="input"
+      type="text"
+      [required]="true"
+      [value]="editingOutflow?.label"
+      placeholder="Libellé"
+      (input)="updateAddingOutflowLabel($event)"
+    />
+    <!-- outflow amount -->
+    <input
+      class="input"
+      type="number"
+      step="0.01"
+      (click)="openNumpad($event)"
+      [required]="true"
+      [value]="editingOutflow?.amount ?? 'Pas de montant'"
+    />
+    <div class="modal__actions">
+      <app-button
+        [label]="'Annuler'"
+        [variant]="'danger'"
+        (click)="closeAddOutflowModal($event)"
+      ></app-button>
+      <app-button [label]="'Valider'" (click)="addOutflow($event)"></app-button>
+    </div>
+  </div>
+</app-sliding-modal>
+
+<!-- 
+  ##################### ADD BUDGET #####################
+-->
+<app-sliding-modal
+  [isOpen]="isAddBudgetModalOpen"
+  (close)="closeAddBudgetModal($event)"
+>
+  <div class="modal">
+    <!-- budget name -->
+    <input
+      class="input"
+      type="text"
+      [required]="true"
+      [value]="editingBudget?.name"
+      placeholder="Nom"
+      (input)="updateAddingBudgetName($event)"
+    />
+    <!-- budget initialBalance -->
+    <input
+      class="input"
+      type="number"
+      step="0.01"
+      (click)="openNumpad($event)"
+      [required]="true"
+      [value]="editingBudget?.initialBalance ?? 'Pas de montant'"
+    />
+    <div class="modal__actions">
+      <app-button
+        [label]="'Annuler'"
+        [variant]="'danger'"
+        (click)="closeAddBudgetModal($event)"
+      ></app-button>
+      <app-button [label]="'Valider'" (click)="addBudget($event)"></app-button>
+    </div>
+  </div>
+</app-sliding-modal>
+
+<!-- 
+  ##################### NUMPAD #####################
+-->
+@if(isNumpadModalOpen) {
+<app-sliding-modal [isOpen]="isNumpadModalOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="initializeNumpadValue()"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
+</app-sliding-modal>
+}
