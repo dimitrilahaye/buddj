@@ -4,7 +4,7 @@ import dbClient from "./providers/persistence/db.js";
 import typeormDataSource from "./providers/persistence/typeormConfig.js";
 import UserRepository from "./providers/persistence/repositories/UserRepository.js";
 import GetDefaultMonthlyTemplate from "./core/usecases/GetDefaultMonthlyTemplate.js";
-import TypeOrmMonthlyTemplateRepository from "./providers/persistence/repositories/MonthlyTemplateRepository.js";
+import MonthlyTemplateRepository from "./providers/persistence/repositories/MonthlyTemplateRepository.js";
 import MonthRepository from "./providers/persistence/repositories/MonthRepository.js";
 import IdProvider from "./providers/IdProvider.js";
 import MonthFactory from "./core/factories/MonthFactory.js";
@@ -44,6 +44,8 @@ import YearlyOutflowRepository from "./providers/persistence/repositories/Yearly
 import GetYearlyOutflows from "./core/usecases/GetYearlyOutflows.js";
 import AddYearlyOutflow from "./core/usecases/AddYearlyOutflow.js";
 import RemoveYearlyOutflow from "./core/usecases/RemoveYearlyOutflow.js";
+import MonthlyOutflowTemplateRepository from "./providers/persistence/repositories/MonthlyOutflowTemplateRepository.js";
+import MonthlyBudgetTemplateRepository from "./providers/persistence/repositories/MonthlyBudgetTemplateRepository.js";
 
 // persistence
 
@@ -63,7 +65,11 @@ const userRepository = new UserRepository(client);
 
 const monthRepository = new MonthRepository();
 
-const monthlyTemplateRepository = new TypeOrmMonthlyTemplateRepository();
+const monthlyTemplateRepository = new MonthlyTemplateRepository();
+
+const monthlyOutflowTemplateRepository = new MonthlyOutflowTemplateRepository();
+
+const monthlyBudgetTemplateRepository = new MonthlyBudgetTemplateRepository();
 
 const pendingDebitRepository = new PendingDebitRepository();
 
@@ -97,6 +103,8 @@ const manageOutflowsCheckingUsecase = new ManageOutflowsChecking(
 
 const getDefaultMonthlyTemplateUsecase = new GetDefaultMonthlyTemplate(
   monthlyTemplateRepository,
+  monthlyOutflowTemplateRepository,
+  monthlyBudgetTemplateRepository,
   pendingDebitRepository,
   yearlyOutflowRepository,
   idProvider
