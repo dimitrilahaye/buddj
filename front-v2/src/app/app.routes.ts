@@ -73,5 +73,8 @@ export const routes: Routes = [
     path: 'monthly-templates/:id',
     component: MonthlyTemplateComponent,
     canActivate: [authGuard],
+    resolve: {
+      monthlyTemplates: monthlyTemplatesResolver,
+    },
   },
 ];
