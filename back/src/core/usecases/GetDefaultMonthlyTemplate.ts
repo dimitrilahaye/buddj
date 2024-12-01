@@ -1,5 +1,5 @@
 import IdProvider from "../../providers/IdProvider.js";
-import GetDefaultMonthlyTemplateDomainService from "../domain-services/GetDefaultMonthlyTemplateDomainService.js";
+import GetDefaultMonthlyTemplateDomainService from "../domain-services/monthly-template/GetDefaultMonthlyTemplateDomainService.js";
 import MonthlyBudgetTemplateRepository from "../ports/repositories/MonthlyBudgetTemplateRepository.js";
 import MonthlyOutflowTemplateRepository from "../ports/repositories/MonthlyOutflowTemplateRepository.js";
 import MonthlyTemplateRepository from "../ports/repositories/MonthlyTemplateRepository.js";

@@ -17,4 +17,10 @@ export default class TypeOrmMonthlyTemplateRepository
 
     return template.toDomain();
   }
+
+  async getAll(): Promise<MonthlyTemplate[]> {
+    const templates = await MonthlyTemplateDao.find();
+
+    return templates.map((template) => template.toDomain());
+  }
 }
