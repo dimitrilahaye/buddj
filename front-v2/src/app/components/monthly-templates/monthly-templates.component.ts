@@ -7,6 +7,7 @@ import { MonthTemplate } from '../../models/monthTemplate.model';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { CommonModule } from '@angular/common';
 import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-monthly-templates',
@@ -20,7 +21,8 @@ export class MonthlyTemplatesComponent {
 
   constructor(
     @Inject(MONTHLY_TEMPLATES_STORE)
-    private readonly monthlyTemplatesStore: MonthlyTemplatesStoreInterface
+    private readonly monthlyTemplatesStore: MonthlyTemplatesStoreInterface,
+    private router: Router
   ) {
     this.templatesSignal = this.monthlyTemplatesStore.getAll();
   }
@@ -34,7 +36,7 @@ export class MonthlyTemplatesComponent {
   }
 
   goToTemplatePage(templateId: string, event: Event) {
-    console.info(templateId);
+    this.router.navigate(['/monthly-templates', templateId]);
     event.stopPropagation();
   }
 }
