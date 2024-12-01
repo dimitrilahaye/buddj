@@ -20,7 +20,7 @@ describe("Integration | Consumers | Routes | GET /months/template/default", func
       await clearDB();
     });
 
-    it.only("should return data for a new month creation", async function () {
+    it("should return data for a new month creation", async function () {
       // given
       server = mockedServer({ isAuthenticated: true }, deps);
       const cookie = await authenticate(server);
