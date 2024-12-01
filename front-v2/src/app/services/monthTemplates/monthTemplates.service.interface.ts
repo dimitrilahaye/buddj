@@ -4,6 +4,7 @@ import { MonthCreationTemplate } from '../../models/monthTemplate.model';
 
 export default interface MonthTemplatesServiceInterface {
   getTemplate(): Observable<MonthCreationTemplate>;
+  getAll(): Observable<void>;
 }
 
 export const MONTH_TEMPLATES_SERVICE =
