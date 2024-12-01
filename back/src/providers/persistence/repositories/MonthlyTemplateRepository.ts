@@ -12,7 +12,7 @@ export default class MonthlyTemplateRepository
       id: "id",
       name: "Template par défaut",
       isDefault: true,
-      budgets: env.template.weeklyBudgets.map(
+      budgets: env.template.budgets.map(
         ({ name }: { name: string }) =>
           new MonthlyBudgetTemplate({ id: "id", name, initialBalance: 200 })
       ),
