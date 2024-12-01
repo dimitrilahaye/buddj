@@ -1,47 +1,45 @@
-import expect, { Clock } from "../../../../test-helpers.js";
+import { afterEach } from "mocha";
+import { clearDB } from "../../test-helpers.js";
+import expect from "../../../../test-helpers.js";
 import MonthlyTemplateRepository from "../../../../../providers/persistence/repositories/MonthlyTemplateRepository.js";
+import {
+  insertDefaultMonthlyTemplate,
+  insertNonDefaultMonthlyTemplate,
+} from "../../../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
 import MonthlyTemplate from "../../../../../core/models/template/MonthlyTemplate.js";
-import env from "../../../../../env-vars.js";
-import sinon from "sinon";
 
 describe("Integration | Providers | Persistence | Repositories | MonthlyTemplateRepository", function () {
-  const monthDate = new Date("2024-01-01");
-  let clock = new Clock();
-
-  afterEach(() => {
-    clock.restore();
+  afterEach(async () => {
+    await clearDB();
   });
 
-  it("should return the right data for a new month creation", async function () {
-    // given
-    clock.start(monthDate);
-    sinon.stub(env, "template").value({
-      budgets: [
-        { name: "Semaine 1" },
-        { name: "Semaine 2" },
-        { name: "Semaine 3" },
-        { name: "Semaine 4" },
-        { name: "Semaine 5" },
-      ],
-      outflows: [
-        { label: "Loyer", amount: 699.41 },
-        { label: "Bouygues", amount: 70.89 },
-      ],
+  describe("#getDefault", () => {
+    describe("When there are not any default template", () => {
+      it("should return null", async () => {
+        // given
+        await insertNonDefaultMonthlyTemplate();
+        const repository = new MonthlyTemplateRepository();
+
+        // when
+        const template = await repository.getDefault();
+
+        // then
+        expect(template).to.be.null;
+      });
     });
-    const repository = new MonthlyTemplateRepository();
 
-    // when
-    const newMonth = await repository.getDefaultMonthlyTemplate();
+    describe("When there is a default template", () => {
+      it("should return it", async () => {
+        // given
+        await insertDefaultMonthlyTemplate();
+        const repository = new MonthlyTemplateRepository();
 
-    // then
-    expect(newMonth.name).to.equal("Template par défaut");
-    expect(newMonth.isDefault).to.equal(true);
-    expect(newMonth.startingBalance).to.equal(0);
-    expect(newMonth.month).to.deep.equal(monthDate);
-    expect(newMonth.budgets).to.have.length(5);
-    expect(newMonth.budgets.every((budget) => budget.initialBalance === 200)).to
-      .be.true;
-    expect(newMonth.outflows).to.have.length(2);
-    expect(newMonth).to.be.instanceOf(MonthlyTemplate);
+        // when
+        const template = await repository.getDefault();
+
+        // then
+        expect(template).to.be.instanceOf(MonthlyTemplate);
+      });
+    });
   });
 });
