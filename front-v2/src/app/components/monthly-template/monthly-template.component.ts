@@ -23,11 +23,22 @@ import { CommonModule } from '@angular/common';
 export class MonthlyTemplateComponent implements OnInit {
   templateId: string | null = null;
   templateSignal: Signal<MonthTemplate | null> = signal(null);
-  outflowDelationModalIsOpen = false;
-  outflowToDelete: Outflow | null = null;
-  budgetDelationModalIsOpen = false;
-  budgetToDelete: Budget | null = null;
   editingTemplate: MonthTemplate | null = null;
+  isTemplateNameModalOpen = false;
+  // remove outflow
+  isRemoveOutflowModalOpen = false;
+  outflowToDelete: Outflow | null = null;
+  // remove budget
+  isRemoveBudgetModalOpen = false;
+  budgetToDelete: Budget | null = null;
+  // add outflow
+  isAddOutflowModalOpen = false;
+  editingOutflow: Omit<Outflow, 'id' | 'isChecked'> | null = null;
+  // add budget
+  isAddBudgetModalOpen = false;
+  editingBudget: Omit<Budget, 'id'> | null = null;
+  // numpad
+  isNumpadModalOpen = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,8 +49,16 @@ export class MonthlyTemplateComponent implements OnInit {
   ngOnInit(): void {
     this.templateId = this.route.snapshot.paramMap.get('id') || '';
     this.templateSignal = this.monthlyTemplatesStore.getById(this.templateId);
+    this.initializeEditingTemplate();
+  }
+
+  private initializeEditingTemplate() {
     if (this.template) {
-      this.editingTemplate = { ...this.template };
+      this.editingTemplate = {
+        ...this.template,
+        outflows: [...this.template.outflows],
+        budgets: [...this.template.budgets],
+      };
     }
   }
 
@@ -63,48 +82,194 @@ export class MonthlyTemplateComponent implements OnInit {
     return this.editingTemplate?.isDefault ? 'par défault' : 'pas par défaut';
   }
 
-  openOutflowDelationModal(outflow: Outflow, event: Event) {
-    this.outflowDelationModalIsOpen = true;
-    this.outflowToDelete = outflow;
-    event.stopPropagation();
-  }
-
-  closeOutflowDelationModal(event: Event) {
-    this.outflowDelationModalIsOpen = false;
-    this.outflowToDelete = null;
-    event.stopPropagation();
-  }
-
-  openBudgetDelationModal(budget: Budget, event: Event) {
-    this.budgetDelationModalIsOpen = true;
-    this.budgetToDelete = budget;
-    event.stopPropagation();
-  }
-
-  closeBudgetDelationModal(event: Event) {
-    this.budgetDelationModalIsOpen = false;
-    this.budgetToDelete = null;
-    event.stopPropagation();
-  }
-
   defaultChanged(isDefault: boolean) {
     if (this.editingTemplate) {
       this.editingTemplate.isDefault = isDefault;
     }
   }
 
-  editTitle(event: Event) {
-    console.info('edit title');
+  // update template nale
+  openTemplateNameModal(event: Event) {
+    this.isTemplateNameModalOpen = true;
     event.stopPropagation();
+  }
+
+  closeTemplateNameModal(event: Event) {
+    this.isTemplateNameModalOpen = false;
+    event.stopPropagation();
+  }
+
+  cancelNameUpdate(event: Event) {
+    this.isTemplateNameModalOpen = false;
+    event.stopPropagation();
+    if (!this.editingTemplate || !this.template) {
+      return;
+    }
+    this.editingTemplate.name = this.template.name;
+  }
+
+  updateTemplateName(event: Event) {
+    if (!this.editingTemplate) {
+      return;
+    }
+    const input = event.target as HTMLInputElement;
+    const inputValue = input.value;
+    this.editingTemplate.name = inputValue;
+  }
+
+  // remove outflow
+  openOutflowDelationModal(outflow: Outflow, event: Event) {
+    this.isRemoveOutflowModalOpen = true;
+    this.outflowToDelete = outflow;
+    event.stopPropagation();
+  }
+
+  closeOutflowDelationModal(event: Event) {
+    this.isRemoveOutflowModalOpen = false;
+    this.outflowToDelete = null;
+    event.stopPropagation();
+  }
+
+  removeOutflow(event: Event) {
+    if (this.outflowToDelete && this.editingTemplate) {
+      this.editingTemplate.outflows = this.editingTemplate.outflows.filter(
+        (o) => o.id !== this.outflowToDelete?.id
+      );
+    }
+    this.isRemoveOutflowModalOpen = false;
+    this.outflowToDelete = null;
+    event.stopPropagation();
+  }
+
+  // remove budget
+  openBudgetDelationModal(budget: Budget, event: Event) {
+    this.isRemoveBudgetModalOpen = true;
+    this.budgetToDelete = budget;
+    event.stopPropagation();
+  }
+
+  closeBudgetDelationModal(event: Event) {
+    this.isRemoveBudgetModalOpen = false;
+    this.budgetToDelete = null;
+    event.stopPropagation();
+  }
+
+  removeBudget(event: Event) {
+    if (this.budgetToDelete && this.editingTemplate) {
+      this.editingTemplate.budgets = this.editingTemplate.budgets.filter(
+        (b) => b.id !== this.budgetToDelete?.id
+      );
+    }
+    this.isRemoveBudgetModalOpen = false;
+    this.budgetToDelete = null;
+    event.stopPropagation();
+  }
+
+  // add outflow
+  openAddOutflowModal() {
+    this.isAddOutflowModalOpen = true;
+    this.editingOutflow = {
+      amount: 0,
+      label: '',
+    };
+  }
+
+  closeAddOutflowModal(event: Event) {
+    this.isAddOutflowModalOpen = false;
+    this.editingOutflow = null;
+    event.stopPropagation();
+  }
+
+  updateAddingOutflowLabel(event: Event) {
+    if (!this.editingOutflow) {
+      return;
+    }
+    const value = (event.target as HTMLInputElement).value;
+    this.editingOutflow.label = value;
   }
 
   addOutflow(event: Event) {
-    console.info('add outflow');
+    if (this.editingTemplate && this.editingOutflow) {
+      this.editingTemplate.outflows.push({
+        ...this.editingOutflow,
+        id: '',
+        isChecked: false,
+      });
+    }
+    this.closeAddOutflowModal(event);
+  }
+
+  // add budget
+  openAddBudgetModal() {
+    this.isAddBudgetModalOpen = true;
+    this.editingBudget = {
+      initialBalance: 0,
+      name: '',
+    };
+  }
+
+  closeAddBudgetModal(event: Event) {
+    this.isAddBudgetModalOpen = false;
+    this.editingBudget = null;
     event.stopPropagation();
   }
 
+  updateAddingBudgetName(event: Event) {
+    if (!this.editingBudget) {
+      return;
+    }
+    const value = (event.target as HTMLInputElement).value;
+    this.editingBudget.name = value;
+  }
+
   addBudget(event: Event) {
-    console.info('add budget');
+    if (this.editingTemplate && this.editingBudget) {
+      this.editingTemplate.budgets.push({
+        ...this.editingBudget,
+        id: '',
+      });
+    }
+    this.closeAddBudgetModal(event);
+  }
+
+  // numpad
+  openNumpad(event: Event) {
+    this.isNumpadModalOpen = true;
     event.stopPropagation();
+  }
+
+  initializeNumpadValue() {
+    if (this.editingOutflow) {
+      return this.editingOutflow.amount?.toString() ?? '0';
+    }
+    if (this.editingBudget) {
+      return this.editingBudget.initialBalance?.toString() ?? '0';
+    }
+    return '0';
+  }
+
+  closeNumpad(event: Event) {
+    this.isNumpadModalOpen = false;
+    event.stopPropagation();
+  }
+
+  updateAmountValue(value: string) {
+    const amount = Number(value.replace(',', '.'));
+    if (this.editingOutflow) {
+      this.editingOutflow.amount = amount;
+    }
+    if (this.editingBudget) {
+      this.editingBudget.initialBalance = amount;
+    }
+    this.isNumpadModalOpen = false;
+  }
+
+  resetForm(event: Event) {
+    this.initializeEditingTemplate();
+    event.stopPropagation();
+  }
+
+  submitTemplate() {
+    console.info(this.editingTemplate);
   }
 }
