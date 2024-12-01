@@ -2,11 +2,11 @@
 export type MonthTemplate = {
   month: Date;
   startingBalance: number;
-  weeklyBudgets: WeeklyBudget[];
+  budgets: Budget[];
   outflows: Outflow[];
 };
 
-export type WeeklyBudget = {
+export type Budget = {
   name: string;
   initialBalance: number;
 };

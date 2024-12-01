@@ -3,8 +3,8 @@ import env from "./env-vars.js";
 import dbClient from "./providers/persistence/db.js";
 import typeormDataSource from "./providers/persistence/typeormConfig.js";
 import UserRepository from "./providers/persistence/repositories/UserRepository.js";
-import GetMonthCreationTemplate from "./core/usecases/GetMonthCreationTemplate.js";
-import MonthCreationTemplateRepository from "./providers/persistence/repositories/MonthCreationTemplateRepository.js";
+import GetDefaultMonthlyTemplate from "./core/usecases/GetDefaultMonthlyTemplate.js";
+import MonthlyTemplateRepository from "./providers/persistence/repositories/MonthlyTemplateRepository.js";
 import MonthRepository from "./providers/persistence/repositories/MonthRepository.js";
 import IdProvider from "./providers/IdProvider.js";
 import MonthFactory from "./core/factories/MonthFactory.js";
@@ -63,7 +63,7 @@ const userRepository = new UserRepository(client);
 
 const monthRepository = new MonthRepository();
 
-const monthCreationTemplateRepository = new MonthCreationTemplateRepository();
+const monthlyTemplateRepository = new MonthlyTemplateRepository();
 
 const pendingDebitRepository = new PendingDebitRepository();
 
@@ -95,10 +95,11 @@ const manageOutflowsCheckingUsecase = new ManageOutflowsChecking(
   monthRepository
 );
 
-const getMonthCreationTemplateUsecase = new GetMonthCreationTemplate(
-  monthCreationTemplateRepository,
+const getDefaultMonthlyTemplateUsecase = new GetDefaultMonthlyTemplate(
+  monthlyTemplateRepository,
   pendingDebitRepository,
-  yearlyOutflowRepository
+  yearlyOutflowRepository,
+  idProvider
 );
 
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(
@@ -140,7 +141,7 @@ export {
   userRepository,
   monthDto,
   yearlyOutflowsDto,
-  getMonthCreationTemplateUsecase,
+  getDefaultMonthlyTemplateUsecase,
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
   addWeeklyExpenseUsecase,

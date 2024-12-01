@@ -1,5 +1,9 @@
 import sinon from "sinon";
 
+const idProviderStub = {
+  get: sinon.stub(),
+};
+
 const monthRepositoryStub = {
   addExpenseToWeeklyBudget: sinon.stub(),
   addOutflow: sinon.stub(),
@@ -20,8 +24,8 @@ const monthRepositoryStub = {
   updateWeeklyBudgetInitialBalance: sinon.stub(),
 };
 
-const monthCreationTemplateRepositoryStub = {
-  getNewMonthTemplate: sinon.stub(),
+const monthlyTemplateRepositoryStub = {
+  getDefaultMonthlyTemplate: sinon.stub(),
 };
 
 const pendingDebitRepositoryStub = {
@@ -56,13 +60,15 @@ function resetStubs() {
   yearlyOutflowRepositoryStub.getAll.reset();
   yearlyOutflowRepositoryStub.add.reset();
   yearlyOutflowRepositoryStub.remove.reset();
-  monthCreationTemplateRepositoryStub.getNewMonthTemplate.reset();
+  monthlyTemplateRepositoryStub.getDefaultMonthlyTemplate.reset();
+  idProviderStub.get.reset();
 }
 
 export {
   monthRepositoryStub,
   pendingDebitRepositoryStub,
   yearlyOutflowRepositoryStub,
-  monthCreationTemplateRepositoryStub,
+  monthlyTemplateRepositoryStub,
+  idProviderStub,
   resetStubs,
 };

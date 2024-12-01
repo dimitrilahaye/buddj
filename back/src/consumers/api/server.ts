@@ -10,8 +10,8 @@ import cookieSession from "cookie-session";
 import passport from "passport";
 
 import UserRepository from "../../providers/persistence/repositories/UserRepository.js";
-import { getMonthTemplate } from "./routes/monthTemplate.js";
-import GetMonthCreationTemplate from "../../core/usecases/GetMonthCreationTemplate.js";
+import { getDefaultMonthlyTemplate } from "./routes/getDefaultMonthlyTemplate.js";
+import GetDefaultMonthlyTemplate from "../../core/usecases/GetDefaultMonthlyTemplate.js";
 import errorHandler from "./errorHandler.js";
 import { createNewMonth } from "./routes/createNewMonth.js";
 import CreateNewMonth from "../../core/usecases/CreateNewMonth.js";
@@ -103,7 +103,7 @@ export type Deps = {
   userRepository: UserRepository;
   monthDto: MonthDtoBuilder;
   yearlyOutflowsDto: YearlyOutflowsDtoBuilder;
-  getMonthCreationTemplateUsecase: GetMonthCreationTemplate;
+  getDefaultMonthlyTemplateUsecase: GetDefaultMonthlyTemplate;
   createNewMonthUsecase: CreateNewMonth;
   getUnarchivedMonthsUsecase: GetUnarchivedMonths;
   addWeeklyExpenseUsecase: AddWeeklyExpense;
@@ -142,7 +142,7 @@ function buildApi(
   {
     monthDto,
     yearlyOutflowsDto,
-    getMonthCreationTemplateUsecase,
+    getDefaultMonthlyTemplateUsecase,
     getUnarchivedMonthsUsecase,
     createNewMonthUsecase,
     addWeeklyExpenseUsecase,
@@ -333,7 +333,11 @@ function buildApi(
       deserializer: addWeeklyExpenseDeserializer,
     })
   );
-  api.use(getMonthTemplate(router, { getMonthCreationTemplateUsecase }));
+  api.use(
+    getDefaultMonthlyTemplate(router, {
+      usecase: getDefaultMonthlyTemplateUsecase,
+    })
+  );
   api.use(getUnarchivedMonths(router, { getUnarchivedMonthsUsecase }));
   api.use(
     createNewMonth(router, {
