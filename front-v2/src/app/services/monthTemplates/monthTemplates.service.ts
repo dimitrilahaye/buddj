@@ -1,10 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import MonthTemplatesServiceInterface from './monthTemplates.service.interface';
-import { map, Observable } from 'rxjs';
-import { MonthCreationTemplate } from '../../models/monthTemplate.model';
+import { map, Observable, tap } from 'rxjs';
+import {
+  MonthCreationTemplate,
+  MonthTemplate,
+} from '../../models/monthTemplate.model';
 import { Response } from '../../models/response.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import {
+  MONTHLY_TEMPLATES_STORE,
+  MonthlyTemplatesStoreInterface,
+} from '../../stores/monthlyTemplates/monthlyTemplates.store.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +19,11 @@ import { environment } from '../../../environments/environment';
 export class MonthTemplatesService implements MonthTemplatesServiceInterface {
   private apiUrl: string;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    @Inject(MONTHLY_TEMPLATES_STORE)
+    private monthlyTemplatesStore: MonthlyTemplatesStoreInterface
+  ) {
     this.apiUrl = environment.apiUrl;
   }
 
@@ -22,5 +33,14 @@ export class MonthTemplatesService implements MonthTemplatesServiceInterface {
         `${this.apiUrl}/months/template/default`
       )
       .pipe(map(({ data }) => data));
+  }
+
+  getAll(): Observable<void> {
+    return this.http
+      .get<Response<MonthTemplate[]>>(`${this.apiUrl}/months/template`)
+      .pipe(
+        tap(({ data }) => this.monthlyTemplatesStore.addAll(data)),
+        map(() => void 0)
+      );
   }
 }
