@@ -46,6 +46,7 @@ import AddYearlyOutflow from "./core/usecases/AddYearlyOutflow.js";
 import RemoveYearlyOutflow from "./core/usecases/RemoveYearlyOutflow.js";
 import MonthlyOutflowTemplateRepository from "./providers/persistence/repositories/MonthlyOutflowTemplateRepository.js";
 import MonthlyBudgetTemplateRepository from "./providers/persistence/repositories/MonthlyBudgetTemplateRepository.js";
+import GetAllMonthlyTemplates from "./core/usecases/GetAllMonthlyTemplates.js";
 
 // persistence
 
@@ -110,6 +111,12 @@ const getDefaultMonthlyTemplateUsecase = new GetDefaultMonthlyTemplate(
   idProvider
 );
 
+const getAllMonthlyTemplatesUsecase = new GetAllMonthlyTemplates(
+  monthlyTemplateRepository,
+  monthlyOutflowTemplateRepository,
+  monthlyBudgetTemplateRepository
+);
+
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(
   weeklyExpenseFactory,
   monthRepository
@@ -150,6 +157,7 @@ export {
   monthDto,
   yearlyOutflowsDto,
   getDefaultMonthlyTemplateUsecase,
+  getAllMonthlyTemplatesUsecase,
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
   addWeeklyExpenseUsecase,

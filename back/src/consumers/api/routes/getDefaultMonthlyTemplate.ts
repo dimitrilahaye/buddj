@@ -11,8 +11,8 @@ function getDefaultMonthlyTemplate(
 ) {
   return router.get("/months/template/default", async (req, res, next) => {
     try {
-      const month = await usecase.execute();
-      res.send({ success: true, data: month });
+      const template = await usecase.execute();
+      res.send({ success: true, data: template });
     } catch (e) {
       next(e);
     }
