@@ -17,4 +17,15 @@ export class MonthlyTemplatesStore implements MonthlyTemplatesStoreInterface {
       return outflows;
     });
   }
+
+  getById(id: string): Signal<MonthTemplate | null> {
+    const all = this._all();
+    const template = all.find((t) => t.id === id);
+    if (!template) {
+      return signal(null);
+    }
+    template.outflows.sort((a, b) => a.label.localeCompare(b.label));
+    template.budgets.sort((a, b) => a.name.localeCompare(b.name));
+    return signal(template);
+  }
 }

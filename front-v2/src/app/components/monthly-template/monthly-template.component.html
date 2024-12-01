@@ -1,1 +1,102 @@
-<p>monthly-template works!</p>
+<app-header-back-to-home></app-header-back-to-home>
+<div class="content">
+  @if(!editingTemplate) {
+  <app-info>Le template désiré n'existe pas</app-info>
+  } @else {
+  <div class="title">
+    {{ editingTemplate.name }}
+    <app-button-icon
+      icon="fa-edit"
+      size="small"
+      (click)="editTitle($event)"
+    ></app-button-icon>
+  </div>
+  <div class="total">total: {{ total | currency : "EUR" }}</div>
+  <div class="template__infos">
+    <app-toggle-button
+      (toggleChange)="defaultChanged($event)"
+      [isToggled]="editingTemplate.isDefault"
+    ></app-toggle-button>
+    <span>{{ isDefaultInfo }}</span>
+  </div>
+  <section>
+    <div class="subtitle">
+      Sorties mensuelles
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addOutflow($event)"
+      ></app-button-icon>
+    </div>
+    <div class="outflows__list">
+      @if (editingTemplate.outflows.length === 0) {
+      <app-info>Aucune sortie mensuelle pour le moment 😁</app-info>
+      } @else {
+      <app-item *ngFor="let outflow of editingTemplate.outflows; let i = index">
+        <button type="button" class="outflows-list-item">
+          <span class="outflows-list-item__icon">
+            <i class="fa-solid fa-money-bill-transfer"></i>
+          </span>
+          <div class="outflows-list-item__info">
+            <span class="outflows-list-item-info__label">
+              {{ outflow.label }}</span
+            >
+            <span class="outflows-list-item-info__amount">{{
+              outflow.amount | currency : "EUR"
+            }}</span>
+          </div>
+
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </button>
+      </app-item>
+      }
+    </div>
+  </section>
+  <app-divider></app-divider>
+  <section>
+    <div class="subtitle">
+      Budgets
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        (click)="addBudget($event)"
+      ></app-button-icon>
+    </div>
+    <div class="outflows__list">
+      @if (editingTemplate.budgets.length === 0) {
+      <app-info>Aucune sortie mensuelle pour le moment 😁</app-info>
+      } @else {
+      <app-item *ngFor="let budget of editingTemplate.budgets; let i = index">
+        <button type="button" class="outflows-list-item">
+          <span class="outflows-list-item__icon">
+            <i class="fa-solid fa-basket-shopping"></i>
+          </span>
+          <div class="outflows-list-item__info">
+            <span class="outflows-list-item-info__label">
+              {{ budget.name }}</span
+            >
+            <span class="outflows-list-item-info__amount">{{
+              budget.initialBalance | currency : "EUR"
+            }}</span>
+          </div>
+
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            (click)="openBudgetDelationModal(budget, $event)"
+          >
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </button>
+      </app-item>
+      }
+    </div>
+  </section>
+  }
+</div>

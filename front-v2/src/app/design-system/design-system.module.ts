@@ -15,6 +15,7 @@ import { ModalComponent } from './modal/modal/modal.component';
 import { InfoComponent } from './info/info.component';
 import { NumpadComponent } from './numpad/numpad.component';
 import { ButtonIconComponent } from './button-icon/button-icon.component';
+import { ToggleButtonComponent } from './toggle-button/toggle-button.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { ButtonIconComponent } from './button-icon/button-icon.component';
     InfoComponent,
     NumpadComponent,
     ButtonIconComponent,
+    ToggleButtonComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -49,6 +51,7 @@ import { ButtonIconComponent } from './button-icon/button-icon.component';
     InfoComponent,
     NumpadComponent,
     ButtonIconComponent,
+    ToggleButtonComponent,
   ],
 })
 export class DesignSystemModule {}
