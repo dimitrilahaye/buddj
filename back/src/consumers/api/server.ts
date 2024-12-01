@@ -62,6 +62,8 @@ import { addYearlyOutflow } from "./routes/addYearlyOutflow.js";
 import RemoveYearlyOutflow from "../../core/usecases/RemoveYearlyOutflow.js";
 import { removeYearlyOutflow } from "./routes/removeYearlyOutflow.js";
 import { RemoveYearlyOutflowDeserializer } from "./deserializers/removeYearlyOutflow.js";
+import GetAllMonthlyTemplates from "../../core/usecases/GetAllMonthlyTemplates.js";
+import { getAllMonthlyTemplates } from "./routes/getAllMonthlyTemplates.js";
 
 declare global {
   namespace Express {
@@ -104,6 +106,7 @@ export type Deps = {
   monthDto: MonthDtoBuilder;
   yearlyOutflowsDto: YearlyOutflowsDtoBuilder;
   getDefaultMonthlyTemplateUsecase: GetDefaultMonthlyTemplate;
+  getAllMonthlyTemplatesUsecase: GetAllMonthlyTemplates;
   createNewMonthUsecase: CreateNewMonth;
   getUnarchivedMonthsUsecase: GetUnarchivedMonths;
   addWeeklyExpenseUsecase: AddWeeklyExpense;
@@ -143,6 +146,7 @@ function buildApi(
     monthDto,
     yearlyOutflowsDto,
     getDefaultMonthlyTemplateUsecase,
+    getAllMonthlyTemplatesUsecase,
     getUnarchivedMonthsUsecase,
     createNewMonthUsecase,
     addWeeklyExpenseUsecase,
@@ -336,6 +340,11 @@ function buildApi(
   api.use(
     getDefaultMonthlyTemplate(router, {
       usecase: getDefaultMonthlyTemplateUsecase,
+    })
+  );
+  api.use(
+    getAllMonthlyTemplates(router, {
+      usecase: getAllMonthlyTemplatesUsecase,
     })
   );
   api.use(getUnarchivedMonths(router, { getUnarchivedMonthsUsecase }));
