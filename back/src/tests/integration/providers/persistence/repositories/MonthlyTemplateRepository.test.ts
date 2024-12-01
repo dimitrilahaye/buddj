@@ -41,5 +41,35 @@ describe("Integration | Providers | Persistence | Repositories | MonthlyTemplate
         expect(template).to.be.instanceOf(MonthlyTemplate);
       });
     });
+
+    describe("#getAll", () => {
+      describe("when there is not any templates", () => {
+        it("should return an empty list", async () => {
+          // given
+          const repository = new MonthlyTemplateRepository();
+
+          // when
+          const templates = await repository.getAll();
+
+          // then
+          expect(templates).to.have.length(0);
+        });
+      });
+
+      describe("when there are templates", () => {
+        it("should return them", async () => {
+          // given
+          await insertDefaultMonthlyTemplate();
+          await insertNonDefaultMonthlyTemplate();
+          const repository = new MonthlyTemplateRepository();
+
+          // when
+          const templates = await repository.getAll();
+
+          // then
+          expect(templates).to.have.length(2);
+        });
+      });
+    });
   });
 });
