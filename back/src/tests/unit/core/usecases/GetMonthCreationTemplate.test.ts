@@ -29,9 +29,7 @@ describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
     const expectedTemplate = {
       addMonthlyProjectForAmount: sinon.stub(),
     };
-    monthlyTemplateRepositoryStub.getDefaultMonthlyTemplate.resolves(
-      expectedTemplate
-    );
+    monthlyTemplateRepositoryStub.getDefault.resolves(expectedTemplate);
 
     const usecase = new GetDefaultMonthlyTemplate(
       monthlyTemplateRepositoryStub,
@@ -44,8 +42,7 @@ describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
     const monthlyTemplate = await usecase.execute();
 
     // then
-    expect(monthlyTemplateRepositoryStub.getDefaultMonthlyTemplate).to.have.been
-      .calledOnce;
+    expect(monthlyTemplateRepositoryStub.getDefault).to.have.been.calledOnce;
     expect(
       expectedTemplate.addMonthlyProjectForAmount
     ).to.have.been.calledOnceWith(idProviderStub, expectedTotal);

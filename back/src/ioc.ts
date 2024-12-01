@@ -4,7 +4,7 @@ import dbClient from "./providers/persistence/db.js";
 import typeormDataSource from "./providers/persistence/typeormConfig.js";
 import UserRepository from "./providers/persistence/repositories/UserRepository.js";
 import GetDefaultMonthlyTemplate from "./core/usecases/GetDefaultMonthlyTemplate.js";
-import MonthlyTemplateRepository from "./providers/persistence/repositories/MonthlyTemplateRepository.js";
+import TypeOrmMonthlyTemplateRepository from "./providers/persistence/repositories/MonthlyTemplateRepository.js";
 import MonthRepository from "./providers/persistence/repositories/MonthRepository.js";
 import IdProvider from "./providers/IdProvider.js";
 import MonthFactory from "./core/factories/MonthFactory.js";
@@ -63,7 +63,7 @@ const userRepository = new UserRepository(client);
 
 const monthRepository = new MonthRepository();
 
-const monthlyTemplateRepository = new MonthlyTemplateRepository();
+const monthlyTemplateRepository = new TypeOrmMonthlyTemplateRepository();
 
 const pendingDebitRepository = new PendingDebitRepository();
 

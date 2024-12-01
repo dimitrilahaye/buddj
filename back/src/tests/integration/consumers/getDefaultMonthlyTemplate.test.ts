@@ -8,19 +8,23 @@ import {
   MonthlyTemplateOutflowsError,
   MonthlyTemplateBudgetError,
 } from "../../../core/errors/MonthlyTemplateErrors.js";
+import { insertDefaultMonthlyTemplate } from "../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
+import { clearDB } from "../providers/test-helpers.js";
 
 describe("Integration | Consumers | Routes | GET /months/template/default", function () {
   let server: http.Server;
 
   describe("When user is authenticated", function () {
-    afterEach(function () {
+    afterEach(async function () {
       server.close();
+      await clearDB();
     });
 
-    it("should return data for a new month creation", async function () {
+    it.only("should return data for a new month creation", async function () {
       // given
       server = mockedServer({ isAuthenticated: true }, deps);
       const cookie = await authenticate(server);
+      await insertDefaultMonthlyTemplate();
 
       // when
       const response = await request(server)

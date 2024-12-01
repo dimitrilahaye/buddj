@@ -13,8 +13,7 @@ export default class GetDefaultMonthlyTemplate {
 
   async execute() {
     const pendingDebits = await this.pendingDebitRepository.getAll();
-    const template =
-      await this.monthlyTemplateRepository.getDefaultMonthlyTemplate();
+    const template = await this.monthlyTemplateRepository.getDefault();
 
     const yearlyOutflows = await this.yearlyOutflowsRepository.getAll();
     const monthlyProjectTotal = yearlyOutflows.getMonthlyProjectsAmount();

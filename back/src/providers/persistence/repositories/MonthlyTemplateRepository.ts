@@ -1,27 +1,20 @@
-import MonthlyBudgetTemplate from "../../../core/models/template/MonthlyBudgetTemplate.js";
-import MonthlyOutflowTemplate from "../../../core/models/template/MonthlyOutflowTemplate.js";
 import MonthlyTemplate from "../../../core/models/template/MonthlyTemplate.js";
-import MonthlyTemplateRepositoryInterface from "../../../core/ports/repositories/MonthlyTemplateRepository.js";
-import env from "../../../env-vars.js";
+import MonthlyTemplateRepository from "../../../core/ports/repositories/MonthlyTemplateRepository.js";
+import { MonthlyTemplateDao } from "../entities/MonthlyTemplate.js";
 
-export default class MonthlyTemplateRepository
-  implements MonthlyTemplateRepositoryInterface
+export default class TypeOrmMonthlyTemplateRepository
+  implements MonthlyTemplateRepository
 {
-  async getDefaultMonthlyTemplate() {
-    const props = {
-      id: "id",
-      name: "Template par défaut",
-      isDefault: true,
-      budgets: env.template.budgets.map(
-        ({ name }: { name: string }) =>
-          new MonthlyBudgetTemplate({ id: "id", name, initialBalance: 200 })
-      ),
-      outflows: env.template.outflows.map(
-        ({ label, amount }: { label: string; amount: number }) =>
-          new MonthlyOutflowTemplate({ id: "id", label, amount })
-      ),
-    };
+  async getDefault(): Promise<MonthlyTemplate | null> {
+    const template = await MonthlyTemplateDao.findOne({
+      where: {
+        isDefault: true,
+      },
+    });
+    if (!template) {
+      return null;
+    }
 
-    return new MonthlyTemplate(props);
+    return template.toDomain();
   }
 }
