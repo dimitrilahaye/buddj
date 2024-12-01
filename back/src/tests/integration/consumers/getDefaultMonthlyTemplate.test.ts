@@ -5,11 +5,11 @@ import { afterEach } from "mocha";
 import * as deps from "../../../ioc.js";
 import sinon from "sinon";
 import {
-  MonthCreationOutflowsError,
-  MonthCreationTemplateWeeklyBudgetError,
-} from "../../../core/errors/MonthCreationTemplateErrors.js";
+  MonthlyTemplateOutflowsError,
+  MonthlyTemplateBudgetError,
+} from "../../../core/errors/MonthlyTemplateErrors.js";
 
-describe("Integration | Consumers | Routes | GET /months/template", function () {
+describe("Integration | Consumers | Routes | GET /months/template/default", function () {
   let server: http.Server;
 
   describe("When user is authenticated", function () {
@@ -24,7 +24,7 @@ describe("Integration | Consumers | Routes | GET /months/template", function () 
 
       // when
       const response = await request(server)
-        .get("/months/template")
+        .get("/months/template/default")
         .set("Cookie", cookie);
 
       // then
@@ -34,15 +34,15 @@ describe("Integration | Consumers | Routes | GET /months/template", function () 
 
     it("should return 502 error if month template does not contain 5 weekly budget", async function () {
       // given
-      deps.getMonthCreationTemplateUsecase.execute = sinon
+      deps.getDefaultMonthlyTemplateUsecase.execute = sinon
         .stub()
-        .throwsException(new MonthCreationTemplateWeeklyBudgetError());
+        .throwsException(new MonthlyTemplateBudgetError());
       server = mockedServer({ isAuthenticated: true }, deps);
       const cookie = await authenticate(server);
 
       // when
       const response = await request(server)
-        .get("/months/template")
+        .get("/months/template/default")
         .set("Cookie", cookie);
 
       // then
@@ -52,15 +52,15 @@ describe("Integration | Consumers | Routes | GET /months/template", function () 
 
     it("should return 502 error if month template does not contain at least 1 outflow", async function () {
       // given
-      deps.getMonthCreationTemplateUsecase.execute = sinon
+      deps.getDefaultMonthlyTemplateUsecase.execute = sinon
         .stub()
-        .throwsException(new MonthCreationOutflowsError());
+        .throwsException(new MonthlyTemplateOutflowsError());
       server = mockedServer({ isAuthenticated: true }, deps);
       const cookie = await authenticate(server);
 
       // when
       const response = await request(server)
-        .get("/months/template")
+        .get("/months/template/default")
         .set("Cookie", cookie);
 
       // then
@@ -79,7 +79,7 @@ describe("Integration | Consumers | Routes | GET /months/template", function () 
     });
 
     it("should return a 401 error", async function () {
-      await request(server).get("/months/template").expect(401);
+      await request(server).get("/months/template/default").expect(401);
     });
   });
 });

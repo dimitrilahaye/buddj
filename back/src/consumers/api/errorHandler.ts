@@ -31,8 +31,8 @@ const errorHandler = (
     case "YearlyOutflowsAddError":
       statusCode = 422;
       break;
-    case "MonthCreationTemplateWeeklyBudgetError":
-    case "MonthCreationOutflowsError":
+    case "MonthlyTemplateBudgetError":
+    case "MonthlyTemplateOutflowsError":
     case "WeeklyBudgetsDashboardWeeklyBudgetsError":
       statusCode = 502;
       break;

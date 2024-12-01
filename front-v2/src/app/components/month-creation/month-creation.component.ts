@@ -248,7 +248,7 @@ export class MonthCreationComponent implements OnInit {
   private setNewMonthData() {
     this.newMonth.month = new Date(this.template!.template.month);
     this.newMonth.startingBalance = this.template!.template.startingBalance;
-    this.newMonth.weeklyBudgets = this.template!.template.weeklyBudgets;
+    this.newMonth.weeklyBudgets = this.template!.template.budgets;
     this.newMonth.outflows = this.template!.template.outflows;
   }
 

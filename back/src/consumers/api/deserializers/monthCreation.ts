@@ -1,6 +1,6 @@
 import MonthCreationCommand, {
   OutflowCreationCommand,
-  WeeklyBudgetCreationCommand,
+  BudgetCreationCommand,
 } from "../../../core/commands/MonthCreationCommand.js";
 import Koi from "../validators/Koi.js";
 import SerializationError from "../errors/DeserializationError.js";
@@ -21,7 +21,7 @@ const deserializer: MonthCreationDeserializer = (body: any) => {
       Koi.validate(outflow.amount).number();
       Koi.validate(outflow.label).string().notEmpty();
     });
-    body.weeklyBudgets.forEach((weeklyBudget: WeeklyBudgetCreationCommand) => {
+    body.weeklyBudgets.forEach((weeklyBudget: BudgetCreationCommand) => {
       Koi.validate(weeklyBudget.initialBalance).number();
       Koi.validate(weeklyBudget.name).string().notEmpty();
     });
@@ -45,7 +45,7 @@ const deserializer: MonthCreationDeserializer = (body: any) => {
       amount: outflow.amount,
     })),
     weeklyBudgets: body.weeklyBudgets.map(
-      (weeklyBudget: WeeklyBudgetCreationCommand) => ({
+      (weeklyBudget: BudgetCreationCommand) => ({
         name: weeklyBudget.name,
         initialBalance: weeklyBudget.initialBalance,
       })

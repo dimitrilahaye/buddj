@@ -18,7 +18,9 @@ export class MonthTemplatesService implements MonthTemplatesServiceInterface {
 
   getTemplate(): Observable<MonthCreationTemplate> {
     return this.http
-      .get<Response<MonthCreationTemplate>>(`${this.apiUrl}/months/template`)
+      .get<Response<MonthCreationTemplate>>(
+        `${this.apiUrl}/months/template/default`
+      )
       .pipe(map(({ data }) => data));
   }
 }

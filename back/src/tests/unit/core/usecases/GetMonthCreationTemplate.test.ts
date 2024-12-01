@@ -1,15 +1,16 @@
 import expect from "../../../test-helpers.js";
 import {
-  monthCreationTemplateRepositoryStub,
+  monthlyTemplateRepositoryStub,
   pendingDebitRepositoryStub,
   resetStubs,
   yearlyOutflowRepositoryStub,
+  idProviderStub,
 } from "./test-helpers.js";
-import GetMonthCreationTemplate from "../../../../core/usecases/GetMonthCreationTemplate.js";
+import GetDefaultMonthlyTemplate from "../../../../core/usecases/GetDefaultMonthlyTemplate.js";
 import { after } from "mocha";
 import sinon from "sinon";
 
-describe("Unit | Core | Usecases | GetMonthCreationTemplate", function () {
+describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
   after(() => {
     resetStubs();
   });
@@ -28,25 +29,26 @@ describe("Unit | Core | Usecases | GetMonthCreationTemplate", function () {
     const expectedTemplate = {
       addMonthlyProjectForAmount: sinon.stub(),
     };
-    monthCreationTemplateRepositoryStub.getNewMonthTemplate.resolves(
+    monthlyTemplateRepositoryStub.getDefaultMonthlyTemplate.resolves(
       expectedTemplate
     );
 
-    const usecase = new GetMonthCreationTemplate(
-      monthCreationTemplateRepositoryStub,
+    const usecase = new GetDefaultMonthlyTemplate(
+      monthlyTemplateRepositoryStub,
       pendingDebitRepositoryStub,
-      yearlyOutflowRepositoryStub
+      yearlyOutflowRepositoryStub,
+      idProviderStub
     );
 
     // when
-    const monthCreationTemplate = await usecase.execute();
+    const monthlyTemplate = await usecase.execute();
 
     // then
-    expect(monthCreationTemplateRepositoryStub.getNewMonthTemplate).to.have.been
+    expect(monthlyTemplateRepositoryStub.getDefaultMonthlyTemplate).to.have.been
       .calledOnce;
     expect(
       expectedTemplate.addMonthlyProjectForAmount
-    ).to.have.been.calledOnceWith(expectedTotal);
-    expect(monthCreationTemplate.pendingDebits).to.be.equals(expectedDebits);
+    ).to.have.been.calledOnceWith(idProviderStub, expectedTotal);
+    expect(monthlyTemplate.pendingDebits).to.be.equals(expectedDebits);
   });
 });
