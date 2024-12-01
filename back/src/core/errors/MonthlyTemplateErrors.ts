@@ -12,4 +12,17 @@ class MonthlyTemplateOutflowsError extends Error {
   }
 }
 
-export { MonthlyTemplateOutflowsError, MonthlyTemplateBudgetError };
+class NoDefaultMonthlyTemplateError extends Error {
+  constructor() {
+    super(
+      "MonthlyTemplate: you need a default template in order to create a month"
+    );
+    this.name = "NoDefaultMonthlyTemplateError";
+  }
+}
+
+export {
+  MonthlyTemplateOutflowsError,
+  MonthlyTemplateBudgetError,
+  NoDefaultMonthlyTemplateError,
+};
