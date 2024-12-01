@@ -9,7 +9,7 @@ export default class MonthCreationTemplateRepository
 {
   async getNewMonthTemplate() {
     const props = {
-      weeklyBudgets: env.template.weeklyBudgets.map(
+      weeklyBudgets: (env.template.weeklyBudgets ?? env.template.budgets).map(
         ({ name }: { name: string }) => new WeeklyBudgetTemplate({ name })
       ),
       outflows: env.template.outflows.map(
