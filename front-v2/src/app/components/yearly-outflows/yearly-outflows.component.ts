@@ -25,11 +25,17 @@ import {
   Validators,
 } from '@angular/forms';
 import { amountValidator } from '../../validators/amount.validator';
+import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
 
 @Component({
   selector: 'app-yearly-outflows',
   standalone: true,
-  imports: [DesignSystemModule, CommonModule, ReactiveFormsModule],
+  imports: [
+    DesignSystemModule,
+    CommonModule,
+    ReactiveFormsModule,
+    HeaderBackToHomeComponent,
+  ],
   templateUrl: './yearly-outflows.component.html',
   styleUrl: './yearly-outflows.component.scss',
 })
@@ -209,9 +215,5 @@ export class YearlyOutflowsComponent {
       .subscribe(() => {
         this.toaster.success('La sortie annuelle ont été supprimée !');
       });
-  }
-
-  backToHome() {
-    this.router.navigate(['home']);
   }
 }

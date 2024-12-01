@@ -32,6 +32,7 @@ import {
   type YearlyOutflowsStoreInterface,
 } from '../../stores/yearlyOutflows/yearlyOutflows.store.interface';
 import { YearlyOutflow } from '../../models/yearlyOutflow.model';
+import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
 
 @Component({
   selector: 'app-month-creation',
@@ -41,6 +42,7 @@ import { YearlyOutflow } from '../../models/yearlyOutflow.model';
     CommonModule,
     DesignSystemModule,
     ToggleVisibilityButtonComponent,
+    HeaderBackToHomeComponent,
   ],
   templateUrl: './month-creation.component.html',
   styleUrl: './month-creation.component.scss',
