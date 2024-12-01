@@ -16,7 +16,7 @@ describe("Integration | Providers | Persistence | Repositories | MonthlyTemplate
     // given
     clock.start(monthDate);
     sinon.stub(env, "template").value({
-      weeklyBudgets: [
+      budgets: [
         { name: "Semaine 1" },
         { name: "Semaine 2" },
         { name: "Semaine 3" },

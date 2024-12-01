@@ -8,17 +8,17 @@ import IdProvider from "../../ports/providers/IdProvider.js";
 
 export default class MonthlyTemplate {
   id: string;
+  name: string;
+  isDefault: boolean;
+  budgets: MonthlyBudgetTemplate[] = [];
+  outflows: MonthlyOutflowTemplate[] = [];
   month: Date;
   startingBalance: number;
-  budgets: MonthlyBudgetTemplate[];
-  outflows: MonthlyOutflowTemplate[];
-  isDefault: boolean;
-  name: string;
 
   constructor(props: {
     id: string;
-    budgets: MonthlyBudgetTemplate[];
-    outflows: MonthlyOutflowTemplate[];
+    budgets?: MonthlyBudgetTemplate[];
+    outflows?: MonthlyOutflowTemplate[];
     isDefault: boolean;
     name: string;
   }) {
@@ -28,14 +28,18 @@ export default class MonthlyTemplate {
     this.isDefault = props.isDefault;
     this.name = props.name;
 
-    if (props.budgets.length !== 5) {
-      throw new MonthlyTemplateBudgetError();
+    if (props.budgets) {
+      if (props.budgets.length !== 5) {
+        throw new MonthlyTemplateBudgetError();
+      }
+      this.budgets = props.budgets;
     }
-    if (props.outflows.length === 0) {
-      throw new MonthlyTemplateOutflowsError();
+    if (props.outflows) {
+      if (props.outflows.length === 0) {
+        throw new MonthlyTemplateOutflowsError();
+      }
+      this.outflows = props.outflows;
     }
-    this.budgets = props.budgets;
-    this.outflows = props.outflows;
   }
 
   addMonthlyProjectForAmount(idProvider: IdProvider, amount: number) {
