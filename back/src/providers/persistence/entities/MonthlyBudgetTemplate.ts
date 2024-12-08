@@ -16,15 +16,12 @@ export class MonthlyBudgetTemplateDao extends BaseEntity {
   @Column({ name: "monthly_template_id", type: "uuid" })
   monthlyTemplateId: string;
 
-  static fromDomain(
-    monthlyTemplate: MonthlyTemplate,
-    model: MonthlyBudgetTemplate
-  ) {
+  static fromDomain(templateId: string, model: MonthlyBudgetTemplate) {
     return MonthlyBudgetTemplateDao.create({
       id: model.id,
       name: model.name,
       initialBalance: Number(model.initialBalance),
-      monthlyTemplateId: monthlyTemplate.id,
+      monthlyTemplateId: templateId,
     });
   }
 

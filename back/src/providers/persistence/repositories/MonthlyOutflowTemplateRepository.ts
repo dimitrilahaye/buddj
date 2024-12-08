@@ -20,4 +20,13 @@ export default class TypeOrmMonthlyOutflowTemplateRepository
   async deleteById(outflowId: string): Promise<void> {
     await MonthlyOutflowTemplateDao.delete(outflowId);
   }
+
+  async save(
+    templateId: string,
+    outflow: MonthlyOutflowTemplate
+  ): Promise<void> {
+    await MonthlyOutflowTemplateDao.save(
+      MonthlyOutflowTemplateDao.fromDomain(templateId, outflow)
+    );
+  }
 }

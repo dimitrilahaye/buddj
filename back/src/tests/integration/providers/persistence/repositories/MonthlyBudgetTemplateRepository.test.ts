@@ -7,6 +7,7 @@ import {
   insertMonthlyBudgetTemplate,
 } from "../../../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
 import { MonthlyBudgetTemplateDao } from "../../../../../providers/persistence/entities/MonthlyBudgetTemplate.js";
+import MonthlyBudgetTemplate from "../../../../../core/models/monthly-template/MonthlyBudgetTemplate.js";
 
 describe("Integration | Providers | Persistence | Repositories | MonthlyBudgetTemplateRepository", function () {
   afterEach(async () => {
@@ -59,6 +60,28 @@ describe("Integration | Providers | Persistence | Repositories | MonthlyBudgetTe
         id: budget.id,
       });
       expect(foundBudgets).to.have.length(0);
+    });
+  });
+
+  describe("#save", () => {
+    it("should create the budget", async () => {
+      // given
+      const newBudget = new MonthlyBudgetTemplate({
+        id: "5f9f1228-d649-4228-b599-b709278dc4fe",
+        name: "Semaine 1",
+        initialBalance: 200,
+      });
+      const template = await insertDefaultMonthlyTemplate();
+      const repository = new MonthlyBudgetTemplateRepository();
+
+      // when
+      await repository.save(template.id, newBudget);
+
+      // then
+      const foundBudgets = await MonthlyBudgetTemplateDao.findBy({
+        id: newBudget.id,
+      });
+      expect(foundBudgets).to.have.length(1);
     });
   });
 });

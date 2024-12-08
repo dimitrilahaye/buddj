@@ -7,6 +7,7 @@ import {
   insertMonthlyOutflowTemplate,
 } from "../../../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
 import { MonthlyOutflowTemplateDao } from "../../../../../providers/persistence/entities/MonthlyOutflowTemplate.js";
+import MonthlyOutflowTemplate from "../../../../../core/models/monthly-template/MonthlyOutflowTemplate.js";
 
 describe("Integration | Providers | Persistence | Repositories | MonthlyOutflowTemplateRepository", function () {
   afterEach(async () => {
@@ -59,6 +60,28 @@ describe("Integration | Providers | Persistence | Repositories | MonthlyOutflowT
         id: outflow.id,
       });
       expect(foundOutflows).to.have.length(0);
+    });
+  });
+
+  describe("#save", () => {
+    it("should create the outflow", async () => {
+      // given
+      const newOutflow = new MonthlyOutflowTemplate({
+        id: "5f9f1228-d649-4228-b599-b709278dc4fe",
+        label: "Jow",
+        amount: 10,
+      });
+      const template = await insertDefaultMonthlyTemplate();
+      const repository = new MonthlyOutflowTemplateRepository();
+
+      // when
+      await repository.save(template.id, newOutflow);
+
+      // then
+      const foundOutflows = await MonthlyOutflowTemplateDao.findBy({
+        id: newOutflow.id,
+      });
+      expect(foundOutflows).to.have.length(1);
     });
   });
 });

@@ -20,4 +20,10 @@ export default class TypeOrmMonthlyBudgetTemplateRepository
   async deleteById(budgetId: string): Promise<void> {
     await MonthlyBudgetTemplateDao.delete(budgetId);
   }
+
+  async save(templateId: string, budget: MonthlyBudgetTemplate): Promise<void> {
+    await MonthlyBudgetTemplateDao.save(
+      MonthlyBudgetTemplateDao.fromDomain(templateId, budget)
+    );
+  }
 }
