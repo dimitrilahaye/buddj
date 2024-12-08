@@ -115,26 +115,10 @@
   ##################### FOOTER #####################
 -->
 <div class="month-creation__footer">
-  <span class="month-creation-footer__forecast-balance"
-    >Total : <strong>{{ total | currency : "EUR" }}</strong></span
-  >
   <div class="month-creation-footer__actions">
-    <button
-      class="month-creation-footer-actions__action"
-      type="button"
-      [disabled]="isLoading"
-      (click)="resetForm($event)"
+    <span class="month-creation-footer__forecast-balance"
+      >Total : <strong>{{ total | currency : "EUR" }}</strong></span
     >
-      <i class="fa-solid fa-rotate"></i>
-    </button>
-    <app-button
-      [type]="'submit'"
-      [size]="'big'"
-      [variant]="'danger'"
-      [label]="'Sauvegarder'"
-      [disabled]="isLoading"
-      (click)="submitTemplate()"
-    ></app-button>
   </div>
 </div>
 
@@ -181,7 +165,8 @@
   <app-button
     [size]="'big'"
     [variant]="'danger'"
-    [label]="'Supprimer la sortie mensuelle'"
+    [label]="'Supprimer définitivement la sortie'"
+    [loading]="isLoading"
     (click)="removeOutflow($event)"
   ></app-button>
 </app-modal>
@@ -196,7 +181,8 @@
   <app-button
     [size]="'big'"
     [variant]="'danger'"
-    [label]="'Supprimer le budget'"
+    [label]="'Supprimer définitivement le budget'"
+    [loading]="isLoading"
     (click)="removeBudget($event)"
   ></app-button>
 </app-modal>
