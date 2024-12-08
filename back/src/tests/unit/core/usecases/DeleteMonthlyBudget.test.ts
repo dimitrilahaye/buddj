@@ -1,5 +1,5 @@
 import expect from "../../../test-helpers.js";
-import UpdateMonthlyTemplate from "../../../../core/usecases/UpdateMonthlyTemplate.js";
+import DeleteMonthlyBudget from "../../../../core/usecases/DeleteMonthlyBudget.js";
 import { MonthlyTemplateDoesNotExistError } from "../../../../core/errors/MonthlyTemplateErrors.js";
 import {
   monthlyBudgetTemplateRepositoryStub,
@@ -10,7 +10,7 @@ import {
 import sinon from "sinon";
 import { afterEach } from "mocha";
 
-describe("Unit | Core | Usecases | UpdateMonthlyTemplate", function () {
+describe("Unit | Core | Usecases | DeleteMonthlyBudget", function () {
   afterEach(() => {
     resetStubs();
   });
@@ -19,9 +19,9 @@ describe("Unit | Core | Usecases | UpdateMonthlyTemplate", function () {
   describe("when template does not exist", () => {
     it("should throw an error", async () => {
       // given
-      const command = { id: "unexisting-id", name: "newName", isDefault: true };
+      const command = { templateId: "unexisting-id", budgetId: "id" };
       monthlyTemplateRepositoryStub.getById.resolves(null);
-      const usecase = new UpdateMonthlyTemplate(
+      const usecase = new DeleteMonthlyBudget(
         monthlyTemplateRepositoryStub,
         monthlyOutflowTemplateRepositoryStub,
         monthlyBudgetTemplateRepositoryStub
@@ -32,27 +32,20 @@ describe("Unit | Core | Usecases | UpdateMonthlyTemplate", function () {
         MonthlyTemplateDoesNotExistError
       );
       expect(monthlyTemplateRepositoryStub.getById).has.been.calledWith(
-        command.id
+        command.templateId
       );
     });
 
     it("should update the template and return it", async () => {
       // given
-      const command = { id: "id", name: "newName", isDefault: true };
+      const command = { templateId: "id", budgetId: "id" };
       const templateGetByIdSpy = {
-        id: command.id,
-        updateName: sinon.spy(),
-        updateIsDefault: sinon.spy(),
+        id: command.templateId,
+        removeBudget: sinon.spy(),
         outflows: [],
         budgets: [],
       };
       monthlyTemplateRepositoryStub.getById.resolves(templateGetByIdSpy);
-      const templateSaveSpy = {
-        id: command.id,
-        outflows: [],
-        budgets: [],
-      };
-      monthlyTemplateRepositoryStub.save.resolves(templateSaveSpy);
       const expectedTemplateOutflows = Symbol("expectedTemplateOutflows");
       monthlyOutflowTemplateRepositoryStub.getAllByTemplateId.resolves(
         expectedTemplateOutflows
@@ -63,7 +56,7 @@ describe("Unit | Core | Usecases | UpdateMonthlyTemplate", function () {
         expectedTemplateBudgets
       );
 
-      const usecase = new UpdateMonthlyTemplate(
+      const usecase = new DeleteMonthlyBudget(
         monthlyTemplateRepositoryStub,
         monthlyOutflowTemplateRepositoryStub,
         monthlyBudgetTemplateRepositoryStub
@@ -74,24 +67,22 @@ describe("Unit | Core | Usecases | UpdateMonthlyTemplate", function () {
 
       // then
       expect(monthlyTemplateRepositoryStub.getById).has.been.calledWith(
-        command.id
+        command.templateId
       );
 
-      expect(templateGetByIdSpy.updateName).has.been.calledWith(command.name);
-      expect(templateGetByIdSpy.updateIsDefault).has.been.calledWith(
-        command.isDefault
+      expect(templateGetByIdSpy.removeBudget).has.been.calledWith(
+        command.budgetId
       );
 
       expect(
         monthlyOutflowTemplateRepositoryStub.getAllByTemplateId
-      ).to.have.been.calledOnceWith(command.id);
+      ).to.have.been.calledOnceWith(command.templateId);
       expect(
         monthlyBudgetTemplateRepositoryStub.getAllByTemplateId
-      ).to.have.been.calledOnceWith(command.id);
-
-      expect(monthlyTemplateRepositoryStub.save).to.have.been.calledOnceWith(
-        templateGetByIdSpy
-      );
+      ).to.have.been.calledOnceWith(command.templateId);
+      expect(
+        monthlyBudgetTemplateRepositoryStub.deleteById
+      ).to.have.been.calledOnceWith(command.budgetId);
 
       expect(monthlyTemplate.budgets).to.be.equals(expectedTemplateBudgets);
       expect(monthlyTemplate.outflows).to.be.equals(expectedTemplateOutflows);
