@@ -1,24 +1,24 @@
 import GetMonthlyTemplateByIdDomainService from "../domain-services/monthly-template/GetMonthlyTemplateByIdDomainService.js";
-import MonthlyOutflowFactory from "../factories/MonthlyOutflowFactory.js";
+import MonthlyBudgetFactory from "../factories/MonthlyBudgetFactory.js";
 import IdProvider from "../ports/providers/IdProvider.js";
 import MonthlyBudgetTemplateRepository from "../ports/repositories/MonthlyBudgetTemplateRepository.js";
 import MonthlyOutflowTemplateRepository from "../ports/repositories/MonthlyOutflowTemplateRepository.js";
 import MonthlyTemplateRepository from "../ports/repositories/MonthlyTemplateRepository.js";
 
-export interface AddMonthlyOutflowCommand {
+export interface AddMonthlyBudgetCommand {
   templateId: string;
-  amount: number;
-  label: string;
+  initialBalance: number;
+  name: string;
 }
 
-export default class AddMonthlyOutflow {
+export default class AddMonthlyBudget {
   getMonthlyTemplateByIdDomainService: GetMonthlyTemplateByIdDomainService;
 
   constructor(
     public monthlyTemplateRepository: MonthlyTemplateRepository,
     public monthlyOutflowTemplateRepository: MonthlyOutflowTemplateRepository,
     public monthlyBudgetTemplateRepository: MonthlyBudgetTemplateRepository,
-    public factory: MonthlyOutflowFactory
+    public factory: MonthlyBudgetFactory
   ) {
     this.getMonthlyTemplateByIdDomainService =
       new GetMonthlyTemplateByIdDomainService(
@@ -28,15 +28,15 @@ export default class AddMonthlyOutflow {
       );
   }
 
-  async execute(command: AddMonthlyOutflowCommand) {
+  async execute(command: AddMonthlyBudgetCommand) {
     const template = await this.getMonthlyTemplateByIdDomainService.execute(
       command.templateId
     );
-    const newOutflow = this.factory.create(command);
-    template.addOutflow(newOutflow);
-    await this.monthlyOutflowTemplateRepository.save(
+    const newBudget = this.factory.create(command);
+    template.addBudget(newBudget);
+    await this.monthlyBudgetTemplateRepository.save(
       command.templateId,
-      newOutflow
+      newBudget
     );
 
     return template;
