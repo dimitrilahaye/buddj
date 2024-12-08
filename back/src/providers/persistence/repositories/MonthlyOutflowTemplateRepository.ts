@@ -16,4 +16,8 @@ export default class TypeOrmMonthlyOutflowTemplateRepository
 
     return outflows.map((outflow) => outflow.toDomain());
   }
+
+  async deleteById(outflowId: string): Promise<void> {
+    await MonthlyOutflowTemplateDao.delete(outflowId);
+  }
 }

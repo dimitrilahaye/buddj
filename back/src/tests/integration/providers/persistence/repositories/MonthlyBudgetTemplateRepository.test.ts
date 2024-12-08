@@ -6,8 +6,9 @@ import {
   insertDefaultMonthlyTemplate,
   insertMonthlyBudgetTemplate,
 } from "../../../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
+import { MonthlyBudgetTemplateDao } from "../../../../../providers/persistence/entities/MonthlyBudgetTemplate.js";
 
-describe("Integration | Providers | Persistence | Repositories | MonthlyBudgetTemplateRepository", function () {
+describe.only("Integration | Providers | Persistence | Repositories | MonthlyBudgetTemplateRepository", function () {
   afterEach(async () => {
     await clearDB();
   });
@@ -40,6 +41,24 @@ describe("Integration | Providers | Persistence | Repositories | MonthlyBudgetTe
         // then
         expect(foundBudget).to.deep.equal(budget.toDomain());
       });
+    });
+  });
+
+  describe("#deleteById", () => {
+    it("should delete the budget", async () => {
+      // given
+      const template = await insertDefaultMonthlyTemplate();
+      const budget = await insertMonthlyBudgetTemplate(template.id);
+      const repository = new MonthlyBudgetTemplateRepository();
+
+      // when
+      await repository.deleteById(budget.id);
+
+      // then
+      const foundBudgets = await MonthlyBudgetTemplateDao.findBy({
+        id: budget.id,
+      });
+      expect(foundBudgets).to.have.length(0);
     });
   });
 });
