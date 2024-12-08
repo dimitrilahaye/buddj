@@ -58,4 +58,26 @@ export class MonthTemplatesService implements MonthTemplatesServiceInterface {
         map(() => void 0)
       );
   }
+
+  deleteOutflow(templateId: string, outflowId: string): Observable<void> {
+    return this.http
+      .delete<Response<MonthTemplate>>(
+        `${this.apiUrl}/monthly-templates/${templateId}/monthly-outflows/${outflowId}`
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyTemplatesStore.replaceOne(data)),
+        map(() => void 0)
+      );
+  }
+
+  deleteBudget(templateId: string, budgetId: string): Observable<void> {
+    return this.http
+      .delete<Response<MonthTemplate>>(
+        `${this.apiUrl}/monthly-templates/${templateId}/monthly-budgets/${budgetId}`
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyTemplatesStore.replaceOne(data)),
+        map(() => void 0)
+      );
+  }
 }

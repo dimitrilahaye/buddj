@@ -1,4 +1,4 @@
-import { Injectable, Signal, signal } from '@angular/core';
+import { computed, Injectable, Signal, signal } from '@angular/core';
 import { MonthlyTemplatesStoreInterface } from './monthlyTemplates.store.interface';
 import { MonthTemplate } from '../../models/monthTemplate.model';
 
@@ -22,18 +22,27 @@ export class MonthlyTemplatesStore implements MonthlyTemplatesStoreInterface {
     this._all.update((templates) => {
       const filteredTemplates = templates.filter((t) => t.id !== template.id);
 
-      return [...filteredTemplates, template];
+      return [...filteredTemplates, { ...template }];
     });
   }
 
   getById(id: string): Signal<MonthTemplate | null> {
-    const all = this._all();
-    const template = all.find((t) => t.id === id);
-    if (!template) {
-      return signal(null);
-    }
-    template.outflows.sort((a, b) => a.label.localeCompare(b.label));
-    template.budgets.sort((a, b) => a.name.localeCompare(b.name));
-    return signal(template);
+    return computed(() => {
+      const all = this._all();
+      const template = all.find((t) => t.id === id);
+      if (!template) {
+        return null;
+      }
+
+      return {
+        ...template,
+        outflows: [...template.outflows].sort((a, b) =>
+          a.label.localeCompare(b.label)
+        ),
+        budgets: [...template.budgets].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        ),
+      };
+    });
   }
 }

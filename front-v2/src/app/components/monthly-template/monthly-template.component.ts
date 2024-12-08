@@ -1,4 +1,11 @@
-import { Component, Inject, OnInit, Signal, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  Inject,
+  OnInit,
+  Signal,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   MONTHLY_TEMPLATES_STORE,
@@ -30,7 +37,7 @@ import ToasterServiceInterface, {
 export class MonthlyTemplateComponent implements OnInit {
   templateId: string | null = null;
   templateSignal: Signal<MonthTemplate | null> = signal(null);
-  editingTemplate: MonthTemplate | null = null;
+  editingTemplateSignal!: Signal<MonthTemplate | null>;
   isTemplateNameModalOpen = false;
   isLoading = false;
   // remove outflow
@@ -58,19 +65,25 @@ export class MonthlyTemplateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.templateId = this.route.snapshot.paramMap.get('id') || '';
-    this.templateSignal = this.monthlyTemplatesStore.getById(this.templateId);
     this.initializeEditingTemplate();
   }
 
-  private initializeEditingTemplate() {
-    if (this.template) {
-      this.editingTemplate = {
-        ...this.template,
-        outflows: [...this.template.outflows],
-        budgets: [...this.template.budgets],
-      };
-    }
+  initializeEditingTemplate() {
+    this.templateId = this.route.snapshot.paramMap.get('id') || '';
+    this.templateSignal = this.monthlyTemplatesStore.getById(this.templateId);
+    this.editingTemplateSignal = computed(() => {
+      return this.template
+        ? ({
+            ...this.template,
+            outflows: [...this.template.outflows],
+            budgets: [...this.template.budgets],
+          } as MonthTemplate)
+        : null;
+    });
+  }
+
+  get editingTemplate() {
+    return this.editingTemplateSignal();
   }
 
   get total() {
@@ -85,7 +98,7 @@ export class MonthlyTemplateComponent implements OnInit {
     return totalBudgets + totalOutflows;
   }
 
-  get template() {
+  get template(): MonthTemplate | null {
     return this.templateSignal();
   }
 
@@ -100,7 +113,7 @@ export class MonthlyTemplateComponent implements OnInit {
     }
   }
 
-  // update template nale
+  // update template name
   openTemplateNameModal(event: Event) {
     this.isTemplateNameModalOpen = true;
     event.stopPropagation();
@@ -146,13 +159,21 @@ export class MonthlyTemplateComponent implements OnInit {
 
   removeOutflow(event: Event) {
     if (this.outflowToDelete && this.editingTemplate) {
-      this.editingTemplate.outflows = this.editingTemplate.outflows.filter(
-        (o) => o.id !== this.outflowToDelete?.id
-      );
+      this.isLoading = true;
+      this.monthlyTemplatesService
+        .deleteOutflow(this.editingTemplate.id, this.outflowToDelete.id)
+        .pipe(
+          finalize(() => {
+            this.isLoading = false;
+            this.isRemoveOutflowModalOpen = false;
+            this.outflowToDelete = null;
+          })
+        )
+        .subscribe(() => {
+          this.toaster.success('Votre sortie mensuelle a bien été supprimée !');
+        });
+      event.stopPropagation();
     }
-    this.isRemoveOutflowModalOpen = false;
-    this.outflowToDelete = null;
-    event.stopPropagation();
   }
 
   // remove budget
@@ -170,13 +191,21 @@ export class MonthlyTemplateComponent implements OnInit {
 
   removeBudget(event: Event) {
     if (this.budgetToDelete && this.editingTemplate) {
-      this.editingTemplate.budgets = this.editingTemplate.budgets.filter(
-        (b) => b.id !== this.budgetToDelete?.id
-      );
+      this.isLoading = true;
+      this.monthlyTemplatesService
+        .deleteBudget(this.editingTemplate.id, this.budgetToDelete.id)
+        .pipe(
+          finalize(() => {
+            this.isLoading = false;
+            this.isRemoveBudgetModalOpen = false;
+            this.budgetToDelete = null;
+          })
+        )
+        .subscribe(() => {
+          this.toaster.success('Votre budget a bien été supprimé !');
+        });
+      event.stopPropagation();
     }
-    this.isRemoveBudgetModalOpen = false;
-    this.budgetToDelete = null;
-    event.stopPropagation();
   }
 
   // add outflow
@@ -278,15 +307,6 @@ export class MonthlyTemplateComponent implements OnInit {
     this.isNumpadModalOpen = false;
   }
 
-  resetForm(event: Event) {
-    this.initializeEditingTemplate();
-    event.stopPropagation();
-  }
-
-  submitTemplate() {
-    console.info(this.editingTemplate);
-  }
-
   updateTemplate(template: MonthTemplate) {
     this.isLoading = true;
     this.monthlyTemplatesService
@@ -300,8 +320,13 @@ export class MonthlyTemplateComponent implements OnInit {
           this.isTemplateNameModalOpen = false;
         })
       )
-      .subscribe(() => {
-        this.toaster.success('Votre template a bien été modifié !');
+      .subscribe({
+        next: () => {
+          this.toaster.success('Votre template a bien été modifié !');
+        },
+        error: () => {
+          this.initializeEditingTemplate();
+        },
       });
   }
 }
