@@ -32,6 +32,10 @@ const errorHandler = (
     case "TransferBalanceIntoMonthError":
     case "YearlyOutflowsAddError":
     case "MonthlyTemplateNameCanNotBeEmptyError":
+    case "MonthlyOutflowTemplateLabelCanNotBeEmptyError":
+    case "MonthlyBudgetTemplateNameCanNotBeEmptyError":
+    case "MonthlyOutflowTemplateAmountCanNotBeLessThanOneError":
+    case "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError":
       statusCode = 422;
       break;
     case "WeeklyBudgetsDashboardWeeklyBudgetsError":
