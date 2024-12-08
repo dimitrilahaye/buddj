@@ -4,6 +4,7 @@ import { MonthTemplate } from '../../models/monthTemplate.model';
 export interface MonthlyTemplatesStoreInterface {
   getAll(): Signal<MonthTemplate[]>;
   addAll(outflows: MonthTemplate[]): void;
+  replaceOne(template: MonthTemplate): void;
   getById(id: string): Signal<MonthTemplate | null>;
 }
 

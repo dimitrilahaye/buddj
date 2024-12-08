@@ -43,4 +43,19 @@ export class MonthTemplatesService implements MonthTemplatesServiceInterface {
         map(() => void 0)
       );
   }
+
+  updateTemplate(
+    templateId: string,
+    data: { name: string; isDefault: boolean }
+  ): Observable<void> {
+    return this.http
+      .patch<Response<MonthTemplate>>(
+        `${this.apiUrl}/monthly-templates/${templateId}`,
+        data
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyTemplatesStore.replaceOne(data)),
+        map(() => void 0)
+      );
+  }
 }

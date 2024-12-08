@@ -1,6 +1,11 @@
 <div class="toggle-wrapper">
   <label class="toggle-switch">
-    <input type="checkbox" [checked]="isToggled" (change)="onToggle($event)" />
-    <span class="slider"></span>
+    <input
+      type="checkbox"
+      [disabled]="disabled()"
+      [checked]="isToggled"
+      (change)="onToggle($event)"
+    />
+    <span class="slider" [ngClass]="{ 'slider--disabled': disabled() }"></span>
   </label>
 </div>
