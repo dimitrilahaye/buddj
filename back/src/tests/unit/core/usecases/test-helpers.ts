@@ -27,6 +27,8 @@ const monthRepositoryStub = {
 const monthlyTemplateRepositoryStub = {
   getDefault: sinon.stub(),
   getAll: sinon.stub(),
+  getById: sinon.stub(),
+  save: sinon.stub(),
 };
 
 const monthlyOutflowTemplateRepositoryStub = {
@@ -70,7 +72,9 @@ function resetStubs() {
   yearlyOutflowRepositoryStub.add.reset();
   yearlyOutflowRepositoryStub.remove.reset();
   monthlyTemplateRepositoryStub.getDefault.reset();
+  monthlyTemplateRepositoryStub.getById.reset();
   monthlyTemplateRepositoryStub.getAll.reset();
+  monthlyTemplateRepositoryStub.save.reset();
   monthlyOutflowTemplateRepositoryStub.getAllByTemplateId.reset();
   monthlyBudgetTemplateRepositoryStub.getAllByTemplateId.reset();
   idProviderStub.get.reset();

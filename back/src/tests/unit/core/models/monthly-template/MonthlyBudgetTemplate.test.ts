@@ -1,5 +1,5 @@
 import expect from "../../../../test-helpers.js";
-import MonthlyBudgetTemplate from "../../../../../core/models/template/MonthlyBudgetTemplate.js";
+import MonthlyBudgetTemplate from "../../../../../core/models/monthly-template/MonthlyBudgetTemplate.js";
 
 describe("Unit | Core | Models | Template | MonthlyBudgetTemplate", function () {
   describe("#constructor", function () {

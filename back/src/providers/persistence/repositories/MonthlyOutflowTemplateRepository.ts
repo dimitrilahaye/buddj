@@ -1,4 +1,4 @@
-import MonthlyOutflowTemplate from "../../../core/models/template/MonthlyOutflowTemplate.js";
+import MonthlyOutflowTemplate from "../../../core/models/monthly-template/MonthlyOutflowTemplate.js";
 import MonthlyOutflowTemplateRepository from "../../../core/ports/repositories/MonthlyOutflowTemplateRepository.js";
 import { MonthlyOutflowTemplateDao } from "../entities/MonthlyOutflowTemplate.js";
 

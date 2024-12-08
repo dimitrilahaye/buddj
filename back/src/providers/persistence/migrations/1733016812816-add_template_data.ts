@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 import IdProvider from "../../IdProvider.js";
-import MonthlyTemplate from "../../../core/models/template/MonthlyTemplate.js";
-import MonthlyBudgetTemplate from "../../../core/models/template/MonthlyBudgetTemplate.js";
-import MonthlyOutflowTemplate from "../../../core/models/template/MonthlyOutflowTemplate.js";
+import MonthlyTemplate from "../../../core/models/monthly-template/MonthlyTemplate.js";
+import MonthlyBudgetTemplate from "../../../core/models/monthly-template/MonthlyBudgetTemplate.js";
+import MonthlyOutflowTemplate from "../../../core/models/monthly-template/MonthlyOutflowTemplate.js";
 
 export class AddTemplateData1733016812816 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

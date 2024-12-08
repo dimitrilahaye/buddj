@@ -1,5 +1,5 @@
 import GetAllMonthlyTemplatesDomainService from "../domain-services/monthly-template/GetAllMonthlyTemplatesDomainService.js";
-import MonthlyTemplate from "../models/template/MonthlyTemplate.js";
+import MonthlyTemplate from "../models/monthly-template/MonthlyTemplate.js";
 import MonthlyBudgetTemplateRepository from "../ports/repositories/MonthlyBudgetTemplateRepository.js";
 import MonthlyOutflowTemplateRepository from "../ports/repositories/MonthlyOutflowTemplateRepository.js";
 import MonthlyTemplateRepository from "../ports/repositories/MonthlyTemplateRepository.js";

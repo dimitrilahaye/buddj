@@ -6,7 +6,7 @@ import {
   insertDefaultMonthlyTemplate,
   insertNonDefaultMonthlyTemplate,
 } from "../../../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
-import MonthlyTemplate from "../../../../../core/models/template/MonthlyTemplate.js";
+import MonthlyTemplate from "../../../../../core/models/monthly-template/MonthlyTemplate.js";
 
 describe("Integration | Providers | Persistence | Repositories | MonthlyTemplateRepository", function () {
   afterEach(async () => {
@@ -69,6 +69,60 @@ describe("Integration | Providers | Persistence | Repositories | MonthlyTemplate
           // then
           expect(templates).to.have.length(2);
         });
+      });
+    });
+
+    describe("#getById", () => {
+      describe("when template does not exist", () => {
+        it("should return null", async () => {
+          // given
+          const repository = new MonthlyTemplateRepository();
+
+          // when
+          const template = await repository.getById(
+            "6186fae7-8e54-4de2-bb68-17b7042bd813"
+          );
+
+          // then
+          expect(template).to.be.null;
+        });
+      });
+
+      describe("when template exists", () => {
+        it("should return it", async () => {
+          // given
+          const template = await insertDefaultMonthlyTemplate();
+          const repository = new MonthlyTemplateRepository();
+
+          // when
+          const foundTemplate = await repository.getById(template.id);
+
+          // then
+          if (foundTemplate === null) {
+            expect.fail("foundTemplate should not be null");
+            return;
+          }
+          expect(template.id).to.be.equal(foundTemplate.id);
+        });
+      });
+    });
+
+    describe("#save", () => {
+      it("should udpate the template", async () => {
+        // given
+        const dao = await insertDefaultMonthlyTemplate();
+        const repository = new MonthlyTemplateRepository();
+
+        const template = dao.toDomain();
+        template.updateName("new name");
+        template.updateIsDefault(false);
+
+        // when
+        const updatedTemplate = await repository.save(template);
+
+        // then
+        expect(updatedTemplate.name).to.equal(template.name);
+        expect(updatedTemplate.isDefault).to.equal(template.isDefault);
       });
     });
   });

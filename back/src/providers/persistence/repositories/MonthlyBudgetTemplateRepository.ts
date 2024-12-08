@@ -1,4 +1,4 @@
-import MonthlyBudgetTemplate from "../../../core/models/template/MonthlyBudgetTemplate.js";
+import MonthlyBudgetTemplate from "../../../core/models/monthly-template/MonthlyBudgetTemplate.js";
 import MonthlyBudgetTemplateRepository from "../../../core/ports/repositories/MonthlyBudgetTemplateRepository.js";
 import { MonthlyBudgetTemplateDao } from "../entities/MonthlyBudgetTemplate.js";
 
