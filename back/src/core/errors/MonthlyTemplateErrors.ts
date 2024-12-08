@@ -1,10 +1,3 @@
-class MonthlyTemplateOutflowsError extends Error {
-  constructor() {
-    super("MonthlyTemplate: should have at least 1 outflow");
-    this.name = "MonthlyTemplateOutflowsError";
-  }
-}
-
 class NoDefaultMonthlyTemplateError extends Error {
   constructor() {
     super(
@@ -29,7 +22,6 @@ class MonthlyTemplateDoesNotExistError extends Error {
 }
 
 export {
-  MonthlyTemplateOutflowsError,
   NoDefaultMonthlyTemplateError,
   MonthlyTemplateNameCanNotBeEmptyError,
   MonthlyTemplateDoesNotExistError,

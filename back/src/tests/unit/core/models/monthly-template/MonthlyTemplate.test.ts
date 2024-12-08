@@ -2,10 +2,7 @@ import expect, { Clock } from "../../../../test-helpers.js";
 import MonthlyTemplate from "../../../../../core/models/monthly-template/MonthlyTemplate.js";
 import MonthlyWeeklyBudgetTemplate from "../../../../../core/models/monthly-template/MonthlyBudgetTemplate.js";
 import MonthlyOutflowTemplate from "../../../../../core/models/monthly-template/MonthlyOutflowTemplate.js";
-import {
-  MonthlyTemplateNameCanNotBeEmptyError,
-  MonthlyTemplateOutflowsError,
-} from "../../../../../core/errors/MonthlyTemplateErrors.js";
+import { MonthlyTemplateNameCanNotBeEmptyError } from "../../../../../core/errors/MonthlyTemplateErrors.js";
 import { idProviderStub, resetStubs } from "../../usecases/test-helpers.js";
 import { after } from "mocha";
 
@@ -13,7 +10,7 @@ after(() => {
   resetStubs();
 });
 
-describe("Unit | Core | Models | Template | MonthlyTemplate", function () {
+describe.only("Unit | Core | Models | Template | MonthlyTemplate", function () {
   const monthDate = new Date("2024-01-01");
 
   describe("#constructor", function () {
@@ -56,31 +53,6 @@ describe("Unit | Core | Models | Template | MonthlyTemplate", function () {
         month: monthDate,
         startingBalance: 0,
       });
-    });
-  });
-  describe("if there is not any outflows", function () {
-    let clock = new Clock();
-
-    afterEach(() => {
-      clock.restore();
-    });
-
-    it("should throw MonthlyTemplateOutflowsError", function () {
-      // given
-      clock.start(monthDate);
-
-      const props = {
-        id: "id",
-        name: "template",
-        isDefault: true,
-        budgets: [],
-        outflows: [],
-      };
-
-      // when / then
-      expect(() => new MonthlyTemplate(props)).to.throw(
-        MonthlyTemplateOutflowsError
-      );
     });
   });
 
@@ -177,6 +149,65 @@ describe("Unit | Core | Models | Template | MonthlyTemplate", function () {
 
       // then
       expect(month.isDefault).to.equal(expectedNewIsDefault);
+    });
+  });
+
+  describe("#removeOutflow", () => {
+    it("should delete the outflow", function () {
+      // given
+      const outflowId = "id";
+      const props = {
+        id: "id",
+        name: "template",
+        isDefault: true,
+        outflows: [
+          new MonthlyOutflowTemplate({
+            id: outflowId,
+            label: "outflow",
+            amount: 10,
+          }),
+        ],
+      };
+      const month = new MonthlyTemplate(props);
+
+      // when
+      month.removeOutflow(outflowId);
+
+      // then
+      expect(month.outflows).to.have.length(0);
+    });
+  });
+
+  describe("#removeBudget", () => {
+    it("should delete the outflow", function () {
+      // given
+      const budgetId = "id";
+      const props = {
+        id: "id",
+        name: "template",
+        isDefault: true,
+        budgets: [
+          new MonthlyWeeklyBudgetTemplate({
+            id: budgetId,
+            name: "Semaine 1",
+            initialBalance: 200,
+          }),
+        ],
+        outflows: [
+          new MonthlyOutflowTemplate({
+            id: "id",
+            label: "outflow",
+            amount: 10,
+          }),
+        ],
+      };
+      const month = new MonthlyTemplate(props);
+
+      // when
+      month.removeBudget(budgetId);
+
+      // then
+      expect(month.budgets).to.have.length(0);
     });
   });
 });

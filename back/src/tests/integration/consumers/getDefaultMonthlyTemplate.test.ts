@@ -3,8 +3,6 @@ import request from "supertest";
 import { authenticate, mockedServer, expect } from "./test-helpers.js";
 import { afterEach } from "mocha";
 import * as deps from "../../../ioc.js";
-import sinon from "sinon";
-import { MonthlyTemplateOutflowsError } from "../../../core/errors/MonthlyTemplateErrors.js";
 import { insertDefaultMonthlyTemplate } from "../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
 import { clearDB } from "../providers/test-helpers.js";
 
@@ -33,32 +31,6 @@ describe("Integration | Consumers | Routes | GET /months/template/default", func
       expect(response.statusCode).to.be.equal(200);
       expect(response.body.success).to.be.true;
       await clearDB();
-    });
-
-    it("should return 502 error if month template does not contain at least 1 outflow", async function () {
-      // given
-      server = mockedServer(
-        { isAuthenticated: true },
-        {
-          ...deps,
-          getDefaultMonthlyTemplateUsecase: {
-            ...deps.getDefaultMonthlyTemplateUsecase,
-            execute: sinon
-              .stub()
-              .throwsException(new MonthlyTemplateOutflowsError()),
-          },
-        }
-      );
-      const cookie = await authenticate(server);
-
-      // when
-      const response = await request(server)
-        .get("/months/template/default")
-        .set("Cookie", cookie);
-
-      // then
-      expect(response.statusCode).to.be.equal(502);
-      expect(response.body.success).to.be.false;
     });
 
     it("should return 404 error if there is no default template", async function () {

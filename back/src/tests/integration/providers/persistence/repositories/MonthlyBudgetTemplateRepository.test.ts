@@ -8,7 +8,7 @@ import {
 } from "../../../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
 import { MonthlyBudgetTemplateDao } from "../../../../../providers/persistence/entities/MonthlyBudgetTemplate.js";
 
-describe.only("Integration | Providers | Persistence | Repositories | MonthlyBudgetTemplateRepository", function () {
+describe("Integration | Providers | Persistence | Repositories | MonthlyBudgetTemplateRepository", function () {
   afterEach(async () => {
     await clearDB();
   });

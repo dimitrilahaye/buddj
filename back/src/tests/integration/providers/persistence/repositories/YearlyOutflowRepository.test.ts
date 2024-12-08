@@ -1,4 +1,4 @@
-import { afterEach } from "mocha";
+import { afterEach, before } from "mocha";
 import expect from "../../../../test-helpers.js";
 import { clearDB } from "../../test-helpers.js";
 import IdProvider from "../../../../../providers/IdProvider.js";
@@ -10,6 +10,10 @@ const repository = new TypeOrmYearlyOutflowRepository();
 const idProvider = new IdProvider();
 
 describe("Integration | Providers | Persistence | Repositories | YearlyOutflowRepository", function () {
+  before(async () => {
+    await clearDB();
+  });
+
   afterEach(async () => {
     await clearDB();
   });

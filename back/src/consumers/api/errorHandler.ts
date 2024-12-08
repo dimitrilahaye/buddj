@@ -34,7 +34,6 @@ const errorHandler = (
     case "MonthlyTemplateNameCanNotBeEmptyError":
       statusCode = 422;
       break;
-    case "MonthlyTemplateOutflowsError":
     case "WeeklyBudgetsDashboardWeeklyBudgetsError":
       statusCode = 502;
       break;
