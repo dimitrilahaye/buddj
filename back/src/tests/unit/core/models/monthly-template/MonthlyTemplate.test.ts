@@ -179,7 +179,7 @@ describe("Unit | Core | Models | Template | MonthlyTemplate", function () {
   });
 
   describe("#removeBudget", () => {
-    it("should delete the outflow", function () {
+    it("should delete the budget", function () {
       // given
       const budgetId = "id";
       const props = {
@@ -208,6 +208,63 @@ describe("Unit | Core | Models | Template | MonthlyTemplate", function () {
 
       // then
       expect(month.budgets).to.have.length(0);
+    });
+  });
+
+  describe("#addOutflow", () => {
+    it("should add the outflow", function () {
+      // given
+      const budgetId = "id";
+      const props = {
+        id: "id",
+        name: "template",
+        isDefault: true,
+        budgets: [
+          new MonthlyWeeklyBudgetTemplate({
+            id: budgetId,
+            name: "Semaine 1",
+            initialBalance: 200,
+          }),
+        ],
+      };
+      const month = new MonthlyTemplate(props);
+
+      // when
+      month.addOutflow(
+        new MonthlyOutflowTemplate({
+          id: "id",
+          label: "outflow",
+          amount: 10,
+        })
+      );
+
+      // then
+      expect(month.outflows).to.have.length(1);
+    });
+  });
+
+  describe("#addBudget", () => {
+    it("should add the budget", function () {
+      // given
+      const budgetId = "id";
+      const props = {
+        id: "id",
+        name: "template",
+        isDefault: true,
+      };
+      const month = new MonthlyTemplate(props);
+
+      // when
+      month.addBudget(
+        new MonthlyWeeklyBudgetTemplate({
+          id: budgetId,
+          name: "Semaine 1",
+          initialBalance: 200,
+        })
+      );
+
+      // then
+      expect(month.budgets).to.have.length(1);
     });
   });
 });

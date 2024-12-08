@@ -52,6 +52,14 @@ export default class MonthlyTemplate {
     this.budgets = this.budgets.filter((b) => b.id !== budgetId);
   }
 
+  addOutflow(outflow: MonthlyOutflowTemplate) {
+    this.outflows.push(outflow);
+  }
+
+  addBudget(budget: MonthlyBudgetTemplate) {
+    this.budgets.push(budget);
+  }
+
   addMonthlyProjectForAmount(idProvider: IdProvider, amount: number) {
     this.outflows.push(
       new MonthlyOutflowTemplate({
