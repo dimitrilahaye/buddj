@@ -4,27 +4,20 @@ import MonthlyOutflowTemplateRepository from "../../ports/repositories/MonthlyOu
 import MonthlyTemplateRepository from "../../ports/repositories/MonthlyTemplateRepository.js";
 import addOutflowsAndBudgetsToTemplate from "./addOutflowsAndBudgetsToTemplate.js";
 
-export default class GetAllMonthlyTemplatesDomainService {
+export default class SaveMonthlyTemplateDomainService {
   constructor(
     public monthlyTemplateRepository: MonthlyTemplateRepository,
     public monthlyOutflowTemplateRepository: MonthlyOutflowTemplateRepository,
     public monthlyBudgetTemplateRepository: MonthlyBudgetTemplateRepository
   ) {}
 
-  async execute() {
-    const promises: Promise<MonthlyTemplate>[] = [];
-    const templates = await this.monthlyTemplateRepository.getAll();
+  async execute(template: MonthlyTemplate) {
+    const updatedTemplate = await this.monthlyTemplateRepository.save(template);
 
-    templates.forEach((template) => {
-      promises.push(
-        addOutflowsAndBudgetsToTemplate(
-          this.monthlyOutflowTemplateRepository,
-          this.monthlyBudgetTemplateRepository,
-          template
-        )
-      );
-    });
-
-    return await Promise.all(promises);
+    return await addOutflowsAndBudgetsToTemplate(
+      this.monthlyOutflowTemplateRepository,
+      this.monthlyBudgetTemplateRepository,
+      updatedTemplate
+    );
   }
 }

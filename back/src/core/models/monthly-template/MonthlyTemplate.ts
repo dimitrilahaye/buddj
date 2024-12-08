@@ -2,7 +2,7 @@ import MonthlyBudgetTemplate from "./MonthlyBudgetTemplate.js";
 import MonthlyOutflowTemplate from "./MonthlyOutflowTemplate.js";
 import {
   MonthlyTemplateOutflowsError,
-  MonthlyTemplateBudgetError,
+  MonthlyTemplateNameCanNotBeEmptyError,
 } from "../../errors/MonthlyTemplateErrors.js";
 import IdProvider from "../../ports/providers/IdProvider.js";
 
@@ -29,9 +29,6 @@ export default class MonthlyTemplate {
     this.name = props.name;
 
     if (props.budgets) {
-      if (props.budgets.length !== 5) {
-        throw new MonthlyTemplateBudgetError();
-      }
       this.budgets = props.budgets;
     }
     if (props.outflows) {
@@ -40,6 +37,17 @@ export default class MonthlyTemplate {
       }
       this.outflows = props.outflows;
     }
+  }
+
+  updateName(name: string) {
+    if (name.length === 0) {
+      throw new MonthlyTemplateNameCanNotBeEmptyError();
+    }
+    this.name = name;
+  }
+
+  updateIsDefault(isDefault: boolean) {
+    this.isDefault = isDefault;
   }
 
   addMonthlyProjectForAmount(idProvider: IdProvider, amount: number) {

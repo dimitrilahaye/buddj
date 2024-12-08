@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import MonthlyTemplate from "../../../core/models/template/MonthlyTemplate.js";
+import MonthlyTemplate from "../../../core/models/monthly-template/MonthlyTemplate.js";
 
 @Entity({ name: "monthly_templates" })
 export class MonthlyTemplateDao extends BaseEntity {

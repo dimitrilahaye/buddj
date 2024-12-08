@@ -1,5 +1,5 @@
 import expect from "../../../../test-helpers.js";
-import MonthlyOutflowTemplate from "../../../../../core/models/template/MonthlyOutflowTemplate.js";
+import MonthlyOutflowTemplate from "../../../../../core/models/monthly-template/MonthlyOutflowTemplate.js";
 
 describe("Unit | Core | Models | Template | MonthlyOutflowTemplate", function () {
   describe("#constructor", function () {

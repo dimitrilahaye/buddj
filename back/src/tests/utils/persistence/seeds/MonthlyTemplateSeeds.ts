@@ -6,19 +6,25 @@ import { MonthlyBudgetTemplateDao } from "../../../../providers/persistence/enti
 const idProvider = new IdProvider();
 
 async function insertDefaultMonthlyTemplate() {
-  return await MonthlyTemplateDao.save({
+  const template = MonthlyTemplateDao.create({
     id: idProvider.get(),
     name: "Template par défaut",
     isDefault: true,
   });
+  await template.save();
+
+  return template;
 }
 
 async function insertNonDefaultMonthlyTemplate() {
-  return await MonthlyTemplateDao.save({
+  const template = MonthlyTemplateDao.create({
     id: idProvider.get(),
     name: "Template",
     isDefault: false,
   });
+  await template.save();
+
+  return template;
 }
 
 async function insertMonthlyOutflowTemplate(templateId: string) {

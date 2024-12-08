@@ -1,4 +1,4 @@
-import MonthlyBudgetTemplate from "../../models/template/MonthlyBudgetTemplate.js";
+import MonthlyBudgetTemplate from "../../models/monthly-template/MonthlyBudgetTemplate.js";
 
 export default interface MonthlyBudgetTemplateRepository {
   getAllByTemplateId(templateId: string): Promise<MonthlyBudgetTemplate[]>;

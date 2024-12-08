@@ -1,10 +1,3 @@
-class MonthlyTemplateBudgetError extends Error {
-  constructor() {
-    super("MonthlyTemplate: should have 5 weekly budgets");
-    this.name = "MonthlyTemplateBudgetError";
-  }
-}
-
 class MonthlyTemplateOutflowsError extends Error {
   constructor() {
     super("MonthlyTemplate: should have at least 1 outflow");
@@ -21,8 +14,23 @@ class NoDefaultMonthlyTemplateError extends Error {
   }
 }
 
+class MonthlyTemplateNameCanNotBeEmptyError extends Error {
+  constructor() {
+    super("MonthlyTemplate: template name can not be empty");
+    this.name = "MonthlyTemplateNameCanNotBeEmptyError";
+  }
+}
+
+class MonthlyTemplateDoesNotExistError extends Error {
+  constructor() {
+    super("MonthlyTemplate: template with given id does not exist");
+    this.name = "MonthlyTemplateDoesNotExistError";
+  }
+}
+
 export {
   MonthlyTemplateOutflowsError,
-  MonthlyTemplateBudgetError,
   NoDefaultMonthlyTemplateError,
+  MonthlyTemplateNameCanNotBeEmptyError,
+  MonthlyTemplateDoesNotExistError,
 };
