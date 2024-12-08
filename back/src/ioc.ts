@@ -36,6 +36,7 @@ import monthCreationDeserializer from "./consumers/api/deserializers/monthCreati
 import unarchiveMonthDeserializer from "./consumers/api/deserializers/unarchiveMonth.js";
 import manageExpenseCheckingDeserializer from "./consumers/api/deserializers/manageExpenseChecking.js";
 import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/manageOutflowChecking.js";
+import updateMonthlyTemplateDeserializer from "./consumers/api/deserializers/updateMonthlyTemplate.js";
 import transferBalanceIntoMonthDeserializer from "./consumers/api/deserializers/transferBalanceIntoMonth.js";
 import addYearlyOutflowDeserializer from "./consumers/api/deserializers/addYearlyOutflow.js";
 import removeYearlyOutflowDeserializer from "./consumers/api/deserializers/removeYearlyOutflow.js";
@@ -47,6 +48,7 @@ import RemoveYearlyOutflow from "./core/usecases/RemoveYearlyOutflow.js";
 import MonthlyOutflowTemplateRepository from "./providers/persistence/repositories/MonthlyOutflowTemplateRepository.js";
 import MonthlyBudgetTemplateRepository from "./providers/persistence/repositories/MonthlyBudgetTemplateRepository.js";
 import GetAllMonthlyTemplates from "./core/usecases/GetAllMonthlyTemplates.js";
+import UpdateMonthlyTemplate from "./core/usecases/UpdateMonthlyTemplate.js";
 
 // persistence
 
@@ -117,6 +119,12 @@ const getAllMonthlyTemplatesUsecase = new GetAllMonthlyTemplates(
   monthlyBudgetTemplateRepository
 );
 
+const updateMonthlyTemplateUsecase = new UpdateMonthlyTemplate(
+  monthlyTemplateRepository,
+  monthlyOutflowTemplateRepository,
+  monthlyBudgetTemplateRepository
+);
+
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(
   weeklyExpenseFactory,
   monthRepository
@@ -157,6 +165,7 @@ export {
   monthDto,
   yearlyOutflowsDto,
   getDefaultMonthlyTemplateUsecase,
+  updateMonthlyTemplateUsecase,
   getAllMonthlyTemplatesUsecase,
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
@@ -188,4 +197,5 @@ export {
   transferBalanceIntoMonthDeserializer,
   addYearlyOutflowDeserializer,
   removeYearlyOutflowDeserializer,
+  updateMonthlyTemplateDeserializer,
 };

@@ -12,7 +12,6 @@ function getAllMonthlyTemplates(
   return router.get("/months/template", async (req, res, next) => {
     try {
       const templates = await usecase.execute();
-      console.info(templates);
       res.send({ success: true, data: templates });
     } catch (e) {
       next(e);

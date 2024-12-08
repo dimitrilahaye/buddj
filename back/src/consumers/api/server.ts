@@ -64,6 +64,9 @@ import { removeYearlyOutflow } from "./routes/removeYearlyOutflow.js";
 import { RemoveYearlyOutflowDeserializer } from "./deserializers/removeYearlyOutflow.js";
 import GetAllMonthlyTemplates from "../../core/usecases/GetAllMonthlyTemplates.js";
 import { getAllMonthlyTemplates } from "./routes/getAllMonthlyTemplates.js";
+import UpdateMonthlyTemplate from "../../core/usecases/UpdateMonthlyTemplate.js";
+import { updateMonthlyTemplate } from "./routes/updateMonthlyTemplate.js";
+import { UpdateMonthlyTemplateDeserializer } from "./deserializers/updateMonthlyTemplate.js";
 
 declare global {
   namespace Express {
@@ -106,6 +109,7 @@ export type Deps = {
   monthDto: MonthDtoBuilder;
   yearlyOutflowsDto: YearlyOutflowsDtoBuilder;
   getDefaultMonthlyTemplateUsecase: GetDefaultMonthlyTemplate;
+  updateMonthlyTemplateUsecase: UpdateMonthlyTemplate;
   getAllMonthlyTemplatesUsecase: GetAllMonthlyTemplates;
   createNewMonthUsecase: CreateNewMonth;
   getUnarchivedMonthsUsecase: GetUnarchivedMonths;
@@ -137,6 +141,7 @@ export type Deps = {
   transferBalanceIntoMonthDeserializer: TransferBalanceIntoMonthDeserializer;
   addYearlyOutflowDeserializer: AddYearlyOutflowDeserializer;
   removeYearlyOutflowDeserializer: RemoveYearlyOutflowDeserializer;
+  updateMonthlyTemplateDeserializer: UpdateMonthlyTemplateDeserializer;
 };
 
 function buildApi(
@@ -146,6 +151,7 @@ function buildApi(
     monthDto,
     yearlyOutflowsDto,
     getDefaultMonthlyTemplateUsecase,
+    updateMonthlyTemplateUsecase,
     getAllMonthlyTemplatesUsecase,
     getUnarchivedMonthsUsecase,
     createNewMonthUsecase,
@@ -177,6 +183,7 @@ function buildApi(
     addYearlyOutflowDeserializer,
     transferBalanceIntoMonthDeserializer,
     removeYearlyOutflowDeserializer,
+    updateMonthlyTemplateDeserializer,
   }: Deps
 ) {
   const api = express();
@@ -340,6 +347,12 @@ function buildApi(
   api.use(
     getDefaultMonthlyTemplate(router, {
       usecase: getDefaultMonthlyTemplateUsecase,
+    })
+  );
+  api.use(
+    updateMonthlyTemplate(router, {
+      usecase: updateMonthlyTemplateUsecase,
+      deserializer: updateMonthlyTemplateDeserializer,
     })
   );
   api.use(
