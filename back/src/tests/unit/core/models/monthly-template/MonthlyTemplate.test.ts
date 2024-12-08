@@ -10,7 +10,7 @@ after(() => {
   resetStubs();
 });
 
-describe.only("Unit | Core | Models | Template | MonthlyTemplate", function () {
+describe("Unit | Core | Models | Template | MonthlyTemplate", function () {
   const monthDate = new Date("2024-01-01");
 
   describe("#constructor", function () {
