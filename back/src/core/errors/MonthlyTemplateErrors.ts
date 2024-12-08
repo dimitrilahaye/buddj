@@ -21,8 +21,42 @@ class MonthlyTemplateDoesNotExistError extends Error {
   }
 }
 
+class MonthlyOutflowTemplateLabelCanNotBeEmptyError extends Error {
+  constructor() {
+    super("MonthlyOutflowTemplate: outflow label can not be empty");
+    this.name = "MonthlyOutflowTemplateLabelCanNotBeEmptyError";
+  }
+}
+
+class MonthlyOutflowTemplateAmountCanNotBeLessThanOneError extends Error {
+  constructor() {
+    super("MonthlyOutflowTemplate: outflow amount must be greater than 0");
+    this.name = "MonthlyOutflowTemplateAmountCanNotBeLessThanOneError";
+  }
+}
+
+class MonthlyBudgetTemplateNameCanNotBeEmptyError extends Error {
+  constructor() {
+    super("MonthlyBudgetTemplate: budget name can not be empty");
+    this.name = "MonthlyBudgetTemplateNameCanNotBeEmptyError";
+  }
+}
+
+class MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError extends Error {
+  constructor() {
+    super(
+      "MonthlyBudgetTemplate: outflow initial balance must be greater than 0"
+    );
+    this.name = "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError";
+  }
+}
+
 export {
   NoDefaultMonthlyTemplateError,
   MonthlyTemplateNameCanNotBeEmptyError,
   MonthlyTemplateDoesNotExistError,
+  MonthlyOutflowTemplateLabelCanNotBeEmptyError,
+  MonthlyBudgetTemplateNameCanNotBeEmptyError,
+  MonthlyOutflowTemplateAmountCanNotBeLessThanOneError,
+  MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError,
 };
