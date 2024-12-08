@@ -12,9 +12,17 @@ export class MonthlyTemplatesStore implements MonthlyTemplatesStoreInterface {
     return this._all.asReadonly();
   }
 
-  addAll(outflows: MonthTemplate[]): void {
+  addAll(templates: MonthTemplate[]): void {
     this._all.update(() => {
-      return outflows;
+      return templates;
+    });
+  }
+
+  replaceOne(template: MonthTemplate): void {
+    this._all.update((templates) => {
+      const filteredTemplates = templates.filter((t) => t.id !== template.id);
+
+      return [...filteredTemplates, template];
     });
   }
 

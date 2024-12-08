@@ -1,4 +1,4 @@
-import { Component, Input, output } from '@angular/core';
+import { Component, input, Input, output } from '@angular/core';
 
 @Component({
   selector: 'app-toggle-button',
@@ -8,6 +8,7 @@ import { Component, Input, output } from '@angular/core';
 })
 export class ToggleButtonComponent {
   @Input() isToggled = false;
+  disabled = input(false);
   toggleChange = output<boolean>();
 
   onToggle(event: Event): void {

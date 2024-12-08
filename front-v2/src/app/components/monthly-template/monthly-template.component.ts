@@ -12,6 +12,13 @@ import {
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
 import { CommonModule } from '@angular/common';
+import MonthTemplatesServiceInterface, {
+  MONTH_TEMPLATES_SERVICE,
+} from '../../services/monthTemplates/monthTemplates.service.interface';
+import { finalize } from 'rxjs';
+import ToasterServiceInterface, {
+  TOASTER_SERVICE,
+} from '../../services/toaster/toaster.service.interface';
 
 @Component({
   selector: 'app-monthly-template',
@@ -25,6 +32,7 @@ export class MonthlyTemplateComponent implements OnInit {
   templateSignal: Signal<MonthTemplate | null> = signal(null);
   editingTemplate: MonthTemplate | null = null;
   isTemplateNameModalOpen = false;
+  isLoading = false;
   // remove outflow
   isRemoveOutflowModalOpen = false;
   outflowToDelete: Outflow | null = null;
@@ -43,7 +51,10 @@ export class MonthlyTemplateComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     @Inject(MONTHLY_TEMPLATES_STORE)
-    private readonly monthlyTemplatesStore: MonthlyTemplatesStoreInterface
+    private readonly monthlyTemplatesStore: MonthlyTemplatesStoreInterface,
+    @Inject(MONTH_TEMPLATES_SERVICE)
+    private readonly monthlyTemplatesService: MonthTemplatesServiceInterface,
+    @Inject(TOASTER_SERVICE) private readonly toaster: ToasterServiceInterface
   ) {}
 
   ngOnInit(): void {
@@ -85,6 +96,7 @@ export class MonthlyTemplateComponent implements OnInit {
   defaultChanged(isDefault: boolean) {
     if (this.editingTemplate) {
       this.editingTemplate.isDefault = isDefault;
+      this.updateTemplate(this.editingTemplate);
     }
   }
 
@@ -94,8 +106,10 @@ export class MonthlyTemplateComponent implements OnInit {
     event.stopPropagation();
   }
 
-  closeTemplateNameModal(event: Event) {
-    this.isTemplateNameModalOpen = false;
+  submitUpdateTemplateName(event: Event) {
+    if (this.editingTemplate) {
+      this.updateTemplate(this.editingTemplate);
+    }
     event.stopPropagation();
   }
 
@@ -271,5 +285,23 @@ export class MonthlyTemplateComponent implements OnInit {
 
   submitTemplate() {
     console.info(this.editingTemplate);
+  }
+
+  updateTemplate(template: MonthTemplate) {
+    this.isLoading = true;
+    this.monthlyTemplatesService
+      .updateTemplate(template.id, {
+        name: template.name,
+        isDefault: template.isDefault,
+      })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.isTemplateNameModalOpen = false;
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success('Votre template a bien été modifié !');
+      });
   }
 }
