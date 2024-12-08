@@ -5,7 +5,7 @@ import { afterEach, beforeEach } from "mocha";
 import { authenticate, expect, mockedServer } from "./test-helpers.js";
 import * as deps from "../../../ioc.js";
 import { TransferBalanceIntoMonthCommand } from "../../../core/usecases/TransferBalanceIntoMonth.js";
-import { Deps } from "../../../consumers/api/server.js";
+import { Deps } from "../../../ioc.js";
 import { TransferableAccountNotFoundError } from "../../../core/errors/TransferableMonthErrors.js";
 import { TransferBalanceIntoMonthError } from "../../../core/errors/TransferBalanceIntoMonthErrors.js";
 

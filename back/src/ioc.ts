@@ -15,8 +15,10 @@ import WeeklyExpenseFactory from "./core/factories/WeeklyExpenseFactory.js";
 import ManageExpensesChecking from "./core/usecases/ManageExpensesChecking.js";
 import ManageOutflowsChecking from "./core/usecases/ManageOutflowsChecking.js";
 import ArchiveMonth from "./core/usecases/ArchiveMonth.js";
-import monthDto from "./consumers/api/dtos/monthDto.js";
-import yearlyOutflowsDto from "./consumers/api/dtos/yearlyOutflowsDto.js";
+import monthDto, { MonthDtoBuilder } from "./consumers/api/dtos/monthDto.js";
+import yearlyOutflowsDto, {
+  YearlyOutflowsDtoBuilder,
+} from "./consumers/api/dtos/yearlyOutflowsDto.js";
 import DeleteExpense from "./core/usecases/DeleteExpense.js";
 import UpdateExpense from "./core/usecases/UpdateExpense.js";
 import DeleteOutflow from "./core/usecases/DeleteOutflow.js";
@@ -26,20 +28,54 @@ import GetArchivedMonths from "./core/usecases/GetArchivedMonths.js";
 import UnarchiveMonth from "./core/usecases/UnarchiveMonth.js";
 import DeleteMonth from "./core/usecases/DeleteMonth.js";
 import TransferBalanceIntoMonth from "./core/usecases/TransferBalanceIntoMonth.js";
-import addOutflowDeserializer from "./consumers/api/deserializers/addOutflow.js";
-import addWeeklyExpenseDeserializer from "./consumers/api/deserializers/addWeeklyExpense.js";
-import archiveMonthDeserializer from "./consumers/api/deserializers/archiveMonth.js";
-import deleteExpenseDeserializer from "./consumers/api/deserializers/deleteExpense.js";
-import deleteMonthDeserializer from "./consumers/api/deserializers/deleteMonth.js";
-import deleteOutflowDeserializer from "./consumers/api/deserializers/deleteOutflow.js";
-import monthCreationDeserializer from "./consumers/api/deserializers/monthCreation.js";
-import unarchiveMonthDeserializer from "./consumers/api/deserializers/unarchiveMonth.js";
-import manageExpenseCheckingDeserializer from "./consumers/api/deserializers/manageExpenseChecking.js";
-import manageOutflowCheckingDeserializer from "./consumers/api/deserializers/manageOutflowChecking.js";
-import updateMonthlyTemplateDeserializer from "./consumers/api/deserializers/updateMonthlyTemplate.js";
-import transferBalanceIntoMonthDeserializer from "./consumers/api/deserializers/transferBalanceIntoMonth.js";
-import addYearlyOutflowDeserializer from "./consumers/api/deserializers/addYearlyOutflow.js";
-import removeYearlyOutflowDeserializer from "./consumers/api/deserializers/removeYearlyOutflow.js";
+import addOutflowDeserializer, {
+  AddOutflowDeserializer,
+} from "./consumers/api/deserializers/addOutflow.js";
+import addWeeklyExpenseDeserializer, {
+  AddWeeklyExpenseDeserializer,
+} from "./consumers/api/deserializers/addWeeklyExpense.js";
+import archiveMonthDeserializer, {
+  ArchiveMonthDeserializer,
+} from "./consumers/api/deserializers/archiveMonth.js";
+import deleteExpenseDeserializer, {
+  DeleteExpenseDeserializer,
+} from "./consumers/api/deserializers/deleteExpense.js";
+import deleteMonthDeserializer, {
+  DeleteMonthDeserializer,
+} from "./consumers/api/deserializers/deleteMonth.js";
+import deleteOutflowDeserializer, {
+  DeleteOutflowDeserializer,
+} from "./consumers/api/deserializers/deleteOutflow.js";
+import monthCreationDeserializer, {
+  MonthCreationDeserializer,
+} from "./consumers/api/deserializers/monthCreation.js";
+import unarchiveMonthDeserializer, {
+  UnarchiveMonthDeserializer,
+} from "./consumers/api/deserializers/unarchiveMonth.js";
+import manageExpenseCheckingDeserializer, {
+  ManageExpensesCheckingDeserializer,
+} from "./consumers/api/deserializers/manageExpenseChecking.js";
+import manageOutflowCheckingDeserializer, {
+  ManageOutflowsCheckingDeserializer,
+} from "./consumers/api/deserializers/manageOutflowChecking.js";
+import updateMonthlyTemplateDeserializer, {
+  UpdateMonthlyTemplateDeserializer,
+} from "./consumers/api/deserializers/updateMonthlyTemplate.js";
+import deleteMonthlyOutflowDeserializer, {
+  DeleteMonthlyOutflowDeserializer,
+} from "./consumers/api/deserializers/deleteMonthlyOutflow.js";
+import deleteMonthlyBudgetDeserializer, {
+  DeleteMonthlyBudgetDeserializer,
+} from "./consumers/api/deserializers/deleteMonthlyBudget.js";
+import transferBalanceIntoMonthDeserializer, {
+  TransferBalanceIntoMonthDeserializer,
+} from "./consumers/api/deserializers/transferBalanceIntoMonth.js";
+import addYearlyOutflowDeserializer, {
+  AddYearlyOutflowDeserializer,
+} from "./consumers/api/deserializers/addYearlyOutflow.js";
+import removeYearlyOutflowDeserializer, {
+  RemoveYearlyOutflowDeserializer,
+} from "./consumers/api/deserializers/removeYearlyOutflow.js";
 import PendingDebitRepository from "./providers/persistence/repositories/PendingDebitRepository.js";
 import YearlyOutflowRepository from "./providers/persistence/repositories/YearlyOutflowRepository.js";
 import GetYearlyOutflows from "./core/usecases/GetYearlyOutflows.js";
@@ -49,6 +85,8 @@ import MonthlyOutflowTemplateRepository from "./providers/persistence/repositori
 import MonthlyBudgetTemplateRepository from "./providers/persistence/repositories/MonthlyBudgetTemplateRepository.js";
 import GetAllMonthlyTemplates from "./core/usecases/GetAllMonthlyTemplates.js";
 import UpdateMonthlyTemplate from "./core/usecases/UpdateMonthlyTemplate.js";
+import DeleteMonthlyOutflow from "./core/usecases/DeleteMonthlyOutflow.js";
+import DeleteMonthlyBudget from "./core/usecases/DeleteMonthlyBudget.js";
 
 // persistence
 
@@ -125,6 +163,18 @@ const updateMonthlyTemplateUsecase = new UpdateMonthlyTemplate(
   monthlyBudgetTemplateRepository
 );
 
+const deleteMonthlyOutflowUsecase = new DeleteMonthlyOutflow(
+  monthlyTemplateRepository,
+  monthlyOutflowTemplateRepository,
+  monthlyBudgetTemplateRepository
+);
+
+const deleteMonthlyBudgetUsecase = new DeleteMonthlyBudget(
+  monthlyTemplateRepository,
+  monthlyOutflowTemplateRepository,
+  monthlyBudgetTemplateRepository
+);
+
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(
   weeklyExpenseFactory,
   monthRepository
@@ -159,6 +209,50 @@ const removeYearlyOutflowUsecase = new RemoveYearlyOutflow(
   yearlyOutflowRepository
 );
 
+export type Deps = {
+  userRepository: UserRepository;
+  monthDto: MonthDtoBuilder;
+  yearlyOutflowsDto: YearlyOutflowsDtoBuilder;
+  getDefaultMonthlyTemplateUsecase: GetDefaultMonthlyTemplate;
+  deleteMonthlyOutflowUsecase: DeleteMonthlyOutflow;
+  deleteMonthlyBudgetUsecase: DeleteMonthlyBudget;
+  updateMonthlyTemplateUsecase: UpdateMonthlyTemplate;
+  getAllMonthlyTemplatesUsecase: GetAllMonthlyTemplates;
+  createNewMonthUsecase: CreateNewMonth;
+  getUnarchivedMonthsUsecase: GetUnarchivedMonths;
+  addWeeklyExpenseUsecase: AddWeeklyExpense;
+  manageExpensesCheckingUsecase: ManageExpensesChecking;
+  manageOutflowsCheckingUsecase: ManageOutflowsChecking;
+  archiveMonthUsecase: ArchiveMonth;
+  deleteExpenseUsecase: DeleteExpense;
+  updateExpenseUsecase: UpdateExpense;
+  deleteOutflowUsecase: DeleteOutflow;
+  addOutflowUsecase: AddOutflow;
+  getArchivedMonthsUsecase: GetArchivedMonths;
+  unarchiveMonthUsecase: UnarchiveMonth;
+  deleteMonthUsecase: DeleteMonth;
+  transferBalanceIntoMonthUsecase: TransferBalanceIntoMonth;
+  getYearlyOutflowsUsecase: GetYearlyOutflows;
+  addYearlyOutflowUsecase: AddYearlyOutflow;
+  removeYearlyOutflowUsecase: RemoveYearlyOutflow;
+  addOutflowDeserializer: AddOutflowDeserializer;
+  addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
+  archiveMonthDeserializer: ArchiveMonthDeserializer;
+  deleteExpenseDeserializer: DeleteExpenseDeserializer;
+  deleteMonthDeserializer: DeleteMonthDeserializer;
+  deleteOutflowDeserializer: DeleteOutflowDeserializer;
+  manageExpenseCheckingDeserializer: ManageExpensesCheckingDeserializer;
+  manageOutflowCheckingDeserializer: ManageOutflowsCheckingDeserializer;
+  monthCreationDeserializer: MonthCreationDeserializer;
+  unarchiveMonthDeserializer: UnarchiveMonthDeserializer;
+  transferBalanceIntoMonthDeserializer: TransferBalanceIntoMonthDeserializer;
+  addYearlyOutflowDeserializer: AddYearlyOutflowDeserializer;
+  removeYearlyOutflowDeserializer: RemoveYearlyOutflowDeserializer;
+  updateMonthlyTemplateDeserializer: UpdateMonthlyTemplateDeserializer;
+  deleteMonthlyOutflowDeserializer: DeleteMonthlyOutflowDeserializer;
+  deleteMonthlyBudgetDeserializer: DeleteMonthlyBudgetDeserializer;
+};
+
 export {
   client as dbClient,
   userRepository,
@@ -166,6 +260,8 @@ export {
   yearlyOutflowsDto,
   getDefaultMonthlyTemplateUsecase,
   updateMonthlyTemplateUsecase,
+  deleteMonthlyOutflowUsecase,
+  deleteMonthlyBudgetUsecase,
   getAllMonthlyTemplatesUsecase,
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
@@ -198,4 +294,6 @@ export {
   addYearlyOutflowDeserializer,
   removeYearlyOutflowDeserializer,
   updateMonthlyTemplateDeserializer,
+  deleteMonthlyOutflowDeserializer,
+  deleteMonthlyBudgetDeserializer,
 };
