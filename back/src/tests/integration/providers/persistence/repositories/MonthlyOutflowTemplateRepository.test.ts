@@ -6,6 +6,7 @@ import {
   insertDefaultMonthlyTemplate,
   insertMonthlyOutflowTemplate,
 } from "../../../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
+import { MonthlyOutflowTemplateDao } from "../../../../../providers/persistence/entities/MonthlyOutflowTemplate.js";
 
 describe("Integration | Providers | Persistence | Repositories | MonthlyOutflowTemplateRepository", function () {
   afterEach(async () => {
@@ -40,6 +41,24 @@ describe("Integration | Providers | Persistence | Repositories | MonthlyOutflowT
         // then
         expect(foundOutflow).to.deep.equal(outflow.toDomain());
       });
+    });
+  });
+
+  describe("#deleteById", () => {
+    it("should delete the outflow", async () => {
+      // given
+      const template = await insertDefaultMonthlyTemplate();
+      const outflow = await insertMonthlyOutflowTemplate(template.id);
+      const repository = new MonthlyOutflowTemplateRepository();
+
+      // when
+      await repository.deleteById(outflow.id);
+
+      // then
+      const foundOutflows = await MonthlyOutflowTemplateDao.findBy({
+        id: outflow.id,
+      });
+      expect(foundOutflows).to.have.length(0);
     });
   });
 });

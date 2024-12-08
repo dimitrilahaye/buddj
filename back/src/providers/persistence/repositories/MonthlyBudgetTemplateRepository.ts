@@ -16,4 +16,8 @@ export default class TypeOrmMonthlyBudgetTemplateRepository
 
     return budgets.map((budget) => budget.toDomain());
   }
+
+  async deleteById(budgetId: string): Promise<void> {
+    await MonthlyBudgetTemplateDao.delete(budgetId);
+  }
 }
