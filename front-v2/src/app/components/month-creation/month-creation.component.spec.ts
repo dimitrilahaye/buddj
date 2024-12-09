@@ -19,6 +19,7 @@ describe('MonthCreationComponent', () => {
         template: {
           month: new Date(),
           outflows: [],
+          budgets: [],
         },
         pendingDebits: [],
       },

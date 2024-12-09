@@ -98,6 +98,9 @@ export class MonthCreationComponent implements OnInit {
           outflows: (data['template'].template as MonthTemplate).outflows.sort(
             (a, b) => a.label.localeCompare(b.label)
           ),
+          budgets: (data['template'].template as MonthTemplate).budgets.sort(
+            (a, b) => a.name.localeCompare(b.name)
+          ),
         },
       };
       this.setNewMonthData();
