@@ -2,12 +2,16 @@ import http from "node:http";
 import request from "supertest";
 import sinon from "sinon";
 import { afterEach, beforeEach } from "mocha";
-import { authenticate, expect, mockedServer } from "./test-helpers.js";
-import * as deps from "../../../ioc.js";
-import { TransferBalanceIntoMonthCommand } from "../../../core/usecases/TransferBalanceIntoMonth.js";
-import { Deps } from "../../../ioc.js";
-import { TransferableAccountNotFoundError } from "../../../core/errors/TransferableMonthErrors.js";
-import { TransferBalanceIntoMonthError } from "../../../core/errors/TransferBalanceIntoMonthErrors.js";
+import {
+  authenticate,
+  expect,
+  mockedServer,
+} from "../../../integration/consumers/test-helpers.js";
+import * as deps from "../../../../ioc.js";
+import { TransferBalanceIntoMonthCommand } from "../../../../core/usecases/TransferBalanceIntoMonth.js";
+import { Deps } from "../../../../ioc.js";
+import { TransferableAccountNotFoundError } from "../../../../core/errors/TransferableMonthErrors.js";
+import { TransferBalanceIntoMonthError } from "../../../../core/errors/TransferBalanceIntoMonthErrors.js";
 
 describe("Integration | Consumers | Routes | PUT /months/:monthId/transfer/from/:fromType/:fromId/to/:toType/:toId", function () {
   let server: http.Server;

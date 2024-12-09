@@ -1,0 +1,12 @@
+{
+    "require": ["ts-node/register", "src/tests/integration/setup.ts"],
+    "node-option": [
+        "loader=ts-node/esm"
+    ],
+    "extension": ["ts"],
+    "spec": ["./src/tests/integration/**/*.test.*"],
+    "timeout": 2000,
+    "recursive": true,
+    "reporter": "spec",
+    "ui": "bdd"
+  }

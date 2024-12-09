@@ -1,23 +1,28 @@
 import * as http from "node:http";
 import request from "supertest";
-import { authenticate, mockedServer, expect } from "./test-helpers.js";
+import {
+  authenticate,
+  mockedServer,
+  expect,
+} from "../../../integration/consumers/test-helpers.js";
 import { afterEach } from "mocha";
-import * as deps from "../../../ioc.js";
+import * as deps from "../../../../ioc.js";
 import sinon from "sinon";
-import DeserializationError from "../../../consumers/api/errors/DeserializationError.js";
-import { MonthlyTemplateDoesNotExistError } from "../../../core/errors/MonthlyTemplateErrors.js";
+import DeserializationError from "../../../../consumers/api/errors/DeserializationError.js";
+import {
+  MonthlyTemplateDoesNotExistError,
+  MonthlyTemplateNameCanNotBeEmptyError,
+} from "../../../../core/errors/MonthlyTemplateErrors.js";
 
-describe("Integration | Consumers | Routes | DELETE /monthly-templates/:templateId/monthly-outflows/:outflowId", function () {
+describe("Integration | Consumers | Routes | PATCH /monthly-templates/:id", function () {
   let server: http.Server;
 
   afterEach(async function () {
     server.close();
   });
 
-  const params = {
-    templateId: "6186fae7-8e54-4de2-bb68-17b7042bd813",
-    outflowId: "23e603ab-71f9-46e0-a497-3fbae2154e23",
-  };
+  const body = { name: "newName", isDefault: true };
+  const params = { id: "6186fae7-8e54-4de2-bb68-17b7042bd813" };
 
   describe("When user is authenticated", function () {
     it("should return updated template", async function () {
@@ -26,28 +31,29 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
         ...deps,
       };
       const updatedTemplate = "updatedTemplate";
-      depsStub.deleteMonthlyOutflowUsecase.execute = sinon
+      depsStub.updateMonthlyTemplateUsecase.execute = sinon
         .stub()
         .resolves(updatedTemplate);
       const command = Symbol("command");
-      depsStub.deleteMonthlyOutflowDeserializer = sinon.stub().returns(command);
+      depsStub.updateMonthlyTemplateDeserializer = sinon
+        .stub()
+        .returns(command);
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);
 
       // when
       const response = await request(server)
-        .delete(
-          `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
-        )
+        .patch(`/monthly-templates/${params.id}`)
+        .send(body)
         .set("Cookie", cookie);
 
       // then
-      expect(depsStub.deleteMonthlyOutflowDeserializer).to.have.been.calledWith(
-        params
-      );
       expect(
-        depsStub.deleteMonthlyOutflowUsecase.execute
+        depsStub.updateMonthlyTemplateDeserializer
+      ).to.have.been.calledWith(params, body);
+      expect(
+        depsStub.updateMonthlyTemplateUsecase.execute
       ).to.have.been.calledWith(command);
       expect(response.statusCode).to.be.equal(200);
       expect(response.body.success).to.be.true;
@@ -59,7 +65,7 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
       const depsStub = {
         ...deps,
       };
-      depsStub.deleteMonthlyOutflowDeserializer = sinon
+      depsStub.updateMonthlyTemplateDeserializer = sinon
         .stub()
         .throwsException(new DeserializationError("", ""));
 
@@ -68,9 +74,8 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
 
       // when
       const response = await request(server)
-        .delete(
-          `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
-        )
+        .patch(`/monthly-templates/${params.id}`)
+        .send(body)
         .set("Cookie", cookie);
 
       // then
@@ -83,24 +88,52 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
       const depsStub = {
         ...deps,
       };
-      depsStub.deleteMonthlyOutflowUsecase.execute = sinon
+      depsStub.updateMonthlyTemplateUsecase.execute = sinon
         .stub()
         .throws(new MonthlyTemplateDoesNotExistError());
       const command = Symbol("command");
-      depsStub.deleteMonthlyOutflowDeserializer = sinon.stub().returns(command);
+      depsStub.updateMonthlyTemplateDeserializer = sinon
+        .stub()
+        .returns(command);
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);
 
       // when
       const response = await request(server)
-        .delete(
-          `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
-        )
+        .patch(`/monthly-templates/${params.id}`)
+        .send(body)
         .set("Cookie", cookie);
 
       // then
       expect(response.statusCode).to.be.equal(404);
+      expect(response.body.success).to.be.false;
+    });
+
+    it("should return 422 error if entity is unprocessabled", async () => {
+      // given
+      const depsStub = {
+        ...deps,
+      };
+      depsStub.updateMonthlyTemplateUsecase.execute = sinon
+        .stub()
+        .throws(new MonthlyTemplateNameCanNotBeEmptyError());
+      const command = Symbol("command");
+      depsStub.updateMonthlyTemplateDeserializer = sinon
+        .stub()
+        .returns(command);
+
+      server = mockedServer({ isAuthenticated: true }, depsStub);
+      const cookie = await authenticate(server);
+
+      // when
+      const response = await request(server)
+        .patch(`/monthly-templates/${params.id}`)
+        .send(body)
+        .set("Cookie", cookie);
+
+      // then
+      expect(response.statusCode).to.be.equal(422);
       expect(response.body.success).to.be.false;
     });
   });
@@ -115,9 +148,7 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
     });
 
     it("should return a 401 error", async function () {
-      await request(server).delete(
-        `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
-      );
+      await request(server).patch(`/monthly-templates/${params.id}`).send(body);
     });
   });
 });

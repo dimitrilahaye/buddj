@@ -24,8 +24,8 @@
     "db:prepare": "npm run db:drop && npm run db:migrate",
     "db:prepare:test": "NODE_ENV=test npm run db:prepare",
     "test": "NODE_ENV=test mocha",
-    "test:unit": "cross-env MOCHA_TEST=unit NODE_ENV=test mocha --grep 'Unit'",
-    "test:integration": "NODE_ENV=test mocha --grep 'Integration'",
+    "tu": "mocha --config .mocharc.unit.json",
+    "ti": "mocha --config .mocharc.integration.json",
     "test:full": "npm run db:prepare:test && npm run test"
   },
   "engines": {

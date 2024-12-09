@@ -1,8 +1,12 @@
 import * as http from "node:http";
 import request from "supertest";
-import { authenticate, mockedServer, expect } from "./test-helpers.js";
+import {
+  authenticate,
+  mockedServer,
+  expect,
+} from "../../../integration/consumers/test-helpers.js";
 import { afterEach } from "mocha";
-import * as deps from "../../../ioc.js";
+import * as deps from "../../../../ioc.js";
 import sinon from "sinon";
 
 describe("Integration | Consumers | Routes | GET /months/template", function () {
