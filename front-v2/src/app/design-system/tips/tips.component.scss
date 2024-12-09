@@ -1,0 +1,11 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
+.tips {
+    background: var(--color-100);
+    border-radius: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    color: var(--dark-100);
+    text-align: center;
+}

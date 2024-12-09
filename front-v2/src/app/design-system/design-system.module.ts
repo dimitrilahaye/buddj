@@ -16,6 +16,8 @@ import { InfoComponent } from './info/info.component';
 import { NumpadComponent } from './numpad/numpad.component';
 import { ButtonIconComponent } from './button-icon/button-icon.component';
 import { ToggleButtonComponent } from './toggle-button/toggle-button.component';
+import { TipsComponent } from './tips/tips.component';
+import { ButtonLinkComponent } from './button-link/button-link.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,8 @@ import { ToggleButtonComponent } from './toggle-button/toggle-button.component';
     NumpadComponent,
     ButtonIconComponent,
     ToggleButtonComponent,
+    TipsComponent,
+    ButtonLinkComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -52,6 +56,8 @@ import { ToggleButtonComponent } from './toggle-button/toggle-button.component';
     NumpadComponent,
     ButtonIconComponent,
     ToggleButtonComponent,
+    TipsComponent,
+    ButtonLinkComponent,
   ],
 })
 export class DesignSystemModule {}

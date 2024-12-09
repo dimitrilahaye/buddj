@@ -91,6 +91,12 @@ export class MonthCreationComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
+      if (data['template'].template === null) {
+        this.template = null;
+        this.dataLoaded = true;
+        return;
+      }
+
       this.template = {
         ...data['template'],
         template: {
@@ -109,6 +115,10 @@ export class MonthCreationComponent implements OnInit {
 
       this.dataLoaded = true;
     });
+  }
+
+  goToTemplatesPage() {
+    this.router.navigate(['monthly-templates']);
   }
 
   togglePendingDebits(event: Event) {
