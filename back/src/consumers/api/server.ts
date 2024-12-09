@@ -33,6 +33,8 @@ import { updateMonthlyTemplate } from "./routes/updateMonthlyTemplate.js";
 import { Deps } from "../../ioc.js";
 import { deleteMonthlyOutflow } from "./routes/deleteMonthlyOutflow.js";
 import { deleteMonthlyBudget } from "./routes/deleteMonthlyBudget.js";
+import { addMonthlyOutflow } from "./routes/addMonthlyOutflow.js";
+import { addMonthlyBudget } from "./routes/addMonthlyBudget.js";
 
 declare global {
   namespace Express {
@@ -275,6 +277,18 @@ function buildApi(
     createNewMonth(router, {
       createNewMonthUsecase: dependencies.createNewMonthUsecase,
       deserializer: dependencies.monthCreationDeserializer,
+    })
+  );
+  api.use(
+    addMonthlyOutflow(router, {
+      usecase: dependencies.addMonthlyOutflowUsecase,
+      deserializer: dependencies.addMonthlyOutflowDeserializer,
+    })
+  );
+  api.use(
+    addMonthlyBudget(router, {
+      usecase: dependencies.addMonthlyBudgetUsecase,
+      deserializer: dependencies.addMonthlyBudgetDeserializer,
     })
   );
   api.use(

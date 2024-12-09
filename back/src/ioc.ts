@@ -87,6 +87,16 @@ import GetAllMonthlyTemplates from "./core/usecases/GetAllMonthlyTemplates.js";
 import UpdateMonthlyTemplate from "./core/usecases/UpdateMonthlyTemplate.js";
 import DeleteMonthlyOutflow from "./core/usecases/DeleteMonthlyOutflow.js";
 import DeleteMonthlyBudget from "./core/usecases/DeleteMonthlyBudget.js";
+import AddMonthlyBudget from "./core/usecases/AddMonthlyBudget.js";
+import AddMonthlyOutflow from "./core/usecases/AddMonthlyOutflow.js";
+import MonthlyOutflowFactory from "./core/factories/MonthlyOutflowFactory.js";
+import MonthlyBudgetFactory from "./core/factories/MonthlyBudgetFactory.js";
+import addMonthlyOutflowDeserializer, {
+  AddMonthlyOutflowDeserializer,
+} from "./consumers/api/deserializers/addMonthlyOutflow.js";
+import addMonthlyBudgetDeserializer, {
+  AddMonthlyBudgetDeserializer,
+} from "./consumers/api/deserializers/addMonthlyBudget.js";
 
 // persistence
 
@@ -125,6 +135,10 @@ const monthFactory = new MonthFactory(idProvider);
 const weeklyExpenseFactory = new WeeklyExpenseFactory(idProvider);
 
 const outflowFactory = new AccountOutflowFactory(idProvider);
+
+const monthlyOutflowFactory = new MonthlyOutflowFactory(idProvider);
+
+const monthlyBudgetFactory = new MonthlyBudgetFactory(idProvider);
 
 // use cases
 
@@ -173,6 +187,20 @@ const deleteMonthlyBudgetUsecase = new DeleteMonthlyBudget(
   monthlyTemplateRepository,
   monthlyOutflowTemplateRepository,
   monthlyBudgetTemplateRepository
+);
+
+const addMonthlyOutflowUsecase = new AddMonthlyOutflow(
+  monthlyTemplateRepository,
+  monthlyOutflowTemplateRepository,
+  monthlyBudgetTemplateRepository,
+  monthlyOutflowFactory
+);
+
+const addMonthlyBudgetUsecase = new AddMonthlyBudget(
+  monthlyTemplateRepository,
+  monthlyOutflowTemplateRepository,
+  monthlyBudgetTemplateRepository,
+  monthlyBudgetFactory
 );
 
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(
@@ -231,6 +259,8 @@ export type Deps = {
   getArchivedMonthsUsecase: GetArchivedMonths;
   unarchiveMonthUsecase: UnarchiveMonth;
   deleteMonthUsecase: DeleteMonth;
+  addMonthlyOutflowUsecase: AddMonthlyOutflow;
+  addMonthlyBudgetUsecase: AddMonthlyBudget;
   transferBalanceIntoMonthUsecase: TransferBalanceIntoMonth;
   getYearlyOutflowsUsecase: GetYearlyOutflows;
   addYearlyOutflowUsecase: AddYearlyOutflow;
@@ -251,6 +281,8 @@ export type Deps = {
   updateMonthlyTemplateDeserializer: UpdateMonthlyTemplateDeserializer;
   deleteMonthlyOutflowDeserializer: DeleteMonthlyOutflowDeserializer;
   deleteMonthlyBudgetDeserializer: DeleteMonthlyBudgetDeserializer;
+  addMonthlyOutflowDeserializer: AddMonthlyOutflowDeserializer;
+  addMonthlyBudgetDeserializer: AddMonthlyBudgetDeserializer;
 };
 
 export {
@@ -268,6 +300,8 @@ export {
   addWeeklyExpenseUsecase,
   manageExpensesCheckingUsecase,
   manageOutflowsCheckingUsecase,
+  addMonthlyOutflowUsecase,
+  addMonthlyBudgetUsecase,
   archiveMonthUsecase,
   deleteExpenseUsecase,
   updateExpenseUsecase,
@@ -296,4 +330,6 @@ export {
   updateMonthlyTemplateDeserializer,
   deleteMonthlyOutflowDeserializer,
   deleteMonthlyBudgetDeserializer,
+  addMonthlyOutflowDeserializer,
+  addMonthlyBudgetDeserializer,
 };
