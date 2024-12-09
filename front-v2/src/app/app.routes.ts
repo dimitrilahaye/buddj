@@ -10,6 +10,9 @@ import { ArchivedMonthsComponent } from './components/archived-months/archived-m
 import { archivedMonthsResolver } from './resolvers/archived-months/archived-months.resolver';
 import { YearlyOutflowsComponent } from './components/yearly-outflows/yearly-outflows.component';
 import { yearlyOutflowsResolver } from './resolvers/yearly-outflows/yearly-outflows.resolver';
+import { MonthlyTemplatesComponent } from './components/monthly-templates/monthly-templates.component';
+import { monthlyTemplatesResolver } from './resolvers/monthly-templates/monthly-templates.resolver';
+import { MonthlyTemplateComponent } from './components/monthly-template/monthly-template.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -56,6 +59,22 @@ export const routes: Routes = [
     canActivate: [authGuard],
     resolve: {
       yearlyOutflows: yearlyOutflowsResolver,
+    },
+  },
+  {
+    path: 'monthly-templates',
+    component: MonthlyTemplatesComponent,
+    canActivate: [authGuard],
+    resolve: {
+      monthlyTemplates: monthlyTemplatesResolver,
+    },
+  },
+  {
+    path: 'monthly-templates/:id',
+    component: MonthlyTemplateComponent,
+    canActivate: [authGuard],
+    resolve: {
+      monthlyTemplates: monthlyTemplatesResolver,
     },
   },
 ];

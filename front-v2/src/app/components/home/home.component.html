@@ -66,7 +66,10 @@
           >
         </div>
         <div class="menu-category-actions__action">
-          <app-button-icon icon="fa-shapes" [disabled]="true"></app-button-icon>
+          <app-button-icon
+            icon="fa-shapes"
+            (click)="navigateToMonthlyTemplates($event)"
+          ></app-button-icon>
           <span class="menu-category-actions-action__label"
             >Gérer les templates</span
           >

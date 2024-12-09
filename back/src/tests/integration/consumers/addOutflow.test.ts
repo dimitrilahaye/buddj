@@ -6,7 +6,7 @@ import { authenticate, expect, mockedServer } from "./test-helpers.js";
 import * as deps from "../../../ioc.js";
 import AddOutflowCommand from "../../../core/commands/AddOutflowCommand.js";
 import { MonthNotFoundError } from "../../../core/errors/MonthErrors.js";
-import { Deps } from "../../../consumers/api/server.js";
+import { Deps } from "../../../ioc.js";
 
 describe("Integration | Consumers | Routes | PUT /months/{monthId}/outflows", function () {
   let server: http.Server;

@@ -1,5 +1,9 @@
 import sinon from "sinon";
 
+const idProviderStub = {
+  get: sinon.stub(),
+};
+
 const monthRepositoryStub = {
   addExpenseToWeeklyBudget: sinon.stub(),
   addOutflow: sinon.stub(),
@@ -20,8 +24,23 @@ const monthRepositoryStub = {
   updateWeeklyBudgetInitialBalance: sinon.stub(),
 };
 
-const monthCreationTemplateRepositoryStub = {
-  getNewMonthTemplate: sinon.stub(),
+const monthlyTemplateRepositoryStub = {
+  getDefault: sinon.stub(),
+  getAll: sinon.stub(),
+  getById: sinon.stub(),
+  save: sinon.stub(),
+};
+
+const monthlyOutflowTemplateRepositoryStub = {
+  getAllByTemplateId: sinon.stub(),
+  deleteById: sinon.stub(),
+  save: sinon.stub(),
+};
+
+const monthlyBudgetTemplateRepositoryStub = {
+  getAllByTemplateId: sinon.stub(),
+  deleteById: sinon.stub(),
+  save: sinon.stub(),
 };
 
 const pendingDebitRepositoryStub = {
@@ -56,13 +75,26 @@ function resetStubs() {
   yearlyOutflowRepositoryStub.getAll.reset();
   yearlyOutflowRepositoryStub.add.reset();
   yearlyOutflowRepositoryStub.remove.reset();
-  monthCreationTemplateRepositoryStub.getNewMonthTemplate.reset();
+  monthlyTemplateRepositoryStub.getDefault.reset();
+  monthlyTemplateRepositoryStub.getById.reset();
+  monthlyTemplateRepositoryStub.getAll.reset();
+  monthlyTemplateRepositoryStub.save.reset();
+  monthlyOutflowTemplateRepositoryStub.getAllByTemplateId.reset();
+  monthlyBudgetTemplateRepositoryStub.getAllByTemplateId.reset();
+  monthlyOutflowTemplateRepositoryStub.deleteById.reset();
+  monthlyBudgetTemplateRepositoryStub.deleteById.reset();
+  monthlyOutflowTemplateRepositoryStub.save.reset();
+  monthlyBudgetTemplateRepositoryStub.save.reset();
+  idProviderStub.get.reset();
 }
 
 export {
   monthRepositoryStub,
   pendingDebitRepositoryStub,
   yearlyOutflowRepositoryStub,
-  monthCreationTemplateRepositoryStub,
+  monthlyTemplateRepositoryStub,
+  monthlyOutflowTemplateRepositoryStub,
+  monthlyBudgetTemplateRepositoryStub,
+  idProviderStub,
   resetStubs,
 };

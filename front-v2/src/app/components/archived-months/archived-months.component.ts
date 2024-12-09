@@ -23,11 +23,17 @@ import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
+import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
 
 @Component({
   selector: 'app-archived-months',
   standalone: true,
-  imports: [DesignSystemModule, DateNormalizePipe, CommonModule],
+  imports: [
+    DesignSystemModule,
+    DateNormalizePipe,
+    CommonModule,
+    HeaderBackToHomeComponent,
+  ],
   templateUrl: './archived-months.component.html',
   styleUrl: './archived-months.component.scss',
 })
@@ -96,9 +102,5 @@ export class ArchivedMonthsComponent implements OnInit {
 
   isUnarchiveMonthLoadingById(monthId: string) {
     return this.unarchiveLoadingByMonthId === monthId;
-  }
-
-  backToHome() {
-    this.router.navigate(['home']);
   }
 }

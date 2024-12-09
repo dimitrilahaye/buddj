@@ -81,10 +81,6 @@
     background: none;
     padding: 0;
   
-    &--checked {
-      opacity: 0.3;
-    }
-  
     &__icon {
       display: flex;
       justify-content: center;
@@ -99,11 +95,6 @@
     }
   
     &__info {
-      &--checked {
-        color: var(--dark-100);
-        text-decoration: line-through;
-      }
-  
       display: flex;
       flex-direction: column;
       align-items: flex-start;

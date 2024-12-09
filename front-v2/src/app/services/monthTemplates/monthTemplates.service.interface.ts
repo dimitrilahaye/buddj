@@ -4,6 +4,13 @@ import { MonthCreationTemplate } from '../../models/monthTemplate.model';
 
 export default interface MonthTemplatesServiceInterface {
   getTemplate(): Observable<MonthCreationTemplate>;
+  getAll(): Observable<void>;
+  updateTemplate(
+    templateId: string,
+    data: { name: string; isDefault: boolean }
+  ): Observable<void>;
+  deleteOutflow(templateId: string, outflowId: string): Observable<void>;
+  deleteBudget(templateId: string, budgetId: string): Observable<void>;
 }
 
 export const MONTH_TEMPLATES_SERVICE =

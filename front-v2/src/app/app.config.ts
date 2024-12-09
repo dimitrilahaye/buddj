@@ -29,6 +29,8 @@ import { YEARLY_OUTFLOWS_SERVICE } from './services/yearlyOutflows/yearly-outflo
 import { YearlyOutflowsService } from './services/yearlyOutflows/yearly-outflows.service';
 import { YEARLY_OUTFLOWS_STORE } from './stores/yearlyOutflows/yearlyOutflows.store.interface';
 import { YearlyOutflowsStore } from './stores/yearlyOutflows/yearlyOutflows.store';
+import { MONTHLY_TEMPLATES_STORE } from './stores/monthlyTemplates/monthlyTemplates.store.interface';
+import { MonthlyTemplatesStore } from './stores/monthlyTemplates/monthlyTemplates.store';
 
 registerLocaleData(localeFr);
 
@@ -69,6 +71,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: YEARLY_OUTFLOWS_STORE,
       useClass: YearlyOutflowsStore,
+    },
+    {
+      provide: MONTHLY_TEMPLATES_STORE,
+      useClass: MonthlyTemplatesStore,
     },
     {
       provide: TOASTER_SERVICE,

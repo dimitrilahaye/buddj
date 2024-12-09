@@ -1,0 +1,276 @@
+<app-header-back-to-home></app-header-back-to-home>
+<div class="content">
+  @if(!editingTemplate) {
+  <app-info>Le template désiré n'existe pas</app-info>
+  } @else {
+  <div class="title">
+    {{ editingTemplate.name }}
+    <app-button-icon
+      icon="fa-edit"
+      size="small"
+      [disabled]="isLoading"
+      (click)="openTemplateNameModal($event)"
+    ></app-button-icon>
+  </div>
+  <div class="template__infos">
+    <app-toggle-button
+      (toggleChange)="defaultChanged($event)"
+      [disabled]="isLoading"
+      [isToggled]="editingTemplate.isDefault"
+    ></app-toggle-button>
+    <span>
+      {{ isDefaultInfo }}
+      @if(isLoading) { &nbsp;
+      <i class="fa-solid fa-arrows-rotate rotate"></i>
+      }
+    </span>
+  </div>
+  <section>
+    <div class="subtitle">
+      Sorties mensuelles
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        [disabled]="isLoading"
+        (click)="openAddOutflowModal()"
+      ></app-button-icon>
+    </div>
+    <div class="outflows__list">
+      @if (editingTemplate.outflows.length === 0) {
+      <app-info>Aucune sortie mensuelle pour le moment 😁</app-info>
+      } @else {
+      <app-item *ngFor="let outflow of editingTemplate.outflows; let i = index">
+        <button type="button" class="outflows-list-item">
+          <span class="outflows-list-item__icon">
+            <i class="fa-solid fa-money-bill-transfer"></i>
+          </span>
+          <div class="outflows-list-item__info">
+            <span class="outflows-list-item-info__label">
+              {{ outflow.label }}</span
+            >
+            <span class="outflows-list-item-info__amount">{{
+              outflow.amount | currency : "EUR"
+            }}</span>
+          </div>
+
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            [disabled]="isLoading"
+            (click)="openOutflowDelationModal(outflow, $event)"
+          >
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </button>
+      </app-item>
+      }
+    </div>
+  </section>
+  <app-divider></app-divider>
+  <section>
+    <div class="subtitle">
+      Budgets
+      <app-button-icon
+        icon="fa-plus"
+        size="small"
+        [disabled]="isLoading"
+        (click)="openAddBudgetModal()"
+      ></app-button-icon>
+    </div>
+    <div class="outflows__list">
+      @if (editingTemplate.budgets.length === 0) {
+      <app-info>Aucune sortie mensuelle pour le moment 😁</app-info>
+      } @else {
+      <app-item *ngFor="let budget of editingTemplate.budgets; let i = index">
+        <button type="button" class="outflows-list-item">
+          <span class="outflows-list-item__icon">
+            <i class="fa-solid fa-basket-shopping"></i>
+          </span>
+          <div class="outflows-list-item__info">
+            <span class="outflows-list-item-info__label">
+              {{ budget.name }}</span
+            >
+            <span class="outflows-list-item-info__amount">{{
+              budget.initialBalance | currency : "EUR"
+            }}</span>
+          </div>
+
+          <button
+            class="outflows-list-item__delete"
+            type="button"
+            [disabled]="isLoading"
+            (click)="openBudgetDelationModal(budget, $event)"
+          >
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </button>
+      </app-item>
+      }
+    </div>
+  </section>
+  }
+</div>
+
+<!-- 
+  ##################### FOOTER #####################
+-->
+<div class="month-creation__footer">
+  <div class="month-creation-footer__actions">
+    <span class="month-creation-footer__forecast-balance"
+      >Total : <strong>{{ total | currency : "EUR" }}</strong></span
+    >
+  </div>
+</div>
+
+<!-- 
+  ##################### UPDATE NAME #####################
+-->
+<app-sliding-modal
+  [isOpen]="isTemplateNameModalOpen"
+  (close)="cancelNameUpdate($event)"
+  [canClose]="!isLoading"
+>
+  <div class="modal">
+    <input
+      class="input"
+      type="text"
+      [required]="true"
+      [value]="editingTemplate?.name"
+      placeholder="Nom"
+      (input)="updateTemplateName($event)"
+    />
+    <div class="modal__actions">
+      <app-button
+        [label]="'Annuler'"
+        [disabled]="isLoading"
+        (click)="cancelNameUpdate($event)"
+      ></app-button>
+      <app-button
+        [label]="'Valider'"
+        [variant]="'danger'"
+        [loading]="isLoading"
+        (click)="submitUpdateTemplateName($event)"
+      ></app-button>
+    </div>
+  </div>
+</app-sliding-modal>
+
+<!-- 
+  ##################### REMOVE OUTFLOW #####################
+-->
+<app-modal
+  [modalOpen]="isRemoveOutflowModalOpen"
+  (click)="closeOutflowDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer définitivement la sortie'"
+    [loading]="isLoading"
+    (click)="removeOutflow($event)"
+  ></app-button>
+</app-modal>
+
+<!-- 
+  ##################### REMOVE BUDGET #####################
+-->
+<app-modal
+  [modalOpen]="isRemoveBudgetModalOpen"
+  (click)="closeBudgetDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer définitivement le budget'"
+    [loading]="isLoading"
+    (click)="removeBudget($event)"
+  ></app-button>
+</app-modal>
+
+<!-- 
+  ##################### ADD OUTFLOW #####################
+-->
+<app-sliding-modal
+  [isOpen]="isAddOutflowModalOpen"
+  (close)="closeAddOutflowModal($event)"
+  [canClose]="!isLoading"
+>
+  <div class="modal">
+    <!-- outflow label -->
+    <input
+      class="input"
+      type="text"
+      [required]="true"
+      [value]="editingOutflow?.label"
+      placeholder="Libellé"
+      (input)="updateAddingOutflowLabel($event)"
+    />
+    <!-- outflow amount -->
+    <input
+      class="input"
+      type="number"
+      step="0.01"
+      (click)="openNumpad($event)"
+      [required]="true"
+      [value]="editingOutflow?.amount ?? 'Pas de montant'"
+    />
+    <div class="modal__actions">
+      <app-button
+        [label]="'Annuler'"
+        [variant]="'danger'"
+        (click)="closeAddOutflowModal($event)"
+      ></app-button>
+      <app-button [label]="'Valider'" (click)="addOutflow($event)"></app-button>
+    </div>
+  </div>
+</app-sliding-modal>
+
+<!-- 
+  ##################### ADD BUDGET #####################
+-->
+<app-sliding-modal
+  [isOpen]="isAddBudgetModalOpen"
+  (close)="closeAddBudgetModal($event)"
+  [canClose]="!isLoading"
+>
+  <div class="modal">
+    <!-- budget name -->
+    <input
+      class="input"
+      type="text"
+      [required]="true"
+      [value]="editingBudget?.name"
+      placeholder="Nom"
+      (input)="updateAddingBudgetName($event)"
+    />
+    <!-- budget initialBalance -->
+    <input
+      class="input"
+      type="number"
+      step="0.01"
+      (click)="openNumpad($event)"
+      [required]="true"
+      [value]="editingBudget?.initialBalance ?? 'Pas de montant'"
+    />
+    <div class="modal__actions">
+      <app-button
+        [label]="'Annuler'"
+        [variant]="'danger'"
+        (click)="closeAddBudgetModal($event)"
+      ></app-button>
+      <app-button [label]="'Valider'" (click)="addBudget($event)"></app-button>
+    </div>
+  </div>
+</app-sliding-modal>
+
+<!-- 
+  ##################### NUMPAD #####################
+-->
+@if(isNumpadModalOpen) {
+<app-sliding-modal [isOpen]="isNumpadModalOpen" (close)="closeNumpad($event)">
+  <app-numpad
+    [value]="initializeNumpadValue()"
+    (submitted)="updateAmountValue($event)"
+  ></app-numpad>
+</app-sliding-modal>
+}

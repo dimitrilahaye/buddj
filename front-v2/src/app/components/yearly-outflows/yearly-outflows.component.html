@@ -11,11 +11,7 @@
   ></app-button>
 </app-modal>
 
-<div class="header">
-  <button type="button" (click)="backToHome()">
-    <i class="fa-solid fa-circle-xmark"></i>
-  </button>
-</div>
+<app-header-back-to-home></app-header-back-to-home>
 <div class="content">
   @if(!outflows()) {
   <app-info>Aucune sortie annuelle pour le moment 😁</app-info>

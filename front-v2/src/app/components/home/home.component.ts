@@ -136,6 +136,11 @@ export class HomeComponent {
     this.router.navigate(['archived-months']);
   }
 
+  navigateToMonthlyTemplates(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['monthly-templates']);
+  }
+
   navigateToYearlyOutlfows(event: Event) {
     event.stopPropagation();
     this.router.navigate(['yearly-outflows']);
