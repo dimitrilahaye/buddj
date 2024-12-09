@@ -9,3 +9,11 @@
     color: var(--dark-100);
     text-align: center;
 }
+
+::ng-deep app-tips {
+    p {
+        @extend %text-7;
+
+        margin: 0;
+    }
+}

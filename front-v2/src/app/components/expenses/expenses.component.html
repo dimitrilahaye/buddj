@@ -77,7 +77,11 @@
           </div>
           @if (getExpensesFormGroupByWeekId(week.id).length === 0 &&
           filterIsActive(i + 1)) {
-          <app-info>Pas de dépenses à afficher 😁</app-info> } @else {
+          <app-tips>
+            <p>Vous n'avez pas encore crée de dépenses pour ce budget 🙂</p>
+            <img width="50%" src="info/no-expenses-yet.png" alt="" />
+          </app-tips>
+          } @else {
           <app-item
             *ngFor="
               let expense of getExpensesFormGroupByWeekId(week.id);
@@ -139,7 +143,12 @@
     </div>
     }
   </form>
-  } @else { <app-info>Aucune dépense actuellement 😁</app-info> }
+  } @else {
+  <app-tips>
+    <p>Vous n'avez pas encore crée de budgets pour ce mois 🙂</p>
+    <img width="70%" src="info/no-budgets-yet.png" alt="" />
+  </app-tips>
+  }
 </div>
 
 @if(addExpenseForm) {
