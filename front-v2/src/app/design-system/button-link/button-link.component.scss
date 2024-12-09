@@ -1,0 +1,10 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
+.link {
+    @extend %text-7;
+
+    display: block;
+
+    color: var(--color-800);
+  }
