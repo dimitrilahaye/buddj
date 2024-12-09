@@ -121,14 +121,12 @@ export class MonthCreationComponent implements OnInit {
     this.router.navigate(['monthly-templates']);
   }
 
-  togglePendingDebits(event: Event) {
+  togglePendingDebits() {
     this.takeIntoAccountPendingDebits = !this.takeIntoAccountPendingDebits;
-    event.preventDefault();
   }
 
-  toggleYearlyOutflows(event: Event) {
+  toggleYearlyOutflows() {
     this.takeIntoAccountYearlyOutflows = !this.takeIntoAccountYearlyOutflows;
-    event.preventDefault();
   }
 
   toggleVisibilityForOutflowWithIndex(index: number) {

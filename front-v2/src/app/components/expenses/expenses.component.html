@@ -27,11 +27,10 @@
           }}</span>
         </div>
         <div class="expenses-list__filters">
-          <a
+          <app-button-link
             class="expenses-list-filters__link"
-            href="#"
-            (click)="toggleBudgetsUnfolded($event)"
-            >{{ unfoldBudgetsLabel }}</a
+            (onClick)="toggleBudgetsUnfolded()"
+            >{{ unfoldBudgetsLabel }}</app-button-link
           >
         </div>
       </div>

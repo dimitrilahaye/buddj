@@ -152,8 +152,7 @@ export class ExpensesComponent implements AfterViewInit {
     return `${checkedExpenses} non-prélevées / ${totalExpenses}`;
   }
 
-  toggleBudgetsUnfolded(event: Event) {
-    event.preventDefault();
+  toggleBudgetsUnfolded() {
     this.budgetsUnfolded = !this.budgetsUnfolded;
     if (this.budgetsUnfolded) {
       this.filters = [1, 2, 3, 4, 5];
