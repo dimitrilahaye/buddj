@@ -1,24 +1,27 @@
 import * as http from "node:http";
 import request from "supertest";
-import { authenticate, mockedServer, expect } from "./test-helpers.js";
-import { afterEach } from "mocha";
-import * as deps from "../../../ioc.js";
-import sinon from "sinon";
-import DeserializationError from "../../../consumers/api/errors/DeserializationError.js";
 import {
-  MonthlyTemplateDoesNotExistError,
-  MonthlyTemplateNameCanNotBeEmptyError,
-} from "../../../core/errors/MonthlyTemplateErrors.js";
+  authenticate,
+  mockedServer,
+  expect,
+} from "../../../integration/consumers/test-helpers.js";
+import { afterEach } from "mocha";
+import * as deps from "../../../../ioc.js";
+import sinon from "sinon";
+import DeserializationError from "../../../../consumers/api/errors/DeserializationError.js";
+import { MonthlyTemplateDoesNotExistError } from "../../../../core/errors/MonthlyTemplateErrors.js";
 
-describe("Integration | Consumers | Routes | PATCH /monthly-templates/:id", function () {
+describe("Integration | Consumers | Routes | DELETE /monthly-templates/:templateId/monthly-budgets/:budgetId", function () {
   let server: http.Server;
 
   afterEach(async function () {
     server.close();
   });
 
-  const body = { name: "newName", isDefault: true };
-  const params = { id: "6186fae7-8e54-4de2-bb68-17b7042bd813" };
+  const params = {
+    templateId: "6186fae7-8e54-4de2-bb68-17b7042bd813",
+    budgetId: "23e603ab-71f9-46e0-a497-3fbae2154e23",
+  };
 
   describe("When user is authenticated", function () {
     it("should return updated template", async function () {
@@ -27,29 +30,28 @@ describe("Integration | Consumers | Routes | PATCH /monthly-templates/:id", func
         ...deps,
       };
       const updatedTemplate = "updatedTemplate";
-      depsStub.updateMonthlyTemplateUsecase.execute = sinon
+      depsStub.deleteMonthlyBudgetUsecase.execute = sinon
         .stub()
         .resolves(updatedTemplate);
       const command = Symbol("command");
-      depsStub.updateMonthlyTemplateDeserializer = sinon
-        .stub()
-        .returns(command);
+      depsStub.deleteMonthlyBudgetDeserializer = sinon.stub().returns(command);
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);
 
       // when
       const response = await request(server)
-        .patch(`/monthly-templates/${params.id}`)
-        .send(body)
+        .delete(
+          `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+        )
         .set("Cookie", cookie);
 
       // then
+      expect(depsStub.deleteMonthlyBudgetDeserializer).to.have.been.calledWith(
+        params
+      );
       expect(
-        depsStub.updateMonthlyTemplateDeserializer
-      ).to.have.been.calledWith(params, body);
-      expect(
-        depsStub.updateMonthlyTemplateUsecase.execute
+        depsStub.deleteMonthlyBudgetUsecase.execute
       ).to.have.been.calledWith(command);
       expect(response.statusCode).to.be.equal(200);
       expect(response.body.success).to.be.true;
@@ -61,7 +63,7 @@ describe("Integration | Consumers | Routes | PATCH /monthly-templates/:id", func
       const depsStub = {
         ...deps,
       };
-      depsStub.updateMonthlyTemplateDeserializer = sinon
+      depsStub.deleteMonthlyBudgetDeserializer = sinon
         .stub()
         .throwsException(new DeserializationError("", ""));
 
@@ -70,8 +72,9 @@ describe("Integration | Consumers | Routes | PATCH /monthly-templates/:id", func
 
       // when
       const response = await request(server)
-        .patch(`/monthly-templates/${params.id}`)
-        .send(body)
+        .delete(
+          `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+        )
         .set("Cookie", cookie);
 
       // then
@@ -84,52 +87,24 @@ describe("Integration | Consumers | Routes | PATCH /monthly-templates/:id", func
       const depsStub = {
         ...deps,
       };
-      depsStub.updateMonthlyTemplateUsecase.execute = sinon
+      depsStub.deleteMonthlyBudgetUsecase.execute = sinon
         .stub()
         .throws(new MonthlyTemplateDoesNotExistError());
       const command = Symbol("command");
-      depsStub.updateMonthlyTemplateDeserializer = sinon
-        .stub()
-        .returns(command);
+      depsStub.deleteMonthlyBudgetDeserializer = sinon.stub().returns(command);
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);
 
       // when
       const response = await request(server)
-        .patch(`/monthly-templates/${params.id}`)
-        .send(body)
+        .delete(
+          `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+        )
         .set("Cookie", cookie);
 
       // then
       expect(response.statusCode).to.be.equal(404);
-      expect(response.body.success).to.be.false;
-    });
-
-    it("should return 422 error if entity is unprocessabled", async () => {
-      // given
-      const depsStub = {
-        ...deps,
-      };
-      depsStub.updateMonthlyTemplateUsecase.execute = sinon
-        .stub()
-        .throws(new MonthlyTemplateNameCanNotBeEmptyError());
-      const command = Symbol("command");
-      depsStub.updateMonthlyTemplateDeserializer = sinon
-        .stub()
-        .returns(command);
-
-      server = mockedServer({ isAuthenticated: true }, depsStub);
-      const cookie = await authenticate(server);
-
-      // when
-      const response = await request(server)
-        .patch(`/monthly-templates/${params.id}`)
-        .send(body)
-        .set("Cookie", cookie);
-
-      // then
-      expect(response.statusCode).to.be.equal(422);
       expect(response.body.success).to.be.false;
     });
   });
@@ -144,7 +119,9 @@ describe("Integration | Consumers | Routes | PATCH /monthly-templates/:id", func
     });
 
     it("should return a 401 error", async function () {
-      await request(server).patch(`/monthly-templates/${params.id}`).send(body);
+      await request(server).delete(
+        `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+      );
     });
   });
 });

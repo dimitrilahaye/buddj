@@ -1,13 +1,17 @@
 import * as http from "node:http";
 import request from "supertest";
-import { authenticate, mockedServer, expect } from "./test-helpers.js";
+import {
+  authenticate,
+  mockedServer,
+  expect,
+} from "../../../integration/consumers/test-helpers.js";
 import { afterEach } from "mocha";
-import * as deps from "../../../ioc.js";
+import * as deps from "../../../../ioc.js";
 import sinon from "sinon";
-import DeserializationError from "../../../consumers/api/errors/DeserializationError.js";
-import { MonthlyTemplateDoesNotExistError } from "../../../core/errors/MonthlyTemplateErrors.js";
+import DeserializationError from "../../../../consumers/api/errors/DeserializationError.js";
+import { MonthlyTemplateDoesNotExistError } from "../../../../core/errors/MonthlyTemplateErrors.js";
 
-describe("Integration | Consumers | Routes | DELETE /monthly-templates/:templateId/monthly-budgets/:budgetId", function () {
+describe("Integration | Consumers | Routes | DELETE /monthly-templates/:templateId/monthly-outflows/:outflowId", function () {
   let server: http.Server;
 
   afterEach(async function () {
@@ -16,7 +20,7 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
 
   const params = {
     templateId: "6186fae7-8e54-4de2-bb68-17b7042bd813",
-    budgetId: "23e603ab-71f9-46e0-a497-3fbae2154e23",
+    outflowId: "23e603ab-71f9-46e0-a497-3fbae2154e23",
   };
 
   describe("When user is authenticated", function () {
@@ -26,11 +30,11 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
         ...deps,
       };
       const updatedTemplate = "updatedTemplate";
-      depsStub.deleteMonthlyBudgetUsecase.execute = sinon
+      depsStub.deleteMonthlyOutflowUsecase.execute = sinon
         .stub()
         .resolves(updatedTemplate);
       const command = Symbol("command");
-      depsStub.deleteMonthlyBudgetDeserializer = sinon.stub().returns(command);
+      depsStub.deleteMonthlyOutflowDeserializer = sinon.stub().returns(command);
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);
@@ -38,16 +42,16 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
       // when
       const response = await request(server)
         .delete(
-          `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+          `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
         )
         .set("Cookie", cookie);
 
       // then
-      expect(depsStub.deleteMonthlyBudgetDeserializer).to.have.been.calledWith(
+      expect(depsStub.deleteMonthlyOutflowDeserializer).to.have.been.calledWith(
         params
       );
       expect(
-        depsStub.deleteMonthlyBudgetUsecase.execute
+        depsStub.deleteMonthlyOutflowUsecase.execute
       ).to.have.been.calledWith(command);
       expect(response.statusCode).to.be.equal(200);
       expect(response.body.success).to.be.true;
@@ -59,7 +63,7 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
       const depsStub = {
         ...deps,
       };
-      depsStub.deleteMonthlyBudgetDeserializer = sinon
+      depsStub.deleteMonthlyOutflowDeserializer = sinon
         .stub()
         .throwsException(new DeserializationError("", ""));
 
@@ -69,7 +73,7 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
       // when
       const response = await request(server)
         .delete(
-          `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+          `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
         )
         .set("Cookie", cookie);
 
@@ -83,11 +87,11 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
       const depsStub = {
         ...deps,
       };
-      depsStub.deleteMonthlyBudgetUsecase.execute = sinon
+      depsStub.deleteMonthlyOutflowUsecase.execute = sinon
         .stub()
         .throws(new MonthlyTemplateDoesNotExistError());
       const command = Symbol("command");
-      depsStub.deleteMonthlyBudgetDeserializer = sinon.stub().returns(command);
+      depsStub.deleteMonthlyOutflowDeserializer = sinon.stub().returns(command);
 
       server = mockedServer({ isAuthenticated: true }, depsStub);
       const cookie = await authenticate(server);
@@ -95,7 +99,7 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
       // when
       const response = await request(server)
         .delete(
-          `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+          `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
         )
         .set("Cookie", cookie);
 
@@ -116,7 +120,7 @@ describe("Integration | Consumers | Routes | DELETE /monthly-templates/:template
 
     it("should return a 401 error", async function () {
       await request(server).delete(
-        `/monthly-templates/${params.templateId}/monthly-budgets/${params.budgetId}`
+        `/monthly-templates/${params.templateId}/monthly-outflows/${params.outflowId}`
       );
     });
   });

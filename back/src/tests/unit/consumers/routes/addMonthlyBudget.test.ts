@@ -2,15 +2,19 @@ import http from "node:http";
 import request from "supertest";
 import sinon, { SinonStub } from "sinon";
 import { afterEach, beforeEach } from "mocha";
-import { authenticate, expect, mockedServer } from "./test-helpers.js";
-import * as deps from "../../../ioc.js";
-import { AddMonthlyBudgetCommand } from "../../../core/usecases/AddMonthlyBudget.js";
-import { Deps } from "../../../ioc.js";
+import {
+  authenticate,
+  expect,
+  mockedServer,
+} from "../../../integration/consumers/test-helpers.js";
+import * as deps from "../../../../ioc.js";
+import { AddMonthlyBudgetCommand } from "../../../../core/usecases/AddMonthlyBudget.js";
+import { Deps } from "../../../../ioc.js";
 import {
   MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError,
   MonthlyBudgetTemplateNameCanNotBeEmptyError,
   MonthlyTemplateDoesNotExistError,
-} from "../../../core/errors/MonthlyTemplateErrors.js";
+} from "../../../../core/errors/MonthlyTemplateErrors.js";
 
 describe("Integration | Consumers | Routes | POST /monthly-templates/:templateId/monthly-budgets", function () {
   let server: http.Server;

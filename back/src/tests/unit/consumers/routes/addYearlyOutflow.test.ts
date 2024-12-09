@@ -2,10 +2,14 @@ import http from "node:http";
 import request from "supertest";
 import sinon, { SinonStub } from "sinon";
 import { afterEach, beforeEach } from "mocha";
-import { authenticate, expect, mockedServer } from "./test-helpers.js";
-import * as deps from "../../../ioc.js";
-import { YearlyOutflowsAddError } from "../../../core/errors/YearlyOutflowsErrors.js";
-import DeserializationError from "../../../consumers/api/errors/DeserializationError.js";
+import {
+  authenticate,
+  expect,
+  mockedServer,
+} from "../../../integration/consumers/test-helpers.js";
+import * as deps from "../../../../ioc.js";
+import { YearlyOutflowsAddError } from "../../../../core/errors/YearlyOutflowsErrors.js";
+import DeserializationError from "../../../../consumers/api/errors/DeserializationError.js";
 
 describe("Integration | Consumers | Routes | POST /yearly-outflows", function () {
   let server: http.Server;
