@@ -9,11 +9,10 @@ import {
   monthlyBudgetTemplateRepositoryStub,
 } from "./test-helpers.js";
 import GetDefaultMonthlyTemplate from "../../../../core/usecases/GetDefaultMonthlyTemplate.js";
-import { after } from "mocha";
 import sinon from "sinon";
 
 describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
-  after(() => {
+  afterEach(() => {
     resetStubs();
   });
 
@@ -77,5 +76,26 @@ describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
     expect(monthlyTemplate.template?.outflows).to.be.equals(
       expectedTemplateOutflows
     );
+  });
+
+  it("should return only null template if there is no default template", async function () {
+    // given
+    monthlyTemplateRepositoryStub.getDefault.resolves(null);
+
+    const usecase = new GetDefaultMonthlyTemplate(
+      monthlyTemplateRepositoryStub,
+      monthlyOutflowTemplateRepositoryStub,
+      monthlyBudgetTemplateRepositoryStub,
+      pendingDebitRepositoryStub,
+      yearlyOutflowRepositoryStub,
+      idProviderStub
+    );
+
+    // when
+    const monthlyTemplate = await usecase.execute();
+
+    // then
+    expect(monthlyTemplateRepositoryStub.getDefault).to.have.been.calledOnce;
+    expect(monthlyTemplate.template).to.be.null;
   });
 });

@@ -1,4 +1,3 @@
-import { NoDefaultMonthlyTemplateError } from "../../errors/MonthlyTemplateErrors.js";
 import MonthlyBudgetTemplateRepository from "../../ports/repositories/MonthlyBudgetTemplateRepository.js";
 import MonthlyOutflowTemplateRepository from "../../ports/repositories/MonthlyOutflowTemplateRepository.js";
 import MonthlyTemplateRepository from "../../ports/repositories/MonthlyTemplateRepository.js";
@@ -14,7 +13,7 @@ export default class GetDefaultMonthlyTemplateDomainService {
   async execute() {
     const template = await this.monthlyTemplateRepository.getDefault();
     if (!template) {
-      throw new NoDefaultMonthlyTemplateError();
+      return null;
     }
 
     return await addOutflowsAndBudgetsToTemplate(

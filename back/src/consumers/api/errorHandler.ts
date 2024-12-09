@@ -20,7 +20,6 @@ const errorHandler = (
     case "TransferableAccountNotFoundError":
     case "TransferableWeeklyBudgetNotFoundError":
     case "YearlyOutflowsIdDoesNotExistError":
-    case "NoDefaultMonthlyTemplateError":
     case "MonthlyTemplateDoesNotExistError":
       statusCode = 404;
       break;
