@@ -9,7 +9,6 @@ import { YearlyOutflowDao } from "../../../providers/persistence/entities/Yearly
 
 describe("Integration | Consumers | Routes | GET /months/template/default", function () {
   let server: http.Server;
-  const originalUsecase = deps.getDefaultMonthlyTemplateUsecase;
 
   describe("When user is authenticated", function () {
     afterEach(async function () {
@@ -37,27 +36,6 @@ describe("Integration | Consumers | Routes | GET /months/template/default", func
       // then
       expect(response.statusCode).to.be.equal(200);
       expect(response.body.success).to.be.true;
-    });
-
-    it("should return 404 error if there is no default template", async function () {
-      // given
-      server = mockedServer(
-        { isAuthenticated: true },
-        { ...deps, getDefaultMonthlyTemplateUsecase: originalUsecase }
-      );
-      const cookie = await authenticate(server);
-
-      // when
-      const response = await request(server)
-        .get("/months/template/default")
-        .set("Cookie", cookie);
-
-      // then
-      expect(response.body.message).to.be.equal(
-        "MonthlyTemplate: you need a default template in order to create a month"
-      );
-      expect(response.statusCode).to.be.equal(404);
-      expect(response.body.success).to.be.false;
     });
   });
 

@@ -1,12 +1,3 @@
-class NoDefaultMonthlyTemplateError extends Error {
-  constructor() {
-    super(
-      "MonthlyTemplate: you need a default template in order to create a month"
-    );
-    this.name = "NoDefaultMonthlyTemplateError";
-  }
-}
-
 class MonthlyTemplateNameCanNotBeEmptyError extends Error {
   constructor() {
     super("MonthlyTemplate: template name can not be empty");
@@ -52,7 +43,6 @@ class MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError extends Error 
 }
 
 export {
-  NoDefaultMonthlyTemplateError,
   MonthlyTemplateNameCanNotBeEmptyError,
   MonthlyTemplateDoesNotExistError,
   MonthlyOutflowTemplateLabelCanNotBeEmptyError,

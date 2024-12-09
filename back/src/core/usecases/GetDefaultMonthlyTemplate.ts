@@ -26,10 +26,16 @@ export default class GetDefaultMonthlyTemplate {
   }
 
   async execute() {
-    const pendingDebits = await this.pendingDebitRepository.getAll();
-    const yearlyOutflows = await this.yearlyOutflowsRepository.getAll();
     const template =
       await this.getDefaultMonthlyTemplateDomainService.execute();
+    if (!template) {
+      return {
+        template: null,
+      };
+    }
+
+    const pendingDebits = await this.pendingDebitRepository.getAll();
+    const yearlyOutflows = await this.yearlyOutflowsRepository.getAll();
 
     const monthlyProjectTotal = yearlyOutflows.getMonthlyProjectsAmount();
     template.addMonthlyProjectForAmount(this.idProvider, monthlyProjectTotal);
