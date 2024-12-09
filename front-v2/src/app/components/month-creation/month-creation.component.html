@@ -84,15 +84,14 @@
         Total : {{ getYearlyOutflowsTotal() | currency : "EUR" }}
       </span>
       <br />
-      <a
-        (click)="toggleYearlyOutflows($event)"
+      <app-button-link
+        (onClick)="toggleYearlyOutflows()"
         class="month-creation-step-info__link"
-        href="#"
       >
         @if(takeIntoAccountYearlyOutflows) { Ne pas les prendre en compte dans
         le solde prévisionnel } @else { Les prendre en compte dans le solde
         prévisionnel }
-      </a>
+      </app-button-link>
     </div>
     @if(takeIntoAccountYearlyOutflows) {
     <app-item
@@ -139,15 +138,14 @@
         Total : {{ getPendingDebitsTotal() | currency : "EUR" }}
       </span>
       <br />
-      <a
-        (click)="togglePendingDebits($event)"
+      <app-button-link
+        (onClick)="togglePendingDebits()"
         class="month-creation-step-info__link"
-        href="#"
       >
         @if(takeIntoAccountPendingDebits) { Ne pas les prendre en compte dans le
         solde prévisionnel } @else { Les prendre en compte dans le solde
         prévisionnel }
-      </a>
+      </app-button-link>
     </div>
     @if(takeIntoAccountPendingDebits) {
     <app-item
