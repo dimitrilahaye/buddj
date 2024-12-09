@@ -28,10 +28,10 @@ class MonthlyOutflowTemplateLabelCanNotBeEmptyError extends Error {
   }
 }
 
-class MonthlyOutflowTemplateAmountCanNotBeLessThanOneError extends Error {
+class MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError extends Error {
   constructor() {
     super("MonthlyOutflowTemplate: outflow amount must be greater than 0");
-    this.name = "MonthlyOutflowTemplateAmountCanNotBeLessThanOneError";
+    this.name = "MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError";
   }
 }
 
@@ -57,6 +57,6 @@ export {
   MonthlyTemplateDoesNotExistError,
   MonthlyOutflowTemplateLabelCanNotBeEmptyError,
   MonthlyBudgetTemplateNameCanNotBeEmptyError,
-  MonthlyOutflowTemplateAmountCanNotBeLessThanOneError,
+  MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError,
   MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError,
 };
