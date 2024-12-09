@@ -14,7 +14,10 @@
 <app-header-back-to-home></app-header-back-to-home>
 <div class="content">
   @if(!outflows()) {
-  <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
+  <app-tips>
+    <p>Vous n'avez pas encore crée de sorties annuelles 🙂</p>
+    <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
+  </app-tips>
   } @else {
   <div>Total par mois : {{ totalAmountByMonth | currency : "EUR" }}</div>
   <ng-container *ngFor="let month of months">
@@ -29,7 +32,10 @@
       </div>
       <div class="outflows__list">
         @if (getOutflowsForMonth(month.month).length === 0) {
-        <app-info>Aucune sortie annuelle pour le moment 😁</app-info>
+        <app-tips>
+          <p>Aucune sortie annuelle pour le moment 🙂</p>
+          <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
+        </app-tips>
         } @else {
         <app-item
           *ngFor="

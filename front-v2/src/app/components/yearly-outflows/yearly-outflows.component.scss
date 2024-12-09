@@ -49,6 +49,11 @@
         flex-direction: column;
         gap: 20px;
         padding-bottom: 10px;
+
+        ::ng-deep app-tips {
+          width: 50%;
+          margin: 0 auto;
+        }
     }
 }
 
