@@ -5,6 +5,7 @@ import { afterEach } from "mocha";
 import * as deps from "../../../ioc.js";
 import { insertDefaultMonthlyTemplate } from "../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
 import { clearDB } from "../providers/test-helpers.js";
+import { YearlyOutflowDao } from "../../../providers/persistence/entities/YearlyOutflow.js";
 
 describe("Integration | Consumers | Routes | GET /months/template/default", function () {
   let server: http.Server;
@@ -21,6 +22,12 @@ describe("Integration | Consumers | Routes | GET /months/template/default", func
       server = mockedServer({ isAuthenticated: true }, deps);
       const cookie = await authenticate(server);
       await insertDefaultMonthlyTemplate();
+      await YearlyOutflowDao.save({
+        id: "1377315a-ce7d-486e-8aae-d4b146a5593a",
+        label: "label",
+        amount: 10,
+        month: 2,
+      });
 
       // when
       const response = await request(server)
@@ -30,7 +37,6 @@ describe("Integration | Consumers | Routes | GET /months/template/default", func
       // then
       expect(response.statusCode).to.be.equal(200);
       expect(response.body.success).to.be.true;
-      await clearDB();
     });
 
     it("should return 404 error if there is no default template", async function () {

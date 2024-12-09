@@ -34,7 +34,7 @@ const errorHandler = (
     case "MonthlyTemplateNameCanNotBeEmptyError":
     case "MonthlyOutflowTemplateLabelCanNotBeEmptyError":
     case "MonthlyBudgetTemplateNameCanNotBeEmptyError":
-    case "MonthlyOutflowTemplateAmountCanNotBeLessThanOneError":
+    case "MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError":
     case "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError":
       statusCode = 422;
       break;

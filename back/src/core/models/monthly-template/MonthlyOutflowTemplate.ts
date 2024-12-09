@@ -1,5 +1,5 @@
 import {
-  MonthlyOutflowTemplateAmountCanNotBeLessThanOneError,
+  MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError,
   MonthlyOutflowTemplateLabelCanNotBeEmptyError,
 } from "../../errors/MonthlyTemplateErrors.js";
 
@@ -14,8 +14,8 @@ export default class MonthlyOutflowTemplate {
       throw new MonthlyOutflowTemplateLabelCanNotBeEmptyError();
     }
     this.label = props.label;
-    if (props.amount < 1) {
-      throw new MonthlyOutflowTemplateAmountCanNotBeLessThanOneError();
+    if (props.amount <= 0) {
+      throw new MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError();
     }
     this.amount = props.amount;
   }

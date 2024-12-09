@@ -1,7 +1,7 @@
 import expect from "../../../../test-helpers.js";
 import MonthlyOutflowTemplate from "../../../../../core/models/monthly-template/MonthlyOutflowTemplate.js";
 import {
-  MonthlyOutflowTemplateAmountCanNotBeLessThanOneError,
+  MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError,
   MonthlyOutflowTemplateLabelCanNotBeEmptyError,
 } from "../../../../../core/errors/MonthlyTemplateErrors.js";
 
@@ -46,7 +46,7 @@ describe("Unit | Core | Models | Template | MonthlyOutflowTemplate", function ()
 
       // when / then
       expect(() => new MonthlyOutflowTemplate(props)).to.throw(
-        MonthlyOutflowTemplateAmountCanNotBeLessThanOneError
+        MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError
       );
     });
   });
