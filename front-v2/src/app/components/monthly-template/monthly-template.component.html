@@ -217,10 +217,14 @@
     <div class="modal__actions">
       <app-button
         [label]="'Annuler'"
-        [variant]="'danger'"
         (click)="closeAddOutflowModal($event)"
       ></app-button>
-      <app-button [label]="'Valider'" (click)="addOutflow($event)"></app-button>
+      <app-button
+        [label]="'Valider'"
+        [variant]="'danger'"
+        [loading]="isLoading"
+        (click)="addOutflow($event)"
+      ></app-button>
     </div>
   </div>
 </app-sliding-modal>
@@ -255,10 +259,14 @@
     <div class="modal__actions">
       <app-button
         [label]="'Annuler'"
-        [variant]="'danger'"
         (click)="closeAddBudgetModal($event)"
       ></app-button>
-      <app-button [label]="'Valider'" (click)="addBudget($event)"></app-button>
+      <app-button
+        [label]="'Valider'"
+        [variant]="'danger'"
+        [loading]="isLoading"
+        (click)="addBudget($event)"
+      ></app-button>
     </div>
   </div>
 </app-sliding-modal>

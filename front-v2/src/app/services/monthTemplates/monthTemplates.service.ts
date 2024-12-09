@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
-import MonthTemplatesServiceInterface from './monthTemplates.service.interface';
+import MonthTemplatesServiceInterface, {
+  AddingBudget,
+  AddingOutflow,
+} from './monthTemplates.service.interface';
 import { map, Observable, tap } from 'rxjs';
 import {
   MonthCreationTemplate,
@@ -74,6 +77,30 @@ export class MonthTemplatesService implements MonthTemplatesServiceInterface {
     return this.http
       .delete<Response<MonthTemplate>>(
         `${this.apiUrl}/monthly-templates/${templateId}/monthly-budgets/${budgetId}`
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyTemplatesStore.replaceOne(data)),
+        map(() => void 0)
+      );
+  }
+
+  addBudget(templateId: string, budget: AddingBudget): Observable<void> {
+    return this.http
+      .post<Response<MonthTemplate>>(
+        `${this.apiUrl}/monthly-templates/${templateId}/monthly-budgets`,
+        budget
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyTemplatesStore.replaceOne(data)),
+        map(() => void 0)
+      );
+  }
+
+  addOutflow(templateId: string, budget: AddingOutflow): Observable<void> {
+    return this.http
+      .post<Response<MonthTemplate>>(
+        `${this.apiUrl}/monthly-templates/${templateId}/monthly-outflows`,
+        budget
       )
       .pipe(
         tap(({ data }) => this.monthlyTemplatesStore.replaceOne(data)),

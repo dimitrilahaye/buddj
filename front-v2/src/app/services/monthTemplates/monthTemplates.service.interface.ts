@@ -1,6 +1,13 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MonthCreationTemplate } from '../../models/monthTemplate.model';
+import {
+  Budget,
+  MonthCreationTemplate,
+  Outflow,
+} from '../../models/monthTemplate.model';
+
+export type AddingBudget = Omit<Budget, 'id'>;
+export type AddingOutflow = Omit<Outflow, 'id' | 'isChecked'>;
 
 export default interface MonthTemplatesServiceInterface {
   getTemplate(): Observable<MonthCreationTemplate>;
@@ -11,6 +18,8 @@ export default interface MonthTemplatesServiceInterface {
   ): Observable<void>;
   deleteOutflow(templateId: string, outflowId: string): Observable<void>;
   deleteBudget(templateId: string, budgetId: string): Observable<void>;
+  addBudget(templateId: string, budget: AddingBudget): Observable<void>;
+  addOutflow(templateId: string, budget: AddingOutflow): Observable<void>;
 }
 
 export const MONTH_TEMPLATES_SERVICE =

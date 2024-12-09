@@ -20,12 +20,14 @@ import { DesignSystemModule } from '../../design-system/design-system.module';
 import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
 import { CommonModule } from '@angular/common';
 import MonthTemplatesServiceInterface, {
+  AddingBudget,
   MONTH_TEMPLATES_SERVICE,
 } from '../../services/monthTemplates/monthTemplates.service.interface';
 import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
+import { AddOutflow } from '../../services/months/months.service.interface';
 
 @Component({
   selector: 'app-monthly-template',
@@ -48,10 +50,10 @@ export class MonthlyTemplateComponent implements OnInit {
   budgetToDelete: Budget | null = null;
   // add outflow
   isAddOutflowModalOpen = false;
-  editingOutflow: Omit<Outflow, 'id' | 'isChecked'> | null = null;
+  editingOutflow: AddOutflow | null = null;
   // add budget
   isAddBudgetModalOpen = false;
-  editingBudget: Omit<Budget, 'id'> | null = null;
+  editingBudget: AddingBudget | null = null;
   // numpad
   isNumpadModalOpen = false;
 
@@ -232,14 +234,27 @@ export class MonthlyTemplateComponent implements OnInit {
   }
 
   addOutflow(event: Event) {
+    event.stopPropagation();
     if (this.editingTemplate && this.editingOutflow) {
-      this.editingTemplate.outflows.push({
-        ...this.editingOutflow,
-        id: '',
-        isChecked: false,
-      });
+      this.isLoading = true;
+      this.monthlyTemplatesService
+        .addOutflow(this.editingTemplate.id, this.editingOutflow)
+        .pipe(
+          finalize(() => {
+            this.isLoading = false;
+            this.isAddOutflowModalOpen = false;
+            this.editingOutflow = null;
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.toaster.success('Votre sortie a bien été ajoutée !');
+          },
+          error: () => {
+            this.initializeEditingTemplate();
+          },
+        });
     }
-    this.closeAddOutflowModal(event);
   }
 
   // add budget
@@ -266,13 +281,27 @@ export class MonthlyTemplateComponent implements OnInit {
   }
 
   addBudget(event: Event) {
+    event.stopPropagation();
     if (this.editingTemplate && this.editingBudget) {
-      this.editingTemplate.budgets.push({
-        ...this.editingBudget,
-        id: '',
-      });
+      this.isLoading = true;
+      this.monthlyTemplatesService
+        .addBudget(this.editingTemplate.id, this.editingBudget)
+        .pipe(
+          finalize(() => {
+            this.isLoading = false;
+            this.isAddBudgetModalOpen = false;
+            this.editingBudget = null;
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.toaster.success('Votre budget a bien été ajouté !');
+          },
+          error: () => {
+            this.initializeEditingTemplate();
+          },
+        });
     }
-    this.closeAddBudgetModal(event);
   }
 
   // numpad
