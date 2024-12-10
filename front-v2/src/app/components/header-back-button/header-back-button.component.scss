@@ -8,6 +8,7 @@
     left: 0;
     z-index: 1;
     display: flex;
+    gap: 20px;
     justify-content: flex-start;
     padding: 10px;
     box-sizing: border-box;
@@ -20,6 +21,7 @@
         border: 0;
         background: none;
         margin: none;
+        padding: 0;
         color: var(--color-950);
     }
 }
