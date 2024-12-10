@@ -1,11 +1,11 @@
 .modal {
   &__container {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 10;
+    z-index: 21;
   }
 }
 
@@ -30,7 +30,7 @@
     padding: 10px;
     box-sizing: border-box;
     border-radius: var(--radius-70);
-    z-index: 10;
+    z-index: 21;
     height: fit-content;
     width: fit-content;
     box-shadow: 0 5px 10px 0;
@@ -38,12 +38,12 @@
 }
 
 .backdrop {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 9;
+  z-index: 20;
   background-color: rgba(183, 183, 183, 0.5);
   backdrop-filter: blur(8px);
   filter: blur(8px);
