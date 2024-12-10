@@ -256,36 +256,35 @@
       </div>
     </app-item>
   </div>
-
-  <div class="month-creation__footer">
-    <span class="month-creation-footer__forecast-balance"
-      >Solde prévisionnel : <strong>{{ forecastBalance }}€</strong></span
-    >
-    <div class="month-creation-footer__actions">
-      <button
-        class="month-creation-footer-actions__action"
-        type="button"
-        (click)="addNewOutflow($event)"
-      >
-        <i class="fa-solid fa-plus"></i>
-      </button>
-      <button
-        class="month-creation-footer-actions__action"
-        type="button"
-        (click)="resetForm($event)"
-      >
-        <i class="fa-solid fa-rotate"></i>
-      </button>
-      <app-button
-        [type]="'submit'"
-        [size]="'big'"
-        [variant]="'danger'"
-        [label]="'Créer'"
-        [loading]="creationLoader"
-      ></app-button>
-    </div>
-  </div>
 </form>
+<div class="month-creation__footer">
+  <span class="month-creation-footer__forecast-balance"
+    >Solde prévisionnel : <strong>{{ forecastBalance }}€</strong></span
+  >
+  <div class="month-creation-footer__actions">
+    <button
+      class="month-creation-footer-actions__action"
+      type="button"
+      (click)="addNewOutflow($event)"
+    >
+      <i class="fa-solid fa-plus"></i>
+    </button>
+    <button
+      class="month-creation-footer-actions__action"
+      type="button"
+      (click)="resetForm($event)"
+    >
+      <i class="fa-solid fa-rotate"></i>
+    </button>
+    <app-button
+      [type]="'submit'"
+      [size]="'big'"
+      [variant]="'danger'"
+      [label]="'Créer'"
+      [loading]="creationLoader"
+    ></app-button>
+  </div>
+</div>
 
 <!-- 
   ##################### Modal outflows (step 2) #####################

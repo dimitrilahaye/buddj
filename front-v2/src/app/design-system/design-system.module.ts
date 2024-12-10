@@ -18,6 +18,7 @@ import { ButtonIconComponent } from './button-icon/button-icon.component';
 import { ToggleButtonComponent } from './toggle-button/toggle-button.component';
 import { TipsComponent } from './tips/tips.component';
 import { ButtonLinkComponent } from './button-link/button-link.component';
+import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { ButtonLinkComponent } from './button-link/button-link.component';
     ToggleButtonComponent,
     TipsComponent,
     ButtonLinkComponent,
+    ScrollToTopComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -58,6 +60,7 @@ import { ButtonLinkComponent } from './button-link/button-link.component';
     ToggleButtonComponent,
     TipsComponent,
     ButtonLinkComponent,
+    ScrollToTopComponent,
   ],
 })
 export class DesignSystemModule {}
