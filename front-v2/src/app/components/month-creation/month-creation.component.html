@@ -26,7 +26,7 @@
 <app-loader></app-loader>
 } @if(template === null) {
 
-<app-header-back-to-home></app-header-back-to-home>
+<app-header-back-button></app-header-back-button>
 <div class="tips-container">
   <app-tips>
     <p>Vous n'avez pas encore crée de template par défaut 🙂</p>
@@ -38,7 +38,7 @@
 </div>
 
 } @if(dataLoaded && form) {
-<app-header-back-to-home></app-header-back-to-home>
+<app-header-back-button></app-header-back-button>
 <form class="month-creation" [formGroup]="form" (ngSubmit)="onSubmit()">
   <!-- 
     ##################### STEP 1 #####################

@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HeaderBackToHomeComponent } from './header-back-to-home.component';
+import { HeaderBackButtonComponent } from './header-back-button.component';
 
 describe('HeaderBackToHomeComponent', () => {
-  let component: HeaderBackToHomeComponent;
-  let fixture: ComponentFixture<HeaderBackToHomeComponent>;
+  let component: HeaderBackButtonComponent;
+  let fixture: ComponentFixture<HeaderBackButtonComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HeaderBackToHomeComponent]
-    })
-    .compileComponents();
+      imports: [HeaderBackButtonComponent],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(HeaderBackToHomeComponent);
+    fixture = TestBed.createComponent(HeaderBackButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
