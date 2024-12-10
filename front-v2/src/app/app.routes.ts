@@ -13,6 +13,7 @@ import { yearlyOutflowsResolver } from './resolvers/yearly-outflows/yearly-outfl
 import { MonthlyTemplatesComponent } from './components/monthly-templates/monthly-templates.component';
 import { monthlyTemplatesResolver } from './resolvers/monthly-templates/monthly-templates.resolver';
 import { MonthlyTemplateComponent } from './components/monthly-template/monthly-template.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -44,6 +45,11 @@ export const routes: Routes = [
     resolve: {
       template: monthTemplateResolver,
     },
+  },
+  {
+    path: 'settings',
+    component: SettingsComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'archived-months',

@@ -471,7 +471,8 @@ export class MonthCreationComponent implements OnInit {
     this.amountValueControl = null;
   }
 
-  onSubmit() {
+  onSubmit(event: Event) {
+    event.stopPropagation();
     if (this.form.valid) {
       const raw = this.form.getRawValue();
       const yearlyOutflows = raw.yearlyOutflows.map((o: YearlyOutflow) => ({

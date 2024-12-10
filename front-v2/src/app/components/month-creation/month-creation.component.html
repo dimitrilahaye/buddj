@@ -39,7 +39,7 @@
 
 } @if(dataLoaded && form) {
 <app-header-back-button></app-header-back-button>
-<form class="month-creation" [formGroup]="form" (ngSubmit)="onSubmit()">
+<form class="month-creation" [formGroup]="form">
   <!-- 
     ##################### STEP 1 #####################
      -->
@@ -282,6 +282,7 @@
       [variant]="'danger'"
       [label]="'Créer'"
       [loading]="creationLoader"
+      (click)="onSubmit($event)"
     ></app-button>
   </div>
 </div>
