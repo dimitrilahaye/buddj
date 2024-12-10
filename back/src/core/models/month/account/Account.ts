@@ -1,9 +1,5 @@
 import AccountOutflow from "./AccountOutflow.js";
 import WeeklyBudget from "./WeeklyBudget.js";
-import {
-  AccountOutflowsError,
-  AccountWeeklyBudgetsError,
-} from "../../../errors/AccountErrors.js";
 import WeeklyExpense from "./WeeklyExpense.js";
 import { WeeklyBudgetNotFoundError } from "../../../errors/WeeklyBudgetErrors.js";
 import { AccountOutflowNotFoundError } from "../../../errors/AccountOuflowErrors.js";
@@ -11,8 +7,8 @@ import { AccountOutflowNotFoundError } from "../../../errors/AccountOuflowErrors
 export default class Account {
   id: string;
   currentBalance: number;
-  outflows: AccountOutflow[];
-  weeklyBudgets: WeeklyBudget[];
+  outflows: AccountOutflow[] = [];
+  weeklyBudgets: WeeklyBudget[] = [];
 
   constructor(props: {
     id: string;
@@ -20,12 +16,6 @@ export default class Account {
     outflows: AccountOutflow[];
     weeklyBudgets: WeeklyBudget[];
   }) {
-    if (props.weeklyBudgets.length !== 5) {
-      throw new AccountWeeklyBudgetsError();
-    }
-    if (props.outflows.length === 0) {
-      throw new AccountOutflowsError();
-    }
     this.id = props.id;
     this.currentBalance = props.currentBalance;
     this.outflows = props.outflows;

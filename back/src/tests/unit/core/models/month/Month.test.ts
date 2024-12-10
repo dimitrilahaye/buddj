@@ -6,7 +6,6 @@ import AccountOutflow from "../../../../../core/models/month/account/AccountOutf
 import WeeklyBudget from "../../../../../core/models/month/account/WeeklyBudget.js";
 import Dashboard from "../../../../../core/models/dashboard/Dashboard.js";
 import WeeklyExpense from "../../../../../core/models/month/account/WeeklyExpense.js";
-import { AccountOutflowsError } from "../../../../../core/errors/AccountErrors.js";
 
 describe("Unit | Core | Models | Month | Month", function () {
   describe("#constructor", function () {
@@ -847,62 +846,6 @@ describe("Unit | Core | Models | Month | Month", function () {
       // then
       expect(accountStub.deleteOutflow).to.have.been.calledOnceWith(
         targetedOutflowId
-      );
-    });
-
-    it("should throw an error if there is only one outflow", () => {
-      // given
-      const targetedOutflowId = "outflow-id";
-      const accountStub = new Account({
-        id: "uuid",
-        currentBalance: 2000,
-        outflows: [
-          new AccountOutflow({
-            id: targetedOutflowId,
-            label: "outlfow",
-            amount: 10.05,
-            isChecked: true,
-          }),
-        ],
-        weeklyBudgets: [
-          new WeeklyBudget({
-            id: "uuid",
-            name: "Semaine 1",
-            initialBalance: 200,
-          }),
-          new WeeklyBudget({
-            id: "uuid",
-            name: "Semaine 2",
-            initialBalance: 200,
-          }),
-          new WeeklyBudget({
-            id: "uuid",
-            name: "Semaine 3",
-            initialBalance: 200,
-          }),
-          new WeeklyBudget({
-            id: "uuid",
-            name: "Semaine 4",
-            initialBalance: 200,
-          }),
-          new WeeklyBudget({
-            id: "uuid",
-            name: "Semaine 5",
-            initialBalance: 200,
-          }),
-        ],
-      });
-      accountStub.deleteOutflow = sinon.stub();
-      const props = {
-        id: "uuid",
-        date: new Date(),
-        account: accountStub,
-      };
-      const month = new Month(props);
-
-      // when
-      expect(() => month.deleteOutflow(targetedOutflowId)).to.throw(
-        AccountOutflowsError
       );
     });
   });

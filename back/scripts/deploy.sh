@@ -5,7 +5,7 @@ set -o pipefail
 
 # tests
 echo "👨🏻‍🔧 Launching tests"
-npm run test:full
+npm run tf
 echo "✅ Tests successfully passed"
 echo ""
 

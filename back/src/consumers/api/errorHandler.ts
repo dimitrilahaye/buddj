@@ -24,8 +24,6 @@ const errorHandler = (
       statusCode = 404;
       break;
     case "AccountInitialBalanceError":
-    case "AccountWeeklyBudgetsError":
-    case "AccountOutflowsError":
     case "WeeklyBudgetInitialBalanceError":
     case "WeeklyExpenseAmountError":
     case "TransferBalanceIntoMonthError":
@@ -36,9 +34,6 @@ const errorHandler = (
     case "MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError":
     case "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError":
       statusCode = 422;
-      break;
-    case "WeeklyBudgetsDashboardWeeklyBudgetsError":
-      statusCode = 502;
       break;
     default:
       statusCode = 500;
