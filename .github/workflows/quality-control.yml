@@ -38,7 +38,7 @@ jobs:
 
     - name: Back ~ Tests
       working-directory: ./back
-      run: npm run test:full
+      run: npm run tf
       env:
         DB_URL_TEST: postgres
         DB_PORT_TEST: 5432
