@@ -23,7 +23,7 @@ import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
-import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
+import { HeaderBackButtonComponent } from '../header-back-button/header-back-button.component';
 
 @Component({
   selector: 'app-archived-months',
@@ -32,7 +32,7 @@ import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to
     DesignSystemModule,
     DateNormalizePipe,
     CommonModule,
-    HeaderBackToHomeComponent,
+    HeaderBackButtonComponent,
   ],
   templateUrl: './archived-months.component.html',
   styleUrl: './archived-months.component.scss',

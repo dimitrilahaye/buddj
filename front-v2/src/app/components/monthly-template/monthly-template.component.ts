@@ -17,7 +17,7 @@ import {
   Outflow,
 } from '../../models/monthTemplate.model';
 import { DesignSystemModule } from '../../design-system/design-system.module';
-import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
+import { HeaderBackButtonComponent } from '../header-back-button/header-back-button.component';
 import { CommonModule } from '@angular/common';
 import MonthTemplatesServiceInterface, {
   AddingBudget,
@@ -32,7 +32,7 @@ import { AddOutflow } from '../../services/months/months.service.interface';
 @Component({
   selector: 'app-monthly-template',
   standalone: true,
-  imports: [CommonModule, DesignSystemModule, HeaderBackToHomeComponent],
+  imports: [CommonModule, DesignSystemModule, HeaderBackButtonComponent],
   templateUrl: './monthly-template.component.html',
   styleUrl: './monthly-template.component.scss',
 })

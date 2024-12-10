@@ -1,7 +1,7 @@
 @if(!dataLoaded) {
 <app-loader></app-loader>
 } @else {
-<app-header-back-to-home></app-header-back-to-home>
+<app-header-back-button></app-header-back-button>
 <div class="archived-months">
   @if(hasArchivedMonths()) {
   <app-item *ngFor="let month of getArchivedMonths(); let i = index">

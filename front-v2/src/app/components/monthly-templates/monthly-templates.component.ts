@@ -6,13 +6,13 @@ import {
 import { MonthTemplate } from '../../models/monthTemplate.model';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { CommonModule } from '@angular/common';
-import { HeaderBackToHomeComponent } from '../header-back-to-home/header-back-to-home.component';
+import { HeaderBackButtonComponent } from '../header-back-button/header-back-button.component';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-monthly-templates',
   standalone: true,
-  imports: [CommonModule, DesignSystemModule, HeaderBackToHomeComponent],
+  imports: [CommonModule, DesignSystemModule, HeaderBackButtonComponent],
   templateUrl: './monthly-templates.component.html',
   styleUrl: './monthly-templates.component.scss',
 })
