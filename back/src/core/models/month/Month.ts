@@ -2,7 +2,6 @@ import Account from "./account/Account.js";
 import Dashboard from "../dashboard/Dashboard.js";
 import WeeklyExpense from "./account/WeeklyExpense.js";
 import AccountOutflow from "./account/AccountOutflow.js";
-import { AccountOutflowsError } from "../../errors/AccountErrors.js";
 
 export default class Month {
   id: string;
@@ -77,9 +76,6 @@ export default class Month {
   }
 
   deleteOutflow(outflowId: string) {
-    if (this.account.outflows.length === 1) {
-      throw new AccountOutflowsError();
-    }
     this.account.deleteOutflow(outflowId);
   }
 
