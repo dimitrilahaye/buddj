@@ -2,7 +2,10 @@
 
 <div class="content">
   @if(templates.length === 0) {
-  <app-info>Aucun template pour le moment 😁</app-info>
+  <app-tips>
+    <p>Vous n'avez pas encore crée de template 🙂</p>
+    <img width="50%" src="info/no-default-template.png" alt="" />
+  </app-tips>
   } @else {
   <section class="content__template" *ngFor="let template of templates">
     <div class="content-template__content">

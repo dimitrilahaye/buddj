@@ -1,6 +1,5 @@
-@if (displayLoader) { <app-loader></app-loader> }
+@if (displayLoader) { <app-loader></app-loader> } @if (current) {
 <header class="header">
-  @if (current !== null) {
   <div class="header__month">
     <button
       class="header-month__navigation"
@@ -34,9 +33,9 @@
       }}</span>
     </div>
   </div>
-  }
 </header>
 <nav class="nav">
+  @if (current) {
   <button
     type="button"
     class="nav__item"
@@ -53,6 +52,7 @@
   >
     <i class="fa-solid fa-money-bill-transfer"></i>
   </button>
+  }
   <button
     type="button"
     class="nav__item"
@@ -62,9 +62,22 @@
     <i class="fa-solid fa-gear"></i>
   </button>
 </nav>
+}
 <div class="content">
-  @if(!current) { <app-info>Aucun mois pour le moment 😁</app-info> } @else
-  {<router-outlet />}
+  @if(!current) {
+  <app-tips>
+    <p>Vous n'avez pas encore crée de mois 🙂</p>
+    <img width="70%" src="info/no-budgets-yet.png" alt="" />
+    <p>Rendez-vous dans les settings pour créer votre premier mois</p>
+    <app-button
+      [size]="'big'"
+      [variant]="'danger'"
+      [label]="'Go'"
+      (click)="goToSettings()"
+    >
+    </app-button>
+  </app-tips>
+  } @else {<router-outlet />}
 </div>
 
 <ng-template #loader>

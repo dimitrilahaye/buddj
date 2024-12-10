@@ -11,7 +11,12 @@ import MonthsServiceInterface, {
 } from '../../services/months/months.service.interface';
 import { finalize } from 'rxjs';
 import { DesignSystemModule } from '../../design-system/design-system.module';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import {
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -38,6 +43,7 @@ export class HomeComponent {
   confirmArchiveModalIsOpen = false;
 
   constructor(
+    private router: Router,
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
     @Inject(MONTHS_SERVICE)
@@ -81,5 +87,9 @@ export class HomeComponent {
 
   getPreviousMonth() {
     this.monthlyBudgetsStore.setPreviousMonth();
+  }
+
+  goToSettings() {
+    this.router.navigate(['settings']);
   }
 }

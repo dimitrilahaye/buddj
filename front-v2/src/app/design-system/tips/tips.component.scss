@@ -17,3 +17,10 @@
         margin: 0;
     }
 }
+
+::ng-deep app-button {
+    button {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+}

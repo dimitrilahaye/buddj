@@ -37,7 +37,10 @@
     </div>
     <div class="outflows__list">
       @if (editingTemplate.outflows.length === 0) {
-      <app-info>Aucune sortie mensuelle pour le moment 😁</app-info>
+      <app-tips>
+        <p>Aucune sortie mensuelle pour le moment 🙂</p>
+        <img width="70%" src="info/no-outflows-yet.png" alt="" />
+      </app-tips>
       } @else {
       <app-item *ngFor="let outflow of editingTemplate.outflows; let i = index">
         <button type="button" class="outflows-list-item">
@@ -79,7 +82,10 @@
     </div>
     <div class="outflows__list">
       @if (editingTemplate.budgets.length === 0) {
-      <app-info>Aucune sortie mensuelle pour le moment 😁</app-info>
+      <app-tips>
+        <p>Aucun budget mensuel pour le moment 🙂</p>
+        <img width="70%" src="info/no-budgets-yet.png" alt="" />
+      </app-tips>
       } @else {
       <app-item *ngFor="let budget of editingTemplate.budgets; let i = index">
         <button type="button" class="outflows-list-item">

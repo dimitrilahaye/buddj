@@ -1,6 +1,7 @@
 <app-header-back-button></app-header-back-button> @if (displayLoader) {
 <app-loader></app-loader> } @else {
 <div class="menu">
+  @if(current) {
   <div class="menu__category">
     <div class="menu-category__title menu-category__title--capitalize">
       <span>{{ currentMonthDate | dateNormalize }}</span>
@@ -37,6 +38,7 @@
       </div>
     </div>
   </div>
+  }
   <div class="menu__category">
     <div class="menu-category__title">
       <span>Tous les mois</span>
