@@ -25,11 +25,10 @@
 }
 
 .content {
-    margin-top: 40px;
-    height: 100%;
-    padding: 5px;
-    padding-bottom: 40px;
-    box-sizing: border-box;
+  margin-top: 40px;
+  padding: 5px;
+  padding-bottom: 60px;
+  box-sizing: border-box;
 }
 
 .outflows {
@@ -143,4 +142,68 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+
+
+  .month-creation {
+    &__footer {
+      position: fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: auto;
+      width: 100%;
+      padding: 10px 20px;
+      bottom: 0;
+      left: 0;
+      background: var(--color-800);
+      box-shadow: 0 6px 20px 0;
+      border-radius: var(--radius-100) var(--radius-100) 0 0;
+      box-sizing: border-box;
+    }
+  }
+
+  .month-creation-footer-actions {
+    &__action {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 10px;
+      height: 10px;
+      padding: 20px;
+      border-radius: 50%;
+      background: var(--color-100);
+      font-size: 20px;
+      color: var(--color-900);
+      border: 3px solid var(--color-900);
+  
+      &:disabled {
+        opacity: 0.3;
+      }
+    }
+  }
+  
+  .month-creation-footer {
+    &__forecast-balance {
+      border-radius: var(--radius-50);
+      background-color: var(--light-60);
+      padding: 5px 10px;
+      box-sizing: border-box;
+      font-size: var(--text-7);
+    }
+    &__actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+  
+      app-button {
+        &:last-child {
+          flex: 1;
+        }
+      }
+    }
   }
