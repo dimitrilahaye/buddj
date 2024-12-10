@@ -213,6 +213,9 @@
       (click)="openNumpad($event)"
       [required]="true"
       [value]="editingOutflow?.amount ?? 'Pas de montant'"
+      inputmode="none"
+      autocomplete="off"
+      readonly
     />
     <div class="modal__actions">
       <app-button
@@ -255,6 +258,9 @@
       (click)="openNumpad($event)"
       [required]="true"
       [value]="editingBudget?.initialBalance ?? 'Pas de montant'"
+      inputmode="none"
+      autocomplete="off"
+      readonly
     />
     <div class="modal__actions">
       <app-button
