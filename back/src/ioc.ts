@@ -97,6 +97,11 @@ import addMonthlyOutflowDeserializer, {
 import addMonthlyBudgetDeserializer, {
   AddMonthlyBudgetDeserializer,
 } from "./consumers/api/deserializers/addMonthlyBudget.js";
+import AddBudget from "./core/usecases/AddBudget.js";
+import AccountBudgetFactory from "./core/factories/AccountBudgetFactory.js";
+import addBudgetDeserializer, {
+  AddBudgetDeserializer,
+} from "./consumers/api/deserializers/addBudget.js";
 
 // persistence
 
@@ -135,6 +140,8 @@ const monthFactory = new MonthFactory(idProvider);
 const weeklyExpenseFactory = new WeeklyExpenseFactory(idProvider);
 
 const outflowFactory = new AccountOutflowFactory(idProvider);
+
+const budgetFactory = new AccountBudgetFactory(idProvider);
 
 const monthlyOutflowFactory = new MonthlyOutflowFactory(idProvider);
 
@@ -222,6 +229,8 @@ const deleteOutflowUsecase = new DeleteOutflow(monthRepository);
 
 const addOutflowUsecase = new AddOutflow(outflowFactory, monthRepository);
 
+const addBudgetUsecase = new AddBudget(budgetFactory, monthRepository);
+
 const transferBalanceIntoMonthUsecase = new TransferBalanceIntoMonth(
   monthRepository
 );
@@ -256,6 +265,7 @@ export type Deps = {
   updateExpenseUsecase: UpdateExpense;
   deleteOutflowUsecase: DeleteOutflow;
   addOutflowUsecase: AddOutflow;
+  addBudgetUsecase: AddBudget;
   getArchivedMonthsUsecase: GetArchivedMonths;
   unarchiveMonthUsecase: UnarchiveMonth;
   deleteMonthUsecase: DeleteMonth;
@@ -266,6 +276,7 @@ export type Deps = {
   addYearlyOutflowUsecase: AddYearlyOutflow;
   removeYearlyOutflowUsecase: RemoveYearlyOutflow;
   addOutflowDeserializer: AddOutflowDeserializer;
+  addBudgetDeserializer: AddBudgetDeserializer;
   addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
   archiveMonthDeserializer: ArchiveMonthDeserializer;
   deleteExpenseDeserializer: DeleteExpenseDeserializer;
@@ -307,6 +318,7 @@ export {
   updateExpenseUsecase,
   deleteOutflowUsecase,
   addOutflowUsecase,
+  addBudgetUsecase,
   getArchivedMonthsUsecase,
   unarchiveMonthUsecase,
   deleteMonthUsecase,
@@ -315,6 +327,7 @@ export {
   addYearlyOutflowUsecase,
   removeYearlyOutflowUsecase,
   addOutflowDeserializer,
+  addBudgetDeserializer,
   addWeeklyExpenseDeserializer,
   archiveMonthDeserializer,
   deleteExpenseDeserializer,
