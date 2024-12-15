@@ -13,8 +13,8 @@ export default class Account {
   constructor(props: {
     id: string;
     currentBalance: number;
-    outflows: AccountOutflow[];
-    weeklyBudgets: WeeklyBudget[];
+    outflows?: AccountOutflow[];
+    weeklyBudgets?: WeeklyBudget[];
   }) {
     this.id = props.id;
     this.currentBalance = props.currentBalance;
@@ -38,6 +38,10 @@ export default class Account {
 
   addOutflow(outflow: AccountOutflow) {
     this.outflows.push(outflow);
+  }
+
+  addBudget(budget: WeeklyBudget) {
+    this.weeklyBudgets.push(budget);
   }
 
   /**

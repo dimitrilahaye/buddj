@@ -2,6 +2,7 @@ import Account from "./account/Account.js";
 import Dashboard from "../dashboard/Dashboard.js";
 import WeeklyExpense from "./account/WeeklyExpense.js";
 import AccountOutflow from "./account/AccountOutflow.js";
+import WeeklyBudget from "./account/WeeklyBudget.js";
 
 export default class Month {
   id: string;
@@ -81,6 +82,10 @@ export default class Month {
 
   addOutflow(outflow: AccountOutflow) {
     this.account.addOutflow(outflow);
+  }
+
+  addBudget(outflow: WeeklyBudget) {
+    this.account.addBudget(outflow);
   }
 
   /**

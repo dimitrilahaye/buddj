@@ -912,6 +912,34 @@ describe("Unit | Core | Models | Month | Month", function () {
     });
   });
 
+  describe("#addBudget", () => {
+    it("should call the account to add budget", () => {
+      // given
+      const newBudget = new WeeklyBudget({
+        id: "uuid",
+        name: "Vacances",
+        initialBalance: 100,
+      });
+      const accountStub = new Account({
+        id: "uuid",
+        currentBalance: 2000,
+      });
+      accountStub.addBudget = sinon.stub();
+      const props = {
+        id: "uuid",
+        date: new Date(),
+        account: accountStub,
+      };
+      const month = new Month(props);
+
+      // when
+      month.addBudget(newBudget);
+
+      // then
+      expect(accountStub.addBudget).to.have.been.calledOnceWith(newBudget);
+    });
+  });
+
   describe("#archive", function () {
     it("should set isArchived to true", function () {
       // given
