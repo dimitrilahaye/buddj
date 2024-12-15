@@ -102,6 +102,10 @@ import AccountBudgetFactory from "./core/factories/AccountBudgetFactory.js";
 import addBudgetDeserializer, {
   AddBudgetDeserializer,
 } from "./consumers/api/deserializers/addBudget.js";
+import updateBudgetDeserializer, {
+  UpdateBudgetDeserializer,
+} from "./consumers/api/deserializers/updateBudget.js";
+import UpdateBudget from "./core/usecases/UpdateBudget.js";
 
 // persistence
 
@@ -231,6 +235,8 @@ const addOutflowUsecase = new AddOutflow(outflowFactory, monthRepository);
 
 const addBudgetUsecase = new AddBudget(budgetFactory, monthRepository);
 
+const updateBudgetUsecase = new UpdateBudget(monthRepository);
+
 const transferBalanceIntoMonthUsecase = new TransferBalanceIntoMonth(
   monthRepository
 );
@@ -266,6 +272,7 @@ export type Deps = {
   deleteOutflowUsecase: DeleteOutflow;
   addOutflowUsecase: AddOutflow;
   addBudgetUsecase: AddBudget;
+  updateBudgetUsecase: UpdateBudget;
   getArchivedMonthsUsecase: GetArchivedMonths;
   unarchiveMonthUsecase: UnarchiveMonth;
   deleteMonthUsecase: DeleteMonth;
@@ -277,6 +284,7 @@ export type Deps = {
   removeYearlyOutflowUsecase: RemoveYearlyOutflow;
   addOutflowDeserializer: AddOutflowDeserializer;
   addBudgetDeserializer: AddBudgetDeserializer;
+  updateBudgetDeserializer: UpdateBudgetDeserializer;
   addWeeklyExpenseDeserializer: AddWeeklyExpenseDeserializer;
   archiveMonthDeserializer: ArchiveMonthDeserializer;
   deleteExpenseDeserializer: DeleteExpenseDeserializer;
@@ -316,6 +324,7 @@ export {
   archiveMonthUsecase,
   deleteExpenseUsecase,
   updateExpenseUsecase,
+  updateBudgetUsecase,
   deleteOutflowUsecase,
   addOutflowUsecase,
   addBudgetUsecase,
@@ -328,6 +337,7 @@ export {
   removeYearlyOutflowUsecase,
   addOutflowDeserializer,
   addBudgetDeserializer,
+  updateBudgetDeserializer,
   addWeeklyExpenseDeserializer,
   archiveMonthDeserializer,
   deleteExpenseDeserializer,
