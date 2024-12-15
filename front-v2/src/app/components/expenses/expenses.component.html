@@ -40,10 +40,10 @@
             <button
               class="expenses-list__week-hide"
               [ngClass]="{
-                'expenses-list__week-hide--folded': !filterIsActive(i + 1)
+                'expenses-list__week-hide--folded': !filterIsActive(week.id)
               }"
               type="button"
-              (click)="updateFilterState(i + 1)"
+              (click)="updateFilterState(week.id)"
             >
               <i class="fa-solid fa-chevron-right"></i>
             </button>
@@ -74,8 +74,8 @@
               [total]="getInitialBalanceByWeekName(week.name)"
             ></app-progress-bar>
           </div>
-          @if (getExpensesFormGroupByWeekId(week.id).length === 0 &&
-          filterIsActive(i + 1)) {
+          @if (filterIsActive(week.id)) { @if
+          (getExpensesFormGroupByWeekId(week.id).length === 0) {
           <app-tips>
             <p>Vous n'avez pas encore crée de dépenses pour ce budget 🙂</p>
             <img width="50%" src="info/no-expenses-yet.png" alt="" />
@@ -125,7 +125,7 @@
               </button>
             </button>
           </app-item>
-          }
+          } }
         </div>
         <app-divider></app-divider>
       </ng-container>
@@ -142,6 +142,9 @@
     </div>
     }
   </form>
+  <button class="add-budget" (click)="openAddBudgetModal()">
+    <i class="fa-solid fa-plus"></i>
+  </button>
   } @else {
   <app-tips>
     <p>Vous n'avez pas encore crée de budgets pour ce mois 🙂</p>
@@ -206,14 +209,73 @@
 </app-sliding-modal>
 }
 <!-- 
+  ##################### ADD BUDGET #####################
+   -->
+@if(addBudgetModalIsOpen) {
+<app-sliding-modal
+  [isOpen]="addBudgetModalIsOpen"
+  [canClose]="!addBudgetFormIsLoading"
+  (close)="closeAddBudgetModal($event)"
+>
+  <div class="modal-container">
+    <!-- budget name -->
+    <input
+      class="input"
+      type="text"
+      [required]="true"
+      [value]="addingBudget?.name"
+      (input)="updateBudgetName($event)"
+      placeholder="Nom"
+    />
+    <!-- budget initialBalance -->
+    <input
+      class="input"
+      type="number"
+      step="0.01"
+      (click)="openNumpadBudget($event)"
+      [required]="true"
+      [value]="addingBudget?.initialBalance ?? 'Pas de montant'"
+      inputmode="none"
+      autocomplete="off"
+      readonly
+    />
+
+    <div class="modal-container__actions">
+      <app-button
+        class="login-page__login-button"
+        [type]="'submit'"
+        [variant]="'danger'"
+        [label]="'Créer ce budget'"
+        [loading]="addBudgetFormIsLoading"
+        (click)="submitNewBudget($event)"
+      ></app-button>
+    </div>
+  </div>
+</app-sliding-modal>
+}
+
+<!-- 
   ##################### NUMPAD #####################
    -->
-
 @if(amountValueControl !== null) {
 <app-sliding-modal [isOpen]="isNumpadModalOpen" (close)="closeNumpad($event)">
   <app-numpad
     [value]="amountValue"
     (submitted)="updateAmountValue($event)"
+  ></app-numpad>
+</app-sliding-modal>
+}
+<!-- 
+  ##################### BUDGET NUMPAD #####################
+   -->
+@if(isNumpadBudgetModalOpen) {
+<app-sliding-modal
+  [isOpen]="isNumpadBudgetModalOpen"
+  (close)="closeBudgetNumpad($event)"
+>
+  <app-numpad
+    [value]="'0'"
+    (submitted)="updateBudgetInitialBalanceValue($event)"
   ></app-numpad>
 </app-sliding-modal>
 }

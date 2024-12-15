@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import MonthsServiceInterface, {
+  AddBudget,
   AddExpense,
   AddOutflow,
   UpdateExpensesChecking,
@@ -64,6 +65,18 @@ export class MonthsService implements MonthsServiceInterface {
       .post<Response<MonthlyBudget>>(
         `${this.apiUrl}/months/${monthId}/outflows/`,
         outflow
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(() => void 0)
+      );
+  }
+
+  addBudget(monthId: string, budget: AddBudget): Observable<void> {
+    return this.http
+      .post<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/budgets/`,
+        budget
       )
       .pipe(
         tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),

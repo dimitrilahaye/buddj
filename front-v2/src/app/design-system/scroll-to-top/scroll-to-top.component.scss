@@ -1,10 +1,6 @@
 @import "../../../styles/variables";
 
 .scroll-to-top {
-    // display: flex;
-    // justify-content: center;
-    // align-items: center;
-  
     aspect-ratio: 1;
     display: grid;
     place-items: center;
@@ -12,7 +8,6 @@
     box-sizing: border-box;
     padding: 0;
     width: 50px;
-    // height: 50px;
 
     position: fixed;
     bottom: 20px;
