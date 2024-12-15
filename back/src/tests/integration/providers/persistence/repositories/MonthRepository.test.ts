@@ -301,6 +301,32 @@ describe("Integration | Providers | Persistence | Repositories | MonthRepository
     });
   });
 
+  describe("#updateBudget", () => {
+    it("should update the budget", async () => {
+      // given
+      const monthDao = await insertUnarchivedMonth();
+      const month = monthDao.toDomain();
+      const repository = new MonthRepository();
+      const idProvider = new IdProvider();
+      const factory = new AccountBudgetFactory(idProvider);
+      const budget = factory.create({
+        initialBalance: 100,
+        name: "Vacanss",
+      });
+      month.addBudget(budget);
+      await repository.save(month);
+
+      // when
+      await repository.updateBudget(budget.id, "Vacances");
+
+      // then
+      const persistedBudget = await WeeklyBudgetDao.findOneByOrFail({
+        id: budget.id,
+      });
+      expect(persistedBudget.name).to.be.equal("Vacances");
+    });
+  });
+
   describe("#manageOutflowsChecking", () => {
     it("should check and uncheck outflows", async () => {
       // given

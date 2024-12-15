@@ -1,28 +1,26 @@
-// import MonthRepository from "../ports/repositories/MonthRepository.js";
-// import { MonthNotFoundError } from "../errors/MonthErrors.js";
+import MonthRepository from "../ports/repositories/MonthRepository.js";
+import { MonthNotFoundError } from "../errors/MonthErrors.js";
 
-// export interface UpdateBudgetCommand {
-//   monthId: string;
-//   budgetId: string;
-//   name: string;
-// }
+export interface UpdateBudgetCommand {
+  monthId: string;
+  budgetId: string;
+  name: string;
+}
 
-// export default class UpdateBudget {
-//   constructor(
-//     public readonly monthRepository: MonthRepository
-//   ) {}
+export default class UpdateBudget {
+  constructor(public readonly monthRepository: MonthRepository) {}
 
-//   async execute(command: UpdateBudgetCommand) {
-//     const month = await this.monthRepository.getById(command.monthId);
+  async execute(command: UpdateBudgetCommand) {
+    const month = await this.monthRepository.getById(command.monthId);
 
-//     if (month === null) {
-//       throw new MonthNotFoundError();
-//     }
+    if (month === null) {
+      throw new MonthNotFoundError();
+    }
 
-//     month.addBudget(budget);
+    month.updateBudget(command.budgetId, command.name);
 
-//     await this.monthRepository.addBudget(month, budget);
+    await this.monthRepository.updateBudget(command.budgetId, command.name);
 
-//     return month;
-//   }
-// }
+    return month;
+  }
+}
