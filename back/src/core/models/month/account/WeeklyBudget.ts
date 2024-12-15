@@ -25,6 +25,9 @@ export default class WeeklyBudget {
     }
     this.initialBalance = props.initialBalance;
     this.id = props.id;
+    if (props.name.length === 0) {
+      throw new AccountBudgetNameCantBeEmptyError();
+    }
     this.name = props.name;
     this.startAt = null;
     this.endAt = null;

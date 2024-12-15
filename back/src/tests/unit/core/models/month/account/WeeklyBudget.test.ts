@@ -70,6 +70,20 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
           endAt: null,
         });
       });
+
+      it("should throw an error for an empty name", function () {
+        // given
+        const props = {
+          id: "uuid",
+          name: "",
+          initialBalance: 200,
+        };
+
+        // when / then
+        expect(() => new WeeklyBudget(props)).to.throw(
+          AccountBudgetNameCantBeEmptyError
+        );
+      });
     });
 
     it("should give a weekly budget with right data when current balance is negative", function () {
