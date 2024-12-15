@@ -54,6 +54,11 @@ export default interface MonthsServiceInterface {
     weeklyId: string,
     expense: AddExpense
   ): Observable<void>;
+  updateBudget(
+    monthId: string,
+    budgetId: string,
+    name: string
+  ): Observable<void>;
   getArchivedMonths(): Observable<MonthlyBudget[]>;
   archiveMonth(monthId: string): Observable<void>;
   unarchiveMonth(monthId: string): Observable<void>;

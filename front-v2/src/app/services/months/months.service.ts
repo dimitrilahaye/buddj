@@ -84,6 +84,22 @@ export class MonthsService implements MonthsServiceInterface {
       );
   }
 
+  updateBudget(
+    monthId: string,
+    budgetId: string,
+    name: string
+  ): Observable<void> {
+    return this.http
+      .patch<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/budgets/${budgetId}`,
+        { name }
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(() => void 0)
+      );
+  }
+
   updateOutflowsChecking(
     monthId: string,
     data: UpdateOutflowsChecking
