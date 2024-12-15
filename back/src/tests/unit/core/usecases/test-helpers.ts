@@ -10,6 +10,7 @@ const monthRepositoryStub = {
   addBudget: sinon.stub(),
   archive: sinon.stub(),
   unarchive: sinon.stub(),
+  updateBudget: sinon.stub(),
   delete: sinon.stub(),
   deleteExpense: sinon.stub(),
   deleteOutflow: sinon.stub(),
@@ -60,6 +61,7 @@ function resetStubs() {
   monthRepositoryStub.addBudget.reset();
   monthRepositoryStub.archive.reset();
   monthRepositoryStub.unarchive.reset();
+  monthRepositoryStub.updateBudget.reset();
   monthRepositoryStub.delete.reset();
   monthRepositoryStub.deleteExpense.reset();
   monthRepositoryStub.deleteOutflow.reset();

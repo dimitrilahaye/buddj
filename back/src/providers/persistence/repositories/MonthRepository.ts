@@ -54,6 +54,12 @@ export default class TypeOrmMonthRepository implements MonthRepository {
     }
   }
 
+  async updateBudget(budgetId: string, name: string): Promise<void> {
+    await WeeklyBudgetDao.update(budgetId, {
+      name,
+    });
+  }
+
   async updateAccountCurrentBalance(month: Month): Promise<void> {
     await AccountDao.update(month.account.id, {
       currentBalance: month.account.currentBalance,
