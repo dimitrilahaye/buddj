@@ -13,6 +13,7 @@ import WeeklyExpenseFactory from "../../../../../core/factories/WeeklyExpenseFac
 import { WeeklyExpenseDao } from "../../../../../providers/persistence/entities/WeeklyExpense.js";
 import { WeeklyBudgetDao } from "../../../../../providers/persistence/entities/WeeklyBudget.js";
 import AccountOutflowFactory from "../../../../../core/factories/AccountOutflowFactory.js";
+import AccountBudgetFactory from "../../../../../core/factories/AccountBudgetFactory.js";
 import { OutflowDao } from "../../../../../providers/persistence/entities/Outflow.js";
 import { AccountDao } from "../../../../../providers/persistence/entities/Account.js";
 import { MonthDao } from "../../../../../providers/persistence/entities/Month.js";
@@ -190,6 +191,37 @@ describe("Integration | Providers | Persistence | Repositories | MonthRepository
         (outflow) => outflow.id === persistedOutflow.id
       );
       expect(foundOutflowIntoAccount).not.to.be.null;
+    });
+  });
+
+  describe("#addBudget", () => {
+    it("should add budget", async () => {
+      // given
+      const monthDao = await insertUnarchivedMonth();
+      const month = monthDao.toDomain();
+      const repository = new MonthRepository();
+      const idProvider = new IdProvider();
+      const budgetFactory = new AccountBudgetFactory(idProvider);
+      const newBudget = budgetFactory.create({
+        initialBalance: 100,
+        name: "Vacances",
+      });
+
+      // when
+      await repository.addBudget(month, newBudget);
+
+      // then
+      const persistedBudget = await WeeklyBudgetDao.findOneByOrFail({
+        id: newBudget.id,
+      });
+      expect(persistedBudget).not.to.be.null;
+      const persistedAccount = await AccountDao.findOneByOrFail({
+        id: month.account.id,
+      });
+      const foundBudgetIntoAccount = persistedAccount.weeklyBudgets.find(
+        (budget) => budget.id === persistedBudget.id
+      );
+      expect(foundBudgetIntoAccount).not.to.be.null;
     });
   });
 
