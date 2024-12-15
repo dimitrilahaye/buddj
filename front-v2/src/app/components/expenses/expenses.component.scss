@@ -33,12 +33,18 @@
     gap: 10px;
 
     &-name {
+      @extend %ellipsis;
+      @extend %title-3;
+
+      white-space: nowrap;
+      max-width: 70%;
       margin: 0;
     }
 
     &__header {
       display: flex;
       flex-direction: row;
+      align-items: center;
       gap: 10px;
       padding-left: 10px;
     }

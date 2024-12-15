@@ -62,6 +62,7 @@ export class ExpensesComponent implements AfterViewInit {
   addExpenseFormIsLoading = false;
   addBudgetFormIsLoading = false;
   isExpensesModalOpen = false;
+  isUpdateBudgetModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
   filters: string[] = [];
   formUpdated = false;
@@ -80,6 +81,8 @@ export class ExpensesComponent implements AfterViewInit {
   addBudgetModalIsOpen = false;
   isNumpadBudgetModalOpen = false;
   addingBudget: AddBudget | null = null;
+  updatingBudget: { id: string; name: string; expensesId: string[] } | null =
+    null;
 
   constructor(
     private fb: FormBuilder,
@@ -132,6 +135,7 @@ export class ExpensesComponent implements AfterViewInit {
 
   closeAddBudgetModal(event: Event) {
     this.addBudgetModalIsOpen = false;
+    this.addingBudget = null;
     event.stopPropagation();
   }
 
@@ -141,6 +145,14 @@ export class ExpensesComponent implements AfterViewInit {
     }
     const value = (event.target as HTMLInputElement).value;
     this.addingBudget.name = value;
+  }
+
+  updateUpdatingBudgetName(event: Event) {
+    if (!this.updatingBudget) {
+      return;
+    }
+    const value = (event.target as HTMLInputElement).value;
+    this.updatingBudget.name = value;
   }
 
   closeTransferChoiceModal(event: Event) {
@@ -333,6 +345,17 @@ export class ExpensesComponent implements AfterViewInit {
     this.setAddExpenseForm(weekId);
   }
 
+  openUpdateBudgetModal(weekId?: string) {
+    this.updatingBudget = this.weeks.find((w) => w.id === weekId) ?? null;
+    this.isUpdateBudgetModalOpen = true;
+  }
+
+  closeUpdateBudgetModal(event: Event) {
+    event.stopPropagation();
+    this.updatingBudget = null;
+    this.isUpdateBudgetModalOpen = false;
+  }
+
   closeExpensesModal(event: Event) {
     this.isExpensesModalOpen = false;
     event.stopPropagation();
@@ -417,6 +440,31 @@ export class ExpensesComponent implements AfterViewInit {
       )
       .subscribe(() => {
         this.toaster.success('Votre budget a bien été crée !');
+      });
+  }
+
+  submitUpdateBudget(event: Event) {
+    event.stopPropagation();
+    if (!this.updatingBudget) {
+      return;
+    }
+
+    this.formIsLoading = true;
+    this.monthsService
+      .updateBudget(
+        this.month()!.id,
+        this.updatingBudget.id,
+        this.updatingBudget.name
+      )
+      .pipe(
+        finalize(() => {
+          this.isUpdateBudgetModalOpen = false;
+          this.formIsLoading = false;
+          this.updatingBudget = null;
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success('Votre budget a bien été modifié !');
       });
   }
 
