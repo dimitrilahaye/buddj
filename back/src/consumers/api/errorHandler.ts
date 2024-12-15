@@ -33,6 +33,7 @@ const errorHandler = (
     case "MonthlyBudgetTemplateNameCanNotBeEmptyError":
     case "MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError":
     case "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError":
+    case "AccountBudgetNameCantBeEmptyError":
       statusCode = 422;
       break;
     default:

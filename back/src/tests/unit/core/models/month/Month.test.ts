@@ -940,6 +940,32 @@ describe("Unit | Core | Models | Month | Month", function () {
     });
   });
 
+  describe("#updateBudget", () => {
+    it("should call the account to update budget", () => {
+      // given
+      const accountStub = new Account({
+        id: "uuid",
+        currentBalance: 2000,
+      });
+      accountStub.updateBudget = sinon.spy();
+      const props = {
+        id: "uuid",
+        date: new Date(),
+        account: accountStub,
+      };
+      const month = new Month(props);
+
+      // when
+      month.updateBudget("uuid", "new name");
+
+      // then
+      expect(accountStub.updateBudget).to.have.been.calledOnceWith(
+        "uuid",
+        "new name"
+      );
+    });
+  });
+
   describe("#archive", function () {
     it("should set isArchived to true", function () {
       // given

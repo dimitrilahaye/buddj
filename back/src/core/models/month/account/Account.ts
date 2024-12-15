@@ -109,6 +109,11 @@ export default class Account {
     this.currentBalance = currentBalance;
   }
 
+  updateBudget(budgetId: string, name: string) {
+    const budget = this.findWeeklyBudgetById(budgetId);
+    budget.updateName(name);
+  }
+
   private findWeeklyBudgetById(weeklyId: string) {
     const weekly = this.weeklyBudgets.find((budget) => budget.id === weeklyId);
     if (weekly === undefined) {

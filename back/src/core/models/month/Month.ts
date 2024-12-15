@@ -88,6 +88,10 @@ export default class Month {
     this.account.addBudget(outflow);
   }
 
+  updateBudget(budgetId: string, name: string) {
+    this.account.updateBudget(budgetId, name);
+  }
+
   /**
    * @deprecated
    */

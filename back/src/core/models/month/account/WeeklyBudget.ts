@@ -1,4 +1,7 @@
-import { WeeklyBudgetInitialBalanceError } from "../../../errors/WeeklyBudgetErrors.js";
+import {
+  AccountBudgetNameCantBeEmptyError,
+  WeeklyBudgetInitialBalanceError,
+} from "../../../errors/WeeklyBudgetErrors.js";
 import WeeklyExpense from "./WeeklyExpense.js";
 import { WeeklyExpenseNotFoundError } from "../../../errors/WeeklyExpenseErrors.js";
 
@@ -60,6 +63,13 @@ export default class WeeklyBudget {
   updateExpenseLabel(expenseId: string, label: string) {
     const expense = this.findExpenseById(expenseId);
     expense.updateLabel(label);
+  }
+
+  updateName(name: string) {
+    if (name.length === 0) {
+      throw new AccountBudgetNameCantBeEmptyError();
+    }
+    this.name = name;
   }
 
   findExpenseById(expenseId: string) {

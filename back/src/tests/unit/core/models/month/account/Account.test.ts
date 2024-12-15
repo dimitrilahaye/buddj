@@ -1533,4 +1533,31 @@ describe("Unit | Core | Models | Month | Account | Account", function () {
       ]);
     });
   });
+
+  describe("#updateBudget", function () {
+    it("should update the budget", function () {
+      // given
+      const targetBudget = new WeeklyBudget({
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+      });
+      targetBudget.updateName = sinon.spy();
+      const currentBudgets = [targetBudget];
+      const props = {
+        id: "uuid",
+        currentBalance: 2000,
+        weeklyBudgets: [...currentBudgets],
+      };
+      const account = new Account(props);
+
+      // when
+      account.updateBudget("uuid", "new name");
+
+      // then
+      expect(targetBudget.updateName).to.have.been.calledOnceWithExactly(
+        "new name"
+      );
+    });
+  });
 });
