@@ -2,6 +2,7 @@ import Month from "../../models/month/Month.js";
 import WeeklyExpense from "../../models/month/account/WeeklyExpense.js";
 import AccountOutflow from "../../models/month/account/AccountOutflow.js";
 import TransferableMonth from "../../models/transferable-month/TransferableMonth.js";
+import WeeklyBudget from "../../models/month/account/WeeklyBudget.js";
 
 export default interface MonthRepository {
   save(month: Month): Promise<Month>;
@@ -13,6 +14,8 @@ export default interface MonthRepository {
   ): Promise<void>;
 
   addOutflow(month: Month, outflow: AccountOutflow): Promise<void>;
+
+  addBudget(month: Month, budget: WeeklyBudget): Promise<void>;
 
   updateAccountCurrentBalance(month: Month): Promise<void>;
 

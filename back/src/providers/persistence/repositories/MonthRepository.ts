@@ -8,6 +8,7 @@ import { OutflowDao } from "../entities/Outflow.js";
 import AccountOutflow from "../../../core/models/month/account/AccountOutflow.js";
 import { AccountDao } from "../entities/Account.js";
 import TransferableMonth from "../../../core/models/transferable-month/TransferableMonth.js";
+import WeeklyBudget from "../../../core/models/month/account/WeeklyBudget.js";
 
 export default class TypeOrmMonthRepository implements MonthRepository {
   async addExpenseToWeeklyBudget(
@@ -39,6 +40,17 @@ export default class TypeOrmMonthRepository implements MonthRepository {
     if (accountDao) {
       outflowDao.account = accountDao;
       await outflowDao.save();
+    }
+  }
+
+  async addBudget(month: Month, budget: WeeklyBudget): Promise<void> {
+    const accountDao = await AccountDao.findOne({
+      where: { id: month.account.id },
+    });
+    const budgetDao = WeeklyBudgetDao.fromDomain(budget);
+    if (accountDao) {
+      budgetDao.account = accountDao;
+      await budgetDao.save();
     }
   }
 
