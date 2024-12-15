@@ -1,7 +1,10 @@
 import expect from "../../../../../test-helpers.js";
 import sinon from "sinon";
 import WeeklyBudget from "../../../../../../core/models/month/account/WeeklyBudget.js";
-import { WeeklyBudgetInitialBalanceError } from "../../../../../../core/errors/WeeklyBudgetErrors.js";
+import {
+  AccountBudgetNameCantBeEmptyError,
+  WeeklyBudgetInitialBalanceError,
+} from "../../../../../../core/errors/WeeklyBudgetErrors.js";
 import WeeklyExpense from "../../../../../../core/models/month/account/WeeklyExpense.js";
 import { WeeklyExpenseNotFoundError } from "../../../../../../core/errors/WeeklyExpenseErrors.js";
 
@@ -617,6 +620,38 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
       // when / then
       expect(() => budget.findExpenseById("not-existing-id")).to.throw(
         WeeklyExpenseNotFoundError
+      );
+    });
+  });
+  describe("#updateName", function () {
+    it("should update the budget's name", function () {
+      // given
+      const props = {
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+      };
+      const budget = new WeeklyBudget(props);
+
+      // when
+      budget.updateName("new name");
+
+      // then
+      expect(budget.name).to.equal("new name");
+    });
+
+    it("should throw an error if name is empty", function () {
+      // given
+      const props = {
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+      };
+      const budget = new WeeklyBudget(props);
+
+      // when / then
+      expect(() => budget.updateName("")).to.throw(
+        AccountBudgetNameCantBeEmptyError
       );
     });
   });
