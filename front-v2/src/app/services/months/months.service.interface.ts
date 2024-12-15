@@ -18,6 +18,11 @@ export interface AddExpense {
   amount: number;
 }
 
+export interface AddBudget {
+  initialBalance: number;
+  name: string;
+}
+
 export interface UpdateExpensesChecking {
   weeklyBudgets: {
     id: string;
@@ -34,6 +39,7 @@ export default interface MonthsServiceInterface {
     data: UpdateOutflowsChecking
   ): Observable<void>;
   addOutflow(monthId: string, outflow: AddOutflow): Observable<void>;
+  addBudget(monthId: string, outflow: AddBudget): Observable<void>;
   updateExpensesChecking(
     monthId: string,
     data: UpdateExpensesChecking

@@ -26,6 +26,7 @@ import {
 import { amountValidator } from '../../validators/amount.validator';
 import { CommonModule } from '@angular/common';
 import MonthsServiceInterface, {
+  AddBudget,
   MONTHS_SERVICE,
 } from '../../services/months/months.service.interface';
 import {
@@ -59,9 +60,10 @@ export class ExpensesComponent implements AfterViewInit {
   addExpenseForm: FormGroup | null = null;
   formIsLoading = false;
   addExpenseFormIsLoading = false;
+  addBudgetFormIsLoading = false;
   isExpensesModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
-  filters: number[] = [1, 2, 3, 4, 5];
+  filters: string[] = [];
   formUpdated = false;
   expenseDelationModalIsOpen = false;
   deleteExpenseFormIsLoading = false;
@@ -75,6 +77,9 @@ export class ExpensesComponent implements AfterViewInit {
   transferIsLoading = false;
 
   budgetsUnfolded = false;
+  addBudgetModalIsOpen = false;
+  isNumpadBudgetModalOpen = false;
+  addingBudget: AddBudget | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -117,6 +122,27 @@ export class ExpensesComponent implements AfterViewInit {
     );
   }
 
+  openAddBudgetModal() {
+    this.addBudgetModalIsOpen = true;
+    this.addingBudget = {
+      initialBalance: 0,
+      name: '',
+    };
+  }
+
+  closeAddBudgetModal(event: Event) {
+    this.addBudgetModalIsOpen = false;
+    event.stopPropagation();
+  }
+
+  updateBudgetName(event: Event) {
+    if (!this.addingBudget) {
+      return;
+    }
+    const value = (event.target as HTMLInputElement).value;
+    this.addingBudget.name = value;
+  }
+
   closeTransferChoiceModal(event: Event) {
     this.transferChoiceModalIsOpen = false;
     event.stopPropagation();
@@ -129,8 +155,8 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
-  filterIsActive(week: number) {
-    return this.filters.includes(week);
+  filterIsActive(weekId: string) {
+    return this.filters.includes(weekId);
   }
 
   get forecastBalance() {
@@ -155,7 +181,7 @@ export class ExpensesComponent implements AfterViewInit {
   toggleBudgetsUnfolded() {
     this.budgetsUnfolded = !this.budgetsUnfolded;
     if (this.budgetsUnfolded) {
-      this.filters = [1, 2, 3, 4, 5];
+      this.filters = this.weeks.map((w) => w.id);
     } else {
       this.filters = [];
     }
@@ -204,8 +230,6 @@ export class ExpensesComponent implements AfterViewInit {
       });
 
       this.expenses()!.forEach((expense) => this.addExpense(expense));
-
-      this.filters = [];
     }
   }
 
@@ -226,22 +250,18 @@ export class ExpensesComponent implements AfterViewInit {
     }
   }
 
-  updateFilterState(week: number) {
-    if (this.filters.includes(week)) {
-      this.filters = this.filters.filter((f) => f !== week);
+  updateFilterState(weekId: string) {
+    if (!this.filters.includes(weekId)) {
+      this.filters.push(weekId);
     } else {
-      this.filters.push(week);
+      this.filters = this.filters.filter((f) => f !== weekId);
     }
   }
 
   getExpensesFormGroupByWeekId(weekId: string) {
     return this.expensesFormArray.controls.filter((expense) => {
       const expenseWeekId = expense.get('weekId')?.value;
-      const weekNumber = this.weeks.findIndex((w) => w.id === weekId);
-      if (this.filters.length === 0) {
-        return false;
-      }
-      return expenseWeekId === weekId && this.filters.includes(weekNumber + 1);
+      return expenseWeekId === weekId && this.filters.includes(expenseWeekId);
     });
   }
 
@@ -340,6 +360,11 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
+  closeBudgetNumpad(event: Event) {
+    this.isNumpadBudgetModalOpen = false;
+    event.stopPropagation();
+  }
+
   closeNumpad(event: Event) {
     this.isNumpadModalOpen = false;
     event.stopPropagation();
@@ -351,6 +376,11 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
+  openNumpadBudget(event: Event) {
+    this.isNumpadBudgetModalOpen = true;
+    event.stopPropagation();
+  }
+
   get amountValue() {
     return '' + this.amountValueControl?.value;
   }
@@ -359,6 +389,35 @@ export class ExpensesComponent implements AfterViewInit {
     this.amountValueControl?.patchValue(Number(value.replace(',', '.')));
     this.isNumpadModalOpen = false;
     this.amountValueControl = null;
+  }
+
+  updateBudgetInitialBalanceValue(value: string) {
+    if (this.addingBudget) {
+      const initialBalance = Number(value.replace(',', '.'));
+      this.addingBudget.initialBalance = initialBalance;
+      this.isNumpadBudgetModalOpen = false;
+    }
+  }
+
+  submitNewBudget(event: Event) {
+    event.stopPropagation();
+    if (!this.addingBudget) {
+      return;
+    }
+
+    this.addBudgetFormIsLoading = true;
+    this.monthsService
+      .addBudget(this.month()!.id, this.addingBudget)
+      .pipe(
+        finalize(() => {
+          this.addBudgetModalIsOpen = false;
+          this.addBudgetFormIsLoading = false;
+          this.addingBudget = null;
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success('Votre budget a bien été crée !');
+      });
   }
 
   onSubmit() {

@@ -12,7 +12,7 @@ import { AddBudgetCommand } from "../../../../core/usecases/AddBudget.js";
 import { MonthNotFoundError } from "../../../../core/errors/MonthErrors.js";
 import { Deps } from "../../../../ioc.js";
 
-describe("Integration | Consumers | Routes | PUT /months/{monthId}/budgets", function () {
+describe("Integration | Consumers | Routes | POST /months/{monthId}/budgets", function () {
   let server: http.Server;
 
   describe("When user is authenticated", function () {
@@ -133,7 +133,7 @@ describe("Integration | Consumers | Routes | PUT /months/{monthId}/budgets", fun
 
     it("should return a 401 error", async function () {
       await request(server)
-        .put("/months/85467999-2751-4f04-8d96-7d7727fbff02/budgets")
+        .post("/months/85467999-2751-4f04-8d96-7d7727fbff02/budgets")
         .expect(401);
     });
   });

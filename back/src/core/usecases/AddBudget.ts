@@ -15,7 +15,7 @@ export default class AddBudget {
   ) {}
 
   async execute(command: AddBudgetCommand) {
-    const outflow = this.accountBudgetFactory.create({
+    const budget = this.accountBudgetFactory.create({
       name: command.name,
       initialBalance: command.initialBalance,
     });
@@ -25,9 +25,9 @@ export default class AddBudget {
       throw new MonthNotFoundError();
     }
 
-    month.addBudget(outflow);
+    month.addBudget(budget);
 
-    await this.monthRepository.addBudget(month, outflow);
+    await this.monthRepository.addBudget(month, budget);
 
     return month;
   }
