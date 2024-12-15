@@ -1500,4 +1500,37 @@ describe("Unit | Core | Models | Month | Account | Account", function () {
       expect(account.outflows).to.deep.equal([...currentOutflows, newOutflow]);
     });
   });
+
+  describe("#addBudget", function () {
+    it("should add the budget to the list", function () {
+      // given
+      const newBudget = new WeeklyBudget({
+        id: "uuid",
+        name: "Vacances",
+        initialBalance: 100,
+      });
+      const currentBudgets = [
+        new WeeklyBudget({
+          id: "uuid",
+          name: "Semaine 1",
+          initialBalance: 200,
+        }),
+      ];
+      const props = {
+        id: "uuid",
+        currentBalance: 2000,
+        weeklyBudgets: [...currentBudgets],
+      };
+      const account = new Account(props);
+
+      // when
+      account.addBudget(newBudget);
+
+      // then
+      expect(account.weeklyBudgets).to.deep.equal([
+        ...currentBudgets,
+        newBudget,
+      ]);
+    });
+  });
 });
