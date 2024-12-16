@@ -8,6 +8,7 @@ describe("Unit | Consumers | deserializers | addYearlyOutflow", function () {
       label: "JOW",
       amount: 10,
       month: 1,
+      type: "outflow",
     };
 
     // when
@@ -18,6 +19,7 @@ describe("Unit | Consumers | deserializers | addYearlyOutflow", function () {
       label: body.label,
       amount: body.amount,
       month: body.month,
+      type: body.type,
     });
   });
 });

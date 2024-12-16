@@ -1,15 +1,26 @@
-class YearlyOutflowsAddError extends Error {
+class YearlySavingsAddError extends Error {
   constructor() {
-    super("Yearly outflows: month must be between 1 and 12");
-    this.name = "YearlyOutflowsAddError";
+    super("Yearly savings: month must be between 1 and 12");
+    this.name = "YearlySavingsAddError";
   }
 }
 
-class YearlyOutflowsIdDoesNotExistError extends Error {
+class YearlySavingsIdDoesNotExistError extends Error {
   constructor() {
-    super("Yearly outflows: outflow not found");
-    this.name = "YearlyOutflowsIdDoesNotExistError";
+    super("Yearly savings: saving not found");
+    this.name = "YearlySavingsIdDoesNotExistError";
   }
 }
 
-export { YearlyOutflowsAddError, YearlyOutflowsIdDoesNotExistError };
+class YearlySavingTypeDoesNotExistError extends Error {
+  constructor() {
+    super("Yearly savings: type does not exist");
+    this.name = "YearlySavingTypeDoesNotExistError";
+  }
+}
+
+export {
+  YearlySavingsAddError,
+  YearlySavingsIdDoesNotExistError,
+  YearlySavingTypeDoesNotExistError,
+};

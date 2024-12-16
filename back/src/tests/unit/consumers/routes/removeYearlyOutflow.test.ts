@@ -8,7 +8,7 @@ import {
   mockedServer,
 } from "../../../integration/consumers/test-helpers.js";
 import * as deps from "../../../../ioc.js";
-import { YearlyOutflowsIdDoesNotExistError } from "../../../../core/errors/YearlyOutflowsErrors.js";
+import { YearlySavingsIdDoesNotExistError } from "../../../../core/errors/YearlyOutflowsErrors.js";
 import DeserializationError from "../../../../consumers/api/errors/DeserializationError.js";
 
 describe("Integration | Consumers | Routes | DELETE /yearly-outflows/:id", function () {
@@ -100,7 +100,7 @@ describe("Integration | Consumers | Routes | DELETE /yearly-outflows/:id", funct
         depsStub.removeYearlyOutflowUsecase.execute = sinon
           .stub()
           .withArgs(command)
-          .throwsException(new YearlyOutflowsIdDoesNotExistError());
+          .throwsException(new YearlySavingsIdDoesNotExistError());
 
         server = mockedServer({ isAuthenticated: true }, depsStub);
         const cookie = await authenticate(server);

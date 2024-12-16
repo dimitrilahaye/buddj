@@ -8,7 +8,7 @@ import {
   mockedServer,
 } from "../../../integration/consumers/test-helpers.js";
 import * as deps from "../../../../ioc.js";
-import { YearlyOutflowsAddError } from "../../../../core/errors/YearlyOutflowsErrors.js";
+import { YearlySavingsAddError } from "../../../../core/errors/YearlyOutflowsErrors.js";
 import DeserializationError from "../../../../consumers/api/errors/DeserializationError.js";
 
 describe("Integration | Consumers | Routes | POST /yearly-outflows", function () {
@@ -102,7 +102,7 @@ describe("Integration | Consumers | Routes | POST /yearly-outflows", function ()
         depsStub.addYearlyOutflowUsecase.execute = sinon
           .stub()
           .withArgs(command)
-          .throwsException(new YearlyOutflowsAddError());
+          .throwsException(new YearlySavingsAddError());
 
         server = mockedServer({ isAuthenticated: true }, depsStub);
         const cookie = await authenticate(server);
