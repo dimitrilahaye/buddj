@@ -56,6 +56,7 @@ jobs:
         FRONT_REDIRECT_URL: ${{ secrets.FRONT_REDIRECT_URL }}
         TEMPLATE: ${{ secrets.TEMPLATE }}
         YEARLY: ${{ secrets.YEARLY }}
+        YEARLY_BUDGETS: ${{ secrets.YEARLY_BUDGETS }}
 
   front_checks:
     name: Front ~ Quality Checks
