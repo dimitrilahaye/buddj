@@ -4,6 +4,7 @@ export type YearlyOutflow = {
   month: number;
   label: string;
   amount: number;
+  type: 'outflow';
 };
 
 export type YearlyBudget = {
@@ -11,6 +12,7 @@ export type YearlyBudget = {
   month: number;
   name: string;
   initialBalance: number;
+  type: 'budget';
 };
 
 export type MonthlySavings = {
