@@ -10,6 +10,18 @@
     (click)="removeOutflow($event)"
   ></app-button>
 </app-modal>
+<app-modal
+  [modalOpen]="budgetDelationModalIsOpen"
+  (click)="closeBudgetDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer le budget définitivement'"
+    [loading]="removeIsLoading"
+    (click)="removeBudget($event)"
+  ></app-button>
+</app-modal>
 
 <app-header-back-button></app-header-back-button>
 <div class="content">
