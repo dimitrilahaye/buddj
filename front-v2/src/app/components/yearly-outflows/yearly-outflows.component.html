@@ -25,12 +25,6 @@
 
 <app-header-back-button></app-header-back-button>
 <div class="content">
-  @if(!savings()) {
-  <app-tips>
-    <p>Vous n'avez pas encore crée de sorties annuelles 🙂</p>
-    <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
-  </app-tips>
-  } @else {
   <ng-container *ngFor="let month of months">
     <section class="outflows__month">
       <div class="outflows-month__title">
@@ -48,7 +42,7 @@
         @if (getOutflowsForMonth(month.month).length === 0) {
         <app-tips>
           <p>Vous n'avez enregistré aucune sortie pour ce mois 🙂</p>
-          <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
+          <img width="30%" src="info/no-yearly-outflows-yet.png" alt="" />
         </app-tips>
         } @else {
         <div class="outflows-list__list">
@@ -93,7 +87,7 @@
         @if (getBudgetsForMonth(month.month).length === 0) {
         <app-tips>
           <p>Vous n'avez enregistré aucun budget pour ce mois 🙂</p>
-          <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
+          <img width="30%" src="info/no-yearly-outflows-yet.png" alt="" />
         </app-tips>
         } @else {
         <div class="outflows-list__list">
@@ -131,7 +125,6 @@
     </section>
     <app-divider></app-divider>
   </ng-container>
-  }
 </div>
 
 <div class="month-creation__footer">
