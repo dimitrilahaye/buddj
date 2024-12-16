@@ -45,7 +45,6 @@ export class YearlyOutflowsComponent {
   removeIsLoading = false;
   outflowDelationModalIsOpen = false;
   outflowToDelete: YearlyOutflow | null = null;
-  budgetToDelete: YearlyBudget | null = null;
   addOutflowForm: FormGroup | null = null;
   isOutflowsModalOpen = false;
   addOutflowFormIsLoading = false;
@@ -56,6 +55,8 @@ export class YearlyOutflowsComponent {
   addBudgetForm: FormGroup | null = null;
   isBudgetNumpadModalOpen = false;
   addBudgetFormIsLoading = false;
+  budgetToDelete: YearlyBudget | null = null;
+  budgetDelationModalIsOpen = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialBalanceValueControl: AbstractControl<any, any> | null = null;
 
@@ -165,6 +166,18 @@ export class YearlyOutflowsComponent {
     this.isBudgetsModalOpen = false;
   }
 
+  openBudgetDelationModal(budget: YearlyBudget, event: Event) {
+    this.budgetDelationModalIsOpen = true;
+    this.budgetToDelete = budget;
+    event.stopPropagation();
+  }
+
+  closeBudgetDelationModal(event: Event) {
+    this.budgetDelationModalIsOpen = false;
+    this.budgetToDelete = null;
+    event.stopPropagation();
+  }
+
   openBudgetNumpad(control: AbstractControl, event: Event) {
     this.initialBalanceValueControl = control;
     this.isBudgetNumpadModalOpen = true;
@@ -205,6 +218,22 @@ export class YearlyOutflowsComponent {
     event.stopPropagation();
   }
 
+  removeBudget(event: Event) {
+    this.removeIsLoading = true;
+    event.stopPropagation();
+    this.yearlyOutflowsService
+      .remove(this.budgetToDelete!.id)
+      .pipe(
+        finalize(() => {
+          this.removeIsLoading = false;
+          this.budgetDelationModalIsOpen = false;
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success('Le budget annuel ont été supprimé !');
+      });
+  }
+
   // OUTFLOWS PART
 
   getOutflowsForMonth(month: number) {
@@ -233,12 +262,6 @@ export class YearlyOutflowsComponent {
   openOutflowDelationModal(outflow: YearlyOutflow, event: Event) {
     this.outflowDelationModalIsOpen = true;
     this.outflowToDelete = outflow;
-    event.stopPropagation();
-  }
-
-  openBudgetDelationModal(budget: YearlyBudget, event: Event) {
-    this.outflowDelationModalIsOpen = true;
-    this.budgetToDelete = budget;
     event.stopPropagation();
   }
 
