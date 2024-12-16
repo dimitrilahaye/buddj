@@ -1,26 +1,23 @@
-import YearlyOutflow from "../models/yearly-outflows/YearlyOutflow.js";
-import IdProvider from "../ports/providers/IdProvider.js";
+import YearlySavingFactory from "../factories/YearlySavingFactory.js";
 import YearlyOutflowRepository from "../ports/repositories/YearlyOutflowRepository.js";
 
 export interface AddYearlyOutflowCommand {
   label: string;
   amount: number;
   month: number;
+  type: "outflow" | "budget";
 }
 
 export default class AddYearlyOutflow {
   constructor(
     public yearlyOutflowRepository: YearlyOutflowRepository,
-    public idProvider: IdProvider
+    public factory: YearlySavingFactory
   ) {}
 
   async execute(command: AddYearlyOutflowCommand) {
     const list = await this.yearlyOutflowRepository.getAll();
-    const outflow = new YearlyOutflow({
-      ...command,
-      id: this.idProvider.get(),
-    });
-    list.add(outflow);
-    return this.yearlyOutflowRepository.add(outflow);
+    const saving = this.factory.create(command);
+    list.add(saving);
+    return this.yearlyOutflowRepository.add(saving);
   }
 }

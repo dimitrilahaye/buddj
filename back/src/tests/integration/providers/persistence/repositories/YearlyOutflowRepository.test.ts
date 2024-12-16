@@ -60,7 +60,7 @@ describe("Integration | Providers | Persistence | Repositories | YearlyOutflowRe
     });
   });
   describe("#add", function () {
-    it("should persisted the outflow", async function () {
+    it("should persisted the saving", async function () {
       // given
       const outflow = new YearlyOutflow({
         id: idProvider.get(),
@@ -68,13 +68,20 @@ describe("Integration | Providers | Persistence | Repositories | YearlyOutflowRe
         amount: 10,
         month: 1,
       });
+      const budget = new YearlyBudget({
+        id: idProvider.get(),
+        name: "label",
+        initialBalance: 10,
+        month: 1,
+      });
 
       // when
+      await repository.add(budget);
       const list = await repository.add(outflow);
 
       // then
-      expect(list.getAll()).to.have.length(1);
-      expect(list.getAll()[0]).to.deep.equal(outflow);
+      expect(list.getAll()).to.have.length(2);
+      expect(list.getAll()).to.deep.equal([outflow, budget]);
     });
   });
 

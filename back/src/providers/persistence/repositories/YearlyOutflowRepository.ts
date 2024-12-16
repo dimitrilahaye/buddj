@@ -1,3 +1,4 @@
+import YearlyBudget from "../../../core/models/yearly-outflows/YearlyBudget.js";
 import YearlyOutflow from "../../../core/models/yearly-outflows/YearlyOutflow.js";
 import YearlyOutflows from "../../../core/models/yearly-outflows/YearlyOutflows.js";
 import YearlyOutflowRepository from "../../../core/ports/repositories/YearlyOutflowRepository.js";
@@ -15,9 +16,15 @@ export default class TypeOrmYearlyOutflowRepository
     return new YearlyOutflows(outflows, budgets);
   }
 
-  async add(outflow: YearlyOutflow): Promise<YearlyOutflows> {
-    const dao = YearlyOutflowDao.fromDomain(outflow);
-    await dao.save();
+  async add(saving: YearlyOutflow | YearlyBudget): Promise<YearlyOutflows> {
+    if (saving instanceof YearlyOutflow) {
+      const dao = YearlyOutflowDao.fromDomain(saving);
+      await dao.save();
+    }
+    if (saving instanceof YearlyBudget) {
+      const dao = YearlyOutflowDao.fromDomain(saving);
+      await dao.save();
+    }
 
     return this.getAll();
   }

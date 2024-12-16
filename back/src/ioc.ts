@@ -91,6 +91,7 @@ import AddMonthlyBudget from "./core/usecases/AddMonthlyBudget.js";
 import AddMonthlyOutflow from "./core/usecases/AddMonthlyOutflow.js";
 import MonthlyOutflowFactory from "./core/factories/MonthlyOutflowFactory.js";
 import MonthlyBudgetFactory from "./core/factories/MonthlyBudgetFactory.js";
+import YearlySavingFactory from "./core/factories/YearlySavingFactory.js";
 import addMonthlyOutflowDeserializer, {
   AddMonthlyOutflowDeserializer,
 } from "./consumers/api/deserializers/addMonthlyOutflow.js";
@@ -150,6 +151,8 @@ const budgetFactory = new AccountBudgetFactory(idProvider);
 const monthlyOutflowFactory = new MonthlyOutflowFactory(idProvider);
 
 const monthlyBudgetFactory = new MonthlyBudgetFactory(idProvider);
+
+const yearlySavingFactory = new YearlySavingFactory(idProvider);
 
 // use cases
 
@@ -245,7 +248,7 @@ const getYearlyOutflowsUsecase = new GetYearlyOutflows(yearlyOutflowRepository);
 
 const addYearlyOutflowUsecase = new AddYearlyOutflow(
   yearlyOutflowRepository,
-  idProvider
+  yearlySavingFactory
 );
 
 const removeYearlyOutflowUsecase = new RemoveYearlyOutflow(

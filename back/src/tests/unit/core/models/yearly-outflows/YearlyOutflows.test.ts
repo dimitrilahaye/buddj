@@ -2,8 +2,8 @@ import expect from "../../../../test-helpers.js";
 import YearlyOutflow from "../../../../../core/models/yearly-outflows/YearlyOutflow.js";
 import YearlyOutflows from "../../../../../core/models/yearly-outflows/YearlyOutflows.js";
 import {
-  YearlyOutflowsAddError,
-  YearlyOutflowsIdDoesNotExistError,
+  YearlySavingsAddError,
+  YearlySavingsIdDoesNotExistError,
 } from "../../../../../core/errors/YearlyOutflowsErrors.js";
 import YearlyBudget from "../../../../../core/models/yearly-outflows/YearlyBudget.js";
 
@@ -52,7 +52,7 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
           id: "id1",
           month: 1,
           label: "label",
-          amount: 110,
+          amount: 100,
         }),
         new YearlyOutflow({
           id: "id2",
@@ -61,7 +61,14 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
           amount: 10,
         }),
       ];
-      const yearlyOutflows = new YearlyOutflows(outflows);
+      const yearlyOutflows = new YearlyOutflows(outflows, [
+        new YearlyBudget({
+          id: "id2",
+          month: 1,
+          name: "label",
+          initialBalance: 10,
+        }),
+      ]);
 
       // when
       const total = yearlyOutflows.getMonthlyProjectsAmount();
@@ -88,7 +95,7 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
               amount: 10,
             })
           )
-        ).to.throw(YearlyOutflowsAddError);
+        ).to.throw(YearlySavingsAddError);
       });
     });
 
@@ -121,7 +128,7 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
 
         // when / then
         expect(() => yearlyOutflows.remove("id")).to.throw(
-          YearlyOutflowsIdDoesNotExistError
+          YearlySavingsIdDoesNotExistError
         );
       });
     });

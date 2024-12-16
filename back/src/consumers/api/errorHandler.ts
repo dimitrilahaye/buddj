@@ -19,7 +19,7 @@ const errorHandler = (
     case "AccountOutflowNotFoundError":
     case "TransferableAccountNotFoundError":
     case "TransferableWeeklyBudgetNotFoundError":
-    case "YearlyOutflowsIdDoesNotExistError":
+    case "YearlySavingsIdDoesNotExistError":
     case "MonthlyTemplateDoesNotExistError":
       statusCode = 404;
       break;
@@ -27,13 +27,14 @@ const errorHandler = (
     case "WeeklyBudgetInitialBalanceError":
     case "WeeklyExpenseAmountError":
     case "TransferBalanceIntoMonthError":
-    case "YearlyOutflowsAddError":
+    case "YearlySavingsAddError":
     case "MonthlyTemplateNameCanNotBeEmptyError":
     case "MonthlyOutflowTemplateLabelCanNotBeEmptyError":
     case "MonthlyBudgetTemplateNameCanNotBeEmptyError":
     case "MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError":
     case "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError":
     case "AccountBudgetNameCantBeEmptyError":
+    case "YearlySavingTypeDoesNotExistError":
       statusCode = 422;
       break;
     default:

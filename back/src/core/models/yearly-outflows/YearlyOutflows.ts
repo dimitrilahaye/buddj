@@ -1,6 +1,7 @@
 import {
-  YearlyOutflowsAddError,
-  YearlyOutflowsIdDoesNotExistError,
+  YearlySavingsAddError,
+  YearlySavingsIdDoesNotExistError,
+  YearlySavingTypeDoesNotExistError,
 } from "../../errors/YearlyOutflowsErrors.js";
 import YearlyBudget from "./YearlyBudget.js";
 import YearlyOutflow from "./YearlyOutflow.js";
@@ -31,17 +32,26 @@ export default class YearlyOutflows {
     return Number((total / 12).toFixed(2));
   }
 
-  add(outflow: YearlyOutflow) {
-    if (outflow.month < 1 || outflow.month > 12) {
-      throw new YearlyOutflowsAddError();
+  add(saving: YearlyOutflow | YearlyBudget) {
+    if (saving.month < 1 || saving.month > 12) {
+      throw new YearlySavingsAddError();
     }
-    this.outflowsList.push(outflow);
+    switch (saving.type) {
+      case "outflow":
+        this.outflowsList.push(saving);
+        break;
+      case "budget":
+        this.budgetsList.push(saving);
+        break;
+      default:
+        throw new YearlySavingTypeDoesNotExistError();
+    }
   }
 
   remove(id: string) {
     const outflow = this.outflowsList.find((o) => o.id === id);
     if (!outflow) {
-      throw new YearlyOutflowsIdDoesNotExistError();
+      throw new YearlySavingsIdDoesNotExistError();
     }
     this.outflowsList = this.outflowsList.filter((o) => o.id !== id);
   }
