@@ -56,14 +56,7 @@
 
 .outflows-month {
     &__title {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      align-items: center;
-        
-      span {
-        @extend %title-10;
-      }
+      @extend %title-10;
     }
 }
 
@@ -71,6 +64,19 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    &__header {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+    }
+
+    &__list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
 }
 
 .outflows-list-item {

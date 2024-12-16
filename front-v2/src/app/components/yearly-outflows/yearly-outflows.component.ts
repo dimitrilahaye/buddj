@@ -49,9 +49,15 @@ export class YearlyOutflowsComponent {
   addOutflowForm: FormGroup | null = null;
   isOutflowsModalOpen = false;
   addOutflowFormIsLoading = false;
-  isNumpadModalOpen = false;
+  isOutflowNumpadModalOpen = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   amountValueControl: AbstractControl<any, any> | null = null;
+  isBudgetsModalOpen = false;
+  addBudgetForm: FormGroup | null = null;
+  isBudgetNumpadModalOpen = false;
+  addBudgetFormIsLoading = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialBalanceValueControl: AbstractControl<any, any> | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -134,12 +140,75 @@ export class YearlyOutflowsComponent {
     return total / 12;
   }
 
-  getOutflowsForMonth(month: number) {
-    return this.savings()![month].outflows;
-  }
+  // BUDGETS PART
 
   getBudgetsForMonth(month: number) {
     return this.savings()![month].budgets;
+  }
+
+  addBudgetToMonth(month: number, event: Event) {
+    event.stopPropagation();
+    this.isBudgetsModalOpen = true;
+    this.setAddBudgetForm(month);
+  }
+
+  setAddBudgetForm(month: number) {
+    this.addBudgetForm = this.fb.group({
+      type: [{ value: 'budget', disabled: true }], // hidden
+      month: [{ value: month, disabled: true }], // hidden
+      name: [null, Validators.required],
+      initialBalance: [0, [Validators.required, amountValidator()]],
+    });
+  }
+
+  closeBudgetsModal() {
+    this.isBudgetsModalOpen = false;
+  }
+
+  openBudgetNumpad(control: AbstractControl, event: Event) {
+    this.initialBalanceValueControl = control;
+    this.isBudgetNumpadModalOpen = true;
+    event.stopPropagation();
+  }
+
+  closeBudgetNumpad(event: Event) {
+    this.isBudgetNumpadModalOpen = false;
+    event.stopPropagation();
+  }
+
+  get initialBalanceValue() {
+    return '' + this.initialBalanceValueControl?.value;
+  }
+
+  updateInitialBalanceValue(value: string) {
+    this.initialBalanceValueControl?.patchValue(
+      Number(value.replace(',', '.'))
+    );
+    this.isBudgetNumpadModalOpen = false;
+    this.initialBalanceValueControl = null;
+  }
+
+  submitBudgetModal(event: Event) {
+    event.preventDefault();
+    if (this.addBudgetForm && this.addBudgetForm!.valid) {
+      this.addBudgetFormIsLoading = true;
+      this.yearlyOutflowsService
+        .add(this.addBudgetForm.getRawValue())
+        .pipe(finalize(() => (this.addBudgetFormIsLoading = false)))
+        .subscribe(() => {
+          this.closeBudgetsModal();
+          this.toaster.success('Votre budget annuel a été ajouté !');
+        });
+    } else {
+      this.addBudgetForm!.markAllAsTouched();
+    }
+    event.stopPropagation();
+  }
+
+  // OUTFLOWS PART
+
+  getOutflowsForMonth(month: number) {
+    return this.savings()![month].outflows;
   }
 
   addOutflowToMonth(month: number, event: Event) {
@@ -150,6 +219,7 @@ export class YearlyOutflowsComponent {
 
   setAddOutflowForm(month: number) {
     this.addOutflowForm = this.fb.group({
+      type: [{ value: 'outflow', disabled: true }], // hidden
       month: [{ value: month, disabled: true }], // hidden
       label: [null, Validators.required],
       amount: [0, [Validators.required, amountValidator()]],
@@ -178,14 +248,14 @@ export class YearlyOutflowsComponent {
     event.stopPropagation();
   }
 
-  openNumpad(control: AbstractControl, event: Event) {
+  openOutflowNumpad(control: AbstractControl, event: Event) {
     this.amountValueControl = control;
-    this.isNumpadModalOpen = true;
+    this.isOutflowNumpadModalOpen = true;
     event.stopPropagation();
   }
 
-  closeNumpad(event: Event) {
-    this.isNumpadModalOpen = false;
+  closeOutflowNumpad(event: Event) {
+    this.isOutflowNumpadModalOpen = false;
     event.stopPropagation();
   }
 
@@ -195,7 +265,7 @@ export class YearlyOutflowsComponent {
 
   updateAmountValue(value: string) {
     this.amountValueControl?.patchValue(Number(value.replace(',', '.')));
-    this.isNumpadModalOpen = false;
+    this.isOutflowNumpadModalOpen = false;
     this.amountValueControl = null;
   }
 
