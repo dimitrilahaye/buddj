@@ -50,9 +50,15 @@ export default class YearlyOutflows {
 
   remove(id: string) {
     const outflow = this.outflowsList.find((o) => o.id === id);
-    if (!outflow) {
+    const budget = this.budgetsList.find((o) => o.id === id);
+    if (outflow) {
+      this.outflowsList = this.outflowsList.filter((o) => o.id !== id);
+    }
+    if (budget) {
+      this.budgetsList = this.budgetsList.filter((o) => o.id !== id);
+    }
+    if (!outflow && !budget) {
       throw new YearlySavingsIdDoesNotExistError();
     }
-    this.outflowsList = this.outflowsList.filter((o) => o.id !== id);
   }
 }

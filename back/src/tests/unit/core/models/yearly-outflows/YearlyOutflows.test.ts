@@ -124,7 +124,24 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
     describe("When outflow does not exist", () => {
       it("should throw an error", () => {
         // given
-        const yearlyOutflows = new YearlyOutflows([]);
+        const yearlyOutflows = new YearlyOutflows(
+          [
+            new YearlyOutflow({
+              id: "123",
+              month: 12,
+              label: "label",
+              amount: 10,
+            }),
+          ],
+          [
+            new YearlyBudget({
+              id: "456",
+              month: 12,
+              name: "label",
+              initialBalance: 10,
+            }),
+          ]
+        );
 
         // when / then
         expect(() => yearlyOutflows.remove("id")).to.throw(
@@ -133,25 +150,62 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
       });
     });
 
-    describe("When month is correct", () => {
-      it("should remove the outflow from its list", () => {
-        // given
-        const expectedId = "id";
-        const yearlyOutflows = new YearlyOutflows([
+    it("should remove the outflow from its list", () => {
+      // given
+      const expectedId = "id";
+      const yearlyOutflows = new YearlyOutflows(
+        [
           new YearlyOutflow({
             id: expectedId,
             month: 12,
             label: "label",
             amount: 10,
           }),
-        ]);
+        ],
+        [
+          new YearlyBudget({
+            id: "123",
+            month: 12,
+            name: "label",
+            initialBalance: 10,
+          }),
+        ]
+      );
 
-        // when
-        yearlyOutflows.remove(expectedId);
+      // when
+      yearlyOutflows.remove(expectedId);
 
-        // then
-        expect(yearlyOutflows.getAll()).to.have.length(0);
-      });
+      // then
+      expect(yearlyOutflows.getAll()).to.have.length(1);
+    });
+
+    it("should remove the budget from its list", () => {
+      // given
+      const expectedId = "id";
+      const yearlyOutflows = new YearlyOutflows(
+        [
+          new YearlyOutflow({
+            id: "123",
+            month: 12,
+            label: "label",
+            amount: 10,
+          }),
+        ],
+        [
+          new YearlyBudget({
+            id: expectedId,
+            month: 12,
+            name: "label",
+            initialBalance: 10,
+          }),
+        ]
+      );
+
+      // when
+      yearlyOutflows.remove(expectedId);
+
+      // then
+      expect(yearlyOutflows.getAll()).to.have.length(1);
     });
   });
 });
