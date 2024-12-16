@@ -6,4 +6,16 @@ export type YearlyOutflow = {
   amount: number;
 };
 
-export type YearlyOutflows = Record<number, YearlyOutflow[]>;
+export type YearlyBudget = {
+  id: string;
+  month: number;
+  name: string;
+  initialBalance: number;
+};
+
+export type MonthlySavings = {
+  outflows: YearlyOutflow[];
+  budgets: YearlyBudget[];
+};
+
+export type YearlyOutflows = Record<number, MonthlySavings>;

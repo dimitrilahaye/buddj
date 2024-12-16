@@ -24,6 +24,10 @@
     }
 }
 
+.subtitle {
+  @extend %title-3;
+}
+
 .content {
   margin-top: 40px;
   padding: 5px;
