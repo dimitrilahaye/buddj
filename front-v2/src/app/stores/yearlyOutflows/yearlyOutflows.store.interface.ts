@@ -1,6 +1,6 @@
 import { InjectionToken, Signal } from '@angular/core';
 import {
-  YearlyOutflow,
+  MonthlySavings,
   YearlyOutflows,
 } from '../../models/yearlyOutflow.model';
 
@@ -9,7 +9,7 @@ export interface YearlyOutflowsStoreInterface {
 
   replaceAll(outflows: YearlyOutflows): void;
 
-  getOutflowForMonth(month: number): Signal<YearlyOutflow[]>;
+  getSavingsForMonth(month: number): Signal<MonthlySavings>;
 }
 
 export const YEARLY_OUTFLOWS_STORE =

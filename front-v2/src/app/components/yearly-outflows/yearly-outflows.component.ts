@@ -4,6 +4,7 @@ import {
   YearlyOutflowsStoreInterface,
 } from '../../stores/yearlyOutflows/yearlyOutflows.store.interface';
 import {
+  YearlyBudget,
   YearlyOutflow,
   YearlyOutflows,
 } from '../../models/yearlyOutflow.model';
@@ -40,10 +41,11 @@ import { HeaderBackButtonComponent } from '../header-back-button/header-back-but
   styleUrl: './yearly-outflows.component.scss',
 })
 export class YearlyOutflowsComponent {
-  outflows: Signal<YearlyOutflows | null>;
+  savings: Signal<YearlyOutflows | null>;
   removeIsLoading = false;
   outflowDelationModalIsOpen = false;
   outflowToDelete: YearlyOutflow | null = null;
+  budgetToDelete: YearlyBudget | null = null;
   addOutflowForm: FormGroup | null = null;
   isOutflowsModalOpen = false;
   addOutflowFormIsLoading = false;
@@ -60,7 +62,7 @@ export class YearlyOutflowsComponent {
     private readonly yearlyOutflowsService: YearlyOutflowsServiceInterface,
     @Inject(TOASTER_SERVICE) private readonly toaster: ToasterServiceInterface
   ) {
-    this.outflows = this.yearlyOutflowsStore.getAll();
+    this.savings = this.yearlyOutflowsStore.getAll();
   }
 
   get months() {
@@ -117,20 +119,27 @@ export class YearlyOutflowsComponent {
   }
 
   get totalAmountByMonth() {
-    const yearlyOutflows = this.outflows()!;
+    const yearlyOutflows = this.savings()!;
     let total = 0;
     for (const monthKey in yearlyOutflows) {
       const month = parseInt(monthKey, 10);
-      const outflows = yearlyOutflows[month];
-      total += outflows.reduce((prev, curr) => {
+      const savings = yearlyOutflows[month];
+      total += savings.outflows.reduce((prev, curr) => {
         return prev + curr.amount;
+      }, 0);
+      total += savings.budgets.reduce((prev, curr) => {
+        return prev + curr.initialBalance;
       }, 0);
     }
     return total / 12;
   }
 
   getOutflowsForMonth(month: number) {
-    return this.outflows()![month];
+    return this.savings()![month].outflows;
+  }
+
+  getBudgetsForMonth(month: number) {
+    return this.savings()![month].budgets;
   }
 
   addOutflowToMonth(month: number, event: Event) {
@@ -154,6 +163,12 @@ export class YearlyOutflowsComponent {
   openOutflowDelationModal(outflow: YearlyOutflow, event: Event) {
     this.outflowDelationModalIsOpen = true;
     this.outflowToDelete = outflow;
+    event.stopPropagation();
+  }
+
+  openBudgetDelationModal(budget: YearlyBudget, event: Event) {
+    this.outflowDelationModalIsOpen = true;
+    this.budgetToDelete = budget;
     event.stopPropagation();
   }
 

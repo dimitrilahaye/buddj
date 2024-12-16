@@ -13,7 +13,7 @@
 
 <app-header-back-button></app-header-back-button>
 <div class="content">
-  @if(!outflows()) {
+  @if(!savings()) {
   <app-tips>
     <p>Vous n'avez pas encore crée de sorties annuelles 🙂</p>
     <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
@@ -30,9 +30,10 @@
         ></app-button-icon>
       </div>
       <div class="outflows__list">
+        <div class="subtitle">Sorties</div>
         @if (getOutflowsForMonth(month.month).length === 0) {
         <app-tips>
-          <p>Aucune sortie annuelle pour le moment 🙂</p>
+          <p>Vous n'avez enregistré aucune sortie pour ce mois 🙂</p>
           <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
         </app-tips>
         } @else {
@@ -44,7 +45,7 @@
         >
           <button type="button" class="outflows-list-item">
             <span class="outflows-list-item__icon">
-              <i class="fa-solid fa-calendar-days"></i>
+              <i class="fa-solid fa-money-bill-transfer"></i>
             </span>
             <div class="outflows-list-item__info">
               <span class="outflows-list-item-info__label">
@@ -59,6 +60,39 @@
               class="outflows-list-item__delete"
               type="button"
               (click)="openOutflowDelationModal(outflow, $event)"
+            >
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </button>
+        </app-item>
+        }
+        <div class="subtitle">Budgets</div>
+        @if (getBudgetsForMonth(month.month).length === 0) {
+        <app-tips>
+          <p>Vous n'avez enregistré aucun budget pour ce mois 🙂</p>
+          <img width="70%" src="info/no-yearly-outflows-yet.png" alt="" />
+        </app-tips>
+        } @else {
+        <app-item
+          *ngFor="let budget of getBudgetsForMonth(month.month); let i = index"
+        >
+          <button type="button" class="outflows-list-item">
+            <span class="outflows-list-item__icon">
+              <i class="fa-solid fa-basket-shopping"></i>
+            </span>
+            <div class="outflows-list-item__info">
+              <span class="outflows-list-item-info__label">
+                {{ budget.name }}</span
+              >
+              <span class="outflows-list-item-info__amount">{{
+                budget.initialBalance | currency : "EUR"
+              }}</span>
+            </div>
+
+            <button
+              class="outflows-list-item__delete"
+              type="button"
+              (click)="openBudgetDelationModal(budget, $event)"
             >
               <i class="fa-solid fa-trash-can"></i>
             </button>

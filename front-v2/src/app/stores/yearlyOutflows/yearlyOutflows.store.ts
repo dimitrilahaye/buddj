@@ -1,6 +1,6 @@
 import { Injectable, Signal, signal } from '@angular/core';
 import {
-  YearlyOutflow,
+  MonthlySavings,
   YearlyOutflows,
 } from '../../models/yearlyOutflow.model';
 import { YearlyOutflowsStoreInterface } from './yearlyOutflows.store.interface';
@@ -21,9 +21,12 @@ export class YearlyOutflowsStore implements YearlyOutflowsStoreInterface {
     });
   }
 
-  getOutflowForMonth(month: number): Signal<YearlyOutflow[]> {
+  getSavingsForMonth(month: number): Signal<MonthlySavings> {
     if (this._all() === null) {
-      return signal([]);
+      return signal({
+        budgets: [],
+        outflows: [],
+      });
     }
     return signal(this._all()![month]);
   }

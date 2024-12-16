@@ -172,8 +172,9 @@ export class MonthCreationComponent implements OnInit {
   }
 
   private updateYearlyOutflowsControls(month: number) {
-    this.yearlyOutflows = this.yearlyOutflowsStore.getOutflowForMonth(month);
     this.yearlyOutflowsControls.clear();
+    const savings = this.yearlyOutflowsStore.getSavingsForMonth(month);
+    this.yearlyOutflows = signal(savings().outflows);
     this.yearlyOutflows().forEach((yearlyOutflow) =>
       this.addYearlyOutflow(yearlyOutflow)
     );
