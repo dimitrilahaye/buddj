@@ -7,9 +7,12 @@ export default class TypeOrmYearlyOutflowRepository
   implements YearlyOutflowRepository
 {
   async getAll(): Promise<YearlyOutflows> {
-    const outflows = await YearlyOutflowDao.find();
+    const savings = await YearlyOutflowDao.find();
+    const savingToDomain = savings.map((o) => o.toDomain());
+    const outflows = savingToDomain.filter((s) => s.type === "outflow");
+    const budgets = savingToDomain.filter((s) => s.type === "budget");
 
-    return new YearlyOutflows(outflows.map((o) => o.toDomain()));
+    return new YearlyOutflows(outflows, budgets);
   }
 
   async add(outflow: YearlyOutflow): Promise<YearlyOutflows> {

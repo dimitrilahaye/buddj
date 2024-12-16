@@ -5,10 +5,11 @@ import {
   YearlyOutflowsAddError,
   YearlyOutflowsIdDoesNotExistError,
 } from "../../../../../core/errors/YearlyOutflowsErrors.js";
+import YearlyBudget from "../../../../../core/models/yearly-outflows/YearlyBudget.js";
 
 describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
   describe("#constructor", () => {
-    it("should return a yearly outflows list with right data", () => {
+    it("should return a yearly savings list with right data", () => {
       // given
       const outflows = [
         new YearlyOutflow({
@@ -24,12 +25,22 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows", () => {
           amount: 10,
         }),
       ];
+      const budgets = [
+        new YearlyBudget({
+          id: "id1",
+          month: 1,
+          name: "label",
+          initialBalance: 10,
+        }),
+      ];
 
       // when
-      const yearlyOutflows = new YearlyOutflows(outflows);
+      const yearlyOutflows = new YearlyOutflows(outflows, budgets);
 
       // then
-      expect(yearlyOutflows.getAll()).to.have.length(outflows.length);
+      expect(yearlyOutflows.getAll()).to.have.length(
+        outflows.length + budgets.length
+      );
     });
   });
 

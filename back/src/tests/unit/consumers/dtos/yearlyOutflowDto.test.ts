@@ -2,6 +2,7 @@ import YearlyOutflow from "../../../../core/models/yearly-outflows/YearlyOutflow
 import YearlyOutflows from "../../../../core/models/yearly-outflows/YearlyOutflows.js";
 import yearlyOutflowsDto from "../../../../consumers/api/dtos/yearlyOutflowsDto.js";
 import expect from "../../../test-helpers.js";
+import YearlyBudget from "../../../../core/models/yearly-outflows/YearlyBudget.js";
 
 describe("Unit | Consumers | Dtos | yearlyOutflowsDto", function () {
   it("should return a YearlyOutflows DTO with right data", () => {
@@ -19,32 +20,71 @@ describe("Unit | Consumers | Dtos | yearlyOutflowsDto", function () {
         label: "label",
         amount: 10,
       }),
-      new YearlyOutflow({
+    ];
+    const budgets = [
+      new YearlyBudget({
         id: "id3",
         month: 4,
-        label: "label",
-        amount: 10,
+        name: "label",
+        initialBalance: 10,
       }),
     ];
-    const yearlyOutflows = new YearlyOutflows(outflows);
+
+    const yearlyOutflows = new YearlyOutflows(outflows, budgets);
 
     // when
     const dto = yearlyOutflowsDto(yearlyOutflows);
 
     // then
     expect(dto).to.deep.equal({
-      1: [outflows[0], outflows[1]],
-      2: [],
-      3: [],
-      4: [outflows[2]],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-      10: [],
-      11: [],
-      12: [],
+      1: {
+        outflows: [outflows[0], outflows[1]],
+        budgets: [],
+      },
+      2: {
+        outflows: [],
+        budgets: [],
+      },
+      3: {
+        outflows: [],
+        budgets: [],
+      },
+      4: {
+        outflows: [],
+        budgets: [budgets[0]],
+      },
+      5: {
+        outflows: [],
+        budgets: [],
+      },
+      6: {
+        outflows: [],
+        budgets: [],
+      },
+      7: {
+        outflows: [],
+        budgets: [],
+      },
+      8: {
+        outflows: [],
+        budgets: [],
+      },
+      9: {
+        outflows: [],
+        budgets: [],
+      },
+      10: {
+        outflows: [],
+        budgets: [],
+      },
+      11: {
+        outflows: [],
+        budgets: [],
+      },
+      12: {
+        outflows: [],
+        budgets: [],
+      },
     });
   });
 });

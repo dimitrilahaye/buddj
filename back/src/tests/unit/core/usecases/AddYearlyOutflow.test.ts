@@ -3,6 +3,7 @@ import { yearlyOutflowRepositoryStub } from "./test-helpers.js";
 import AddYearlyOutflow from "../../../../core/usecases/AddYearlyOutflow.js";
 import YearlyOutflows from "../../../../core/models/yearly-outflows/YearlyOutflows.js";
 import sinon from "sinon";
+import YearlyOutflow from "../../../../core/models/yearly-outflows/YearlyOutflow.js";
 
 describe("Unit | Core | Usecases | AddYearlyOutflow", function () {
   it("should call the repository and return the outflows", async () => {
@@ -25,10 +26,10 @@ describe("Unit | Core | Usecases | AddYearlyOutflow", function () {
       amount: 10,
       month: 1,
     };
-    const expectedOutflow = {
+    const expectedOutflow = new YearlyOutflow({
       ...command,
       id: expectedId,
-    };
+    });
 
     // when
     const list = await usecase.execute(command);

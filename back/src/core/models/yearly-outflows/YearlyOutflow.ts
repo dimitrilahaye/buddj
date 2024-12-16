@@ -3,6 +3,7 @@ export default class YearlyOutflow {
   readonly month: number;
   readonly label: string;
   readonly amount: number;
+  readonly type = "outflow";
 
   constructor(props: {
     id: string;
