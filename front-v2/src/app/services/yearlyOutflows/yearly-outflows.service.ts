@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
-import YearlyOutflowsServiceInterface from './yearly-outflows.service.interface';
+import YearlyOutflowsServiceInterface, {
+  getSavingDto,
+} from './yearly-outflows.service.interface';
 import {
   YearlyBudget,
   YearlyOutflow,
@@ -38,8 +40,9 @@ export class YearlyOutflowsService implements YearlyOutflowsServiceInterface {
   }
 
   add(saving: YearlyOutflow | YearlyBudget): Observable<void> {
+    const data = getSavingDto(saving);
     return this.http
-      .post<Response<YearlyOutflows>>(`${this.apiUrl}/yearly-outflows`, saving)
+      .post<Response<YearlyOutflows>>(`${this.apiUrl}/yearly-outflows`, data)
       .pipe(
         tap(({ data }) => this.yearlyOutflowsStore.replaceAll(data)),
         map(() => void 0)
