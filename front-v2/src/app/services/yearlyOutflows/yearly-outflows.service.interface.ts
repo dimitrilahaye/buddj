@@ -1,10 +1,10 @@
 import { InjectionToken } from '@angular/core';
-import { YearlyOutflow } from '../../models/yearlyOutflow.model';
+import { YearlyBudget, YearlyOutflow } from '../../models/yearlyOutflow.model';
 import { Observable } from 'rxjs';
 
 export default interface YearlyOutflowsServiceInterface {
   getAll(): Observable<void>;
-  add(outflow: YearlyOutflow): Observable<void>;
+  add(saving: YearlyOutflow | YearlyBudget): Observable<void>;
   remove(id: string): Observable<void>;
 }
 
