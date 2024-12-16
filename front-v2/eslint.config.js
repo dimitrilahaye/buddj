@@ -15,6 +15,7 @@ module.exports = tseslint.config(
     processor: angular.processInlineTemplates,
     rules: {
       "@angular-eslint/no-output-native": ["warn"],
+      "@angular-eslint/no-output-on-prefix": ["warn"],
       "@angular-eslint/directive-selector": [
         "error",
         {
