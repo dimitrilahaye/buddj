@@ -5,6 +5,7 @@ import IdProvider from "../../../../../providers/IdProvider.js";
 import TypeOrmYearlyOutflowRepository from "../../../../../providers/persistence/repositories/YearlyOutflowRepository.js";
 import YearlyOutflow from "../../../../../core/models/yearly-outflows/YearlyOutflow.js";
 import { YearlyOutflowDao } from "../../../../../providers/persistence/entities/YearlyOutflow.js";
+import YearlyBudget from "../../../../../core/models/yearly-outflows/YearlyBudget.js";
 
 const repository = new TypeOrmYearlyOutflowRepository();
 const idProvider = new IdProvider();
@@ -29,7 +30,7 @@ describe("Integration | Providers | Persistence | Repositories | YearlyOutflowRe
       });
     });
 
-    describe("When there are persisted yearly outflows", function () {
+    describe("When there are persisted yearly outflows and budgets", function () {
       it("should return the list of outflows", async function () {
         // given
         const outflow = new YearlyOutflow({
@@ -40,12 +41,21 @@ describe("Integration | Providers | Persistence | Repositories | YearlyOutflowRe
         });
         await YearlyOutflowDao.save(YearlyOutflowDao.fromDomain(outflow));
 
+        const budget = new YearlyBudget({
+          id: idProvider.get(),
+          name: "label",
+          initialBalance: 10,
+          month: 1,
+        });
+        await YearlyOutflowDao.save(YearlyOutflowDao.fromDomain(budget));
+
         // when
         const list = await repository.getAll();
 
         // then
-        expect(list.getAll()).to.have.length(1);
+        expect(list.getAll()).to.have.length(2);
         expect(list.getAll()[0]).to.deep.equal(outflow);
+        expect(list.getAll()[1]).to.deep.equal(budget);
       });
     });
   });

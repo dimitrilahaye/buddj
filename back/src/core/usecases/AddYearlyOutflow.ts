@@ -1,3 +1,4 @@
+import YearlyOutflow from "../models/yearly-outflows/YearlyOutflow.js";
 import IdProvider from "../ports/providers/IdProvider.js";
 import YearlyOutflowRepository from "../ports/repositories/YearlyOutflowRepository.js";
 
@@ -15,10 +16,10 @@ export default class AddYearlyOutflow {
 
   async execute(command: AddYearlyOutflowCommand) {
     const list = await this.yearlyOutflowRepository.getAll();
-    const outflow = {
+    const outflow = new YearlyOutflow({
       ...command,
       id: this.idProvider.get(),
-    };
+    });
     list.add(outflow);
     return this.yearlyOutflowRepository.add(outflow);
   }

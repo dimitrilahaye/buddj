@@ -20,6 +20,7 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflow", () => {
       expect(outflow.month).to.equal(props.month);
       expect(outflow.label).to.equal(props.label);
       expect(outflow.amount).to.equal(props.amount);
+      expect(outflow.type).to.equal("outflow");
     });
   });
 });
