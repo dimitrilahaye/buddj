@@ -15,6 +15,9 @@ export class YearlyOutflowDao extends BaseEntity {
   @Column({ type: "integer" })
   month: number;
 
+  @Column({ type: "varchar", default: "outflow" })
+  type: string;
+
   static fromDomain(model: YearlyOutflow) {
     return YearlyOutflowDao.create({
       id: model.id,
