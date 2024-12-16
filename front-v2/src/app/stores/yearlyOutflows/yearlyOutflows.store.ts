@@ -23,10 +23,57 @@ export class YearlyOutflowsStore implements YearlyOutflowsStoreInterface {
 
   getSavingsForMonth(month: number): Signal<MonthlySavings> {
     if (this._all() === null) {
-      return signal({
-        budgets: [],
-        outflows: [],
-      });
+      const savings = {
+        1: {
+          budgets: [],
+          outflows: [],
+        },
+        2: {
+          budgets: [],
+          outflows: [],
+        },
+        3: {
+          budgets: [],
+          outflows: [],
+        },
+        4: {
+          budgets: [],
+          outflows: [],
+        },
+        5: {
+          budgets: [],
+          outflows: [],
+        },
+        6: {
+          budgets: [],
+          outflows: [],
+        },
+        7: {
+          budgets: [],
+          outflows: [],
+        },
+        8: {
+          budgets: [],
+          outflows: [],
+        },
+        9: {
+          budgets: [],
+          outflows: [],
+        },
+        10: {
+          budgets: [],
+          outflows: [],
+        },
+        11: {
+          budgets: [],
+          outflows: [],
+        },
+        12: {
+          budgets: [],
+          outflows: [],
+        },
+      };
+      return signal((savings as YearlyOutflows)[month]);
     }
     return signal(this._all()![month]);
   }
