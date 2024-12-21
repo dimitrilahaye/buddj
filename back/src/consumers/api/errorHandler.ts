@@ -10,7 +10,7 @@ const errorHandler = (
   switch (error.name) {
     /** @deprecated */
     case "UpdateExpenseCommandError":
-    case "DeserializationError":
+    case "RequestValidationError":
       statusCode = 400;
       break;
     case "MonthNotFoundError":
@@ -24,7 +24,6 @@ const errorHandler = (
       statusCode = 404;
       break;
     case "AccountInitialBalanceError":
-    case "WeeklyBudgetInitialBalanceError":
     case "WeeklyExpenseAmountError":
     case "TransferBalanceIntoMonthError":
     case "YearlySavingsAddError":

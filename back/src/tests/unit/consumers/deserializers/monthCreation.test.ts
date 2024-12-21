@@ -3,7 +3,7 @@ import deserializer from "../../../../consumers/api/deserializers/monthCreation.
 
 describe("Unit | Consumers | deserializers | monthCreation", function () {
   const body = {
-    month: new Date(),
+    month: new Date().toISOString(),
     startingBalance: 2000,
     outflows: [
       {
@@ -15,6 +15,13 @@ describe("Unit | Consumers | deserializers | monthCreation", function () {
       {
         name: "Semaine 1",
         initialBalance: 200,
+        expenses: [
+          {
+            label: "outlfow",
+            amount: 10.05,
+            date: new Date().toISOString(),
+          },
+        ],
       },
     ],
   };
@@ -25,18 +32,22 @@ describe("Unit | Consumers | deserializers | monthCreation", function () {
 
     // then
     expect(command).to.deep.equal({
-      date: body.month,
+      date: new Date(body.month),
       initialBalance: body.startingBalance,
       outflows: [
         {
-          label: body.outflows[0].label,
-          amount: body.outflows[0].amount,
+          ...body.outflows[0],
         },
       ],
       weeklyBudgets: [
         {
-          name: body.weeklyBudgets[0].name,
-          initialBalance: body.weeklyBudgets[0].initialBalance,
+          ...body.weeklyBudgets[0],
+          expenses: [
+            {
+              ...body.weeklyBudgets[0].expenses[0],
+              date: new Date(body.weeklyBudgets[0].expenses[0].date),
+            },
+          ],
         },
       ],
     });

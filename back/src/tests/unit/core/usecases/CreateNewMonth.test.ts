@@ -20,22 +20,7 @@ describe("Unit | Core | Usecases | CreateNewMonth", function () {
         {
           name: "Semaine 1",
           initialBalance: 200,
-        },
-        {
-          name: "Semaine 2",
-          initialBalance: 200,
-        },
-        {
-          name: "Semaine 3",
-          initialBalance: 200,
-        },
-        {
-          name: "Semaine 4",
-          initialBalance: 200,
-        },
-        {
-          name: "Semaine 5",
-          initialBalance: 200,
+          expenses: [],
         },
       ],
     };
