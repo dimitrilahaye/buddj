@@ -3,7 +3,6 @@ import expect from "../../../test-helpers.js";
 import MonthCreationCommand from "../../../../core/commands/MonthCreationCommand.js";
 import CreateNewMonth from "../../../../core/usecases/CreateNewMonth.js";
 import { monthRepositoryStub } from "./test-helpers.js";
-import { PendingDebitProps } from "../../../../core/models/pending-debit/PendingDebit.js";
 
 describe("Unit | Core | Usecases | CreateNewMonth", function () {
   it("should return a new created month", async function () {
@@ -11,16 +10,6 @@ describe("Unit | Core | Usecases | CreateNewMonth", function () {
     const command: MonthCreationCommand = {
       date: new Date(),
       initialBalance: 2000,
-      pendingDebits: [
-        {
-          id: "8d2eead7-f41d-4e6c-9c52-d0f81c22a21b",
-          monthId: "a8ac22b1-0090-494a-a3fe-9ec2526cf8d1",
-          monthDate: new Date(),
-          label: "label",
-          amount: 10,
-          type: "outflow",
-        } as PendingDebitProps,
-      ],
       outflows: [
         {
           label: "outlfow",

@@ -18,16 +18,6 @@ describe("Unit | Core | Factories | MonthFactory", function () {
       const command = {
         date: new Date(),
         initialBalance: 2000,
-        pendingDebits: [
-          {
-            id: "8d2eead7-f41d-4e6c-9c52-d0f81c22a21b",
-            monthId: "a8ac22b1-0090-494a-a3fe-9ec2526cf8d1",
-            monthDate: new Date(),
-            label: "label",
-            amount: 10,
-            type: "outflow",
-          } as PendingDebitProps,
-        ],
         outflows: [
           {
             label: "outlfow",
@@ -63,7 +53,7 @@ describe("Unit | Core | Factories | MonthFactory", function () {
 
       // then
       expect(month).to.be.instanceof(Month);
-      expect(month.account.outflows).to.have.lengthOf(2);
+      expect(month.account.outflows).to.have.lengthOf(1);
       expect(month.account.weeklyBudgets).to.have.lengthOf(5);
     });
     it("should throw an error if current balance is negative", function () {
@@ -77,16 +67,6 @@ describe("Unit | Core | Factories | MonthFactory", function () {
       const command = {
         date: new Date(),
         initialBalance: -2000,
-        pendingDebits: [
-          {
-            id: "8d2eead7-f41d-4e6c-9c52-d0f81c22a21b",
-            monthId: "a8ac22b1-0090-494a-a3fe-9ec2526cf8d1",
-            monthDate: new Date(),
-            label: "label",
-            amount: 10,
-            type: "outflow",
-          } as PendingDebitProps,
-        ],
         outflows: [
           {
             label: "outlfow",
@@ -133,16 +113,6 @@ describe("Unit | Core | Factories | MonthFactory", function () {
       const command = {
         date: new Date(),
         initialBalance: 0,
-        pendingDebits: [
-          {
-            id: "8d2eead7-f41d-4e6c-9c52-d0f81c22a21b",
-            monthId: "a8ac22b1-0090-494a-a3fe-9ec2526cf8d1",
-            monthDate: new Date(),
-            label: "label",
-            amount: 10,
-            type: "outflow",
-          } as PendingDebitProps,
-        ],
         outflows: [
           {
             label: "outlfow",

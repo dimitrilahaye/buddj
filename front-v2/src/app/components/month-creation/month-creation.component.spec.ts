@@ -21,7 +21,10 @@ describe('MonthCreationComponent', () => {
           outflows: [],
           budgets: [],
         },
-        pendingDebits: [],
+        pendingDebits: {
+          budgets: [],
+          outflows: [],
+        },
       },
     }),
   };
