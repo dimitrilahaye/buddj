@@ -3,9 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   MonthCreationTemplate,
   MonthTemplate,
-  PendingDebit,
 } from '../../models/monthTemplate.model';
 import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
+import {
+  Outflow as PendingOutflow,
+  Budget as PendingBudget,
+} from '../../models/monthTemplate.model';
 import {
   AbstractControl,
   FormArray,
@@ -59,7 +62,7 @@ export class MonthCreationComponent implements OnInit {
   creationLoader = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   amountValueControl: AbstractControl<any, any> | null = null;
-  takeIntoAccountPendingDebits = true;
+  takeIntoAccountPendingOutflows = true;
   outflowsRemovedFromForecastBalance: number[] = [];
   yearlyOutflowDelationModalIsOpen = false;
   yearlyBudgetDelationModalIsOpen = false;
@@ -68,7 +71,7 @@ export class MonthCreationComponent implements OnInit {
   removeIsLoading = false;
   selectedYearlyOutflowIndex: number | null = null;
   selectedYearlyBudgetIndex: number | null = null;
-  selectedPendingDebitIndex: number | null = null;
+  selectedPendingOutflowIndex: number | null = null;
 
   newMonth: Month = {
     month: new Date(),
@@ -125,8 +128,8 @@ export class MonthCreationComponent implements OnInit {
     this.router.navigate(['monthly-templates']);
   }
 
-  togglePendingDebits() {
-    this.takeIntoAccountPendingDebits = !this.takeIntoAccountPendingDebits;
+  togglePendingOutflows() {
+    this.takeIntoAccountPendingOutflows = !this.takeIntoAccountPendingOutflows;
   }
 
   toggleYearlyOutflows() {
@@ -157,6 +160,7 @@ export class MonthCreationComponent implements OnInit {
         [Validators.required, amountValidator()],
       ],
       pendingDebits: this.fb.array([]),
+      pendingOutflows: this.fb.array([]),
       yearlyOutflows: this.fb.array([]),
       yearlyBudgets: this.fb.array([]),
       outflows: this.fb.array([]),
@@ -167,7 +171,9 @@ export class MonthCreationComponent implements OnInit {
     this.newMonth.weeklyBudgets.forEach((weeklyBudget) =>
       this.addWeeklyBudgets(weeklyBudget)
     );
-    this.template?.pendingDebits.forEach((debit) => this.addDebit(debit));
+    this.template?.pendingDebits.outflows.forEach((outflow) =>
+      this.addPendingOutflow(outflow)
+    );
     this.currentSelectedMonth = this.newMonth.month.getMonth() + 1;
     this.updateYearlyOutflowsControls(this.currentSelectedMonth);
     this.updateYearlyBudgetsControls(this.currentSelectedMonth);
@@ -237,14 +243,14 @@ export class MonthCreationComponent implements OnInit {
       },
       0
     );
-    const totalDebits = this.getPendingDebitsTotal();
+    const totalPendingOutflows = this.getPendingOutflowsTotal();
     const totalYearlyOutflows = this.getYearlyOutflowsTotal();
     const totalYearlyBudgets = this.getYearlyBudgetsTotal();
 
     let total = totalOutflows + totalWeeklyBudgets;
 
-    if (this.takeIntoAccountPendingDebits) {
-      total += totalDebits;
+    if (this.takeIntoAccountPendingOutflows) {
+      total += totalPendingOutflows;
     }
     if (this.takeIntoAccountYearlyOutflows) {
       total += totalYearlyOutflows;
@@ -258,8 +264,8 @@ export class MonthCreationComponent implements OnInit {
     return forecastBalance.toFixed(2);
   }
 
-  getPendingDebitsTotal() {
-    return (this.form.value.pendingDebits as PendingDebit[]).reduce(
+  getPendingOutflowsTotal() {
+    return (this.form.value.pendingOutflows as PendingOutflow[]).reduce(
       (total, { amount }) => {
         return total + amount;
       },
@@ -303,16 +309,13 @@ export class MonthCreationComponent implements OnInit {
   ################ Outflows managment ################
   */
 
-  addDebit(debit: PendingDebit) {
+  addPendingOutflow(outflow: PendingOutflow) {
     const debitGroup = this.fb.group({
-      label: [`🛒 ${debit.label}`, Validators.required],
-      amount: [debit.amount, [Validators.required, amountValidator()]],
-      type: [{ value: debit.type, disabled: true }],
-      id: [{ value: debit.id, disabled: true }],
-      monthId: [{ value: debit.monthId, disabled: true }],
-      monthDate: [{ value: debit.monthDate, disabled: true }],
+      label: [`🛒 ${outflow.label}`, Validators.required],
+      amount: [outflow.amount, [Validators.required, amountValidator()]],
+      id: [{ value: outflow.id, disabled: true }],
     });
-    this.pendingDebits.push(debitGroup);
+    this.pendingOutflows.push(debitGroup);
   }
 
   addYearlyOutflow(yearlyOutflow: YearlyOutflow) {
@@ -336,8 +339,8 @@ export class MonthCreationComponent implements OnInit {
     this.yearlyBudgetsControls.push(outflowGroup);
   }
 
-  get pendingDebits(): FormArray {
-    return this.form.get('pendingDebits') as FormArray;
+  get pendingOutflows(): FormArray {
+    return this.form.get('pendingOutflows') as FormArray;
   }
 
   get yearlyOutflowsControls(): FormArray {
@@ -448,19 +451,19 @@ export class MonthCreationComponent implements OnInit {
 
   openPendingDebitDelationModal(index: number, event: Event) {
     this.pendingDebitDelationModalIsOpen = true;
-    this.selectedPendingDebitIndex = index;
+    this.selectedPendingOutflowIndex = index;
     event.stopPropagation();
   }
 
   closePendingDebitDelationModal(event: Event) {
     this.pendingDebitDelationModalIsOpen = false;
-    this.selectedPendingDebitIndex = null;
+    this.selectedPendingOutflowIndex = null;
     event.stopPropagation();
   }
 
-  removePendingDebit(event: Event) {
-    if (this.selectedPendingDebitIndex !== null) {
-      this.pendingDebits.removeAt(this.selectedPendingDebitIndex);
+  removePendingOutflow(event: Event) {
+    if (this.selectedPendingOutflowIndex !== null) {
+      this.pendingOutflows.removeAt(this.selectedPendingOutflowIndex);
       this.closePendingDebitDelationModal(event);
     }
     event.stopPropagation();
@@ -553,10 +556,10 @@ export class MonthCreationComponent implements OnInit {
         name: o.name,
         initialBalance: o.initialBalance,
       }));
+      const pendingOutflows = raw.pendingOutflows;
       raw.outflows.push(...yearlyOutflows);
-      const month: Month & { pendingDebits: PendingDebit[] } = {
-        outflows: raw.outflows,
-        pendingDebits: raw.pendingDebits,
+      const month: Month = {
+        outflows: [...raw.outflows, ...pendingOutflows],
         startingBalance: raw.startingBalance,
         weeklyBudgets: [...yearlyBudgets, ...raw.weeklyBudgets],
         month: this.formatToDate(raw.month),

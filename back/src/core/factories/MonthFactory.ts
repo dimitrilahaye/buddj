@@ -13,26 +13,16 @@ export default class MonthFactory {
     if (command.initialBalance <= 0) {
       throw new AccountInitialBalanceError();
     }
-    const outflows = command.outflows.map((outflow) => {
-      return new AccountOutflow({
-        id: this.idProvider.get(),
-        amount: outflow.amount,
-        label: outflow.label,
-      });
-    });
-    outflows.push(
-      ...command.pendingDebits.map((debit) => {
-        return new AccountOutflow({
-          id: this.idProvider.get(),
-          amount: debit.amount,
-          label: debit.label,
-        });
-      })
-    );
     const account = new Account({
       id: this.idProvider.get(),
       currentBalance: command.initialBalance,
-      outflows: outflows,
+      outflows: command.outflows.map((outflow) => {
+        return new AccountOutflow({
+          id: this.idProvider.get(),
+          amount: outflow.amount,
+          label: outflow.label,
+        });
+      }),
       weeklyBudgets: command.weeklyBudgets.map((weeklyBudget) => {
         return new WeeklyBudget({
           id: this.idProvider.get(),

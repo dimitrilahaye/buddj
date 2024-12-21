@@ -31,7 +31,7 @@
     [variant]="'danger'"
     [label]="'Supprimer la sortie définitivement'"
     [loading]="removeIsLoading"
-    (click)="removePendingDebit($event)"
+    (click)="removePendingOutflow($event)"
   ></app-button>
 </app-modal>
 @if(!dataLoaded) {
@@ -192,30 +192,30 @@
   <!-- 
   ##################### PENDING DEBITS #####################
    -->
-  @if (pendingDebits.controls.length > 0) {
+  @if (pendingOutflows.controls.length > 0) {
   <div
     class="month-creation__step month-creation__step--step_debits"
-    formArrayName="pendingDebits"
+    formArrayName="pendingOutflows"
   >
     <div class="month-creation-step__info">
       Voici les dépenses des mois précédents qui n'ont pas encore été prélevées.
       <br />
       <span class="month-creation-step-info__total">
-        Total : {{ getPendingDebitsTotal() | currency : "EUR" }}
+        Total : {{ getPendingOutflowsTotal() | currency : "EUR" }}
       </span>
       <br />
       <app-button-link
-        (onClick)="togglePendingDebits()"
+        (onClick)="togglePendingOutflows()"
         class="month-creation-step-info__link"
       >
-        @if(takeIntoAccountPendingDebits) { Ne pas les prendre en compte dans le
-        solde prévisionnel } @else { Les prendre en compte dans le solde
+        @if(takeIntoAccountPendingOutflows) { Ne pas les prendre en compte dans
+        le solde prévisionnel } @else { Les prendre en compte dans le solde
         prévisionnel }
       </app-button-link>
     </div>
-    @if(takeIntoAccountPendingDebits) {
+    @if(takeIntoAccountPendingOutflows) {
     <app-item
-      *ngFor="let debit of pendingDebits.controls; let i = index"
+      *ngFor="let debit of pendingOutflows.controls; let i = index"
       [formGroupName]="i"
     >
       <div class="month-creation-item">
