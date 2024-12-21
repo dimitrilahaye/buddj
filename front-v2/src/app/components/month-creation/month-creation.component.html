@@ -1,3 +1,4 @@
+<!-- REMOVE YEARLY OUTFLOW MODAL -->
 <app-modal
   [modalOpen]="yearlyOutflowDelationModalIsOpen"
   (click)="closeYearlyOutflowDelationModal($event)"
@@ -5,11 +6,11 @@
   <app-button
     [size]="'big'"
     [variant]="'danger'"
-    [label]="'Supprimer la sortie définitivement'"
-    [loading]="removeIsLoading"
+    [label]="'Supprimer la sortie'"
     (click)="removeYearlyOutflow($event)"
   ></app-button>
 </app-modal>
+<!-- REMOVE YEARLY BUDGET MODAL -->
 <app-modal
   [modalOpen]="yearlyBudgetDelationModalIsOpen"
   (click)="closeYearlyBudgetDelationModal($event)"
@@ -17,21 +18,32 @@
   <app-button
     [size]="'big'"
     [variant]="'danger'"
-    [label]="'Supprimer la sortie définitivement'"
-    [loading]="removeIsLoading"
+    [label]="'Supprimer le budget'"
     (click)="removeYearlyBudget($event)"
   ></app-button>
 </app-modal>
+<!-- REMOVE PENDING OUTFLOW MODAL -->
 <app-modal
-  [modalOpen]="pendingDebitDelationModalIsOpen"
-  (click)="closePendingDebitDelationModal($event)"
+  [modalOpen]="pendingOutflowsDelationModalIsOpen"
+  (click)="closePendingOutflowDelationModal($event)"
 >
   <app-button
     [size]="'big'"
     [variant]="'danger'"
-    [label]="'Supprimer la sortie définitivement'"
-    [loading]="removeIsLoading"
+    [label]="'Supprimer la sortie'"
     (click)="removePendingOutflow($event)"
+  ></app-button>
+</app-modal>
+<!-- REMOVE PENDING BUDGET MODAL -->
+<app-modal
+  [modalOpen]="pendingBudgetsDelationModalIsOpen"
+  (click)="closePendingBudgetDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer le budget'"
+    (click)="removePendingBudget($event)"
   ></app-button>
 </app-modal>
 @if(!dataLoaded) {
@@ -107,7 +119,7 @@
     </div>
     @if(takeIntoAccountYearlyBudgets) {
     <app-item
-      *ngFor="let outflow of yearlyBudgetsControls.controls; let i = index"
+      *ngFor="let budget of yearlyBudgetsControls.controls; let i = index"
       [formGroupName]="i"
     >
       <div class="month-creation-item">
@@ -116,11 +128,11 @@
         </span>
         <div class="month-creation-item__info">
           <span class="month-creation-item-info__label">{{
-            outflow.get("name")?.value
+            budget.get("name")?.value
           }}</span>
           <span class="month-creation-item-info__amount"
-            >{{ outflow.get("initialBalance")?.value }}€</span
-          >
+            >{{ budget.get("initialBalance")?.value }}€
+          </span>
         </div>
         <button
           class="month-creation-item__delete"
@@ -190,7 +202,65 @@
   }
 
   <!-- 
-  ##################### PENDING DEBITS #####################
+  ##################### PENDING BUDGETS #####################
+   -->
+  @if (pendingBudgets.controls.length > 0) {
+  <div
+    class="month-creation__step month-creation__step--step_debits"
+    formArrayName="pendingBudgets"
+  >
+    <div class="month-creation-step__info">
+      Voici les budgets des mois précédents qui seront transférés dans le
+      nouveau mois.
+      <br />
+      <span class="month-creation-step-info__total">
+        Total : {{ getPendingBudgetsTotal() | currency : "EUR" }}
+      </span>
+      <br />
+      <app-button-link
+        (onClick)="togglePendingBudgets()"
+        class="month-creation-step-info__link"
+      >
+        @if(takeIntoAccountPendingBudgets) { Ne pas les prendre en compte dans
+        le solde prévisionnel } @else { Les prendre en compte dans le solde
+        prévisionnel }
+      </app-button-link>
+    </div>
+    @if(takeIntoAccountPendingBudgets) {
+    <app-item
+      *ngFor="let budget of pendingBudgets.controls; let i = index"
+      [formGroupName]="i"
+    >
+      <div class="month-creation-item">
+        <span class="month-creation-item__icon">
+          <i class="fa-solid fa-basket-shopping"></i>
+        </span>
+        <div class="month-creation-item__info">
+          <span class="month-creation-item-info__label">{{
+            budget.get("name")?.value
+          }}</span>
+          <span class="month-creation-item-info__amount"
+            >{{ budget.get("initialBalance")?.value }}€&nbsp;
+            <span class="month-creation-item-info__label">{{
+              getBudgetExpensesInfo(budget.get("id")?.value)
+            }}</span>
+          </span>
+        </div>
+        <button
+          class="month-creation-item__delete"
+          type="button"
+          (click)="openPendingBudgetDelationModal(i, $event)"
+        >
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    </app-item>
+    }
+  </div>
+  }
+
+  <!-- 
+  ##################### PENDING OUTFLOWS #####################
    -->
   @if (pendingOutflows.controls.length > 0) {
   <div
@@ -198,7 +268,8 @@
     formArrayName="pendingOutflows"
   >
     <div class="month-creation-step__info">
-      Voici les dépenses des mois précédents qui n'ont pas encore été prélevées.
+      Voici les sorties des mois précédents qui seront transférées dans le
+      nouveau mois.
       <br />
       <span class="month-creation-step-info__total">
         Total : {{ getPendingOutflowsTotal() | currency : "EUR" }}
@@ -233,7 +304,7 @@
         <button
           class="month-creation-item__delete"
           type="button"
-          (click)="openPendingDebitDelationModal(i, $event)"
+          (click)="openPendingOutflowDelationModal(i, $event)"
         >
           <i class="fa-solid fa-trash-can"></i>
         </button>
