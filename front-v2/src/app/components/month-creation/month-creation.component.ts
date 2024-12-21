@@ -3,12 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   MonthCreationTemplate,
   MonthTemplate,
-} from '../../models/monthTemplate.model';
-import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
-import {
   Outflow as PendingOutflow,
   Budget as PendingBudget,
+  Budget,
 } from '../../models/monthTemplate.model';
+import { Month, Outflow, WeeklyBudget } from '../../models/month.model';
 import {
   AbstractControl,
   FormArray,
@@ -63,15 +62,18 @@ export class MonthCreationComponent implements OnInit {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   amountValueControl: AbstractControl<any, any> | null = null;
   takeIntoAccountPendingOutflows = true;
+  takeIntoAccountPendingBudgets = true;
   outflowsRemovedFromForecastBalance: number[] = [];
   yearlyOutflowDelationModalIsOpen = false;
   yearlyBudgetDelationModalIsOpen = false;
-  pendingDebitDelationModalIsOpen = false;
+  pendingOutflowsDelationModalIsOpen = false;
+  pendingBudgetsDelationModalIsOpen = false;
   outflowToDelete: AbstractControl<YearlyOutflow> | null = null;
   removeIsLoading = false;
   selectedYearlyOutflowIndex: number | null = null;
   selectedYearlyBudgetIndex: number | null = null;
   selectedPendingOutflowIndex: number | null = null;
+  selectedPendingBudgetIndex: number | null = null;
 
   newMonth: Month = {
     month: new Date(),
@@ -132,6 +134,10 @@ export class MonthCreationComponent implements OnInit {
     this.takeIntoAccountPendingOutflows = !this.takeIntoAccountPendingOutflows;
   }
 
+  togglePendingBudgets() {
+    this.takeIntoAccountPendingBudgets = !this.takeIntoAccountPendingBudgets;
+  }
+
   toggleYearlyOutflows() {
     this.takeIntoAccountYearlyOutflows = !this.takeIntoAccountYearlyOutflows;
   }
@@ -159,8 +165,8 @@ export class MonthCreationComponent implements OnInit {
         this.newMonth.startingBalance,
         [Validators.required, amountValidator()],
       ],
-      pendingDebits: this.fb.array([]),
       pendingOutflows: this.fb.array([]),
+      pendingBudgets: this.fb.array([]),
       yearlyOutflows: this.fb.array([]),
       yearlyBudgets: this.fb.array([]),
       outflows: this.fb.array([]),
@@ -174,6 +180,9 @@ export class MonthCreationComponent implements OnInit {
     this.template?.pendingDebits.outflows.forEach((outflow) =>
       this.addPendingOutflow(outflow)
     );
+    this.template?.pendingDebits.budgets.forEach((budget) =>
+      this.addPendingBudget(budget)
+    );
     this.currentSelectedMonth = this.newMonth.month.getMonth() + 1;
     this.updateYearlyOutflowsControls(this.currentSelectedMonth);
     this.updateYearlyBudgetsControls(this.currentSelectedMonth);
@@ -186,6 +195,18 @@ export class MonthCreationComponent implements OnInit {
         this.updateYearlyBudgetsControls(this.currentSelectedMonth);
       }
     });
+  }
+
+  getBudgetExpensesById(id: string) {
+    const budget = this.template?.pendingDebits.budgets.find(
+      (b) => b.id === id
+    );
+    return budget?.expenses ?? [];
+  }
+
+  getBudgetExpensesInfo(id: string) {
+    const expenses = this.getBudgetExpensesById(id);
+    return `(${expenses.length} dépense${expenses.length > 1 ? 's' : ''})`;
   }
 
   private updateYearlyOutflowsControls(month: number) {
@@ -244,6 +265,7 @@ export class MonthCreationComponent implements OnInit {
       0
     );
     const totalPendingOutflows = this.getPendingOutflowsTotal();
+    const totalPendingBudgets = this.getPendingBudgetsTotal();
     const totalYearlyOutflows = this.getYearlyOutflowsTotal();
     const totalYearlyBudgets = this.getYearlyBudgetsTotal();
 
@@ -251,6 +273,9 @@ export class MonthCreationComponent implements OnInit {
 
     if (this.takeIntoAccountPendingOutflows) {
       total += totalPendingOutflows;
+    }
+    if (this.takeIntoAccountPendingBudgets) {
+      total += totalPendingBudgets;
     }
     if (this.takeIntoAccountYearlyOutflows) {
       total += totalYearlyOutflows;
@@ -268,6 +293,19 @@ export class MonthCreationComponent implements OnInit {
     return (this.form.value.pendingOutflows as PendingOutflow[]).reduce(
       (total, { amount }) => {
         return total + amount;
+      },
+      0
+    );
+  }
+
+  getPendingBudgetsTotal() {
+    return (this.form.getRawValue().pendingBudgets as PendingBudget[]).reduce(
+      (total, budget) => {
+        const totalExpenses = this.getBudgetExpensesById(budget.id).reduce(
+          (totalExpense, expense) => totalExpense + expense.amount,
+          0
+        );
+        return total + budget.initialBalance + totalExpenses;
       },
       0
     );
@@ -311,16 +349,28 @@ export class MonthCreationComponent implements OnInit {
 
   addPendingOutflow(outflow: PendingOutflow) {
     const debitGroup = this.fb.group({
-      label: [`🛒 ${outflow.label}`, Validators.required],
+      label: [outflow.label, Validators.required],
       amount: [outflow.amount, [Validators.required, amountValidator()]],
       id: [{ value: outflow.id, disabled: true }],
     });
     this.pendingOutflows.push(debitGroup);
   }
 
+  addPendingBudget(budget: PendingBudget) {
+    const debitGroup = this.fb.group({
+      name: [budget.name, Validators.required],
+      initialBalance: [
+        budget.initialBalance,
+        [Validators.required, amountValidator()],
+      ],
+      id: [{ value: budget.id, disabled: true }],
+    });
+    this.pendingBudgets.push(debitGroup);
+  }
+
   addYearlyOutflow(yearlyOutflow: YearlyOutflow) {
     const outflowGroup = this.fb.group({
-      label: [`📆 ${yearlyOutflow.label}`, Validators.required],
+      label: [yearlyOutflow.label, Validators.required],
       amount: [yearlyOutflow.amount, [Validators.required, amountValidator()]],
       id: [{ value: yearlyOutflow.id, disabled: true }],
     });
@@ -328,19 +378,23 @@ export class MonthCreationComponent implements OnInit {
   }
 
   addYearlyBudget(yearlyBudget: YearlyBudget) {
-    const outflowGroup = this.fb.group({
-      name: [`📆 ${yearlyBudget.name}`, Validators.required],
+    const budgetGroup = this.fb.group({
+      name: [yearlyBudget.name, Validators.required],
       initialBalance: [
         yearlyBudget.initialBalance,
         [Validators.required, amountValidator()],
       ],
       id: [{ value: yearlyBudget.id, disabled: true }],
     });
-    this.yearlyBudgetsControls.push(outflowGroup);
+    this.yearlyBudgetsControls.push(budgetGroup);
   }
 
   get pendingOutflows(): FormArray {
     return this.form.get('pendingOutflows') as FormArray;
+  }
+
+  get pendingBudgets(): FormArray {
+    return this.form.get('pendingBudgets') as FormArray;
   }
 
   get yearlyOutflowsControls(): FormArray {
@@ -449,14 +503,14 @@ export class MonthCreationComponent implements OnInit {
     event.stopPropagation();
   }
 
-  openPendingDebitDelationModal(index: number, event: Event) {
-    this.pendingDebitDelationModalIsOpen = true;
+  openPendingOutflowDelationModal(index: number, event: Event) {
+    this.pendingOutflowsDelationModalIsOpen = true;
     this.selectedPendingOutflowIndex = index;
     event.stopPropagation();
   }
 
-  closePendingDebitDelationModal(event: Event) {
-    this.pendingDebitDelationModalIsOpen = false;
+  closePendingOutflowDelationModal(event: Event) {
+    this.pendingOutflowsDelationModalIsOpen = false;
     this.selectedPendingOutflowIndex = null;
     event.stopPropagation();
   }
@@ -464,7 +518,27 @@ export class MonthCreationComponent implements OnInit {
   removePendingOutflow(event: Event) {
     if (this.selectedPendingOutflowIndex !== null) {
       this.pendingOutflows.removeAt(this.selectedPendingOutflowIndex);
-      this.closePendingDebitDelationModal(event);
+      this.closePendingOutflowDelationModal(event);
+    }
+    event.stopPropagation();
+  }
+
+  openPendingBudgetDelationModal(index: number, event: Event) {
+    this.pendingBudgetsDelationModalIsOpen = true;
+    this.selectedPendingBudgetIndex = index;
+    event.stopPropagation();
+  }
+
+  closePendingBudgetDelationModal(event: Event) {
+    this.pendingBudgetsDelationModalIsOpen = false;
+    this.selectedPendingBudgetIndex = null;
+    event.stopPropagation();
+  }
+
+  removePendingBudget(event: Event) {
+    if (this.selectedPendingBudgetIndex !== null) {
+      this.pendingBudgets.removeAt(this.selectedPendingBudgetIndex);
+      this.closePendingBudgetDelationModal(event);
     }
     event.stopPropagation();
   }
@@ -557,15 +631,25 @@ export class MonthCreationComponent implements OnInit {
         initialBalance: o.initialBalance,
       }));
       const pendingOutflows = raw.pendingOutflows;
-      raw.outflows.push(...yearlyOutflows);
+      const pendingBudgets = (raw.pendingBudgets as Budget[]).map((budget) => {
+        const expenses = this.getBudgetExpensesById(budget.id);
+        return {
+          ...budget,
+          expenses,
+        };
+      });
       const month: Month = {
-        outflows: [...raw.outflows, ...pendingOutflows],
+        outflows: [...raw.outflows, ...yearlyOutflows, ...pendingOutflows],
         startingBalance: raw.startingBalance,
-        weeklyBudgets: [...yearlyBudgets, ...raw.weeklyBudgets],
+        weeklyBudgets: [
+          ...raw.weeklyBudgets,
+          ...yearlyBudgets,
+          ...pendingBudgets,
+        ],
         month: this.formatToDate(raw.month),
       };
       console.info(month);
-      this.createNewMonth(month);
+      // this.createNewMonth(month);
     } else {
       console.log('Form is invalid');
     }
