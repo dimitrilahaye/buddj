@@ -2,40 +2,25 @@ import MonthCreationCommand, {
   OutflowCreationCommand,
   BudgetCreationCommand,
 } from "../../../core/commands/MonthCreationCommand.js";
-import Koi from "../validators/Koi.js";
-import SerializationError from "../errors/DeserializationError.js";
+import { monthCreationSchema, validSchema } from "../schemas.js";
 
 export type MonthCreationDeserializer = (body: any) => MonthCreationCommand;
 
 const deserializer: MonthCreationDeserializer = (body: any) => {
-  try {
-    Koi.validate(body.month).date();
-    Koi.validate(body.startingBalance).number();
-    Koi.validate(body.outflows).array().notEmpty();
-    Koi.validate(body.weeklyBudgets).array().notEmpty();
-    body.outflows.forEach((outflow: OutflowCreationCommand) => {
-      Koi.validate(outflow.amount).number();
-      Koi.validate(outflow.label).string().notEmpty();
-    });
-    body.weeklyBudgets.forEach((weeklyBudget: BudgetCreationCommand) => {
-      Koi.validate(weeklyBudget.initialBalance).number();
-      Koi.validate(weeklyBudget.name).string().notEmpty();
-    });
-  } catch (e: any) {
-    throw new SerializationError("monthCreation", e.message);
-  }
+  const data = validSchema(monthCreationSchema, body);
 
   return {
-    date: body.month,
-    initialBalance: body.startingBalance,
-    outflows: body.outflows.map((outflow: OutflowCreationCommand) => ({
+    date: data.month,
+    initialBalance: data.startingBalance,
+    outflows: data.outflows.map((outflow: OutflowCreationCommand) => ({
       label: outflow.label,
       amount: outflow.amount,
     })),
-    weeklyBudgets: body.weeklyBudgets.map(
+    weeklyBudgets: data.weeklyBudgets.map(
       (weeklyBudget: BudgetCreationCommand) => ({
         name: weeklyBudget.name,
         initialBalance: weeklyBudget.initialBalance,
+        expenses: weeklyBudget.expenses,
       })
     ),
   };

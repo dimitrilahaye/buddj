@@ -5,6 +5,7 @@ import AccountOutflow from "../models/month/account/AccountOutflow.js";
 import WeeklyBudget from "../models/month/account/WeeklyBudget.js";
 import { AccountInitialBalanceError } from "../errors/AccountErrors.js";
 import IdProvider from "../ports/providers/IdProvider.js";
+import WeeklyExpense from "../models/month/account/WeeklyExpense.js";
 
 export default class MonthFactory {
   constructor(public readonly idProvider: IdProvider) {}
@@ -28,6 +29,17 @@ export default class MonthFactory {
           id: this.idProvider.get(),
           initialBalance: weeklyBudget.initialBalance,
           name: weeklyBudget.name,
+          expenses:
+            weeklyBudget.expenses?.map(
+              (expense) =>
+                new WeeklyExpense({
+                  id: this.idProvider.get(),
+                  amount: expense.amount,
+                  date: expense.date,
+                  label: expense.label,
+                  isChecked: false,
+                })
+            ) ?? [],
         });
       }),
     });

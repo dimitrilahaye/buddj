@@ -3,7 +3,6 @@ import sinon from "sinon";
 import Month from "../../../../core/models/month/Month.js";
 import MonthFactory from "../../../../core/factories/MonthFactory.js";
 import { AccountInitialBalanceError } from "../../../../core/errors/AccountErrors.js";
-import { PendingDebitProps } from "../../../../core/models/pending-debit/PendingDebit.js";
 
 describe("Unit | Core | Factories | MonthFactory", function () {
   describe("#create", function () {
@@ -28,22 +27,7 @@ describe("Unit | Core | Factories | MonthFactory", function () {
           {
             name: "Semaine 1",
             initialBalance: 200,
-          },
-          {
-            name: "Semaine 2",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 3",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 4",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 5",
-            initialBalance: 200,
+            expenses: [],
           },
         ],
       };
@@ -54,7 +38,7 @@ describe("Unit | Core | Factories | MonthFactory", function () {
       // then
       expect(month).to.be.instanceof(Month);
       expect(month.account.outflows).to.have.lengthOf(1);
-      expect(month.account.weeklyBudgets).to.have.lengthOf(5);
+      expect(month.account.weeklyBudgets).to.have.lengthOf(1);
     });
     it("should throw an error if current balance is negative", function () {
       // given
@@ -77,22 +61,7 @@ describe("Unit | Core | Factories | MonthFactory", function () {
           {
             name: "Semaine 1",
             initialBalance: 200,
-          },
-          {
-            name: "Semaine 2",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 3",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 4",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 5",
-            initialBalance: 200,
+            expenses: [],
           },
         ],
       };
@@ -123,22 +92,7 @@ describe("Unit | Core | Factories | MonthFactory", function () {
           {
             name: "Semaine 1",
             initialBalance: 200,
-          },
-          {
-            name: "Semaine 2",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 3",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 4",
-            initialBalance: 200,
-          },
-          {
-            name: "Semaine 5",
-            initialBalance: 200,
+            expenses: [],
           },
         ],
       };

@@ -1,10 +1,7 @@
 import expect from "../../../../../test-helpers.js";
 import sinon from "sinon";
 import WeeklyBudget from "../../../../../../core/models/month/account/WeeklyBudget.js";
-import {
-  AccountBudgetNameCantBeEmptyError,
-  WeeklyBudgetInitialBalanceError,
-} from "../../../../../../core/errors/WeeklyBudgetErrors.js";
+import { AccountBudgetNameCantBeEmptyError } from "../../../../../../core/errors/WeeklyBudgetErrors.js";
 import WeeklyExpense from "../../../../../../core/models/month/account/WeeklyExpense.js";
 import { WeeklyExpenseNotFoundError } from "../../../../../../core/errors/WeeklyExpenseErrors.js";
 
@@ -142,32 +139,6 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
         endAt: null,
         expenses: [],
       });
-    });
-    it("should throw an error if current balance is negative", function () {
-      // given
-      const props = {
-        id: "uuid",
-        name: "Semaine 1",
-        initialBalance: -200,
-      };
-
-      // when / then
-      expect(() => new WeeklyBudget(props)).to.throw(
-        WeeklyBudgetInitialBalanceError
-      );
-    });
-    it("should throw an error if current balance is 0", function () {
-      // given
-      const props = {
-        id: "uuid",
-        name: "Semaine 1",
-        initialBalance: 0,
-      };
-
-      // when / then
-      expect(() => new WeeklyBudget(props)).to.throw(
-        WeeklyBudgetInitialBalanceError
-      );
     });
   });
   describe("#addExpense", function () {

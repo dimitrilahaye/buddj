@@ -1,7 +1,4 @@
-import {
-  AccountBudgetNameCantBeEmptyError,
-  WeeklyBudgetInitialBalanceError,
-} from "../../../errors/WeeklyBudgetErrors.js";
+import { AccountBudgetNameCantBeEmptyError } from "../../../errors/WeeklyBudgetErrors.js";
 import WeeklyExpense from "./WeeklyExpense.js";
 import { WeeklyExpenseNotFoundError } from "../../../errors/WeeklyExpenseErrors.js";
 
@@ -20,9 +17,6 @@ export default class WeeklyBudget {
     initialBalance: number;
     expenses?: WeeklyExpense[];
   }) {
-    if (props.initialBalance <= 0) {
-      throw new WeeklyBudgetInitialBalanceError();
-    }
     this.initialBalance = props.initialBalance;
     this.id = props.id;
     if (props.name.length === 0) {
