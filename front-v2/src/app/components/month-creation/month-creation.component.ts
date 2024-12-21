@@ -31,7 +31,7 @@ import {
   YEARLY_OUTFLOWS_STORE,
   type YearlyOutflowsStoreInterface,
 } from '../../stores/yearlyOutflows/yearlyOutflows.store.interface';
-import { YearlyOutflow } from '../../models/yearlyOutflow.model';
+import { YearlyBudget, YearlyOutflow } from '../../models/yearlyOutflow.model';
 import { HeaderBackButtonComponent } from '../header-back-button/header-back-button.component';
 
 @Component({
@@ -62,10 +62,12 @@ export class MonthCreationComponent implements OnInit {
   takeIntoAccountPendingDebits = true;
   outflowsRemovedFromForecastBalance: number[] = [];
   yearlyOutflowDelationModalIsOpen = false;
+  yearlyBudgetDelationModalIsOpen = false;
   pendingDebitDelationModalIsOpen = false;
   outflowToDelete: AbstractControl<YearlyOutflow> | null = null;
   removeIsLoading = false;
   selectedYearlyOutflowIndex: number | null = null;
+  selectedYearlyBudgetIndex: number | null = null;
   selectedPendingDebitIndex: number | null = null;
 
   newMonth: Month = {
@@ -75,8 +77,10 @@ export class MonthCreationComponent implements OnInit {
     outflows: [],
   };
   yearlyOutflows: Signal<YearlyOutflow[]> = signal([]);
+  yearlyBudgets: Signal<YearlyBudget[]> = signal([]);
   currentSelectedMonth: number | null = null;
   takeIntoAccountYearlyOutflows = true;
+  takeIntoAccountYearlyBudgets = true;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -129,6 +133,10 @@ export class MonthCreationComponent implements OnInit {
     this.takeIntoAccountYearlyOutflows = !this.takeIntoAccountYearlyOutflows;
   }
 
+  toggleYearlyBudgets() {
+    this.takeIntoAccountYearlyBudgets = !this.takeIntoAccountYearlyBudgets;
+  }
+
   toggleVisibilityForOutflowWithIndex(index: number) {
     if (this.outflowsRemovedFromForecastBalance.includes(index)) {
       this.outflowsRemovedFromForecastBalance =
@@ -150,6 +158,7 @@ export class MonthCreationComponent implements OnInit {
       ],
       pendingDebits: this.fb.array([]),
       yearlyOutflows: this.fb.array([]),
+      yearlyBudgets: this.fb.array([]),
       outflows: this.fb.array([]),
       weeklyBudgets: this.fb.array([]),
     });
@@ -161,12 +170,14 @@ export class MonthCreationComponent implements OnInit {
     this.template?.pendingDebits.forEach((debit) => this.addDebit(debit));
     this.currentSelectedMonth = this.newMonth.month.getMonth() + 1;
     this.updateYearlyOutflowsControls(this.currentSelectedMonth);
+    this.updateYearlyBudgetsControls(this.currentSelectedMonth);
 
     this.form.valueChanges.subscribe((value) => {
       const month = Number(value.month.split('-').at(-1));
       if (this.currentSelectedMonth !== month) {
         this.currentSelectedMonth = month;
         this.updateYearlyOutflowsControls(this.currentSelectedMonth);
+        this.updateYearlyBudgetsControls(this.currentSelectedMonth);
       }
     });
   }
@@ -177,6 +188,15 @@ export class MonthCreationComponent implements OnInit {
     this.yearlyOutflows = signal(savings().outflows);
     this.yearlyOutflows().forEach((yearlyOutflow) =>
       this.addYearlyOutflow(yearlyOutflow)
+    );
+  }
+
+  private updateYearlyBudgetsControls(month: number) {
+    this.yearlyBudgetsControls.clear();
+    const savings = this.yearlyOutflowsStore.getSavingsForMonth(month);
+    this.yearlyBudgets = signal(savings().budgets);
+    this.yearlyBudgets().forEach((yearlyBudget) =>
+      this.addYearlyBudget(yearlyBudget)
     );
   }
 
@@ -219,6 +239,7 @@ export class MonthCreationComponent implements OnInit {
     );
     const totalDebits = this.getPendingDebitsTotal();
     const totalYearlyOutflows = this.getYearlyOutflowsTotal();
+    const totalYearlyBudgets = this.getYearlyBudgetsTotal();
 
     let total = totalOutflows + totalWeeklyBudgets;
 
@@ -227,6 +248,9 @@ export class MonthCreationComponent implements OnInit {
     }
     if (this.takeIntoAccountYearlyOutflows) {
       total += totalYearlyOutflows;
+    }
+    if (this.takeIntoAccountYearlyBudgets) {
+      total += totalYearlyBudgets;
     }
 
     const forecastBalance = (this.form.value as Month).startingBalance - total;
@@ -247,6 +271,15 @@ export class MonthCreationComponent implements OnInit {
     return (this.form.value.yearlyOutflows as YearlyOutflow[]).reduce(
       (total, { amount }) => {
         return total + amount;
+      },
+      0
+    );
+  }
+
+  getYearlyBudgetsTotal() {
+    return (this.form.value.yearlyBudgets as YearlyBudget[]).reduce(
+      (total, { initialBalance }) => {
+        return total + initialBalance;
       },
       0
     );
@@ -291,12 +324,28 @@ export class MonthCreationComponent implements OnInit {
     this.yearlyOutflowsControls.push(outflowGroup);
   }
 
+  addYearlyBudget(yearlyBudget: YearlyBudget) {
+    const outflowGroup = this.fb.group({
+      name: [`📆 ${yearlyBudget.name}`, Validators.required],
+      initialBalance: [
+        yearlyBudget.initialBalance,
+        [Validators.required, amountValidator()],
+      ],
+      id: [{ value: yearlyBudget.id, disabled: true }],
+    });
+    this.yearlyBudgetsControls.push(outflowGroup);
+  }
+
   get pendingDebits(): FormArray {
     return this.form.get('pendingDebits') as FormArray;
   }
 
   get yearlyOutflowsControls(): FormArray {
     return this.form.get('yearlyOutflows') as FormArray;
+  }
+
+  get yearlyBudgetsControls(): FormArray {
+    return this.form.get('yearlyBudgets') as FormArray;
   }
 
   addOutflow(outflow: Outflow) {
@@ -373,6 +422,26 @@ export class MonthCreationComponent implements OnInit {
     if (this.selectedYearlyOutflowIndex !== null) {
       this.yearlyOutflowsControls.removeAt(this.selectedYearlyOutflowIndex);
       this.closeYearlyOutflowDelationModal(event);
+    }
+    event.stopPropagation();
+  }
+
+  openYearlyBudgetDelationModal(index: number, event: Event) {
+    this.yearlyBudgetDelationModalIsOpen = true;
+    this.selectedYearlyBudgetIndex = index;
+    event.stopPropagation();
+  }
+
+  closeYearlyBudgetDelationModal(event: Event) {
+    this.yearlyBudgetDelationModalIsOpen = false;
+    this.selectedYearlyBudgetIndex = null;
+    event.stopPropagation();
+  }
+
+  removeYearlyBudget(event: Event) {
+    if (this.selectedYearlyBudgetIndex !== null) {
+      this.yearlyBudgetsControls.removeAt(this.selectedYearlyBudgetIndex);
+      this.closeYearlyBudgetDelationModal(event);
     }
     event.stopPropagation();
   }
@@ -480,14 +549,19 @@ export class MonthCreationComponent implements OnInit {
         label: o.label,
         amount: o.amount,
       }));
+      const yearlyBudgets = raw.yearlyBudgets.map((o: YearlyBudget) => ({
+        name: o.name,
+        initialBalance: o.initialBalance,
+      }));
       raw.outflows.push(...yearlyOutflows);
       const month: Month & { pendingDebits: PendingDebit[] } = {
         outflows: raw.outflows,
         pendingDebits: raw.pendingDebits,
         startingBalance: raw.startingBalance,
-        weeklyBudgets: raw.weeklyBudgets,
+        weeklyBudgets: [...yearlyBudgets, ...raw.weeklyBudgets],
         month: this.formatToDate(raw.month),
       };
+      console.info(month);
       this.createNewMonth(month);
     } else {
       console.log('Form is invalid');

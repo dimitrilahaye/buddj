@@ -11,6 +11,18 @@
   ></app-button>
 </app-modal>
 <app-modal
+  [modalOpen]="yearlyBudgetDelationModalIsOpen"
+  (click)="closeYearlyBudgetDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer la sortie définitivement'"
+    [loading]="removeIsLoading"
+    (click)="removeYearlyBudget($event)"
+  ></app-button>
+</app-modal>
+<app-modal
   [modalOpen]="pendingDebitDelationModalIsOpen"
   (click)="closePendingDebitDelationModal($event)"
 >
@@ -68,6 +80,60 @@
   <!-- 
   ##################### STEP 2 #####################
    -->
+
+  <!-- 
+  ##################### YEARLY BUDGETS #####################
+   -->
+  @if (yearlyBudgetsControls.controls.length > 0) {
+  <div
+    class="month-creation__step month-creation__step--step_debits"
+    formArrayName="yearlyBudgets"
+  >
+    <div class="month-creation-step__info">
+      Voici les budgets annuels qui concernent le mois sélectionné
+      <br />
+      <span class="month-creation-step-info__total">
+        Total : {{ getYearlyBudgetsTotal() | currency : "EUR" }}
+      </span>
+      <br />
+      <app-button-link
+        (onClick)="toggleYearlyBudgets()"
+        class="month-creation-step-info__link"
+      >
+        @if(takeIntoAccountYearlyBudgets) { Ne pas les prendre en compte dans le
+        solde prévisionnel } @else { Les prendre en compte dans le solde
+        prévisionnel }
+      </app-button-link>
+    </div>
+    @if(takeIntoAccountYearlyBudgets) {
+    <app-item
+      *ngFor="let outflow of yearlyBudgetsControls.controls; let i = index"
+      [formGroupName]="i"
+    >
+      <div class="month-creation-item">
+        <span class="month-creation-item__icon">
+          <i class="fa-solid fa-basket-shopping"></i>
+        </span>
+        <div class="month-creation-item__info">
+          <span class="month-creation-item-info__label">{{
+            outflow.get("name")?.value
+          }}</span>
+          <span class="month-creation-item-info__amount"
+            >{{ outflow.get("initialBalance")?.value }}€</span
+          >
+        </div>
+        <button
+          class="month-creation-item__delete"
+          type="button"
+          (click)="openYearlyBudgetDelationModal(i, $event)"
+        >
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    </app-item>
+    }
+  </div>
+  }
 
   <!-- 
   ##################### YEARLY OUTFLOWS #####################
@@ -209,11 +275,11 @@
           (clicked)="toggleVisibilityForOutflowWithIndex(i)"
         ></app-toggle-visibility-button>
         <button
-          class="month-creation-item__edit"
+          class="month-creation-item__delete"
           type="button"
           (click)="openOutflowsModal(i, $event)"
         >
-          <i class="fa-solid fa-pen-fancy"></i>
+          <i class="fa-solid fa-edit"></i>
         </button>
       </div>
     </app-item>
@@ -247,11 +313,11 @@
         </div>
 
         <button
-          class="month-creation-item__edit"
+          class="month-creation-item__delete"
           type="button"
           (click)="openWeeklyBudgetsModal(i, $event)"
         >
-          <i class="fa-solid fa-pen-fancy"></i>
+          <i class="fa-solid fa-edit"></i>
         </button>
       </div>
     </app-item>
@@ -317,14 +383,14 @@
       <div class="modal-container__actions">
         <app-button
           class="login-page__login-button"
-          [label]="'Supprimer'"
+          [label]="'Annuler'"
           [variant]="'danger'"
           (click)="deleteOutflow($event)"
         ></app-button>
         <app-button
           class="login-page__login-button"
           [type]="'submit'"
-          [label]="'Modifier'"
+          [label]="'Ajouter'"
         ></app-button>
       </div>
     </div>
