@@ -1,3 +1,5 @@
+import { Expense } from './monthlyBudget.model';
+
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 export type MonthTemplate = {
   id: string;
@@ -13,6 +15,7 @@ export type Budget = {
   id: string;
   name: string;
   initialBalance: number;
+  expenses?: Expense[];
 };
 
 export type Outflow = {
@@ -22,16 +25,10 @@ export type Outflow = {
   isChecked: boolean;
 };
 
-export type PendingDebit = {
-  id: string;
-  monthId: string;
-  monthDate: Date;
-  label: string;
-  amount: number;
-  type: 'outflow' | 'expense';
-};
-
 export type MonthCreationTemplate = {
   template: MonthTemplate;
-  pendingDebits: PendingDebit[];
+  pendingDebits: {
+    outflows: Outflow[];
+    budgets: Budget[];
+  };
 };

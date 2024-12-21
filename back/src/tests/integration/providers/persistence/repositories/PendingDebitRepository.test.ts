@@ -11,7 +11,7 @@ import WeeklyBudget from "../../../../../core/models/month/account/WeeklyBudget.
 import WeeklyExpense from "../../../../../core/models/month/account/WeeklyExpense.js";
 import { MonthDao } from "../../../../../providers/persistence/entities/Month.js";
 
-describe.only("Integration | Providers | Persistence | Repositories | PendingDebitRepository", () => {
+describe("Integration | Providers | Persistence | Repositories | PendingDebitRepository", () => {
   afterEach(async () => {
     await clearDB();
   });

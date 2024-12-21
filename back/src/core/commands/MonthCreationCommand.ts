@@ -1,5 +1,3 @@
-import { PendingDebitProps } from "../models/pending-debit/PendingDebit.js";
-
 export type OutflowCreationCommand = {
   label: string;
   amount: number;
@@ -13,7 +11,6 @@ interface MonthCreationCommand {
   initialBalance: number;
   outflows: OutflowCreationCommand[];
   weeklyBudgets: BudgetCreationCommand[];
-  pendingDebits: PendingDebitProps[];
 }
 
 export default MonthCreationCommand;
