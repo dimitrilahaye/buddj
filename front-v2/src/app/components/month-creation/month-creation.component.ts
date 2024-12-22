@@ -35,6 +35,7 @@ import {
 } from '../../stores/yearlyOutflows/yearlyOutflows.store.interface';
 import { YearlyBudget, YearlyOutflow } from '../../models/yearlyOutflow.model';
 import { HeaderBackButtonComponent } from '../header-back-button/header-back-button.component';
+import { ShortDatePipe } from '../../pipes/short-date/short-date.pipe';
 
 @Component({
   selector: 'app-month-creation',
@@ -45,6 +46,7 @@ import { HeaderBackButtonComponent } from '../header-back-button/header-back-but
     DesignSystemModule,
     ToggleVisibilityButtonComponent,
     HeaderBackButtonComponent,
+    ShortDatePipe,
   ],
   templateUrl: './month-creation.component.html',
   styleUrl: './month-creation.component.scss',
@@ -350,6 +352,7 @@ export class MonthCreationComponent implements OnInit {
       label: [outflow.label, Validators.required],
       amount: [outflow.amount, [Validators.required, amountValidator()]],
       id: [{ value: outflow.id, disabled: true }],
+      pendingFrom: [{ value: outflow.pendingFrom, disabled: true }],
     });
     this.pendingOutflows.push(debitGroup);
   }
@@ -357,6 +360,7 @@ export class MonthCreationComponent implements OnInit {
   addPendingBudget(budget: PendingBudget) {
     const debitGroup = this.fb.group({
       name: [budget.name, Validators.required],
+      pendingFrom: [{ value: budget.pendingFrom, disabled: true }],
       currentBalance: [
         budget.currentBalance,
         [Validators.required, amountValidator()],
@@ -650,6 +654,7 @@ export class MonthCreationComponent implements OnInit {
         ],
         month: this.formatToDate(raw.month),
       };
+      console.info(month);
       this.createNewMonth(month);
     } else {
       console.log('Form is invalid');

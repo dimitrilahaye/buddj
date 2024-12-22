@@ -9,10 +9,12 @@ export type Month = {
 export type WeeklyBudget = {
   name: string;
   initialBalance: number;
+  pendingFrom?: Date | null;
 };
 
 export type Outflow = {
   amount: number;
   label: string;
   isChecked: boolean;
+  pendingFrom?: Date | null;
 };

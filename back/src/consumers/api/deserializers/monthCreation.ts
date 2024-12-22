@@ -15,12 +15,14 @@ const deserializer: MonthCreationDeserializer = (body: any) => {
     outflows: data.outflows.map((outflow: OutflowCreationCommand) => ({
       label: outflow.label,
       amount: outflow.amount,
+      pendingFrom: outflow.pendingFrom ?? null,
     })),
     weeklyBudgets: data.weeklyBudgets.map(
       (weeklyBudget: BudgetCreationCommand) => ({
         name: weeklyBudget.name,
         initialBalance: weeklyBudget.initialBalance,
         expenses: weeklyBudget.expenses,
+        pendingFrom: weeklyBudget.pendingFrom ?? null,
       })
     ),
   };

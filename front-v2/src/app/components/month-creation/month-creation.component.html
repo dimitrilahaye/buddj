@@ -236,14 +236,19 @@
           <i class="fa-solid fa-basket-shopping"></i>
         </span>
         <div class="month-creation-item__info">
-          <span class="month-creation-item-info__label">{{
-            budget.get("name")?.value
-          }}</span>
+          <div class="month-creation-item-info__container">
+            <span class="month-creation-item-info__label"
+              >{{ budget.get("name")?.value }}
+            </span>
+            <span class="month-creation-item-info__pending"
+              >({{ budget.get("pendingFrom")?.value | shortDate }})</span
+            >
+          </div>
           <span class="month-creation-item-info__amount"
-            >{{ budget.get("currentBalance")?.value }}€&nbsp;
-            <span class="month-creation-item-info__label">{{
-              getBudgetExpensesInfo(budget.get("id")?.value)
-            }}</span>
+            >{{ budget.get("currentBalance")?.value }}€
+            <span class="month-creation-item-info__pending"
+              >&nbsp;{{ getBudgetExpensesInfo(budget.get("id")?.value) }}</span
+            >
           </span>
         </div>
         <button
@@ -294,9 +299,14 @@
           <i class="fa-solid fa-money-bill-transfer"></i>
         </span>
         <div class="month-creation-item__info">
-          <span class="month-creation-item-info__label">{{
-            debit.get("label")?.value
-          }}</span>
+          <div class="month-creation-item-info__container">
+            <span class="month-creation-item-info__label"
+              >{{ debit.get("label")?.value }}
+            </span>
+            <span class="month-creation-item-info__pending"
+              >({{ debit.get("pendingFrom")?.value | shortDate }})</span
+            >
+          </div>
           <span class="month-creation-item-info__amount"
             >{{ debit.get("amount")?.value }}€</span
           >
@@ -333,7 +343,7 @@
           <i class="fa-solid fa-money-bill-transfer"></i>
         </span>
         <div class="month-creation-item__info">
-          <span class="month-creation-item-info__label">{{
+          <span class="month-creation-item-info__label-simple">{{
             outflow.get("label")?.value
           }}</span>
           <span class="month-creation-item-info__amount"
@@ -375,7 +385,7 @@
           <i class="fa-solid fa-basket-shopping"></i>
         </span>
         <div class="month-creation-item__info">
-          <span class="month-creation-item-info__label">{{
+          <span class="month-creation-item-info__label-simple">{{
             weeklyBudget.get("name")?.value
           }}</span>
           <span class="month-creation-item-info__amount"

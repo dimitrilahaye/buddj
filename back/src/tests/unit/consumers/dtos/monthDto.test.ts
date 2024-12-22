@@ -90,26 +90,31 @@ describe("Unit | Consumers | Dtos | monthDto", function () {
           forecastBalance: 970,
           weeklyBudgets: [
             {
+              weekId: "uuid",
               weekName: "Semaine 1",
               initialBalance: 200,
               currentBalance: 170,
             },
             {
+              weekId: "uuid",
               weekName: "Semaine 2",
               initialBalance: 200,
               currentBalance: 200,
             },
             {
+              weekId: "uuid",
               weekName: "Semaine 3",
               initialBalance: 200,
               currentBalance: 200,
             },
             {
+              weekId: "uuid",
               weekName: "Semaine 4",
               initialBalance: 200,
               currentBalance: 200,
             },
             {
+              weekId: "uuid",
               weekName: "Semaine 5",
               initialBalance: 200,
               currentBalance: 200,
@@ -126,12 +131,14 @@ describe("Unit | Consumers | Dtos | monthDto", function () {
             amount: 10.05,
             label: "outlfow",
             isChecked: true,
+            pendingFrom: null,
           },
         ],
         weeklyBudgets: [
           {
             id: "uuid",
             name: "Semaine 1",
+            pendingFrom: null,
             expenses: [
               {
                 id: "uuid",
@@ -150,21 +157,25 @@ describe("Unit | Consumers | Dtos | monthDto", function () {
           {
             id: "uuid",
             name: "Semaine 2",
+            pendingFrom: null,
             expenses: [],
           },
           {
             id: "uuid",
             name: "Semaine 3",
+            pendingFrom: null,
             expenses: [],
           },
           {
             id: "uuid",
             name: "Semaine 4",
+            pendingFrom: null,
             expenses: [],
           },
           {
             id: "uuid",
             name: "Semaine 5",
+            pendingFrom: null,
             expenses: [],
           },
         ],

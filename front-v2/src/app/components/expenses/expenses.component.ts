@@ -39,6 +39,7 @@ import { TransferData } from '../transfer-modals/transfer-choice/transfer-choice
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
+import { ShortDatePipe } from '../../pipes/short-date/short-date.pipe';
 
 @Component({
   selector: 'app-expenses',
@@ -48,6 +49,7 @@ import ToasterServiceInterface, {
     CommonModule,
     DesignSystemModule,
     TransferChoiceComponent,
+    ShortDatePipe,
   ],
   templateUrl: './expenses.component.html',
   styleUrl: './expenses.component.scss',
@@ -181,7 +183,7 @@ export class ExpensesComponent implements AfterViewInit {
     return this.budgetsUnfolded ? 'Tout replier' : 'Tout déplier';
   }
 
-  geBudgetsInfos(weekId: string) {
+  getBudgetsInfos(weekId: string) {
     const expensesForWeekId = this.getExpensesByWeekId(weekId);
     const totalExpenses = expensesForWeekId.length;
     const checkedExpenses = expensesForWeekId.filter(
@@ -211,18 +213,58 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
-  getCurrentBalanceByWeekName(weekName: string) {
-    return this.getDashboardWeeklyBudgetByName(weekName)?.currentBalance ?? 0;
+  getCurrentBalanceByWeekId(weekId: string) {
+    return this.getDashboardWeeklyBudgetById(weekId)?.currentBalance ?? 0;
   }
 
-  getInitialBalanceByWeekName(weekName: string) {
-    return this.getDashboardWeeklyBudgetByName(weekName)?.initialBalance ?? 0;
-  }
-
-  private getDashboardWeeklyBudgetByName(weekName: string) {
-    return this.month()?.dashboard.weeks.weeklyBudgets.find(
-      (w) => w.weekName === weekName
+  getPendingInfo(weekId: string) {
+    const budget = this.month()?.account.weeklyBudgets.find(
+      (b) => b.id === weekId
     );
+    if (budget) {
+      return budget.pendingFrom
+        ? new Date(budget.pendingFrom)?.toISOString()
+        : null;
+    }
+    return null;
+  }
+
+  getInitialBalanceByWeekId(weekId: string) {
+    return this.getDashboardWeeklyBudgetById(weekId)?.initialBalance ?? 0;
+  }
+
+  private getDashboardWeeklyBudgetById(weekId: string) {
+    return this.month()?.dashboard.weeks.weeklyBudgets.find(
+      (w) => w.weekId === weekId
+    );
+  }
+
+  private sortBudgets(
+    a: {
+      id: string;
+      name: string;
+      expensesId: string[];
+      pendingFrom?: Date | null;
+    },
+    b: {
+      id: string;
+      name: string;
+      expensesId: string[];
+      pendingFrom?: Date | null;
+    }
+  ) {
+    if (!a.pendingFrom && b.pendingFrom) return 1; // a après b
+    if (a.pendingFrom && !b.pendingFrom) return -1; // a avant b
+
+    // Deuxième critère : si les deux ont des dates, on les trie par date
+    if (a.pendingFrom && b.pendingFrom) {
+      return (
+        new Date(a.pendingFrom).getTime() - new Date(b.pendingFrom).getTime()
+      );
+    }
+
+    // Troisième critère : si les deux sont null, ou ont la même date, trie par name
+    return a.name.localeCompare(b.name);
   }
 
   private setForm() {
@@ -233,10 +275,11 @@ export class ExpensesComponent implements AfterViewInit {
           return {
             id: w.id,
             name: w.name,
+            pendingFrom: w.pendingFrom,
             expensesId: w.expenses.map((e) => e.id),
           };
         })
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort(this.sortBudgets);
       this.form = this.fb.group({
         expenses: this.fb.array([]),
       });

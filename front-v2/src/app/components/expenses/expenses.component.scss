@@ -7,6 +7,12 @@
   flex-direction: column;
   gap: 20px;
   padding-bottom: 40px;
+    
+  &__pending {
+    @extend %text-5;
+
+    color: var(--color-800);
+  }
 
   &__header {
     display: flex;
@@ -39,6 +45,10 @@
       white-space: nowrap;
       max-width: 70%;
       margin: 0;
+
+      &--pending {
+        color: var(--color-800);
+      }
     }
 
     &__header {

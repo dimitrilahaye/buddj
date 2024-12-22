@@ -40,8 +40,54 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
           ...props,
           initialBalance: 200,
           currentBalance: 170,
+          pendingFrom: null,
           startAt: null,
           endAt: null,
+        });
+      });
+    });
+
+    describe("#isPending", () => {
+      describe("when budget is pending", () => {
+        it("should return true", () => {
+          // given
+          const props = {
+            id: "uuid",
+            name: "Semaine 1",
+            initialBalance: 200,
+            pendingFrom: new Date(),
+            expenses: [],
+          };
+
+          // when
+          const budget = new WeeklyBudget(props);
+
+          // when
+          const isPending = budget.isPending();
+
+          // then
+          expect(isPending).to.be.true;
+        });
+
+        describe("when budget is not pending", () => {
+          it("should return false", () => {
+            // given
+            const props = {
+              id: "uuid",
+              name: "Semaine 1",
+              initialBalance: 200,
+              expenses: [],
+            };
+
+            // when
+            const budget = new WeeklyBudget(props);
+
+            // when
+            const isPending = budget.isPending();
+
+            // then
+            expect(isPending).to.be.false;
+          });
         });
       });
     });
@@ -63,6 +109,7 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
           ...props,
           currentBalance: 200,
           expenses: [],
+          pendingFrom: null,
           startAt: null,
           endAt: null,
         });
@@ -115,6 +162,7 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
         ...props,
         initialBalance: 200,
         currentBalance: -20,
+        pendingFrom: null,
         startAt: null,
         endAt: null,
       });
@@ -135,6 +183,7 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
         ...props,
         currentBalance: 200,
         initialBalance: 200,
+        pendingFrom: null,
         startAt: null,
         endAt: null,
         expenses: [],

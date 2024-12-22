@@ -22,6 +22,7 @@ export default class MonthFactory {
           id: this.idProvider.get(),
           amount: outflow.amount,
           label: outflow.label,
+          pendingFrom: outflow.pendingFrom,
         });
       }),
       weeklyBudgets: command.weeklyBudgets.map((weeklyBudget) => {
@@ -29,6 +30,7 @@ export default class MonthFactory {
           id: this.idProvider.get(),
           initialBalance: weeklyBudget.initialBalance,
           name: weeklyBudget.name,
+          pendingFrom: weeklyBudget.pendingFrom,
           expenses:
             weeklyBudget.expenses?.map(
               (expense) =>

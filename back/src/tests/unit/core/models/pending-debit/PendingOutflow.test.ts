@@ -19,9 +19,8 @@ describe("unit | core | models | pending-debit | PendingOutflow", () => {
 
       // Then
       expect(pendingOutflow.id).to.be.deep.equal(outflow.id);
-      expect(pendingOutflow.label).to.be.deep.equal(
-        `${outflow.label} (janv. 2022)`
-      );
+      expect(pendingOutflow.label).to.be.deep.equal(outflow.label);
+      expect(pendingOutflow.pendingFrom).to.be.deep.equal(monthDate);
       expect(pendingOutflow.amount).to.be.deep.equal(outflow.amount);
     });
   });

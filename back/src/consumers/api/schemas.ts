@@ -24,12 +24,13 @@ const _dateSchema = (message: string) =>
       { message }
     );
 
-const dateSchema = (message: string) =>
+const dateSchema = (message?: string) =>
   _dateSchema(message).transform((val) => new Date(val));
 
 const outflowCreationSchema = z.object({
   label: z.string({ message: "Outflow: Le label est obligatoire" }),
   amount: z.number({ message: "Outflow: Le montant est obligatoire" }),
+  pendingFrom: dateSchema().optional().nullable(),
 });
 
 const expenseCreationSchema = z.object({
@@ -40,6 +41,7 @@ const expenseCreationSchema = z.object({
 
 const budgetCreationSchema = z.object({
   name: z.string({ message: "Budget: Le nom est obligatoire" }),
+  pendingFrom: dateSchema().optional().nullable(),
   initialBalance: z.number({
     message: "Budget: Le solde initial est obligatoire",
   }),

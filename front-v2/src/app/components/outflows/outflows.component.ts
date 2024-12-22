@@ -38,6 +38,7 @@ import { TransferData } from '../transfer-modals/transfer-choice/transfer-choice
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
+import { ShortDatePipe } from '../../pipes/short-date/short-date.pipe';
 
 @Component({
   selector: 'app-outflows',
@@ -47,6 +48,7 @@ import ToasterServiceInterface, {
     CommonModule,
     DesignSystemModule,
     TransferChoiceComponent,
+    ShortDatePipe,
   ],
   templateUrl: './outflows.component.html',
   styleUrl: './outflows.component.scss',
@@ -127,9 +129,18 @@ export class OutflowsComponent implements AfterViewInit {
     this.outflows()!.forEach((outflow) => this.addOutflow(outflow));
   }
 
+  getPendingInfo(outflow: AbstractControl<any, any>) {
+    const pendingFrom = outflow.get('pendingFrom')?.value;
+    if (!pendingFrom) {
+      return null;
+    }
+    return new Date(pendingFrom)?.toISOString();
+  }
+
   addOutflow(outflow: Outflow) {
     const outflowGroup = this.fb.group({
       id: [{ value: outflow.id, disabled: true }], // hidden
+      pendingFrom: [{ value: outflow.pendingFrom, disabled: true }], // hidden
       label: [outflow.label, Validators.required],
       amount: [outflow.amount, [Validators.required, amountValidator()]],
       isChecked: [{ value: outflow.isChecked, disabled: true }], // hidden

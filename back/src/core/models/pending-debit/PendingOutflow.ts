@@ -4,16 +4,12 @@ export default class PendingOutflow {
   readonly id: string;
   readonly label: string;
   readonly amount: number;
+  readonly pendingFrom: Date;
 
   constructor(outflow: AccountOutflow, monthDate: Date) {
     this.id = outflow.id;
     this.amount = outflow.amount;
-    const date = monthDate;
-    const options = { year: "numeric", month: "short" };
-    const formattedDate = date.toLocaleDateString(
-      "fr-FR",
-      options as Intl.DateTimeFormatOptions
-    );
-    this.label = `${outflow.label} (${formattedDate})`;
+    this.pendingFrom = monthDate;
+    this.label = outflow.label;
   }
 }

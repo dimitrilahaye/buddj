@@ -5,4 +5,13 @@ function formatToYYYYMM(date: Date): string {
   return `${year}-${month}`;
 }
 
-export { formatToYYYYMM };
+function shortDate(name: string, date: Date): string {
+  const options = { year: 'numeric', month: 'short' };
+  const formattedDate = date.toLocaleDateString(
+    'fr-FR',
+    options as Intl.DateTimeFormatOptions
+  );
+  return `${name} (${formattedDate})`;
+}
+
+export { formatToYYYYMM, shortDate };
