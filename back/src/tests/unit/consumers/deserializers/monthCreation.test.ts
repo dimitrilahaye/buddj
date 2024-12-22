@@ -37,11 +37,13 @@ describe("Unit | Consumers | deserializers | monthCreation", function () {
       outflows: [
         {
           ...body.outflows[0],
+          pendingFrom: null,
         },
       ],
       weeklyBudgets: [
         {
           ...body.weeklyBudgets[0],
+          pendingFrom: null,
           expenses: [
             {
               ...body.weeklyBudgets[0].expenses[0],

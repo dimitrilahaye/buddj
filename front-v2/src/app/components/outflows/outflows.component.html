@@ -48,6 +48,7 @@
           *ngFor="let outflow of outflowsFormArray.controls; let i = index"
           [formGroupName]="i"
         >
+          @let pending = getPendingInfo(outflow);
           <button
             type="button"
             [ngClass]="{
@@ -65,9 +66,22 @@
               }"
               class="outflows-list-item__info"
             >
-              <span class="outflows-list-item-info__label">{{
-                outflow.get("label")?.value || "Label introuvable"
-              }}</span>
+              <div class="outflows-list-item-info__container">
+                <span
+                  class="outflows-list-item-info__label"
+                  [ngClass]="{
+                    'outflows-list-item-info__label--pending': pending !== null
+                  }"
+                  >{{
+                    outflow.get("label")?.value || "Label introuvable"
+                  }}</span
+                >
+                @if (pending !== null) {
+                <span class="outflows-list-item-info__pending"
+                  >({{ pending | shortDate }})</span
+                >
+                }
+              </div>
               <span class="outflows-list-item-info__amount"
                 >{{
                   outflow.get("amount")?.value || "Somme introuvable"

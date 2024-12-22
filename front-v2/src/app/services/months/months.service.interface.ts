@@ -11,6 +11,7 @@ export interface UpdateOutflowsChecking {
 export interface AddOutflow {
   label: string;
   amount: number;
+  pendingFrom?: Date;
 }
 
 export interface AddExpense {
@@ -21,6 +22,7 @@ export interface AddExpense {
 export interface AddBudget {
   initialBalance: number;
   name: string;
+  pendingFrom?: Date;
 }
 
 export interface UpdateExpensesChecking {

@@ -13,7 +13,7 @@ import {
   type MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { DesignSystemModule } from '../../design-system/design-system.module';
-import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
+import { DateNormalizePipe } from '../../pipes/date-normalize/date-normalize.pipe';
 import { CommonModule } from '@angular/common';
 import MonthsServiceInterface, {
   MONTHS_SERVICE,

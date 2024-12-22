@@ -10,12 +10,14 @@ export default class WeeklyBudget {
   startAt: Date | null;
   endAt: Date | null;
   expenses: WeeklyExpense[];
+  pendingFrom: Date | null = null;
 
   constructor(props: {
     id: string;
     name: string;
     initialBalance: number;
     expenses?: WeeklyExpense[];
+    pendingFrom?: Date;
   }) {
     this.initialBalance = Number(props.initialBalance.toFixed(2));
     this.id = props.id;
@@ -26,7 +28,14 @@ export default class WeeklyBudget {
     this.startAt = null;
     this.endAt = null;
     this.expenses = props.expenses ?? [];
+    if (props.pendingFrom) {
+      this.pendingFrom = props.pendingFrom;
+    }
     this.calculateCurrentBalance();
+  }
+
+  isPending() {
+    return this.pendingFrom !== null;
   }
 
   addExpense(expense: WeeklyExpense) {

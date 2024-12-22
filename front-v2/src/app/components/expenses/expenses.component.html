@@ -35,6 +35,7 @@
         </div>
       </div>
       <ng-container *ngFor="let week of weeks; let i = index">
+        @let pending = getPendingInfo(week.id);
         <div class="expenses-list__week">
           <div class="expenses-list__week__header">
             <button
@@ -47,7 +48,12 @@
             >
               <i class="fa-solid fa-chevron-right"></i>
             </button>
-            <span class="expenses-list__week-name">
+            <span
+              class="expenses-list__week-name"
+              [ngClass]="{
+                'expenses-list__week-name--pending': pending !== null
+              }"
+            >
               {{ week.name }}
             </span>
             <button
@@ -72,13 +78,15 @@
               <i class="fa-solid fa-right-left"></i>
             </button>
           </div>
-
-          <div class="expenses-list__infos">{{ geBudgetsInfos(week.id) }}</div>
+          <div class="expenses-list__pending">
+            @if(pending !== null) { ({{ pending | shortDate }}) }
+          </div>
+          <div class="expenses-list__infos">{{ getBudgetsInfos(week.id) }}</div>
           <div class="expenses-list__balance">
             <span>Solde :</span>
             <app-progress-bar
-              [currentValue]="getCurrentBalanceByWeekName(week.name)"
-              [total]="getInitialBalanceByWeekName(week.name)"
+              [currentValue]="getCurrentBalanceByWeekId(week.id)"
+              [total]="getInitialBalanceByWeekId(week.id)"
             ></app-progress-bar>
           </div>
           @if (filterIsActive(week.id)) { @if

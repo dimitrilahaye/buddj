@@ -122,8 +122,23 @@
 }
 
 .outflows-list-item-info {
+  &__container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
   &__label {
     @extend %text-7;
+
+    &--pending {
+      color: var(--color-800);
+    }
+  }
+  &__pending {
+    @extend %text-5;
+
+    color: var(--color-800);
   }
   &__amount {
     @extend %text-10;

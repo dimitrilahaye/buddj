@@ -34,11 +34,10 @@ describe("unit | core | models | pending-debit | PendingBudget", () => {
 
       // Then
       expect(pendingBudget.id).to.be.deep.equal(budget.id);
-      expect(pendingBudget.name).to.be.deep.equal(
-        `${budget.name} (janv. 2022)`
-      );
+      expect(pendingBudget.name).to.be.deep.equal(budget.name);
       expect(pendingBudget.initialBalance).to.equal(190);
       expect(pendingBudget.currentBalance).to.equal(170);
+      expect(pendingBudget.pendingFrom).to.equal(monthDate);
       expect(pendingBudget.expenses).to.deep.equal([uncheckedExpense]);
     });
 
@@ -56,9 +55,8 @@ describe("unit | core | models | pending-debit | PendingBudget", () => {
 
       // Then
       expect(pendingBudget.id).to.be.deep.equal(budget.id);
-      expect(pendingBudget.name).to.be.deep.equal(
-        `${budget.name} (janv. 2022)`
-      );
+      expect(pendingBudget.name).to.be.deep.equal(budget.name);
+      expect(pendingBudget.pendingFrom).to.equal(monthDate);
       expect(pendingBudget.initialBalance).to.equal(200);
       expect(pendingBudget.currentBalance).to.equal(200);
     });

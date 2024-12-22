@@ -27,6 +27,7 @@ describe("Unit | Core | Factories | AccountBudgetFactory", function () {
         id: "uuid",
         ...command,
         currentBalance: 100,
+        pendingFrom: null,
         expenses: [],
         startAt: null,
         endAt: null,

@@ -4,7 +4,7 @@ import {
   type MonthlyBudgetsStoreInterface,
 } from '../../stores/monthlyBudgets/monthlyBudgets.store.interface';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
-import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
+import { DateNormalizePipe } from '../../pipes/date-normalize/date-normalize.pipe';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import MonthsServiceInterface, {
   MONTHS_SERVICE,

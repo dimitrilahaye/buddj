@@ -9,6 +9,7 @@ export default class WeeklyBudgetsDashboard {
     this.weeklyBudgets = props.weeklyBudgets.map(
       (weekly) =>
         new WeeklyBudgetDashboard({
+          weekId: weekly.id,
           weekName: weekly.name,
           initialBalance: weekly.initialBalance,
           weeklyBudget: weekly,

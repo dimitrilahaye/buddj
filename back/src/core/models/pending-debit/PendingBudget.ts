@@ -6,6 +6,7 @@ export default class PendingBudget {
   readonly name: string;
   readonly initialBalance: number;
   readonly currentBalance: number;
+  readonly pendingFrom: Date;
   readonly expenses: WeeklyExpense[] = [];
 
   constructor(budget: WeeklyBudget, monthDate: Date) {
@@ -29,12 +30,7 @@ export default class PendingBudget {
       this.initialBalance = Number(budget.currentBalance.toFixed(2));
       this.currentBalance = Number(this.initialBalance.toFixed(2));
     }
-    const date = monthDate;
-    const options = { year: "numeric", month: "short" };
-    const formattedDate = date.toLocaleDateString(
-      "fr-FR",
-      options as Intl.DateTimeFormatOptions
-    );
-    this.name = `${budget.name} (${formattedDate})`;
+    this.pendingFrom = monthDate;
+    this.name = budget.name;
   }
 }

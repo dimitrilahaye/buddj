@@ -203,8 +203,31 @@
 }
 
 .month-creation-item-info {
+  &__container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+  }
   &__label {
     @extend %text-7;
+    @extend %ellipsis;
+    
+    max-width: 55%;
+    white-space: nowrap;
+  }
+  &__label-simple {
+    @extend %text-7;
+    max-width: 100%;
+    white-space: unset;
+    overflow: unset;
+    text-overflow: unset;
+    display: unset;
+  }
+  &__pending {
+    @extend %text-5;
+
+    color: var(--color-800);
   }
   &__amount {
     @extend %text-10;

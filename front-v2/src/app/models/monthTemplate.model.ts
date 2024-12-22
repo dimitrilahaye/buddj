@@ -17,6 +17,7 @@ export type Budget = {
   initialBalance: number;
   currentBalance?: number;
   expenses?: Expense[];
+  pendingFrom?: Date | null;
 };
 
 export type Outflow = {
@@ -24,6 +25,7 @@ export type Outflow = {
   amount: number;
   label: string;
   isChecked: boolean;
+  pendingFrom?: Date | null;
 };
 
 export type MonthCreationTemplate = {

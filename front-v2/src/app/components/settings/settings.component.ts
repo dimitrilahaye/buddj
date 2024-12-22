@@ -1,5 +1,5 @@
 import { Component, Inject, Signal } from '@angular/core';
-import { DateNormalizePipe } from '../../pipes/date-normalize.pipe';
+import { DateNormalizePipe } from '../../pipes/date-normalize/date-normalize.pipe';
 import { DesignSystemModule } from '../../design-system/design-system.module';
 import { Router } from '@angular/router';
 import {

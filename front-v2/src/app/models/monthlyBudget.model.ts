@@ -22,6 +22,7 @@ export type DashboardWeeks = {
 };
 
 export type DashboardWeeklyBudget = {
+  weekId: string;
   weekName: string;
   initialBalance: number;
   currentBalance: number;
@@ -39,12 +40,14 @@ export type Outflow = {
   amount: number;
   label: string;
   isChecked: boolean;
+  pendingFrom?: Date | null;
 };
 
 export type WeeklyBudget = {
   id: string;
   name: string;
   expenses: Expense[];
+  pendingFrom?: Date | null;
 };
 
 export type Expense = {

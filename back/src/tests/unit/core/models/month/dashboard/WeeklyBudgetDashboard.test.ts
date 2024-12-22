@@ -8,6 +8,7 @@ describe("Unit | Core | Models | Dashboard | WeeklyBudgetDashboard", () => {
     it("should return a weekly budget dashboard with right data when current balance is greater than 0", () => {
       // given
       const props = {
+        weekId: "uuid",
         weekName: "Semaine 1",
         initialBalance: 200,
         weeklyBudget: new WeeklyBudget({
@@ -52,6 +53,7 @@ describe("Unit | Core | Models | Dashboard | WeeklyBudgetDashboard", () => {
 
       // then
       expect(weekly).to.deep.equal({
+        weekId: props.weekId,
         weekName: props.weekName,
         initialBalance: 200,
         currentBalance: 140,
@@ -60,6 +62,7 @@ describe("Unit | Core | Models | Dashboard | WeeklyBudgetDashboard", () => {
     it("should return a weekly budget dashboard with right data when current balance is negative", () => {
       // given
       const props = {
+        weekId: "uuid",
         weekName: "Semaine 1",
         initialBalance: 200,
         weeklyBudget: new WeeklyBudget({
@@ -104,6 +107,7 @@ describe("Unit | Core | Models | Dashboard | WeeklyBudgetDashboard", () => {
 
       // then
       expect(weekly).to.deep.equal({
+        weekId: props.weekId,
         weekName: props.weekName,
         initialBalance: 200,
         currentBalance: -60,
