@@ -119,9 +119,7 @@ export class MonthCreationComponent implements OnInit {
         },
       };
       this.setNewMonthData();
-
       this.setForm();
-
       this.dataLoaded = true;
     });
   }
@@ -305,7 +303,7 @@ export class MonthCreationComponent implements OnInit {
           (totalExpense, expense) => totalExpense + expense.amount,
           0
         );
-        return total + budget.initialBalance + totalExpenses;
+        return total + (budget.currentBalance ?? 0) + totalExpenses;
       },
       0
     );
@@ -359,8 +357,12 @@ export class MonthCreationComponent implements OnInit {
   addPendingBudget(budget: PendingBudget) {
     const debitGroup = this.fb.group({
       name: [budget.name, Validators.required],
+      currentBalance: [
+        budget.currentBalance,
+        [Validators.required, amountValidator()],
+      ],
       initialBalance: [
-        budget.initialBalance,
+        { value: budget.initialBalance, disabled: true },
         [Validators.required, amountValidator()],
       ],
       id: [{ value: budget.id, disabled: true }],
@@ -648,8 +650,7 @@ export class MonthCreationComponent implements OnInit {
         ],
         month: this.formatToDate(raw.month),
       };
-      console.info(month);
-      // this.createNewMonth(month);
+      this.createNewMonth(month);
     } else {
       console.log('Form is invalid');
     }

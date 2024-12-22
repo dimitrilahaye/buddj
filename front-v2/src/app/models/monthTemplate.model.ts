@@ -15,6 +15,7 @@ export type Budget = {
   id: string;
   name: string;
   initialBalance: number;
+  currentBalance?: number;
   expenses?: Expense[];
 };
 

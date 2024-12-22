@@ -7,7 +7,6 @@ import {
   signal,
   Signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import {
   MONTHLY_BUDGETS_STORE,
@@ -45,7 +44,6 @@ export class ArchivedMonthsComponent implements OnInit {
   openMenuModal = false;
 
   constructor(
-    private router: Router,
     private injector: Injector,
     @Inject(MONTHLY_BUDGETS_STORE)
     private monthlyBudgetsStore: MonthlyBudgetsStoreInterface,
@@ -96,7 +94,12 @@ export class ArchivedMonthsComponent implements OnInit {
     this.deleteMonthLoading = true;
     this.monthsService
       .deleteMonth(month.id)
-      .pipe(finalize(() => (this.deleteMonthLoading = false)))
+      .pipe(
+        finalize(() => {
+          this.deleteMonthLoading = false;
+          this.openMenuModal = false;
+        })
+      )
       .subscribe(() => this.toaster.success('Votre mois a été supprimé !'));
   }
 
