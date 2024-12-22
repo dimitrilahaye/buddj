@@ -78,10 +78,14 @@
               <i class="fa-solid fa-right-left"></i>
             </button>
           </div>
-          <div class="expenses-list__pending">
-            @if(pending !== null) { ({{ pending | shortDate }}) }
+          <div class="expenses-list__infos">
+            @if(pending !== null) {
+            <span class="expenses-list__pending">
+              ({{ pending | shortDate }})
+            </span>
+            }&nbsp;
+            {{ getBudgetsInfos(week.id) }}
           </div>
-          <div class="expenses-list__infos">{{ getBudgetsInfos(week.id) }}</div>
           <div class="expenses-list__balance">
             <span>Solde :</span>
             <app-progress-bar
