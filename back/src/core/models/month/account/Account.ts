@@ -17,7 +17,7 @@ export default class Account {
     weeklyBudgets?: WeeklyBudget[];
   }) {
     this.id = props.id;
-    this.currentBalance = props.currentBalance;
+    this.currentBalance = Number(props.currentBalance.toFixed(2));
     this.outflows = props.outflows;
     this.weeklyBudgets = props.weeklyBudgets;
   }
@@ -106,7 +106,7 @@ export default class Account {
   }
 
   updateCurrentBalance(currentBalance: number) {
-    this.currentBalance = currentBalance;
+    this.currentBalance = Number(currentBalance.toFixed(2));
   }
 
   updateBudget(budgetId: string, name: string) {

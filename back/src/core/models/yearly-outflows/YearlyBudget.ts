@@ -14,6 +14,6 @@ export default class YearlyBudget {
     this.id = props.id;
     this.month = props.month;
     this.name = props.name;
-    this.initialBalance = props.initialBalance;
+    this.initialBalance = Number(props.initialBalance.toFixed(2));
   }
 }

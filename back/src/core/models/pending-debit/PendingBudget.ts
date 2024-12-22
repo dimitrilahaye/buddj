@@ -19,11 +19,15 @@ export default class PendingBudget {
         (total, expense) => total + expense.amount,
         0
       );
-      this.initialBalance = budget.currentBalance + totalExpenses;
-      this.currentBalance = this.initialBalance - totalExpenses;
+      this.initialBalance = Number(
+        (budget.currentBalance + totalExpenses).toFixed(2)
+      );
+      this.currentBalance = Number(
+        (this.initialBalance - totalExpenses).toFixed(2)
+      );
     } else {
-      this.initialBalance = budget.currentBalance;
-      this.currentBalance = this.initialBalance;
+      this.initialBalance = Number(budget.currentBalance.toFixed(2));
+      this.currentBalance = Number(this.initialBalance.toFixed(2));
     }
     const date = monthDate;
     const options = { year: "numeric", month: "short" };

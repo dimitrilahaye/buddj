@@ -17,6 +17,6 @@ export default class MonthlyBudgetTemplate {
     if (props.initialBalance < 1) {
       throw new MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError();
     }
-    this.initialBalance = props.initialBalance;
+    this.initialBalance = Number(props.initialBalance.toFixed(2));
   }
 }

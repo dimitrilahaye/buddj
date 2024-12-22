@@ -17,7 +17,7 @@ export default class WeeklyBudget {
     initialBalance: number;
     expenses?: WeeklyExpense[];
   }) {
-    this.initialBalance = props.initialBalance;
+    this.initialBalance = Number(props.initialBalance.toFixed(2));
     this.id = props.id;
     if (props.name.length === 0) {
       throw new AccountBudgetNameCantBeEmptyError();
@@ -87,7 +87,7 @@ export default class WeeklyBudget {
       amountForOutflow -= this.currentBalance;
     }
 
-    return amountForOutflow;
+    return Number(amountForOutflow.toFixed(2));
   }
 
   calculateCurrentBalance() {
@@ -95,6 +95,8 @@ export default class WeeklyBudget {
       (prev, curr) => prev + curr.amount,
       0
     );
-    this.currentBalance = this.initialBalance - sumOfAllExpenses;
+    this.currentBalance = Number(
+      (this.initialBalance - sumOfAllExpenses).toFixed(2)
+    );
   }
 }

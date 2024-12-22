@@ -16,7 +16,9 @@ export default class WeeklyBudgetDashboard {
       (prev, curr) => prev + curr.amount,
       0
     );
-    this.initialBalance = props.initialBalance;
-    this.currentBalance = this.initialBalance - sumOfAllExpensesAmount;
+    this.initialBalance = Number(props.initialBalance.toFixed(2));
+    this.currentBalance = Number(
+      (this.initialBalance - sumOfAllExpensesAmount).toFixed(2)
+    );
   }
 }
