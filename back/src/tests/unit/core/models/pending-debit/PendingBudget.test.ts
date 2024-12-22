@@ -5,7 +5,7 @@ import WeeklyExpense from "../../../../../core/models/month/account/WeeklyExpens
 
 describe("unit | core | models | pending-debit | PendingBudget", () => {
   describe("#constructor", () => {
-    it("should instantiate pending debit with right data", () => {
+    it("should instantiate pending debit with right data with expenses", () => {
       // Given
       const checkedExpense = new WeeklyExpense({
         id: "uuid",
@@ -37,10 +37,30 @@ describe("unit | core | models | pending-debit | PendingBudget", () => {
       expect(pendingBudget.name).to.be.deep.equal(
         `${budget.name} (janv. 2022)`
       );
-      expect(pendingBudget.initialBalance).to.be.deep.equal(
-        budget.currentBalance
-      );
+      expect(pendingBudget.initialBalance).to.equal(190);
+      expect(pendingBudget.currentBalance).to.equal(170);
       expect(pendingBudget.expenses).to.deep.equal([uncheckedExpense]);
+    });
+
+    it("should instantiate pending debit with right data without expenses", () => {
+      // Given
+      const budget = new WeeklyBudget({
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+      });
+      const monthDate = new Date("2022-01-01");
+
+      // When
+      const pendingBudget = new PendingBudget(budget, monthDate);
+
+      // Then
+      expect(pendingBudget.id).to.be.deep.equal(budget.id);
+      expect(pendingBudget.name).to.be.deep.equal(
+        `${budget.name} (janv. 2022)`
+      );
+      expect(pendingBudget.initialBalance).to.equal(200);
+      expect(pendingBudget.currentBalance).to.equal(200);
     });
   });
 });
