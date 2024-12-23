@@ -26,6 +26,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "npm-run-all2": "^7.0.1"
+    "npm-run-all2": "^7.0.2"
   }
 }
