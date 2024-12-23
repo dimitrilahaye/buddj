@@ -87,11 +87,14 @@ export default class WeeklyBudget {
   }
 
   get amountForOutflow() {
-    let amountForOutflow = 0;
     const sumOfCheckedExpensesAmount = this.expenses
       .filter((expense) => expense.isChecked)
       .reduce((prev, curr) => prev + curr.amount, 0);
-    amountForOutflow = this.initialBalance - sumOfCheckedExpensesAmount;
+
+    let amountForOutflow = Number(
+      (this.initialBalance - sumOfCheckedExpensesAmount).toFixed(2)
+    );
+
     if (this.currentBalance <= 0) {
       amountForOutflow -= this.currentBalance;
     }

@@ -1560,4 +1560,27 @@ describe("Unit | Core | Models | Month | Account | Account", function () {
       );
     });
   });
+
+  describe("#removeBudget", function () {
+    it("should remove the budget", function () {
+      // given
+      const targetBudget = new WeeklyBudget({
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+      });
+      const props = {
+        id: "uuid",
+        currentBalance: 2000,
+        weeklyBudgets: [targetBudget],
+      };
+      const account = new Account(props);
+
+      // when
+      account.removeBudget("uuid");
+
+      // then
+      expect(account.weeklyBudgets).to.have.length(0);
+    });
+  });
 });

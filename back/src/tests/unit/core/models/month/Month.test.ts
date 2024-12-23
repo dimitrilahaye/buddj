@@ -1206,4 +1206,85 @@ describe("Unit | Core | Models | Month | Month", function () {
       expect(month.isArchived).to.be.false;
     });
   });
+
+  describe("#removeBudget", function () {
+    describe("Account", function () {
+      it("should have the right forecast balance", function () {
+        // given
+        const month = new Month({
+          id: "uuid",
+          date: new Date(),
+          isArchived: true,
+          account: new Account({
+            id: "uuid",
+            currentBalance: 2000,
+            outflows: [
+              new AccountOutflow({
+                id: "uuid",
+                label: "outlfow",
+                amount: 10,
+                isChecked: false,
+              }),
+            ],
+            weeklyBudgets: [
+              new WeeklyBudget({
+                id: "uuid",
+                name: "Semaine 1",
+                initialBalance: 200,
+              }),
+            ],
+          }),
+        });
+        expect(month.dashboard().account.forecastBalance).to.be.equal(1790);
+
+        // when
+        month.removeBudget("uuid");
+
+        // then
+        expect(month.dashboard().account.forecastBalance).to.be.equal(1990);
+      });
+    });
+
+    describe("Budgets", function () {
+      it("should have the right forecast balance", function () {
+        // given
+        const month = new Month({
+          id: "uuid",
+          date: new Date(),
+          isArchived: true,
+          account: new Account({
+            id: "uuid",
+            currentBalance: 2000,
+            outflows: [
+              new AccountOutflow({
+                id: "uuid",
+                label: "outlfow",
+                amount: 10,
+                isChecked: false,
+              }),
+            ],
+            weeklyBudgets: [
+              new WeeklyBudget({
+                id: "uuid-1",
+                name: "Semaine 1",
+                initialBalance: 200,
+              }),
+              new WeeklyBudget({
+                id: "uuid-2",
+                name: "Semaine 2",
+                initialBalance: 200,
+              }),
+            ],
+          }),
+        });
+        expect(month.dashboard().weeks.forecastBalance).to.be.equal(400);
+
+        // when
+        month.removeBudget("uuid-1");
+
+        // then
+        expect(month.dashboard().weeks.forecastBalance).to.be.equal(200);
+      });
+    });
+  });
 });

@@ -12,7 +12,7 @@ export default class AccountDashboard {
       },
       0
     );
-    this.forecastBalance =
+    const forecastBalance =
       this.currentBalance -
       props.account.outflows
         .filter((outflow) => !outflow.isChecked)
@@ -20,5 +20,7 @@ export default class AccountDashboard {
           return prev + curr.amount;
         }, 0) -
       amountForWeeklyBudgets;
+
+    this.forecastBalance = Number(forecastBalance.toFixed(2));
   }
 }
