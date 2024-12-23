@@ -741,4 +741,60 @@ describe("Unit | Core | Models | Month | Account | WeeklyBudget", function () {
       expect(budget.amountForOutflow).to.be.equal(0);
     });
   });
+
+  describe("#canBeRemoved", () => {
+    it("should return true if all expenses have been checked", () => {
+      // given
+      const budget = new WeeklyBudget({
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+        expenses: [
+          new WeeklyExpense({
+            id: "uuid",
+            amount: 10,
+            label: "JOW",
+            date: new Date(),
+            isChecked: true,
+          }),
+        ],
+      });
+
+      // when
+      const canBeRemoved = budget.canBeRemoved();
+
+      // then
+      expect(canBeRemoved).to.be.true;
+    });
+    it("should return false if at least one expense has not been checked", () => {
+      // given
+      const budget = new WeeklyBudget({
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+        expenses: [
+          new WeeklyExpense({
+            id: "uuid-1",
+            amount: 10,
+            label: "JOW",
+            date: new Date(),
+            isChecked: true,
+          }),
+          new WeeklyExpense({
+            id: "uuid-2",
+            amount: 10,
+            label: "JOW",
+            date: new Date(),
+            isChecked: false,
+          }),
+        ],
+      });
+
+      // when
+      const canBeRemoved = budget.canBeRemoved();
+
+      // then
+      expect(canBeRemoved).to.be.false;
+    });
+  });
 });

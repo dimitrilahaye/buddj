@@ -4,7 +4,10 @@ import AccountOutflow from "../../../../../../core/models/month/account/AccountO
 import WeeklyBudget from "../../../../../../core/models/month/account/WeeklyBudget.js";
 import sinon from "sinon";
 import WeeklyExpense from "../../../../../../core/models/month/account/WeeklyExpense.js";
-import { WeeklyBudgetNotFoundError } from "../../../../../../core/errors/WeeklyBudgetErrors.js";
+import {
+  AccountBudgetCanNotBeRemovedError,
+  WeeklyBudgetNotFoundError,
+} from "../../../../../../core/errors/WeeklyBudgetErrors.js";
 import { AccountOutflowNotFoundError } from "../../../../../../core/errors/AccountOuflowErrors.js";
 
 describe("Unit | Core | Models | Month | Account | Account", function () {
@@ -1581,6 +1584,35 @@ describe("Unit | Core | Models | Month | Account | Account", function () {
 
       // then
       expect(account.weeklyBudgets).to.have.length(0);
+    });
+
+    it("should trow an error if budget can not be removed", () => {
+      // given
+      const targetBudget = new WeeklyBudget({
+        id: "uuid",
+        name: "Semaine 1",
+        initialBalance: 200,
+        expenses: [
+          new WeeklyExpense({
+            id: "uuid",
+            amount: 10,
+            label: "Jow",
+            isChecked: false,
+            date: new Date(),
+          }),
+        ],
+      });
+      const props = {
+        id: "uuid",
+        currentBalance: 2000,
+        weeklyBudgets: [targetBudget],
+      };
+      const account = new Account(props);
+
+      // when / then
+      expect(() => account.removeBudget("uuid")).to.throw(
+        AccountBudgetCanNotBeRemovedError
+      );
     });
   });
 });

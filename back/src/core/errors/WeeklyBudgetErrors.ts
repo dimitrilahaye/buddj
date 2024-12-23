@@ -12,4 +12,15 @@ class AccountBudgetNameCantBeEmptyError extends Error {
   }
 }
 
-export { WeeklyBudgetNotFoundError, AccountBudgetNameCantBeEmptyError };
+class AccountBudgetCanNotBeRemovedError extends Error {
+  constructor() {
+    super("AccountBudget: this budget can not be removed");
+    this.name = "AccountBudgetCanNotBeRemovedError";
+  }
+}
+
+export {
+  WeeklyBudgetNotFoundError,
+  AccountBudgetNameCantBeEmptyError,
+  AccountBudgetCanNotBeRemovedError,
+};

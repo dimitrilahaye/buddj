@@ -78,6 +78,10 @@ export default class WeeklyBudget {
     this.name = name;
   }
 
+  canBeRemoved() {
+    return this.expenses.filter((expense) => !expense.isChecked).length === 0;
+  }
+
   findExpenseById(expenseId: string) {
     const expense = this.expenses.find((expense) => expense.id === expenseId);
     if (!expense) {
