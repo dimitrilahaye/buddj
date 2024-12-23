@@ -34,6 +34,7 @@ const errorHandler = (
     case "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError":
     case "AccountBudgetNameCantBeEmptyError":
     case "YearlySavingTypeDoesNotExistError":
+    case "AccountBudgetCanNotBeRemovedError":
       statusCode = 422;
       break;
     default:

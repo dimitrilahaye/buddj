@@ -1,7 +1,10 @@
 import AccountOutflow from "./AccountOutflow.js";
 import WeeklyBudget from "./WeeklyBudget.js";
 import WeeklyExpense from "./WeeklyExpense.js";
-import { WeeklyBudgetNotFoundError } from "../../../errors/WeeklyBudgetErrors.js";
+import {
+  AccountBudgetCanNotBeRemovedError,
+  WeeklyBudgetNotFoundError,
+} from "../../../errors/WeeklyBudgetErrors.js";
 import { AccountOutflowNotFoundError } from "../../../errors/AccountOuflowErrors.js";
 
 export default class Account {
@@ -45,6 +48,10 @@ export default class Account {
   }
 
   removeBudget(budgetId: string) {
+    const budget = this.findWeeklyBudgetById(budgetId);
+    if (!budget.canBeRemoved()) {
+      throw new AccountBudgetCanNotBeRemovedError();
+    }
     this.weeklyBudgets = this.weeklyBudgets.filter(
       (budget) => budget.id !== budgetId
     );

@@ -11,8 +11,9 @@ import * as deps from "../../../../ioc.js";
 import { RemoveBudgetCommand } from "../../../../core/usecases/RemoveBudget.js";
 import { MonthNotFoundError } from "../../../../core/errors/MonthErrors.js";
 import { Deps } from "../../../../ioc.js";
+import { AccountBudgetCanNotBeRemovedError } from "../../../../core/errors/WeeklyBudgetErrors.js";
 
-describe.only("Integration | Consumers | Routes | DELETE /months/{monthId}/budgets/{budgetId}", function () {
+describe("Integration | Consumers | Routes | DELETE /months/{monthId}/budgets/{budgetId}", function () {
   let server: http.Server;
 
   describe("When user is authenticated", function () {
@@ -99,6 +100,31 @@ describe.only("Integration | Consumers | Routes | DELETE /months/{monthId}/budge
 
       // then
       expect(response.statusCode).to.be.equal(404);
+      expect(response.body.success).to.be.false;
+    });
+
+    it("should return 422 error if budget can not been removed", async function () {
+      // given
+      const command: RemoveBudgetCommand = {
+        monthId: "a0c3861c-1383-4ef3-8c6b-167dcddd8f78",
+        budgetId: "0cf17604-be48-40d4-89e4-aab9f090cf08",
+      };
+      deps.removeBudgetUsecase.execute = sinon
+        .stub()
+        .withArgs(command)
+        .throwsException(new AccountBudgetCanNotBeRemovedError());
+
+      server = mockedServer({ isAuthenticated: true }, deps);
+      const cookie = await authenticate(server);
+      const { monthId, budgetId } = command;
+
+      // when
+      const response = await request(server)
+        .delete(`/months/${monthId}/budgets/${budgetId}`)
+        .set("Cookie", cookie);
+
+      // then
+      expect(response.statusCode).to.be.equal(422);
       expect(response.body.success).to.be.false;
     });
   });
