@@ -84,6 +84,17 @@ export class MonthsService implements MonthsServiceInterface {
       );
   }
 
+  removeBudget(monthId: string, budgetId: string): Observable<void> {
+    return this.http
+      .delete<Response<MonthlyBudget>>(
+        `${this.apiUrl}/months/${monthId}/budgets/${budgetId}`
+      )
+      .pipe(
+        tap(({ data }) => this.monthlyBudgetsStore.replaceMonth(data)),
+        map(() => void 0)
+      );
+  }
+
   updateBudget(
     monthId: string,
     budgetId: string,

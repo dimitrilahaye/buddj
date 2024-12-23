@@ -10,6 +10,19 @@
     (click)="deleteExpense($event)"
   ></app-button>
 </app-modal>
+
+<app-modal
+  [modalOpen]="isRemoveBudgetModalOpen"
+  (click)="closeBudgetDelationModal($event)"
+>
+  <app-button
+    [size]="'big'"
+    [variant]="'danger'"
+    [label]="'Supprimer le budget définitivement'"
+    [loading]="deleteBudgetFormIsLoading"
+    (click)="removeBudget($event)"
+  ></app-button>
+</app-modal>
 <div
   class="expenses"
   [ngStyle]="{ 'padding-bottom': formUpdated ? '80px' : 0 }"
@@ -62,6 +75,13 @@
               (click)="openUpdateBudgetModal(week.id)"
             >
               <i class="fa-solid fa-edit"></i>
+            </button>
+            <button
+              class="expenses-list__week-transfer"
+              type="button"
+              (click)="openRemoveBudgetModal(week.id)"
+            >
+              <i class="fa-solid fa-trash-can"></i>
             </button>
             <button
               class="expenses-list__week-add"
