@@ -122,4 +122,8 @@ export default class Month {
   updateAccountCurrentBalance(currentBalance: number) {
     this.account.updateCurrentBalance(currentBalance);
   }
+
+  removeBudget(budgetId: string) {
+    this.account.removeBudget(budgetId);
+  }
 }

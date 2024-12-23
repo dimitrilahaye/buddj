@@ -44,6 +44,12 @@ export default class Account {
     this.weeklyBudgets.push(budget);
   }
 
+  removeBudget(budgetId: string) {
+    this.weeklyBudgets = this.weeklyBudgets.filter(
+      (budget) => budget.id !== budgetId
+    );
+  }
+
   /**
    * @deprecated
    */
