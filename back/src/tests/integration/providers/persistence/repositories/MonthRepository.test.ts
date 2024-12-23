@@ -557,4 +557,38 @@ describe("Integration | Providers | Persistence | Repositories | MonthRepository
       expect(updatedWeeklyBudget.initialBalance).to.be.equal("9999");
     });
   });
+
+  describe("#removeBudget", () => {
+    it("should remove the budget and its expenses", async () => {
+      // given
+      await insertUnarchivedMonth();
+      const repository = new MonthRepository();
+      const idProvider = new IdProvider();
+      const budgetFactory = new AccountBudgetFactory(idProvider);
+      const budget = budgetFactory.create({
+        initialBalance: 100,
+        name: "Vacances",
+      });
+      const expenseFactory = new WeeklyExpenseFactory(idProvider);
+      const expense = expenseFactory.create({
+        amount: 10,
+        label: "JOW",
+      });
+      budget.addExpense(expense);
+      await WeeklyBudgetDao.save(WeeklyBudgetDao.fromDomain(budget));
+
+      // when
+      await repository.removeBudget(budget.id);
+
+      // then
+      const persistedBudget = await WeeklyBudgetDao.findOneBy({
+        id: budget.id,
+      });
+      expect(persistedBudget).to.be.null;
+      const persistedExpense = await WeeklyExpenseDao.findOneBy({
+        id: expense.id,
+      });
+      expect(persistedExpense).to.be.null;
+    });
+  });
 });

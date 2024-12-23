@@ -63,4 +63,6 @@ export default interface MonthRepository {
     month: Month,
     weeklyId: string
   ): Promise<void>;
+
+  removeBudget(budgetId: string): Promise<void>;
 }
