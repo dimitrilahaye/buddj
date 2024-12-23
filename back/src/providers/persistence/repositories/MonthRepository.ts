@@ -206,4 +206,8 @@ export default class TypeOrmMonthRepository implements MonthRepository {
       });
     }
   }
+
+  async removeBudget(budgetId: string): Promise<void> {
+    await WeeklyBudgetDao.delete(budgetId);
+  }
 }

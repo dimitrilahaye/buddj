@@ -24,6 +24,7 @@ const monthRepositoryStub = {
   updateWeeklyBudgetCurrentBalance: sinon.stub(),
   getTransferableById: sinon.stub(),
   updateWeeklyBudgetInitialBalance: sinon.stub(),
+  removeBudget: sinon.stub(),
 };
 
 const monthlyTemplateRepositoryStub = {
@@ -75,6 +76,7 @@ function resetStubs() {
   monthRepositoryStub.updateWeeklyBudgetCurrentBalance.reset();
   monthRepositoryStub.getTransferableById.reset();
   monthRepositoryStub.updateWeeklyBudgetInitialBalance.reset();
+  monthRepositoryStub.removeBudget.reset();
   pendingDebitRepositoryStub.getAll.reset();
   yearlyOutflowRepositoryStub.getAll.reset();
   yearlyOutflowRepositoryStub.add.reset();
