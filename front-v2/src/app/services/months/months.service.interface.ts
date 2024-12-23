@@ -42,6 +42,7 @@ export default interface MonthsServiceInterface {
   ): Observable<void>;
   addOutflow(monthId: string, outflow: AddOutflow): Observable<void>;
   addBudget(monthId: string, outflow: AddBudget): Observable<void>;
+  removeBudget(monthId: string, budgetId: string): Observable<void>;
   updateExpensesChecking(
     monthId: string,
     data: UpdateExpensesChecking

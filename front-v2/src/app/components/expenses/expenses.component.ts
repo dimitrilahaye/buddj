@@ -65,11 +65,13 @@ export class ExpensesComponent implements AfterViewInit {
   addBudgetFormIsLoading = false;
   isExpensesModalOpen = false;
   isUpdateBudgetModalOpen = false;
+  isRemoveBudgetModalOpen = false;
   weeks: { id: string; name: string; expensesId: string[] }[] = [];
   filters: string[] = [];
   formUpdated = false;
   expenseDelationModalIsOpen = false;
   deleteExpenseFormIsLoading = false;
+  deleteBudgetFormIsLoading = false;
   expenseToDelete: (Expense & { weekId: string }) | null = null;
   isNumpadModalOpen = false;
   amountValueControl: AbstractControl<any, any> | null = null;
@@ -84,6 +86,8 @@ export class ExpensesComponent implements AfterViewInit {
   isNumpadBudgetModalOpen = false;
   addingBudget: AddBudget | null = null;
   updatingBudget: { id: string; name: string; expensesId: string[] } | null =
+    null;
+  removingBudget: { id: string; name: string; expensesId: string[] } | null =
     null;
 
   constructor(
@@ -210,6 +214,12 @@ export class ExpensesComponent implements AfterViewInit {
   closeExpenseDelationModal(event: Event) {
     this.expenseDelationModalIsOpen = false;
     this.expenseToDelete = null;
+    event.stopPropagation();
+  }
+
+  closeBudgetDelationModal(event: Event) {
+    this.isRemoveBudgetModalOpen = false;
+    this.removingBudget = null;
     event.stopPropagation();
   }
 
@@ -383,6 +393,24 @@ export class ExpensesComponent implements AfterViewInit {
     event.stopPropagation();
   }
 
+  removeBudget(event: Event) {
+    this.deleteBudgetFormIsLoading = true;
+    if (this.removingBudget) {
+      const { id } = this.removingBudget;
+
+      this.monthsService
+        .removeBudget(this.month()!.id, id)
+        .pipe(
+          finalize(() => {
+            this.deleteBudgetFormIsLoading = false;
+            this.closeBudgetDelationModal(event);
+          })
+        )
+        .subscribe(() => this.toaster.success('Votre budget a été supprimé !'));
+    }
+    event.stopPropagation();
+  }
+
   openExpensesModal(weekId?: string) {
     this.isExpensesModalOpen = true;
     this.setAddExpenseForm(weekId);
@@ -391,6 +419,11 @@ export class ExpensesComponent implements AfterViewInit {
   openUpdateBudgetModal(weekId?: string) {
     this.updatingBudget = this.weeks.find((w) => w.id === weekId) ?? null;
     this.isUpdateBudgetModalOpen = true;
+  }
+
+  openRemoveBudgetModal(weekId?: string) {
+    this.removingBudget = this.weeks.find((w) => w.id === weekId) ?? null;
+    this.isRemoveBudgetModalOpen = true;
   }
 
   closeUpdateBudgetModal(event: Event) {
