@@ -37,6 +37,7 @@ import { addMonthlyOutflow } from "./routes/addMonthlyOutflow.js";
 import { addMonthlyBudget } from "./routes/addMonthlyBudget.js";
 import { addBudget } from "./routes/addBudget.js";
 import { updateBudget } from "./routes/updateBudget.js";
+import { removeBudget } from "./routes/removeBudget.js";
 
 declare global {
   namespace Express {
@@ -207,6 +208,12 @@ function buildApi(
       usecase: dependencies.updateBudgetUsecase,
       dto: dependencies.monthDto,
       deserializer: dependencies.updateBudgetDeserializer,
+    })
+  );
+  api.use(
+    removeBudget(router, {
+      usecase: dependencies.removeBudgetUsecase,
+      dto: dependencies.monthDto,
     })
   );
   api.use(

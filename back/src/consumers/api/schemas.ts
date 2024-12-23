@@ -15,6 +15,8 @@ function validSchema<T extends ZodSchema>(
   return parsedData.data;
 }
 
+const uuidSchema = (message?: string) =>
+  z.string().uuid({ message: message ?? "L'UUID n'est pas valide" });
 const _dateSchema = (message: string) =>
   z
     .string()
@@ -57,4 +59,4 @@ const monthCreationSchema = z.object({
   weeklyBudgets: z.array(budgetCreationSchema).default([]),
 });
 
-export { validSchema, monthCreationSchema };
+export { validSchema, monthCreationSchema, uuidSchema };
