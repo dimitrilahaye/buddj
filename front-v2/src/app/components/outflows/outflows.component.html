@@ -44,60 +44,106 @@
         </button>
       </div>
       <div class="outflows-list" formArrayName="outflows">
-        <app-item
-          *ngFor="let outflow of outflowsFormArray.controls; let i = index"
-          [formGroupName]="i"
-        >
-          @let pending = getPendingInfo(outflow);
-          <button
-            type="button"
-            [ngClass]="{
-              'outflows-list-item--checked': isOutflowItemChecked(i)
-            }"
-            class="outflows-list-item"
-            (click)="toggleOutflowAtIndex(i, $event)"
+        @if (pendingOutflows.length > 0) {
+        <app-card>
+          <div class="header header--pending">Sorties des mois précédents</div>
+          <app-item
+            *ngFor="let outflow of pendingOutflows; let i = index"
+            [formGroupName]="i"
           >
-            <span class="outflows-list-item__icon">
-              <i class="fa-solid fa-money-bill-transfer"></i>
-            </span>
-            <div
-              [ngClass]="{
-                'outflows-list-item__info--checked': isOutflowItemChecked(i)
-              }"
-              class="outflows-list-item__info"
-            >
-              <div class="outflows-list-item-info__container">
-                <span
-                  class="outflows-list-item-info__label"
-                  [ngClass]="{
-                    'outflows-list-item-info__label--pending': pending !== null
-                  }"
-                  >{{
-                    outflow.get("label")?.value || "Label introuvable"
-                  }}</span
-                >
-                @if (pending !== null) {
-                <span class="outflows-list-item-info__pending"
-                  >({{ pending | shortDate }})</span
-                >
-                }
-              </div>
-              <span class="outflows-list-item-info__amount"
-                >{{
-                  outflow.get("amount")?.value || "Somme introuvable"
-                }}€</span
-              >
-            </div>
-
             <button
-              class="outflows-list-item__delete"
               type="button"
-              (click)="openOutflowDelationModal(outflow, $event)"
+              [ngClass]="{
+                'outflows-list-item--checked': isPendingOutflowItemChecked(i)
+              }"
+              class="outflows-list-item"
+              (click)="togglePendingOutflowAtIndex(i, $event)"
             >
-              <i class="fa-solid fa-trash-can"></i>
+              <span class="outflows-list-item__icon">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+              </span>
+              <div
+                [ngClass]="{
+                  'outflows-list-item__info--checked':
+                    isPendingOutflowItemChecked(i)
+                }"
+                class="outflows-list-item__info"
+              >
+                <div class="outflows-list-item-info__container">
+                  <span
+                    class="outflows-list-item-info__label outflows-list-item-info__label--pending"
+                    >{{
+                      outflow.get("label")?.value || "Label introuvable"
+                    }}</span
+                  >
+                  <span class="outflows-list-item-info__pending"
+                    >({{ getPendingInfo(outflow) | shortDate }})</span
+                  >
+                </div>
+                <span class="outflows-list-item-info__amount"
+                  >{{
+                    outflow.get("amount")?.value || "Somme introuvable"
+                  }}€</span
+                >
+              </div>
+
+              <button
+                class="outflows-list-item__delete"
+                type="button"
+                (click)="openOutflowDelationModal(outflow, $event)"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </button>
-          </button>
-        </app-item>
+          </app-item>
+        </app-card>
+        }
+
+        <app-card>
+          <div class="header">Sorties du mois en cours</div>
+          <app-item
+            *ngFor="let outflow of regularOutflows; let i = index"
+            [formGroupName]="i"
+          >
+            <button
+              type="button"
+              [ngClass]="{
+                'outflows-list-item--checked': isOutflowItemChecked(i)
+              }"
+              class="outflows-list-item"
+              (click)="toggleOutflowAtIndex(i, $event)"
+            >
+              <span class="outflows-list-item__icon">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+              </span>
+              <div
+                [ngClass]="{
+                  'outflows-list-item__info--checked': isOutflowItemChecked(i)
+                }"
+                class="outflows-list-item__info"
+              >
+                <div class="outflows-list-item-info__container">
+                  <span class="outflows-list-item-info__label">{{
+                    outflow.get("label")?.value || "Label introuvable"
+                  }}</span>
+                </div>
+                <span class="outflows-list-item-info__amount"
+                  >{{
+                    outflow.get("amount")?.value || "Somme introuvable"
+                  }}€</span
+                >
+              </div>
+
+              <button
+                class="outflows-list-item__delete"
+                type="button"
+                (click)="openOutflowDelationModal(outflow, $event)"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </button>
+          </app-item>
+        </app-card>
       </div>
     </div>
     @if(formUpdated) {

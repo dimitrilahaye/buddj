@@ -234,9 +234,25 @@ export class ExpensesComponent implements AfterViewInit {
     if (budget) {
       return budget.pendingFrom
         ? new Date(budget.pendingFrom)?.toISOString()
-        : null;
+        : '';
     }
-    return null;
+    return '';
+  }
+
+  get pendingBudgets() {
+    return (
+      this.month()?.account.weeklyBudgets.filter(
+        (b) => b.pendingFrom !== null && b.pendingFrom !== undefined
+      ) ?? []
+    );
+  }
+
+  get regularBudgets() {
+    return (
+      this.month()?.account.weeklyBudgets.filter(
+        (b) => b.pendingFrom === null || b.pendingFrom === undefined
+      ) ?? []
+    );
   }
 
   getInitialBalanceByWeekId(weekId: string) {

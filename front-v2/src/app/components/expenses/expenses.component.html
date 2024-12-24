@@ -28,7 +28,7 @@
   class="expenses"
   [ngStyle]="{ 'padding-bottom': formUpdated ? '80px' : 0 }"
 >
-  @if(form && expensesFormArray) {
+  @if(form && weeks.length > 0) {
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="expenses-list" formArrayName="expenses">
       <div class="expenses-list__header">
@@ -48,8 +48,10 @@
           >
         </div>
       </div>
-      <ng-container *ngFor="let week of weeks; let i = index">
-        @let pending = getPendingInfo(week.id);
+      @if(pendingBudgets.length > 0) {
+      <div class="header header--pending">Budgets des mois précédents</div>
+      }
+      <ng-container *ngFor="let week of pendingBudgets; let i = index">
         <app-card>
           <div class="expenses-list__week">
             <div class="expenses-list__week__header">
@@ -59,10 +61,7 @@
                 (toggle)="updateFilterState($event)"
               ></app-tab-button>
               <span
-                class="expenses-list__week-name"
-                [ngClass]="{
-                  'expenses-list__week-name--pending': pending !== null
-                }"
+                class="expenses-list__week-name expenses-list__week-name--pending"
               >
                 {{ week.name }}
               </span>
@@ -96,11 +95,120 @@
               </button>
             </div>
             <div class="expenses-list__infos">
-              @if(pending !== null) {
               <span class="expenses-list__pending">
-                ({{ pending | shortDate }})
+                ({{ getPendingInfo(week.id) | shortDate }})
               </span>
-              }&nbsp;
+              &nbsp;
+              {{ getBudgetsInfos(week.id) }}
+            </div>
+            <div class="expenses-list__balance">
+              <span>Solde :</span>
+              <app-progress-bar
+                [currentValue]="getCurrentBalanceByWeekId(week.id)"
+                [total]="getInitialBalanceByWeekId(week.id)"
+              ></app-progress-bar>
+            </div>
+            @if (filterIsActive(week.id)) { @if
+            (getExpensesFormGroupByWeekId(week.id).length === 0) {
+            <app-tips>
+              <p>Vous n'avez pas encore crée de dépenses pour ce budget 🙂</p>
+              <img width="50%" src="info/no-expenses-yet.png" alt="" />
+            </app-tips>
+            } @else {
+            <app-item
+              *ngFor="
+                let expense of getExpensesFormGroupByWeekId(week.id);
+                let i = index
+              "
+              [formGroupName]="i"
+            >
+              <button
+                type="button"
+                [ngClass]="{
+                  'expenses-list-item--checked': isExpenseItemChecked(expense)
+                }"
+                class="expenses-list-item"
+                (click)="toggleExpenseAtIndex(expense, $event)"
+              >
+                <span class="expenses-list-item__icon">
+                  <i class="fa-solid fa-basket-shopping"></i>
+                </span>
+                <div
+                  [ngClass]="{
+                    'expenses-list-item__info--checked':
+                      isExpenseItemChecked(expense)
+                  }"
+                  class="expenses-list-item__info"
+                >
+                  <span class="expenses-list-item-info__label">
+                    {{
+                      expense.get("label")?.value || "Label introuvable"
+                    }}</span
+                  >
+                  <span class="expenses-list-item-info__amount"
+                    >{{
+                      expense.get("amount")?.value || "Somme introuvable"
+                    }}€</span
+                  >
+                </div>
+
+                <button
+                  class="expenses-list-item__delete"
+                  type="button"
+                  (click)="openExpenseDelationModal(expense, $event)"
+                >
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </button>
+            </app-item>
+            } }
+          </div>
+        </app-card>
+      </ng-container>
+
+      <div class="header">Budgets du mois en cours</div>
+      <ng-container *ngFor="let week of regularBudgets; let i = index">
+        <app-card>
+          <div class="expenses-list__week">
+            <div class="expenses-list__week__header">
+              <app-tab-button
+                [id]="week.id"
+                [isFolded]="!filterIsActive(week.id)"
+                (toggle)="updateFilterState($event)"
+              ></app-tab-button>
+              <span class="expenses-list__week-name">
+                {{ week.name }}
+              </span>
+              <button
+                class="expenses-list__week-add"
+                type="button"
+                (click)="openUpdateBudgetModal(week.id)"
+              >
+                <i class="fa-solid fa-edit"></i>
+              </button>
+              <button
+                class="expenses-list__week-transfer"
+                type="button"
+                (click)="openRemoveBudgetModal(week.id)"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+              <button
+                class="expenses-list__week-add"
+                type="button"
+                (click)="openExpensesModal(week.id)"
+              >
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              <button
+                class="expenses-list__week-transfer"
+                type="button"
+                (click)="openTransferChoiceModal(week, $event)"
+              >
+                <i class="fa-solid fa-right-left"></i>
+              </button>
+            </div>
+            <div class="expenses-list__infos">
               {{ getBudgetsInfos(week.id) }}
             </div>
             <div class="expenses-list__balance">
@@ -180,15 +288,15 @@
     </div>
     }
   </form>
-  <button class="add-budget" (click)="openAddBudgetModal()">
-    <i class="fa-solid fa-plus"></i>
-  </button>
   } @else {
   <app-tips>
     <p>Vous n'avez pas encore crée de budgets pour ce mois 🙂</p>
     <img width="70%" src="info/no-budgets-yet.png" alt="" />
   </app-tips>
   }
+  <button class="add-budget" (click)="openAddBudgetModal()">
+    <i class="fa-solid fa-plus"></i>
+  </button>
 </div>
 
 @if(addExpenseForm) {
