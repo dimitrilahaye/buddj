@@ -13,17 +13,26 @@
     ></app-button-icon>
   </div>
   <div class="template__infos">
-    <app-toggle-button
-      (toggleChange)="defaultChanged($event)"
-      [disabled]="isLoading"
-      [isToggled]="editingTemplate.isDefault"
-    ></app-toggle-button>
-    <span>
-      {{ isDefaultInfo }}
-      @if(isLoading) { &nbsp;
-      <i class="fa-solid fa-arrows-rotate rotate"></i>
-      }
-    </span>
+    <div class="template-infos__default">
+      <app-toggle-button
+        (toggleChange)="defaultChanged($event)"
+        [disabled]="isLoading"
+        [isToggled]="editingTemplate.isDefault"
+      ></app-toggle-button>
+      <span>
+        {{ isDefaultInfo }}
+        @if(isLoading) { &nbsp;
+        <i class="fa-solid fa-arrows-rotate rotate"></i>
+        }
+      </span>
+    </div>
+    <div class="expenses-list__filters">
+      <app-button-link
+        class="expenses-list-filters__link"
+        (onClick)="toggleSectionsUnfolded()"
+        >{{ unfoldSectionsLabel }}</app-button-link
+      >
+    </div>
   </div>
   <div class="template__details">
     <app-card>

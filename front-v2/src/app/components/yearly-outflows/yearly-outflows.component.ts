@@ -60,6 +60,7 @@ export class YearlyOutflowsComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialBalanceValueControl: AbstractControl<any, any> | null = null;
   activeTabs: string[] = [];
+  sectionsUnfolded = false;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -124,6 +125,19 @@ export class YearlyOutflowsComponent {
         label: 'Décembre',
       },
     ];
+  }
+
+  toggleSectionsUnfolded() {
+    this.sectionsUnfolded = !this.sectionsUnfolded;
+    if (this.sectionsUnfolded) {
+      this.activeTabs = this.months.map((month) => month.label);
+    } else {
+      this.activeTabs = [];
+    }
+  }
+
+  get unfoldSectionsLabel() {
+    return this.sectionsUnfolded ? 'Tout replier' : 'Tout déplier';
   }
 
   toggleSection(section: string) {

@@ -60,6 +60,7 @@ export class MonthlyTemplateComponent implements OnInit {
   isNumpadModalOpen = false;
   // tabs
   activeTabs: Sections[] = [];
+  sectionsUnfolded = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -118,6 +119,19 @@ export class MonthlyTemplateComponent implements OnInit {
         return prev + curr.initialBalance;
       }, 0) ?? 0
     );
+  }
+
+  toggleSectionsUnfolded() {
+    this.sectionsUnfolded = !this.sectionsUnfolded;
+    if (this.sectionsUnfolded) {
+      this.activeTabs = ['outflows', 'budgets'];
+    } else {
+      this.activeTabs = [];
+    }
+  }
+
+  get unfoldSectionsLabel() {
+    return this.sectionsUnfolded ? 'Tout replier' : 'Tout déplier';
   }
 
   get total() {

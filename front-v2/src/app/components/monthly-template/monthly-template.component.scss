@@ -27,6 +27,7 @@ section {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
   }
   
@@ -34,6 +35,15 @@ section {
     margin-top: 10px;
     display: flex;
     flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.template-infos {
+  &__default {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     gap: 10px;
   }
 }
