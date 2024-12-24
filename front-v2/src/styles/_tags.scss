@@ -11,3 +11,14 @@
   color: var(--dark-100);
   font-size: var(--text-10);
 }
+
+%button {
+  border: 0;
+  background: none;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+}

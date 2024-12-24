@@ -1,0 +1,10 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+
+.card {
+    border: 1px solid var(--light-200);
+    border-radius: 15px;
+    box-sizing: border-box;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

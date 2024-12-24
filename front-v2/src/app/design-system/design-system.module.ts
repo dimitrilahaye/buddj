@@ -19,6 +19,8 @@ import { ToggleButtonComponent } from './toggle-button/toggle-button.component';
 import { TipsComponent } from './tips/tips.component';
 import { ButtonLinkComponent } from './button-link/button-link.component';
 import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
+import { CardComponent } from './card/card.component';
+import { TabButtonComponent } from './tab-button/tab-button.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +42,8 @@ import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
     TipsComponent,
     ButtonLinkComponent,
     ScrollToTopComponent,
+    CardComponent,
+    TabButtonComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [
@@ -61,6 +65,8 @@ import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
     TipsComponent,
     ButtonLinkComponent,
     ScrollToTopComponent,
+    CardComponent,
+    TabButtonComponent,
   ],
 })
 export class DesignSystemModule {}

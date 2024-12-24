@@ -1,6 +1,6 @@
 @import "../../../styles/variables";
 @import "../../../styles/typo";
-@import "../../../styles/input";
+@import "../../../styles/tags";
 
 .content {
     margin-top: 40px;
@@ -16,11 +16,24 @@ section {
     margin: 10px 0;
 }
 
+.subtotal {
+  @extend %text-5;
+
+  color: var(--color-800);
+}
+
 .template {
   &__infos {
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 10px;
+  }
+  
+  &__details {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
   }
 }
@@ -41,13 +54,28 @@ section {
 }
 
 .subtitle {
-    @extend %title-3;
-    
     margin: 5px 0;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
+
+    &__infos {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+}
+
+.subtitle-infos {
+  &__title {
+    @extend %title-3;
+  }
+
+  &__infos {
+    @extend %text-7;
+  }
 }
 
 .outflows {
@@ -56,6 +84,10 @@ section {
         flex-direction: column;
         gap: 10px;
         padding-bottom: 10px;
+
+        &--hide {
+          display: none;
+        }
     }
 }
 

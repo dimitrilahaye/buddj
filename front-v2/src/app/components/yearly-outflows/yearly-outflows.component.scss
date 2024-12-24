@@ -28,11 +28,20 @@
   @extend %title-3;
 }
 
+.subtotal {
+  @extend %text-5;
+
+  color: var(--color-800);
+}
+
 .content {
   margin-top: 40px;
   padding: 5px;
   padding-bottom: 60px;
   box-sizing: border-box;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .outflows {
@@ -59,13 +68,37 @@
             align-items: center;
           }
         }
+
+        &--hide {
+          display: none;
+        }
     }
 }
 
 .outflows-month {
-    &__title {
-      @extend %title-10;
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+}
+
+.outflows-month-header {
+  &__infos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+.outflows-month-header-infos {
+  &__title {
+    @extend %title-10;
+  }
+  &__infos {
+    @extend %text-7;
+  }
 }
 
 .outflows-list {

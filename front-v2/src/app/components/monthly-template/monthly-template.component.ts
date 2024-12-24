@@ -29,6 +29,8 @@ import ToasterServiceInterface, {
 } from '../../services/toaster/toaster.service.interface';
 import { AddOutflow } from '../../services/months/months.service.interface';
 
+type Sections = 'outflows' | 'budgets';
+
 @Component({
   selector: 'app-monthly-template',
   standalone: true,
@@ -56,6 +58,8 @@ export class MonthlyTemplateComponent implements OnInit {
   editingBudget: AddingBudget | null = null;
   // numpad
   isNumpadModalOpen = false;
+  // tabs
+  activeTabs: Sections[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -68,6 +72,18 @@ export class MonthlyTemplateComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeEditingTemplate();
+  }
+
+  toggleSection(section: Sections) {
+    if (this.activeTabs.includes(section)) {
+      this.activeTabs = this.activeTabs.filter((tab) => tab !== section);
+    } else {
+      this.activeTabs.push(section);
+    }
+  }
+
+  sectionIsFolded(section: Sections): boolean {
+    return this.activeTabs.includes(section) === false;
   }
 
   initializeEditingTemplate() {
@@ -88,16 +104,24 @@ export class MonthlyTemplateComponent implements OnInit {
     return this.editingTemplateSignal();
   }
 
-  get total() {
-    const totalOutflows =
+  get outflowsTotal() {
+    return (
       this.editingTemplate?.outflows.reduce((prev, curr) => {
         return prev + curr.amount;
-      }, 0) ?? 0;
-    const totalBudgets =
+      }, 0) ?? 0
+    );
+  }
+
+  get budgetsTotal() {
+    return (
       this.editingTemplate?.budgets.reduce((prev, curr) => {
         return prev + curr.initialBalance;
-      }, 0) ?? 0;
-    return totalBudgets + totalOutflows;
+      }, 0) ?? 0
+    );
+  }
+
+  get total() {
+    return this.budgetsTotal + this.outflowsTotal;
   }
 
   get template(): MonthTemplate | null {

@@ -1,0 +1,10 @@
+<button
+  class="tab"
+  [ngClass]="{
+    'tab--folded': isFolded()
+  }"
+  type="button"
+  (click)="toggleTab()"
+>
+  <i class="fa-solid fa-chevron-right"></i>
+</button>
