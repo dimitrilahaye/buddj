@@ -25,6 +25,13 @@
 
 <app-header-back-button></app-header-back-button>
 <div class="content">
+  <div class="expenses-list__filters">
+    <app-button-link
+      class="expenses-list-filters__link"
+      (onClick)="toggleSectionsUnfolded()"
+      >{{ unfoldSectionsLabel }}</app-button-link
+    >
+  </div>
   <ng-container *ngFor="let month of months">
     <app-card>
       <section class="outflows__month">

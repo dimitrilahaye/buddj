@@ -24,6 +24,13 @@
     }
 }
 
+.expenses-list {
+  &__filters {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
 .subtitle {
   @extend %title-3;
 }
@@ -94,7 +101,7 @@
 
 .outflows-month-header-infos {
   &__title {
-    @extend %title-10;
+    @extend %title-3;
   }
   &__infos {
     @extend %text-7;
