@@ -129,10 +129,28 @@ export class OutflowsComponent implements AfterViewInit {
     this.outflows()!.forEach((outflow) => this.addOutflow(outflow));
   }
 
+  get pendingOutflows() {
+    if (this.outflowsFormArray) {
+      return this.outflowsFormArray.controls.filter(
+        (control) => control.get('pendingFrom')?.value !== null
+      );
+    }
+    return [];
+  }
+
+  get regularOutflows() {
+    if (this.outflowsFormArray) {
+      return this.outflowsFormArray.controls.filter(
+        (control) => control.get('pendingFrom')?.value === null
+      );
+    }
+    return [];
+  }
+
   getPendingInfo(outflow: AbstractControl<any, any>) {
     const pendingFrom = outflow.get('pendingFrom')?.value;
     if (!pendingFrom) {
-      return null;
+      return '';
     }
     return new Date(pendingFrom)?.toISOString();
   }
@@ -160,8 +178,18 @@ export class OutflowsComponent implements AfterViewInit {
   }
 
   toggleOutflowAtIndex(i: number, event: Event) {
-    const outflowControl = this.outflowsFormArray.at(i);
-    const outflowValue = this.outflowsFormArray.at(i).getRawValue();
+    const outflowControl = this.regularOutflows.at(i)!;
+    const outflowValue = outflowControl.getRawValue();
+    outflowControl.setValue({
+      ...outflowValue,
+      isChecked: !outflowValue.isChecked,
+    });
+    event.stopPropagation();
+  }
+
+  togglePendingOutflowAtIndex(i: number, event: Event) {
+    const outflowControl = this.pendingOutflows.at(i)!;
+    const outflowValue = outflowControl.getRawValue();
     outflowControl.setValue({
       ...outflowValue,
       isChecked: !outflowValue.isChecked,
@@ -182,7 +210,12 @@ export class OutflowsComponent implements AfterViewInit {
   }
 
   isOutflowItemChecked(i: number) {
-    const outflowValue = this.outflowsFormArray.at(i).getRawValue();
+    const outflowValue = this.regularOutflows.at(i)!.getRawValue();
+    return outflowValue.isChecked;
+  }
+
+  isPendingOutflowItemChecked(i: number) {
+    const outflowValue = this.pendingOutflows.at(i)!.getRawValue();
     return outflowValue.isChecked;
   }
 

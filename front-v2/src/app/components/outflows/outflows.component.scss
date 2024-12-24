@@ -6,6 +6,16 @@
   flex-direction: column;
   gap: 10px;
   padding-bottom: 40px;
+  
+  ::ng-deep app-card {
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+  }
 
   &__header {
     display: flex;
@@ -13,6 +23,20 @@
     gap: 10px;
     align-items: center;
     justify-content: center;
+  }
+}
+
+.header {
+  @extend %text-5;
+  
+  border-radius: 5px;
+  padding: 5px;
+  font-weight: bold;
+
+  &--pending {
+    background-color: var(--color-700);
+    color: var(--color-300);
+    border: 0px;
   }
 }
 
