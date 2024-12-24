@@ -25,95 +25,152 @@
       }
     </span>
   </div>
-  <section>
-    <div class="subtitle">
-      Sorties mensuelles
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        [disabled]="isLoading"
-        (click)="openAddOutflowModal()"
-      ></app-button-icon>
-    </div>
-    <div class="outflows__list">
-      @if (editingTemplate.outflows.length === 0) {
-      <app-tips>
-        <p>Aucune sortie mensuelle pour le moment 🙂</p>
-        <img width="70%" src="info/no-outflows-yet.png" alt="" />
-      </app-tips>
-      } @else {
-      <app-item *ngFor="let outflow of editingTemplate.outflows; let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-money-bill-transfer"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ outflow.label }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              outflow.amount | currency : "EUR"
-            }}</span>
+  <div class="template__details">
+    <app-card>
+      <section>
+        <div class="subtitle">
+          <app-tab-button
+            [id]="'outflows'"
+            [isFolded]="sectionIsFolded('outflows')"
+            (toggle)="toggleSection('outflows')"
+          ></app-tab-button>
+          <div class="subtitle__infos">
+            <span class="subtitle-infos__title">Sorties mensuelles</span>
+            <span class="subtitle-infos__infos">
+              {{
+                editingTemplate.outflows.length
+                  | i18nPlural
+                    : {
+                        "=0": "aucune sortie",
+                        "=1": "une sortie",
+                        other: "# sorties"
+                      }
+              }}
+              <span class="subtotal">{{
+                outflowsTotal | currency : "EUR"
+              }}</span>
+            </span>
           </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
+          <app-button-icon
+            icon="fa-plus"
+            size="small"
             [disabled]="isLoading"
-            (click)="openOutflowDelationModal(outflow, $event)"
+            (click)="openAddOutflowModal()"
+          ></app-button-icon>
+        </div>
+        <div
+          class="outflows__list"
+          [ngClass]="{ 'outflows__list--hide': sectionIsFolded('outflows') }"
+        >
+          @if (editingTemplate.outflows.length === 0) {
+          <app-tips>
+            <p>Aucune sortie mensuelle pour le moment 🙂</p>
+            <img width="70%" src="info/no-outflows-yet.png" alt="" />
+          </app-tips>
+          } @else {
+          <app-item
+            *ngFor="let outflow of editingTemplate.outflows; let i = index"
           >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
-  <app-divider></app-divider>
-  <section>
-    <div class="subtitle">
-      Budgets
-      <app-button-icon
-        icon="fa-plus"
-        size="small"
-        [disabled]="isLoading"
-        (click)="openAddBudgetModal()"
-      ></app-button-icon>
-    </div>
-    <div class="outflows__list">
-      @if (editingTemplate.budgets.length === 0) {
-      <app-tips>
-        <p>Aucun budget mensuel pour le moment 🙂</p>
-        <img width="70%" src="info/no-budgets-yet.png" alt="" />
-      </app-tips>
-      } @else {
-      <app-item *ngFor="let budget of editingTemplate.budgets; let i = index">
-        <button type="button" class="outflows-list-item">
-          <span class="outflows-list-item__icon">
-            <i class="fa-solid fa-basket-shopping"></i>
-          </span>
-          <div class="outflows-list-item__info">
-            <span class="outflows-list-item-info__label">
-              {{ budget.name }}</span
-            >
-            <span class="outflows-list-item-info__amount">{{
-              budget.initialBalance | currency : "EUR"
-            }}</span>
+            <button type="button" class="outflows-list-item">
+              <span class="outflows-list-item__icon">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+              </span>
+              <div class="outflows-list-item__info">
+                <span class="outflows-list-item-info__label">
+                  {{ outflow.label }}</span
+                >
+                <span class="outflows-list-item-info__amount">{{
+                  outflow.amount | currency : "EUR"
+                }}</span>
+              </div>
+
+              <button
+                class="outflows-list-item__delete"
+                type="button"
+                [disabled]="isLoading"
+                (click)="openOutflowDelationModal(outflow, $event)"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </button>
+          </app-item>
+          }
+        </div>
+      </section>
+    </app-card>
+    <app-card>
+      <section>
+        <div class="subtitle">
+          <app-tab-button
+            [id]="'budgets'"
+            [isFolded]="sectionIsFolded('budgets')"
+            (toggle)="toggleSection('budgets')"
+          ></app-tab-button>
+          <div class="subtitle__infos">
+            <span class="subtitle-infos__title">Budgets</span>
+            <span class="subtitle-infos__infos">
+              {{
+                editingTemplate.budgets.length
+                  | i18nPlural
+                    : {
+                        "=0": "aucun budget",
+                        "=1": "un budget",
+                        other: "# budgets"
+                      }
+              }}
+              <span class="subtotal">{{
+                budgetsTotal | currency : "EUR"
+              }}</span>
+            </span>
           </div>
-
-          <button
-            class="outflows-list-item__delete"
-            type="button"
+          <app-button-icon
+            icon="fa-plus"
+            size="small"
             [disabled]="isLoading"
-            (click)="openBudgetDelationModal(budget, $event)"
+            (click)="openAddBudgetModal()"
+          ></app-button-icon>
+        </div>
+        <div
+          class="outflows__list"
+          [ngClass]="{ 'outflows__list--hide': sectionIsFolded('budgets') }"
+        >
+          @if (editingTemplate.budgets.length === 0) {
+          <app-tips>
+            <p>Aucun budget mensuel pour le moment 🙂</p>
+            <img width="70%" src="info/no-budgets-yet.png" alt="" />
+          </app-tips>
+          } @else {
+          <app-item
+            *ngFor="let budget of editingTemplate.budgets; let i = index"
           >
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </button>
-      </app-item>
-      }
-    </div>
-  </section>
+            <button type="button" class="outflows-list-item">
+              <span class="outflows-list-item__icon">
+                <i class="fa-solid fa-basket-shopping"></i>
+              </span>
+              <div class="outflows-list-item__info">
+                <span class="outflows-list-item-info__label">
+                  {{ budget.name }}</span
+                >
+                <span class="outflows-list-item-info__amount">{{
+                  budget.initialBalance | currency : "EUR"
+                }}</span>
+              </div>
+
+              <button
+                class="outflows-list-item__delete"
+                type="button"
+                [disabled]="isLoading"
+                (click)="openBudgetDelationModal(budget, $event)"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </button>
+          </app-item>
+          }
+        </div>
+      </section>
+    </app-card>
+  </div>
   }
 </div>
 

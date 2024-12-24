@@ -26,104 +26,144 @@
 <app-header-back-button></app-header-back-button>
 <div class="content">
   <ng-container *ngFor="let month of months">
-    <section class="outflows__month">
-      <div class="outflows-month__title">
-        {{ month.label }}
-      </div>
-      <div class="outflows__list">
-        <div class="outflows-list__header">
-          <div class="subtitle">Sorties</div>
-          <app-button-icon
-            icon="fa-plus"
-            size="small"
-            (click)="addOutflowToMonth(month.month, $event)"
-          ></app-button-icon>
+    <app-card>
+      <section class="outflows__month">
+        <div class="outflows-month__header">
+          <app-tab-button
+            [id]="month.label"
+            [isFolded]="sectionIsFolded(month.label)"
+            (toggle)="toggleSection(month.label)"
+          ></app-tab-button>
+          <div class="outflows-month-header__infos">
+            <span class="outflows-month-header-infos__title">{{
+              month.label
+            }}</span>
+            <span class="outflows-month-header-infos__infos">
+              {{
+                getOutflowsForMonth(month.month).length
+                  | i18nPlural
+                    : {
+                        "=0": "aucune sortie",
+                        "=1": "une sortie",
+                        other: "# sorties"
+                      }
+              }}
+              <span class="subtotal">{{
+                getOutflowsTotalForMonth(month.month) | currency : "EUR"
+              }}</span>
+              |
+              {{
+                getBudgetsForMonth(month.month).length
+                  | i18nPlural
+                    : {
+                        "=0": "aucun budget",
+                        "=1": "un budget",
+                        other: "# budgets"
+                      }
+              }}
+              <span class="subtotal">{{
+                getBudgetsTotalForMonth(month.month) | currency : "EUR"
+              }}</span>
+            </span>
+          </div>
         </div>
-        @if (getOutflowsForMonth(month.month).length === 0) {
-        <app-tips>
-          <p>Vous n'avez enregistré aucune sortie pour ce mois 🙂</p>
-          <img width="30%" src="info/no-yearly-outflows-yet.png" alt="" />
-        </app-tips>
-        } @else {
-        <div class="outflows-list__list">
-          <app-item
-            *ngFor="
-              let outflow of getOutflowsForMonth(month.month);
-              let i = index
-            "
-          >
-            <button type="button" class="outflows-list-item">
-              <span class="outflows-list-item__icon">
-                <i class="fa-solid fa-money-bill-transfer"></i>
-              </span>
-              <div class="outflows-list-item__info">
-                <span class="outflows-list-item-info__label">
-                  {{ outflow.label }}</span
-                >
-                <span class="outflows-list-item-info__amount">{{
-                  outflow.amount | currency : "EUR"
-                }}</span>
-              </div>
+        <div
+          class="outflows__list"
+          [ngClass]="{ 'outflows__list--hide': sectionIsFolded(month.label) }"
+        >
+          <div class="outflows-list__header">
+            <div class="subtitle">Sorties</div>
+            <app-button-icon
+              icon="fa-plus"
+              size="small"
+              (click)="addOutflowToMonth(month.month, $event)"
+            ></app-button-icon>
+          </div>
+          @if (getOutflowsForMonth(month.month).length === 0) {
+          <app-tips>
+            <p>Vous n'avez enregistré aucune sortie pour ce mois 🙂</p>
+            <img width="30%" src="info/no-yearly-outflows-yet.png" alt="" />
+          </app-tips>
+          } @else {
+          <div class="outflows-list__list">
+            <app-item
+              *ngFor="
+                let outflow of getOutflowsForMonth(month.month);
+                let i = index
+              "
+            >
+              <button type="button" class="outflows-list-item">
+                <span class="outflows-list-item__icon">
+                  <i class="fa-solid fa-money-bill-transfer"></i>
+                </span>
+                <div class="outflows-list-item__info">
+                  <span class="outflows-list-item-info__label">
+                    {{ outflow.label }}</span
+                  >
+                  <span class="outflows-list-item-info__amount">{{
+                    outflow.amount | currency : "EUR"
+                  }}</span>
+                </div>
 
-              <button
-                class="outflows-list-item__delete"
-                type="button"
-                (click)="openOutflowDelationModal(outflow, $event)"
-              >
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </button>
-          </app-item>
-        </div>
-        }
-        <div class="outflows-list__header">
-          <div class="subtitle">Budgets</div>
-          <app-button-icon
-            icon="fa-plus"
-            size="small"
-            (click)="addBudgetToMonth(month.month, $event)"
-          ></app-button-icon>
-        </div>
-        @if (getBudgetsForMonth(month.month).length === 0) {
-        <app-tips>
-          <p>Vous n'avez enregistré aucun budget pour ce mois 🙂</p>
-          <img width="30%" src="info/no-yearly-outflows-yet.png" alt="" />
-        </app-tips>
-        } @else {
-        <div class="outflows-list__list">
-          <app-item
-            *ngFor="
-              let budget of getBudgetsForMonth(month.month);
-              let i = index
-            "
-          >
-            <button type="button" class="outflows-list-item">
-              <span class="outflows-list-item__icon">
-                <i class="fa-solid fa-basket-shopping"></i>
-              </span>
-              <div class="outflows-list-item__info">
-                <span class="outflows-list-item-info__label">
-                  {{ budget.name }}</span
+                <button
+                  class="outflows-list-item__delete"
+                  type="button"
+                  (click)="openOutflowDelationModal(outflow, $event)"
                 >
-                <span class="outflows-list-item-info__amount">{{
-                  budget.initialBalance | currency : "EUR"
-                }}</span>
-              </div>
-
-              <button
-                class="outflows-list-item__delete"
-                type="button"
-                (click)="openBudgetDelationModal(budget, $event)"
-              >
-                <i class="fa-solid fa-trash-can"></i>
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
               </button>
-            </button>
-          </app-item>
+            </app-item>
+          </div>
+          }
+          <div class="outflows-list__header">
+            <div class="subtitle">Budgets</div>
+            <app-button-icon
+              icon="fa-plus"
+              size="small"
+              (click)="addBudgetToMonth(month.month, $event)"
+            ></app-button-icon>
+          </div>
+          @if (getBudgetsForMonth(month.month).length === 0) {
+          <app-tips>
+            <p>Vous n'avez enregistré aucun budget pour ce mois 🙂</p>
+            <img width="30%" src="info/no-yearly-outflows-yet.png" alt="" />
+          </app-tips>
+          } @else {
+          <div class="outflows-list__list">
+            <app-item
+              *ngFor="
+                let budget of getBudgetsForMonth(month.month);
+                let i = index
+              "
+            >
+              <button type="button" class="outflows-list-item">
+                <span class="outflows-list-item__icon">
+                  <i class="fa-solid fa-basket-shopping"></i>
+                </span>
+                <div class="outflows-list-item__info">
+                  <span class="outflows-list-item-info__label">
+                    {{ budget.name }}</span
+                  >
+                  <span class="outflows-list-item-info__amount">{{
+                    budget.initialBalance | currency : "EUR"
+                  }}</span>
+                </div>
+
+                <button
+                  class="outflows-list-item__delete"
+                  type="button"
+                  (click)="openBudgetDelationModal(budget, $event)"
+                >
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </button>
+            </app-item>
+          </div>
+          }
         </div>
-        }
-      </div>
-    </section>
-    <app-divider></app-divider>
+      </section>
+    </app-card>
   </ng-container>
 </div>
 

@@ -8,20 +8,21 @@
   </app-tips>
   } @else {
   <section class="content__template" *ngFor="let template of templates">
-    <div class="content-template__content">
-      <div class="content-template-content__title">
-        {{ template.name }}&nbsp;<span
-          class="content-template-content-title__infos"
-          >{{ getDefaultInfo(template) }}</span
-        >
+    <app-card>
+      <div class="content-template__content">
+        <div class="content-template-content__title">
+          {{ template.name }}&nbsp;<span
+            class="content-template-content-title__infos"
+            >{{ getDefaultInfo(template) }}</span
+          >
+        </div>
+        <app-button-icon
+          icon="fa-eye"
+          size="small"
+          (click)="goToTemplatePage(template.id, $event)"
+        ></app-button-icon>
       </div>
-      <app-button-icon
-        icon="fa-eye"
-        size="small"
-        (click)="goToTemplatePage(template.id, $event)"
-      ></app-button-icon>
-    </div>
-    <app-divider></app-divider>
+    </app-card>
   </section>
   }
 </div>

@@ -59,6 +59,7 @@ export class YearlyOutflowsComponent {
   budgetDelationModalIsOpen = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialBalanceValueControl: AbstractControl<any, any> | null = null;
+  activeTabs: string[] = [];
 
   constructor(
     private readonly fb: FormBuilder,
@@ -125,6 +126,18 @@ export class YearlyOutflowsComponent {
     ];
   }
 
+  toggleSection(section: string) {
+    if (this.activeTabs.includes(section)) {
+      this.activeTabs = this.activeTabs.filter((tab) => tab !== section);
+    } else {
+      this.activeTabs.push(section);
+    }
+  }
+
+  sectionIsFolded(section: string): boolean {
+    return this.activeTabs.includes(section) === false;
+  }
+
   get totalAmountByMonth() {
     const yearlyOutflows = this.savings()!;
     let total = 0;
@@ -142,6 +155,11 @@ export class YearlyOutflowsComponent {
   }
 
   // BUDGETS PART
+
+  getBudgetsTotalForMonth(month: number) {
+    const budgets = this.getBudgetsForMonth(month);
+    return budgets.reduce((total, budget) => total + budget.initialBalance, 0);
+  }
 
   getBudgetsForMonth(month: number) {
     return this.savings()![month].budgets;
@@ -235,6 +253,11 @@ export class YearlyOutflowsComponent {
   }
 
   // OUTFLOWS PART
+
+  getOutflowsTotalForMonth(month: number) {
+    const outflows = this.getOutflowsForMonth(month);
+    return outflows.reduce((total, outflow) => total + outflow.amount, 0);
+  }
 
   getOutflowsForMonth(month: number) {
     return this.savings()![month].outflows;

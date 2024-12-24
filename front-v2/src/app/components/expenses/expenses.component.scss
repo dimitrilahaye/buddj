@@ -1,11 +1,11 @@
 @import "../../../styles/variables";
 @import "../../../styles/typo";
-@import "../../../styles/input";
+@import "../../../styles/tags";
 
 .expenses-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   padding-bottom: 40px;
     
   &__pending {
