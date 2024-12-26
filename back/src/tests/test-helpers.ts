@@ -2,7 +2,7 @@ import chai from "chai";
 import cap from "chai-as-promised";
 import sinonChai from "sinon-chai";
 import sinon from "sinon";
-import { describe } from "mocha";
+import { test, describe } from "mocha";
 
 const expect = chai.expect;
 
@@ -22,5 +22,7 @@ export class Clock {
     this.clock?.restore();
   }
 }
+
+export { test };
 
 export default expect;
