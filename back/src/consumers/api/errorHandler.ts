@@ -35,6 +35,11 @@ const errorHandler = (
     case "AccountBudgetNameCantBeEmptyError":
     case "YearlySavingTypeDoesNotExistError":
     case "AccountBudgetCanNotBeRemovedError":
+    case "AddedInactiveLogError":
+    case "AddedOlderLogError":
+    case "ProjectNameCanNotBeEmptyError":
+    case "ProjectTargetMustBePositiveError":
+    case "ProjectAmountMustBePositiveError":
       statusCode = 422;
       break;
     default:
