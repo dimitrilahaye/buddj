@@ -10,42 +10,8 @@ import cookieSession from "cookie-session";
 import passport from "passport";
 
 import errorHandler from "./errorHandler.js";
-import { getDefaultMonthlyTemplate } from "./routes/monthly-template/getDefaultMonthlyTemplate.js";
-import { createNewMonth } from "./routes/month/createNewMonth.js";
-import { getUnarchivedMonths } from "./routes/month/getUnarchivedMonths.js";
-import { addWeeklyExpense } from "./routes/month/addWeeklyExpense.js";
-import { manageExpensesChecking } from "./routes/month/manageExpensesChecking.js";
-import { manageOutflowsChecking } from "./routes/month/manageOutflowsChecking.js";
-import { archiveMonth } from "./routes/month/archiveMonth.js";
-import { deleteExpense } from "./routes/month/deleteExpense.js";
-import { updateExpense } from "./routes/month/updateExpense.js";
-import { deleteOutflow } from "./routes/month/deleteOutflow.js";
-import { addOutflow } from "./routes/month/addOutflow.js";
-import { getArchivedMonths } from "./routes/month/getArchivedMonths.js";
-import { unarchiveMonth } from "./routes/month/unarchiveMonth.js";
-import { deleteMonth } from "./routes/month/deleteMonth.js";
-import { transferBalanceIntoMonth } from "./routes/month/transferBalanceIntoMonth.js";
-import { getYearlyOutflows } from "./routes/yearly-saving/getYearlyOutflows.js";
-import { addYearlyOutflow } from "./routes/yearly-saving/addYearlyOutflow.js";
-import { removeYearlyOutflow } from "./routes/yearly-saving/removeYearlyOutflow.js";
-import { getAllMonthlyTemplates } from "./routes/monthly-template/getAllMonthlyTemplates.js";
-import { updateMonthlyTemplate } from "./routes/monthly-template/updateMonthlyTemplate.js";
+import routes from "./routes/index.js";
 import { Deps } from "../../ioc.js";
-import { deleteMonthlyOutflow } from "./routes/monthly-template/deleteMonthlyOutflow.js";
-import { deleteMonthlyBudget } from "./routes/monthly-template/deleteMonthlyBudget.js";
-import { addMonthlyOutflow } from "./routes/monthly-template/addMonthlyOutflow.js";
-import { addMonthlyBudget } from "./routes/monthly-template/addMonthlyBudget.js";
-import { addBudget } from "./routes/month/addBudget.js";
-import { updateBudget } from "./routes/month/updateBudget.js";
-import { removeBudget } from "./routes/month/removeBudget.js";
-import getAllProjectsByCategory from "./routes/project/getAllProjectsByCategory.js";
-import addAmountProject from "./routes/project/addAmountProject.js";
-import createProject from "./routes/project/createProject.js";
-import getProject from "./routes/project/getProject.js";
-import reApplyProject from "./routes/project/reApplyProject.js";
-import rollbackProject from "./routes/project/rollbackProject.js";
-import removeProject from "./routes/project/removeProject.js";
-import updateProject from "./routes/project/updateProject.js";
 
 declare global {
   namespace Express {
@@ -185,145 +151,145 @@ function buildApi(
   api.use(isLoggedIn);
 
   api.use(
-    deleteMonth(router, {
+    routes.month.deleteMonth(router, {
       deleteMonthUsecase: dependencies.deleteMonthUsecase,
       monthDto: dependencies.monthDto,
       deserializer: dependencies.deleteMonthDeserializer,
     })
   );
   api.use(
-    getArchivedMonths(router, {
+    routes.month.getArchivedMonths(router, {
       getArchivedMonthsUsecase: dependencies.getArchivedMonthsUsecase,
       monthDto: dependencies.monthDto,
     })
   );
   api.use(
-    addOutflow(router, {
+    routes.month.addOutflow(router, {
       addOutflowUsecase: dependencies.addOutflowUsecase,
       monthDto: dependencies.monthDto,
       deserializer: dependencies.addOutflowDeserializer,
     })
   );
   api.use(
-    addBudget(router, {
+    routes.month.addBudget(router, {
       usecase: dependencies.addBudgetUsecase,
       dto: dependencies.monthDto,
       deserializer: dependencies.addBudgetDeserializer,
     })
   );
   api.use(
-    updateBudget(router, {
+    routes.month.updateBudget(router, {
       usecase: dependencies.updateBudgetUsecase,
       dto: dependencies.monthDto,
       deserializer: dependencies.updateBudgetDeserializer,
     })
   );
   api.use(
-    removeBudget(router, {
+    routes.month.removeBudget(router, {
       usecase: dependencies.removeBudgetUsecase,
       dto: dependencies.monthDto,
     })
   );
   api.use(
-    deleteOutflow(router, {
+    routes.month.deleteOutflow(router, {
       deleteOutflowUsecase: dependencies.deleteOutflowUsecase,
       monthDto: dependencies.monthDto,
       deserializer: dependencies.deleteOutflowDeserializer,
     })
   );
   api.use(
-    deleteExpense(router, {
+    routes.month.deleteExpense(router, {
       deleteExpenseUsecase: dependencies.deleteExpenseUsecase,
       monthDto: dependencies.monthDto,
       deserializer: dependencies.deleteExpenseDeserializer,
     })
   );
   api.use(
-    unarchiveMonth(router, {
+    routes.month.unarchiveMonth(router, {
       unarchiveMonthUsecase: dependencies.unarchiveMonthUsecase,
       monthDto: dependencies.monthDto,
       deserializer: dependencies.unarchiveMonthDeserializer,
     })
   );
   api.use(
-    archiveMonth(router, {
+    routes.month.archiveMonth(router, {
       archiveMonthUsecase: dependencies.archiveMonthUsecase,
       monthDto: dependencies.monthDto,
       deserializer: dependencies.archiveMonthDeserializer,
     })
   );
   api.use(
-    manageOutflowsChecking(router, {
+    routes.month.manageOutflowsChecking(router, {
       manageOutflowsCheckingUsecase: dependencies.manageOutflowsCheckingUsecase,
       monthDto: dependencies.monthDto,
       deserializer: dependencies.manageOutflowCheckingDeserializer,
     })
   );
   api.use(
-    manageExpensesChecking(router, {
+    routes.month.manageExpensesChecking(router, {
       manageExpensesCheckingUsecase: dependencies.manageExpensesCheckingUsecase,
       deserializer: dependencies.manageExpenseCheckingDeserializer,
     })
   );
   api.use(
-    addWeeklyExpense(router, {
+    routes.month.addWeeklyExpense(router, {
       addWeeklyExpenseUsecase: dependencies.addWeeklyExpenseUsecase,
       deserializer: dependencies.addWeeklyExpenseDeserializer,
     })
   );
   api.use(
-    getDefaultMonthlyTemplate(router, {
+    routes.monthlyTemplate.getDefaultMonthlyTemplate(router, {
       usecase: dependencies.getDefaultMonthlyTemplateUsecase,
     })
   );
   api.use(
-    updateMonthlyTemplate(router, {
+    routes.monthlyTemplate.updateMonthlyTemplate(router, {
       usecase: dependencies.updateMonthlyTemplateUsecase,
       deserializer: dependencies.updateMonthlyTemplateDeserializer,
     })
   );
   api.use(
-    deleteMonthlyOutflow(router, {
+    routes.monthlyTemplate.deleteMonthlyOutflow(router, {
       usecase: dependencies.deleteMonthlyOutflowUsecase,
       deserializer: dependencies.deleteMonthlyOutflowDeserializer,
     })
   );
   api.use(
-    deleteMonthlyBudget(router, {
+    routes.monthlyTemplate.deleteMonthlyBudget(router, {
       usecase: dependencies.deleteMonthlyBudgetUsecase,
       deserializer: dependencies.deleteMonthlyBudgetDeserializer,
     })
   );
   api.use(
-    getAllMonthlyTemplates(router, {
+    routes.monthlyTemplate.getAllMonthlyTemplates(router, {
       usecase: dependencies.getAllMonthlyTemplatesUsecase,
     })
   );
   api.use(
-    getUnarchivedMonths(router, {
+    routes.month.getUnarchivedMonths(router, {
       getUnarchivedMonthsUsecase: dependencies.getUnarchivedMonthsUsecase,
     })
   );
   api.use(
-    createNewMonth(router, {
+    routes.month.createNewMonth(router, {
       createNewMonthUsecase: dependencies.createNewMonthUsecase,
       deserializer: dependencies.monthCreationDeserializer,
     })
   );
   api.use(
-    addMonthlyOutflow(router, {
+    routes.monthlyTemplate.addMonthlyOutflow(router, {
       usecase: dependencies.addMonthlyOutflowUsecase,
       deserializer: dependencies.addMonthlyOutflowDeserializer,
     })
   );
   api.use(
-    addMonthlyBudget(router, {
+    routes.monthlyTemplate.addMonthlyBudget(router, {
       usecase: dependencies.addMonthlyBudgetUsecase,
       deserializer: dependencies.addMonthlyBudgetDeserializer,
     })
   );
   api.use(
-    transferBalanceIntoMonth(router, {
+    routes.month.transferBalanceIntoMonth(router, {
       transferBalanceIntoMonthUsecase:
         dependencies.transferBalanceIntoMonthUsecase,
       deserializer: dependencies.transferBalanceIntoMonthDeserializer,
@@ -331,68 +297,68 @@ function buildApi(
     })
   );
   api.use(
-    getYearlyOutflows(router, {
+    routes.yearlySaving.getYearlyOutflows(router, {
       getYearlyOutflows: dependencies.getYearlyOutflowsUsecase,
       yearlyOutflowsDto: dependencies.yearlyOutflowsDto,
     })
   );
   api.use(
-    addYearlyOutflow(router, {
+    routes.yearlySaving.addYearlyOutflow(router, {
       addYearlyOutflow: dependencies.addYearlyOutflowUsecase,
       deserializer: dependencies.addYearlyOutflowDeserializer,
       yearlyOutflowsDto: dependencies.yearlyOutflowsDto,
     })
   );
   api.use(
-    removeYearlyOutflow(router, {
+    routes.yearlySaving.removeYearlyOutflow(router, {
       removeYearlyOutflow: dependencies.removeYearlyOutflowUsecase,
       deserializer: dependencies.removeYearlyOutflowDeserializer,
       yearlyOutflowsDto: dependencies.yearlyOutflowsDto,
     })
   );
   api.use(
-    getAllProjectsByCategory(router, {
+    routes.project.getAllProjectsByCategory(router, {
       usecase: dependencies.getAllProjectsByCategoryUsecase,
       dto: dependencies.projectDto,
     })
   );
   api.use(
-    addAmountProject(router, {
+    routes.project.addAmountProject(router, {
       usecase: dependencies.addAmountProjectUsecase,
       dto: dependencies.projectDto,
     })
   );
   api.use(
-    createProject(router, {
+    routes.project.createProject(router, {
       usecase: dependencies.createProjectUsecase,
       dto: dependencies.projectDto,
     })
   );
   api.use(
-    getProject(router, {
+    routes.project.getProject(router, {
       usecase: dependencies.getProjectUsecase,
       dto: dependencies.projectDto,
     })
   );
   api.use(
-    reApplyProject(router, {
+    routes.project.reApplyProject(router, {
       usecase: dependencies.reApplyProjectUsecase,
       dto: dependencies.projectDto,
     })
   );
   api.use(
-    rollbackProject(router, {
+    routes.project.rollbackProject(router, {
       usecase: dependencies.rollbackProjectUsecase,
       dto: dependencies.projectDto,
     })
   );
   api.use(
-    removeProject(router, {
+    routes.project.removeProject(router, {
       usecase: dependencies.removeProjectUsecase,
     })
   );
   api.use(
-    updateProject(router, {
+    routes.project.updateProject(router, {
       usecase: dependencies.updateProjectUsecase,
       dto: dependencies.projectDto,
     })
@@ -400,7 +366,7 @@ function buildApi(
 
   /** @deprecated */
   api.use(
-    updateExpense(router, {
+    routes.month.updateExpense(router, {
       updateExpenseUsecase: dependencies.updateExpenseUsecase,
       monthDto: dependencies.monthDto,
     })
