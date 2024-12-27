@@ -4,7 +4,7 @@ import { afterEach, beforeEach } from "mocha";
 import sinon from "sinon";
 import { authenticate, expect, mockedServer } from "./test-helpers.js";
 import { clearDB } from "../providers/test-helpers.js";
-import * as deps from "../../../ioc.js";
+import deps from "../../../ioc/index.js";
 import { MonthDao } from "../../../providers/persistence/entities/Month.js";
 import DeserializationError from "../../../consumers/api/errors/DeserializationError.js";
 

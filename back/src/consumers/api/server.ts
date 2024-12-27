@@ -8,10 +8,9 @@ import express, {
 import cors from "cors";
 import cookieSession from "cookie-session";
 import passport from "passport";
-
 import errorHandler from "./errorHandler.js";
 import routes from "./routes/index.js";
-import { Deps } from "../../ioc.js";
+import { Deps } from "../../ioc/index.js";
 
 declare global {
   namespace Express {

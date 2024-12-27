@@ -7,10 +7,10 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import { RemoveBudgetCommand } from "../../../../../core/usecases/month/RemoveBudget.js";
 import { MonthNotFoundError } from "../../../../../core/errors/MonthErrors.js";
-import { Deps } from "../../../../../ioc.js";
+import { Deps } from "../../../../../ioc/index.js";
 import { AccountBudgetCanNotBeRemovedError } from "../../../../../core/errors/WeeklyBudgetErrors.js";
 
 describe("Integration | Consumers | Routes | DELETE /months/{monthId}/budgets/{budgetId}", function () {

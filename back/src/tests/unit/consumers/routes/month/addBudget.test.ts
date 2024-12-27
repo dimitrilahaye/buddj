@@ -7,10 +7,10 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import { AddBudgetCommand } from "../../../../../core/usecases/month/AddBudget.js";
 import { MonthNotFoundError } from "../../../../../core/errors/MonthErrors.js";
-import { Deps } from "../../../../../ioc.js";
+import { Deps } from "../../../../../ioc/index.js";
 
 describe("Integration | Consumers | Routes | POST /months/{monthId}/budgets", function () {
   let server: http.Server;

@@ -7,7 +7,7 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 
 describe("Integration | Consumers | Routes | GET /yearly-outflows", function () {
   let server: http.Server;

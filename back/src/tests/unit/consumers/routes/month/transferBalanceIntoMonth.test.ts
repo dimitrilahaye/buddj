@@ -7,9 +7,9 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import { TransferBalanceIntoMonthCommand } from "../../../../../core/usecases/month/TransferBalanceIntoMonth.js";
-import { Deps } from "../../../../../ioc.js";
+import { Deps } from "../../../../../ioc/index.js";
 import { TransferableAccountNotFoundError } from "../../../../../core/errors/TransferableMonthErrors.js";
 import { TransferBalanceIntoMonthError } from "../../../../../core/errors/TransferBalanceIntoMonthErrors.js";
 

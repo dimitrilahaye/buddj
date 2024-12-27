@@ -7,9 +7,9 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import { AddMonthlyOutflowCommand } from "../../../../../core/usecases/monthly-template/AddMonthlyOutflow.js";
-import { Deps } from "../../../../../ioc.js";
+import { Deps } from "../../../../../ioc/index.js";
 import {
   MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError,
   MonthlyOutflowTemplateLabelCanNotBeEmptyError,

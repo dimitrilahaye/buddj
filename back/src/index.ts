@@ -1,5 +1,5 @@
 import env from "./env-vars.js";
-import * as deps from "./ioc.js";
+import deps from "./ioc/index.js";
 import buildApi from "./consumers/api/server.js";
 import { Express } from "express";
 import passport from "passport";

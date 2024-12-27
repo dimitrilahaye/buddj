@@ -7,7 +7,7 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import UnarchiveMonthCommand from "../../../../../core/commands/UnarchiveMonthCommand.js";
 import { MonthNotFoundError } from "../../../../../core/errors/MonthErrors.js";
 

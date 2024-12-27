@@ -6,7 +6,7 @@ import {
   expect,
 } from "../../../../integration/consumers/test-helpers.js";
 import { afterEach } from "mocha";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import sinon from "sinon";
 import DeserializationError from "../../../../../consumers/api/errors/DeserializationError.js";
 import { MonthlyTemplateDoesNotExistError } from "../../../../../core/errors/MonthlyTemplateErrors.js";
