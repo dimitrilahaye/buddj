@@ -7,7 +7,7 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import ManageExpensesCheckingCommand from "../../../../../core/commands/ManageExpensesCheckingCommand.js";
 import Month from "../../../../../core/models/month/Month.js";
 import Account from "../../../../../core/models/month/account/Account.js";

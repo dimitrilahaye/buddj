@@ -5,7 +5,7 @@ import passport from "passport";
 import { VerifyCallback } from "passport-google-oauth20";
 
 import buildApi from "../../../consumers/api/server.js";
-import { Deps } from "../../../ioc.js";
+import { Deps } from "../../../ioc/index.js";
 import env from "../../../env-vars.js";
 import request from "supertest";
 import expect from "../../test-helpers.js";

@@ -7,8 +7,8 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
-import { Deps } from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
+import { Deps } from "../../../../../ioc/index.js";
 import { ProjectNotFoundError } from "../../../../../core/errors/ProjectErrors.js";
 
 describe("Integration | Consumers | Routes | PATCH /projects/:projectId/re-apply", function () {

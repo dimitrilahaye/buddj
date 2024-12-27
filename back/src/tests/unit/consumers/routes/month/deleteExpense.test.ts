@@ -7,7 +7,7 @@ import {
   expect,
   mockedServer,
 } from "../../../../integration/consumers/test-helpers.js";
-import * as deps from "../../../../../ioc.js";
+import deps from "../../../../../ioc/index.js";
 import DeleteExpenseCommand from "../../../../../core/commands/DeleteExpenseCommand.js";
 import { MonthNotFoundError } from "../../../../../core/errors/MonthErrors.js";
 

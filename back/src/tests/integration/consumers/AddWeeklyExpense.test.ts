@@ -3,7 +3,7 @@ import request from "supertest";
 import { afterEach, beforeEach } from "mocha";
 import { authenticate, expect, mockedServer } from "./test-helpers.js";
 import { clearDB } from "../providers/test-helpers.js";
-import * as deps from "../../../ioc.js";
+import deps from "../../../ioc/index.js";
 import { insertUnarchivedMonth } from "../../utils/persistence/seeds/MonthSeeds.js";
 import { WeeklyBudgetDao } from "../../../providers/persistence/entities/WeeklyBudget.js";
 

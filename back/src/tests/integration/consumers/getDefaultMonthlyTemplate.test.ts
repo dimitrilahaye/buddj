@@ -2,7 +2,7 @@ import * as http from "node:http";
 import request from "supertest";
 import { authenticate, mockedServer, expect } from "./test-helpers.js";
 import { afterEach } from "mocha";
-import * as deps from "../../../ioc.js";
+import deps from "../../../ioc/index.js";
 import { insertDefaultMonthlyTemplate } from "../../utils/persistence/seeds/MonthlyTemplateSeeds.js";
 import { clearDB } from "../providers/test-helpers.js";
 import { YearlyOutflowDao } from "../../../providers/persistence/entities/YearlyOutflow.js";
