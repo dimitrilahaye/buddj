@@ -241,17 +241,21 @@ export class ExpensesComponent implements AfterViewInit {
 
   get pendingBudgets() {
     return (
-      this.month()?.account.weeklyBudgets.filter(
-        (b) => b.pendingFrom !== null && b.pendingFrom !== undefined
-      ) ?? []
+      this.month()
+        ?.account.weeklyBudgets.filter(
+          (b) => b.pendingFrom !== null && b.pendingFrom !== undefined
+        )
+        .sort(this.sortBudgets) ?? []
     );
   }
 
   get regularBudgets() {
     return (
-      this.month()?.account.weeklyBudgets.filter(
-        (b) => b.pendingFrom === null || b.pendingFrom === undefined
-      ) ?? []
+      this.month()
+        ?.account.weeklyBudgets.filter(
+          (b) => b.pendingFrom === null || b.pendingFrom === undefined
+        )
+        .sort(this.sortBudgets) ?? []
     );
   }
 
@@ -267,15 +271,11 @@ export class ExpensesComponent implements AfterViewInit {
 
   private sortBudgets(
     a: {
-      id: string;
       name: string;
-      expensesId: string[];
       pendingFrom?: Date | null;
     },
     b: {
-      id: string;
       name: string;
-      expensesId: string[];
       pendingFrom?: Date | null;
     }
   ) {
