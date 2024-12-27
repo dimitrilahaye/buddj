@@ -5,7 +5,7 @@ import Refund from "../models/project/Refund.js";
 import Saving from "../models/project/Saving.js";
 import TransferLogs from "../models/project/TransferLogs.js";
 import IdProvider from "../ports/providers/IdProvider.js";
-import { CreateProjectCommand } from "../usecases/CreateProject.js";
+import { CreateProjectCommand } from "../usecases/project/CreateProject.js";
 
 export default class ProjectFactory {
   constructor(public readonly idProvider: IdProvider) {}

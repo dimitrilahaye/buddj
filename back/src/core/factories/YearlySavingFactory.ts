@@ -1,7 +1,7 @@
 import IdProvider from "../ports/providers/IdProvider.js";
 import YearlyOutflow from "../models/yearly-outflows/YearlyOutflow.js";
 import YearlyBudget from "../models/yearly-outflows/YearlyBudget.js";
-import { AddYearlyOutflowCommand } from "../usecases/AddYearlyOutflow.js";
+import { AddYearlyOutflowCommand } from "../usecases/yearly-saving/AddYearlyOutflow.js";
 import { YearlySavingTypeDoesNotExistError } from "../errors/YearlyOutflowsErrors.js";
 
 export default class YearlySavingFactory {

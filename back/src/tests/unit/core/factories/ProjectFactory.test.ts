@@ -1,7 +1,7 @@
 import expect from "../../../test-helpers.js";
 import { idProviderStub } from "../usecases/test-helpers.js";
 import ProjectFactory from "../../../../core/factories/ProjectFactory.js";
-import { CreateProjectCommand } from "../../../../core/usecases/CreateProject.js";
+import { CreateProjectCommand } from "../../../../core/usecases/project/CreateProject.js";
 import Refund from "../../../../core/models/project/Refund.js";
 import Saving from "../../../../core/models/project/Saving.js";
 
