@@ -67,7 +67,7 @@ export class ProjectDao extends BaseEntity {
       return new Refund(
         this.id,
         new ProjectName(this.name),
-        new ProjectTarget(this.target),
+        new ProjectTarget(Number(this.target)),
         new TransferLogs(
           this.logs.map(
             (log) =>
@@ -84,7 +84,7 @@ export class ProjectDao extends BaseEntity {
       return new Saving(
         this.id,
         new ProjectName(this.name),
-        new ProjectTarget(this.target),
+        new ProjectTarget(Number(this.target)),
         new TransferLogs(
           this.logs.map(
             (log) =>
