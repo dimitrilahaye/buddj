@@ -7,7 +7,6 @@ export default interface ProjectRepository {
 
   update(project: Project): Promise<void>;
 
-  // save / rollback / re-apply / add amount
   save(project: Project): Promise<void>;
 
   remove(projectId: string): Promise<void>;
