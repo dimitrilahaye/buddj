@@ -29,34 +29,61 @@ const _dateSchema = (message: string) =>
 const dateSchema = (message?: string) =>
   _dateSchema(message).transform((val) => new Date(val));
 
+const projectCategorySchema = z
+  .string()
+  .regex(/^[a-z]+$/, "La catégorie n'est pas valide");
+
+const updateProjectSchema = z.object({
+  name: z.string({ message: "Le nom n'est pas valide" }).optional(),
+  target: z.number({ message: "L'objectif n'est pas valide" }).optional(),
+});
+
+const addProjectSchema = z.object({
+  name: z.string({ message: "Le nom n'est pas valide" }),
+  target: z.number({ message: "L'objectif' n'est pas valide" }),
+  category: projectCategorySchema,
+});
+
+const addAmountProjectSchema = z.object({
+  amount: z.number({ message: "Le montant n'est pas valide" }),
+});
+
 const outflowCreationSchema = z.object({
-  label: z.string({ message: "Outflow: Le label est obligatoire" }),
-  amount: z.number({ message: "Outflow: Le montant est obligatoire" }),
+  label: z.string({ message: "Le label est obligatoire" }),
+  amount: z.number({ message: "Le montant est obligatoire" }),
   pendingFrom: dateSchema().optional().nullable(),
 });
 
 const expenseCreationSchema = z.object({
-  label: z.string({ message: "Expense: Le label est obligatoire" }),
-  amount: z.number({ message: "Expense: Le montant est obligatoire" }),
-  date: dateSchema("Expense: La date est obligatoire"),
+  label: z.string({ message: "Le label est obligatoire" }),
+  amount: z.number({ message: "Le montant est obligatoire" }),
+  date: dateSchema("La date est obligatoire"),
 });
 
 const budgetCreationSchema = z.object({
-  name: z.string({ message: "Budget: Le nom est obligatoire" }),
+  name: z.string({ message: "Le nom est obligatoire" }),
   pendingFrom: dateSchema().optional().nullable(),
   initialBalance: z.number({
-    message: "Budget: Le solde initial est obligatoire",
+    message: "Le solde initial est obligatoire",
   }),
   expenses: z.array(expenseCreationSchema).default([]).optional(),
 });
 
 const monthCreationSchema = z.object({
-  month: dateSchema("Month: La date est obligatoire"),
+  month: dateSchema("La date est obligatoire"),
   startingBalance: z.number({
-    message: "Month: Le solde initial est obligatoire",
+    message: "Le solde initial est obligatoire",
   }),
   outflows: z.array(outflowCreationSchema).default([]),
   weeklyBudgets: z.array(budgetCreationSchema).default([]),
 });
 
-export { validSchema, monthCreationSchema, uuidSchema };
+export {
+  validSchema,
+  monthCreationSchema,
+  uuidSchema,
+  updateProjectSchema,
+  addProjectSchema,
+  addAmountProjectSchema,
+  projectCategorySchema,
+};

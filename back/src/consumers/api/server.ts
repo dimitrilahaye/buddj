@@ -38,6 +38,14 @@ import { addMonthlyBudget } from "./routes/addMonthlyBudget.js";
 import { addBudget } from "./routes/addBudget.js";
 import { updateBudget } from "./routes/updateBudget.js";
 import { removeBudget } from "./routes/removeBudget.js";
+import getAllProjectsByCategory from "./routes/getAllProjectsByCategory.js";
+import addAmountProject from "./routes/addAmountProject.js";
+import createProject from "./routes/createProject.js";
+import getProject from "./routes/getProject.js";
+import reApplyProject from "./routes/reApplyProject.js";
+import rollbackProject from "./routes/rollbackProject.js";
+import removeProject from "./routes/removeProject.js";
+import updateProject from "./routes/updateProject.js";
 
 declare global {
   namespace Express {
@@ -340,6 +348,53 @@ function buildApi(
       removeYearlyOutflow: dependencies.removeYearlyOutflowUsecase,
       deserializer: dependencies.removeYearlyOutflowDeserializer,
       yearlyOutflowsDto: dependencies.yearlyOutflowsDto,
+    })
+  );
+  api.use(
+    getAllProjectsByCategory(router, {
+      usecase: dependencies.getAllProjectsByCategoryUsecase,
+      dto: dependencies.projectDto,
+    })
+  );
+  api.use(
+    addAmountProject(router, {
+      usecase: dependencies.addAmountProjectUsecase,
+      dto: dependencies.projectDto,
+    })
+  );
+  api.use(
+    createProject(router, {
+      usecase: dependencies.createProjectUsecase,
+      dto: dependencies.projectDto,
+    })
+  );
+  api.use(
+    getProject(router, {
+      usecase: dependencies.getProjectUsecase,
+      dto: dependencies.projectDto,
+    })
+  );
+  api.use(
+    reApplyProject(router, {
+      usecase: dependencies.reApplyProjectUsecase,
+      dto: dependencies.projectDto,
+    })
+  );
+  api.use(
+    rollbackProject(router, {
+      usecase: dependencies.rollbackProjectUsecase,
+      dto: dependencies.projectDto,
+    })
+  );
+  api.use(
+    removeProject(router, {
+      usecase: dependencies.removeProjectUsecase,
+    })
+  );
+  api.use(
+    updateProject(router, {
+      usecase: dependencies.updateProjectUsecase,
+      dto: dependencies.projectDto,
     })
   );
 

@@ -77,6 +77,7 @@ import removeYearlyOutflowDeserializer, {
   RemoveYearlyOutflowDeserializer,
 } from "./consumers/api/deserializers/removeYearlyOutflow.js";
 import PendingDebitRepository from "./providers/persistence/repositories/PendingDebitRepository.js";
+import ProjectRepository from "./providers/persistence/repositories/ProjectRepository.js";
 import YearlyOutflowRepository from "./providers/persistence/repositories/YearlyOutflowRepository.js";
 import GetYearlyOutflows from "./core/usecases/GetYearlyOutflows.js";
 import AddYearlyOutflow from "./core/usecases/AddYearlyOutflow.js";
@@ -108,6 +109,18 @@ import updateBudgetDeserializer, {
 } from "./consumers/api/deserializers/updateBudget.js";
 import UpdateBudget from "./core/usecases/UpdateBudget.js";
 import RemoveBudget from "./core/usecases/RemoveBudget.js";
+import ProjectFactory from "./core/factories/ProjectFactory.js";
+import AddAmountProject from "./core/usecases/AddAmountProject.js";
+import CreateProject from "./core/usecases/CreateProject.js";
+import GetAllProjectsByCategory from "./core/usecases/GetAllProjectsByCategory.js";
+import GetProject from "./core/usecases/GetProject.js";
+import ReApplyProject from "./core/usecases/ReApplyProject.js";
+import RemoveProject from "./core/usecases/RemoveProject.js";
+import RollbackProject from "./core/usecases/RollbackProject.js";
+import UpdateProject from "./core/usecases/UpdateProject.js";
+import projectDto, {
+  ProjectDtoBuilder,
+} from "./consumers/api/dtos/projectDto.js";
 
 // persistence
 
@@ -137,6 +150,8 @@ const pendingDebitRepository = new PendingDebitRepository();
 
 const yearlyOutflowRepository = new YearlyOutflowRepository();
 
+const projectRepository = new ProjectRepository();
+
 // services
 
 const idProvider = new IdProvider();
@@ -154,6 +169,8 @@ const monthlyOutflowFactory = new MonthlyOutflowFactory(idProvider);
 const monthlyBudgetFactory = new MonthlyBudgetFactory(idProvider);
 
 const yearlySavingFactory = new YearlySavingFactory(idProvider);
+
+const projectFactory = new ProjectFactory(idProvider);
 
 // use cases
 
@@ -258,8 +275,30 @@ const removeYearlyOutflowUsecase = new RemoveYearlyOutflow(
   yearlyOutflowRepository
 );
 
+const addAmountProjectUsecase = new AddAmountProject(projectRepository);
+
+const createProjectUsecase = new CreateProject(
+  projectRepository,
+  projectFactory
+);
+
+const getAllProjectsByCategoryUsecase = new GetAllProjectsByCategory(
+  projectRepository
+);
+
+const getProjectUsecase = new GetProject(projectRepository);
+
+const reApplyProjectUsecase = new ReApplyProject(projectRepository);
+
+const removeProjectUsecase = new RemoveProject(projectRepository);
+
+const rollbackProjectUsecase = new RollbackProject(projectRepository);
+
+const updateProjectUsecase = new UpdateProject(projectRepository);
+
 export type Deps = {
   userRepository: UserRepository;
+  projectDto: ProjectDtoBuilder;
   monthDto: MonthDtoBuilder;
   yearlyOutflowsDto: YearlyOutflowsDtoBuilder;
   getDefaultMonthlyTemplateUsecase: GetDefaultMonthlyTemplate;
@@ -289,6 +328,14 @@ export type Deps = {
   getYearlyOutflowsUsecase: GetYearlyOutflows;
   addYearlyOutflowUsecase: AddYearlyOutflow;
   removeYearlyOutflowUsecase: RemoveYearlyOutflow;
+  addAmountProjectUsecase: AddAmountProject;
+  createProjectUsecase: CreateProject;
+  getAllProjectsByCategoryUsecase: GetAllProjectsByCategory;
+  getProjectUsecase: GetProject;
+  reApplyProjectUsecase: ReApplyProject;
+  removeProjectUsecase: RemoveProject;
+  rollbackProjectUsecase: RollbackProject;
+  updateProjectUsecase: UpdateProject;
   addOutflowDeserializer: AddOutflowDeserializer;
   addBudgetDeserializer: AddBudgetDeserializer;
   updateBudgetDeserializer: UpdateBudgetDeserializer;
@@ -316,6 +363,7 @@ export {
   userRepository,
   monthDto,
   yearlyOutflowsDto,
+  projectDto,
   getDefaultMonthlyTemplateUsecase,
   updateMonthlyTemplateUsecase,
   deleteMonthlyOutflowUsecase,
@@ -343,6 +391,14 @@ export {
   addYearlyOutflowUsecase,
   removeYearlyOutflowUsecase,
   removeBudgetUsecase,
+  addAmountProjectUsecase,
+  createProjectUsecase,
+  getAllProjectsByCategoryUsecase,
+  getProjectUsecase,
+  reApplyProjectUsecase,
+  removeProjectUsecase,
+  rollbackProjectUsecase,
+  updateProjectUsecase,
   addOutflowDeserializer,
   addBudgetDeserializer,
   updateBudgetDeserializer,
