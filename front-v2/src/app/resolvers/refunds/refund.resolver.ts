@@ -8,6 +8,6 @@ export const refundResolver: ResolveFn<void> = (route, state) => {
   const service = inject(PROJECTS_SERVICE);
   const store = inject(PROJECT_STORE);
   if (store.getAllByCategory('refund')() === null) {
-    service.getAllByCategory('refund');
+    service.getAllByCategory('refund').subscribe();
   }
 };

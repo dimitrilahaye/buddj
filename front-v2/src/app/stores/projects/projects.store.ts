@@ -52,6 +52,9 @@ export class ProjectStore implements ProjectStoreInterface {
   }
 
   addAll(projects: Project[]): void {
+    if (projects.length === 0) {
+      return;
+    }
     const all =
       projects[0].category === 'refund' ? this._allRefund : this._allSaving;
     all.update(() => {

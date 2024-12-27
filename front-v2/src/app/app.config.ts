@@ -34,6 +34,7 @@ import { MonthlyTemplatesStore } from './stores/monthlyTemplates/monthlyTemplate
 import { PROJECTS_SERVICE } from './services/projects/projects.service.interface';
 import { ProjectsService } from './services/projects/projects.service';
 import { PROJECT_STORE } from './stores/projects/projects.store.interface';
+import { ProjectStore } from './stores/projects/projects.store';
 
 registerLocaleData(localeFr);
 
@@ -77,7 +78,7 @@ export const appConfig: ApplicationConfig = {
     },
     {
       provide: PROJECT_STORE,
-      useClass: ProjectsService,
+      useClass: ProjectStore,
     },
     {
       provide: YEARLY_OUTFLOWS_STORE,
