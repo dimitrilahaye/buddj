@@ -14,6 +14,8 @@ import { MonthlyTemplatesComponent } from './components/monthly-templates/monthl
 import { monthlyTemplatesResolver } from './resolvers/monthly-templates/monthly-templates.resolver';
 import { MonthlyTemplateComponent } from './components/monthly-template/monthly-template.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { RefundsComponent } from './components/refunds/refunds.component';
+import { refundResolver } from './resolvers/refunds/refund.resolver';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -81,6 +83,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     resolve: {
       monthlyTemplates: monthlyTemplatesResolver,
+    },
+  },
+  {
+    path: 'refunds',
+    component: RefundsComponent,
+    canActivate: [authGuard],
+    resolve: {
+      refunds: refundResolver,
     },
   },
 ];

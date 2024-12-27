@@ -98,7 +98,7 @@
       <div class="menu-category-actions__action">
         <app-button-icon
           icon="fa-file-invoice-dollar"
-          [disabled]="true"
+          (click)="navigateToRefunds($event)"
         ></app-button-icon>
         <span class="menu-category-actions-action__label">Remboursements</span>
       </div>

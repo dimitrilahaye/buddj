@@ -106,6 +106,11 @@ export class SettingsComponent {
     this.router.navigate(['yearly-outflows']);
   }
 
+  navigateToRefunds(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['refunds']);
+  }
+
   archiveCurrentMonth(event: Event) {
     this.archiveLoading = true;
     this.monthsService
