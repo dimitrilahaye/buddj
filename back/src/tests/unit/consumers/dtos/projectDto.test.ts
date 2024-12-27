@@ -29,6 +29,7 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
         canRollback: false,
         canReApply: false,
         canFinish: false,
+        category: "refund",
       });
     });
   });
@@ -53,6 +54,7 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
         canRollback: false,
         canReApply: false,
         canFinish: false,
+        category: "saving",
       });
     });
   });
@@ -78,6 +80,7 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
       canRollback: true,
       canReApply: false,
       canFinish: true,
+      category: "refund",
     });
   });
 
@@ -102,6 +105,7 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
       canRollback: false,
       canReApply: true,
       canFinish: false,
+      category: "refund",
     });
   });
 });
