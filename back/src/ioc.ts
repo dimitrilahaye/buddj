@@ -3,121 +3,121 @@ import env from "./env-vars.js";
 import dbClient from "./providers/persistence/db.js";
 import typeormDataSource from "./providers/persistence/typeormConfig.js";
 import UserRepository from "./providers/persistence/repositories/UserRepository.js";
-import GetDefaultMonthlyTemplate from "./core/usecases/GetDefaultMonthlyTemplate.js";
+import GetDefaultMonthlyTemplate from "./core/usecases/monthly-template/GetDefaultMonthlyTemplate.js";
 import MonthlyTemplateRepository from "./providers/persistence/repositories/MonthlyTemplateRepository.js";
 import MonthRepository from "./providers/persistence/repositories/MonthRepository.js";
 import IdProvider from "./providers/IdProvider.js";
 import MonthFactory from "./core/factories/MonthFactory.js";
-import CreateNewMonth from "./core/usecases/CreateNewMonth.js";
-import GetUnarchivedMonths from "./core/usecases/GetUnarchivedMonths.js";
-import AddWeeklyExpense from "./core/usecases/AddWeeklyExpense.js";
+import CreateNewMonth from "./core/usecases/month/CreateNewMonth.js";
+import GetUnarchivedMonths from "./core/usecases/month/GetUnarchivedMonths.js";
+import AddWeeklyExpense from "./core/usecases/month/AddWeeklyExpense.js";
 import WeeklyExpenseFactory from "./core/factories/WeeklyExpenseFactory.js";
-import ManageExpensesChecking from "./core/usecases/ManageExpensesChecking.js";
-import ManageOutflowsChecking from "./core/usecases/ManageOutflowsChecking.js";
-import ArchiveMonth from "./core/usecases/ArchiveMonth.js";
+import ManageExpensesChecking from "./core/usecases/month/ManageExpensesChecking.js";
+import ManageOutflowsChecking from "./core/usecases/month/ManageOutflowsChecking.js";
+import ArchiveMonth from "./core/usecases/month/ArchiveMonth.js";
 import monthDto, { MonthDtoBuilder } from "./consumers/api/dtos/monthDto.js";
 import yearlyOutflowsDto, {
   YearlyOutflowsDtoBuilder,
 } from "./consumers/api/dtos/yearlyOutflowsDto.js";
-import DeleteExpense from "./core/usecases/DeleteExpense.js";
-import UpdateExpense from "./core/usecases/UpdateExpense.js";
-import DeleteOutflow from "./core/usecases/DeleteOutflow.js";
-import AddOutflow from "./core/usecases/AddOutflow.js";
+import DeleteExpense from "./core/usecases/month/DeleteExpense.js";
+import UpdateExpense from "./core/usecases/month/UpdateExpense.js";
+import DeleteOutflow from "./core/usecases/month/DeleteOutflow.js";
+import AddOutflow from "./core/usecases/month/AddOutflow.js";
 import AccountOutflowFactory from "./core/factories/AccountOutflowFactory.js";
-import GetArchivedMonths from "./core/usecases/GetArchivedMonths.js";
-import UnarchiveMonth from "./core/usecases/UnarchiveMonth.js";
-import DeleteMonth from "./core/usecases/DeleteMonth.js";
-import TransferBalanceIntoMonth from "./core/usecases/TransferBalanceIntoMonth.js";
+import GetArchivedMonths from "./core/usecases/month/GetArchivedMonths.js";
+import UnarchiveMonth from "./core/usecases/month/UnarchiveMonth.js";
+import DeleteMonth from "./core/usecases/month/DeleteMonth.js";
+import TransferBalanceIntoMonth from "./core/usecases/month/TransferBalanceIntoMonth.js";
 import addOutflowDeserializer, {
   AddOutflowDeserializer,
-} from "./consumers/api/deserializers/addOutflow.js";
+} from "./consumers/api/deserializers/month/addOutflow.js";
 import addWeeklyExpenseDeserializer, {
   AddWeeklyExpenseDeserializer,
-} from "./consumers/api/deserializers/addWeeklyExpense.js";
+} from "./consumers/api/deserializers/month/addWeeklyExpense.js";
 import archiveMonthDeserializer, {
   ArchiveMonthDeserializer,
-} from "./consumers/api/deserializers/archiveMonth.js";
+} from "./consumers/api/deserializers/month/archiveMonth.js";
 import deleteExpenseDeserializer, {
   DeleteExpenseDeserializer,
-} from "./consumers/api/deserializers/deleteExpense.js";
+} from "./consumers/api/deserializers/month/deleteExpense.js";
 import deleteMonthDeserializer, {
   DeleteMonthDeserializer,
-} from "./consumers/api/deserializers/deleteMonth.js";
+} from "./consumers/api/deserializers/month/deleteMonth.js";
 import deleteOutflowDeserializer, {
   DeleteOutflowDeserializer,
-} from "./consumers/api/deserializers/deleteOutflow.js";
+} from "./consumers/api/deserializers/month/deleteOutflow.js";
 import monthCreationDeserializer, {
   MonthCreationDeserializer,
-} from "./consumers/api/deserializers/monthCreation.js";
+} from "./consumers/api/deserializers/month/monthCreation.js";
 import unarchiveMonthDeserializer, {
   UnarchiveMonthDeserializer,
-} from "./consumers/api/deserializers/unarchiveMonth.js";
+} from "./consumers/api/deserializers/month/unarchiveMonth.js";
 import manageExpenseCheckingDeserializer, {
   ManageExpensesCheckingDeserializer,
-} from "./consumers/api/deserializers/manageExpenseChecking.js";
+} from "./consumers/api/deserializers/month/manageExpenseChecking.js";
 import manageOutflowCheckingDeserializer, {
   ManageOutflowsCheckingDeserializer,
-} from "./consumers/api/deserializers/manageOutflowChecking.js";
+} from "./consumers/api/deserializers/month/manageOutflowChecking.js";
 import updateMonthlyTemplateDeserializer, {
   UpdateMonthlyTemplateDeserializer,
-} from "./consumers/api/deserializers/updateMonthlyTemplate.js";
+} from "./consumers/api/deserializers/monthly-template/updateMonthlyTemplate.js";
 import deleteMonthlyOutflowDeserializer, {
   DeleteMonthlyOutflowDeserializer,
-} from "./consumers/api/deserializers/deleteMonthlyOutflow.js";
+} from "./consumers/api/deserializers/monthly-template/deleteMonthlyOutflow.js";
 import deleteMonthlyBudgetDeserializer, {
   DeleteMonthlyBudgetDeserializer,
-} from "./consumers/api/deserializers/deleteMonthlyBudget.js";
+} from "./consumers/api/deserializers/monthly-template/deleteMonthlyBudget.js";
 import transferBalanceIntoMonthDeserializer, {
   TransferBalanceIntoMonthDeserializer,
-} from "./consumers/api/deserializers/transferBalanceIntoMonth.js";
+} from "./consumers/api/deserializers/month/transferBalanceIntoMonth.js";
 import addYearlyOutflowDeserializer, {
   AddYearlyOutflowDeserializer,
-} from "./consumers/api/deserializers/addYearlyOutflow.js";
+} from "./consumers/api/deserializers/yearly-saving/addYearlyOutflow.js";
 import removeYearlyOutflowDeserializer, {
   RemoveYearlyOutflowDeserializer,
-} from "./consumers/api/deserializers/removeYearlyOutflow.js";
+} from "./consumers/api/deserializers/yearly-saving/removeYearlyOutflow.js";
 import PendingDebitRepository from "./providers/persistence/repositories/PendingDebitRepository.js";
 import ProjectRepository from "./providers/persistence/repositories/ProjectRepository.js";
 import YearlyOutflowRepository from "./providers/persistence/repositories/YearlyOutflowRepository.js";
-import GetYearlyOutflows from "./core/usecases/GetYearlyOutflows.js";
-import AddYearlyOutflow from "./core/usecases/AddYearlyOutflow.js";
-import RemoveYearlyOutflow from "./core/usecases/RemoveYearlyOutflow.js";
+import GetYearlyOutflows from "./core/usecases/yearly-saving/GetYearlyOutflows.js";
+import AddYearlyOutflow from "./core/usecases/yearly-saving/AddYearlyOutflow.js";
+import RemoveYearlyOutflow from "./core/usecases/yearly-saving/RemoveYearlyOutflow.js";
 import MonthlyOutflowTemplateRepository from "./providers/persistence/repositories/MonthlyOutflowTemplateRepository.js";
 import MonthlyBudgetTemplateRepository from "./providers/persistence/repositories/MonthlyBudgetTemplateRepository.js";
-import GetAllMonthlyTemplates from "./core/usecases/GetAllMonthlyTemplates.js";
-import UpdateMonthlyTemplate from "./core/usecases/UpdateMonthlyTemplate.js";
-import DeleteMonthlyOutflow from "./core/usecases/DeleteMonthlyOutflow.js";
-import DeleteMonthlyBudget from "./core/usecases/DeleteMonthlyBudget.js";
-import AddMonthlyBudget from "./core/usecases/AddMonthlyBudget.js";
-import AddMonthlyOutflow from "./core/usecases/AddMonthlyOutflow.js";
+import GetAllMonthlyTemplates from "./core/usecases/monthly-template/GetAllMonthlyTemplates.js";
+import UpdateMonthlyTemplate from "./core/usecases/monthly-template/UpdateMonthlyTemplate.js";
+import DeleteMonthlyOutflow from "./core/usecases/monthly-template/DeleteMonthlyOutflow.js";
+import DeleteMonthlyBudget from "./core/usecases/monthly-template/DeleteMonthlyBudget.js";
+import AddMonthlyBudget from "./core/usecases/monthly-template/AddMonthlyBudget.js";
+import AddMonthlyOutflow from "./core/usecases/monthly-template/AddMonthlyOutflow.js";
 import MonthlyOutflowFactory from "./core/factories/MonthlyOutflowFactory.js";
 import MonthlyBudgetFactory from "./core/factories/MonthlyBudgetFactory.js";
 import YearlySavingFactory from "./core/factories/YearlySavingFactory.js";
 import addMonthlyOutflowDeserializer, {
   AddMonthlyOutflowDeserializer,
-} from "./consumers/api/deserializers/addMonthlyOutflow.js";
+} from "./consumers/api/deserializers/monthly-template/addMonthlyOutflow.js";
 import addMonthlyBudgetDeserializer, {
   AddMonthlyBudgetDeserializer,
-} from "./consumers/api/deserializers/addMonthlyBudget.js";
-import AddBudget from "./core/usecases/AddBudget.js";
+} from "./consumers/api/deserializers/monthly-template/addMonthlyBudget.js";
+import AddBudget from "./core/usecases/month/AddBudget.js";
 import AccountBudgetFactory from "./core/factories/AccountBudgetFactory.js";
 import addBudgetDeserializer, {
   AddBudgetDeserializer,
-} from "./consumers/api/deserializers/addBudget.js";
+} from "./consumers/api/deserializers/month/addBudget.js";
 import updateBudgetDeserializer, {
   UpdateBudgetDeserializer,
-} from "./consumers/api/deserializers/updateBudget.js";
-import UpdateBudget from "./core/usecases/UpdateBudget.js";
-import RemoveBudget from "./core/usecases/RemoveBudget.js";
+} from "./consumers/api/deserializers/month/updateBudget.js";
+import UpdateBudget from "./core/usecases/month/UpdateBudget.js";
+import RemoveBudget from "./core/usecases/month/RemoveBudget.js";
 import ProjectFactory from "./core/factories/ProjectFactory.js";
-import AddAmountProject from "./core/usecases/AddAmountProject.js";
-import CreateProject from "./core/usecases/CreateProject.js";
-import GetAllProjectsByCategory from "./core/usecases/GetAllProjectsByCategory.js";
-import GetProject from "./core/usecases/GetProject.js";
-import ReApplyProject from "./core/usecases/ReApplyProject.js";
-import RemoveProject from "./core/usecases/RemoveProject.js";
-import RollbackProject from "./core/usecases/RollbackProject.js";
-import UpdateProject from "./core/usecases/UpdateProject.js";
+import AddAmountProject from "./core/usecases/project/AddAmountProject.js";
+import CreateProject from "./core/usecases/project/CreateProject.js";
+import GetAllProjectsByCategory from "./core/usecases/project/GetAllProjectsByCategory.js";
+import GetProject from "./core/usecases/project/GetProject.js";
+import ReApplyProject from "./core/usecases/project/ReApplyProject.js";
+import RemoveProject from "./core/usecases/project/RemoveProject.js";
+import RollbackProject from "./core/usecases/project/RollbackProject.js";
+import UpdateProject from "./core/usecases/project/UpdateProject.js";
 import projectDto, {
   ProjectDtoBuilder,
 } from "./consumers/api/dtos/projectDto.js";

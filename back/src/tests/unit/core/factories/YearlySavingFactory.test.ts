@@ -1,7 +1,7 @@
 import expect from "../../../test-helpers.js";
 import { idProviderStub } from "../usecases/test-helpers.js";
 import YearlySavingFactory from "../../../../core/factories/YearlySavingFactory.js";
-import { AddYearlyOutflowCommand } from "../../../../core/usecases/AddYearlyOutflow.js";
+import { AddYearlyOutflowCommand } from "../../../../core/usecases/yearly-saving/AddYearlyOutflow.js";
 import YearlyOutflow from "../../../../core/models/yearly-outflows/YearlyOutflow.js";
 import YearlyBudget from "../../../../core/models/yearly-outflows/YearlyBudget.js";
 
