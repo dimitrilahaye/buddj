@@ -1,4 +1,5 @@
 import Project from "../../../core/models/project/Project.js";
+import Refund from "../../../core/models/project/Refund.js";
 
 interface ProjectDto {
   id: string;
@@ -8,6 +9,7 @@ interface ProjectDto {
   canRollback: boolean;
   canReApply: boolean;
   canFinish: boolean;
+  category: "refund" | "saving";
 }
 
 export type ProjectDtoBuilder = (model: Project) => ProjectDto;
@@ -21,5 +23,6 @@ export default function projectDto(model: Project): ProjectDto {
     canRollback: model.canRollback(),
     canReApply: model.canReApply(),
     canFinish: model.leftAmount() === 0,
+    category: model instanceof Refund ? "refund" : "saving",
   };
 }

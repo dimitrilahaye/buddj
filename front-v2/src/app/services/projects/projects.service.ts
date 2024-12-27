@@ -1,13 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import ProjectsServiceInterface, {
   Category,
   CreateCommand,
 } from './projects.service.interface';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { Response } from '../../models/response.model';
 import { Project } from '../../models/project.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import ProjectStoreInterface, {
+  PROJECT_STORE,
+} from '../../stores/projects/projects.store.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +18,10 @@ import { environment } from '../../../environments/environment';
 export class ProjectsService implements ProjectsServiceInterface {
   private readonly apiUrl: string;
 
-  constructor(private readonly http: HttpClient) {
+  constructor(
+    private readonly http: HttpClient,
+    @Inject(PROJECT_STORE) private readonly store: ProjectStoreInterface
+  ) {
     this.apiUrl = environment.apiUrl;
   }
 
@@ -26,7 +32,7 @@ export class ProjectsService implements ProjectsServiceInterface {
         target: project.target,
       })
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(({ data }) => this.store.replace(data)),
         map(() => void 0)
       );
   }
@@ -38,7 +44,7 @@ export class ProjectsService implements ProjectsServiceInterface {
         null
       )
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(({ data }) => this.store.replace(data)),
         map(() => void 0)
       );
   }
@@ -50,7 +56,7 @@ export class ProjectsService implements ProjectsServiceInterface {
         null
       )
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(({ data }) => this.store.replace(data)),
         map(() => void 0)
       );
   }
@@ -59,7 +65,7 @@ export class ProjectsService implements ProjectsServiceInterface {
     return this.http
       .delete<Response<void>>(`${this.apiUrl}/projects/${project.id}`)
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(() => this.store.remove(project)),
         map(() => void 0)
       );
   }
@@ -68,7 +74,7 @@ export class ProjectsService implements ProjectsServiceInterface {
     return this.http
       .get<Response<Project>>(`${this.apiUrl}/projects/${projectId}`)
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(({ data }) => this.store.add(data)),
         map(() => void 0)
       );
   }
@@ -77,7 +83,7 @@ export class ProjectsService implements ProjectsServiceInterface {
     return this.http
       .get<Response<Project[]>>(`${this.apiUrl}/projects/category/${category}`)
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(({ data }) => this.store.addAll(data)),
         map(() => void 0)
       );
   }
@@ -86,7 +92,7 @@ export class ProjectsService implements ProjectsServiceInterface {
     return this.http
       .post<Response<Project>>(`${this.apiUrl}/projects`, command)
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(({ data }) => this.store.add(data)),
         map(() => void 0)
       );
   }
@@ -97,7 +103,7 @@ export class ProjectsService implements ProjectsServiceInterface {
         amount,
       })
       .pipe(
-        // tap(({ data }) => this.monthlyBudgetsStore.addMonth(data)),
+        tap(({ data }) => this.store.replace(data)),
         map(() => void 0)
       );
   }
