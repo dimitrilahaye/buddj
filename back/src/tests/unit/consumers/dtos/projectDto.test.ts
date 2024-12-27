@@ -66,10 +66,10 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
     const logs = new TransferLogs([
       new TransferLog(new ProjectAmount(200), new Date()),
     ]);
-    const refund = new Saving("1", name, target, logs);
+    const saving = new Saving("1", name, target, logs);
 
     // when
-    const dto = projectDto(refund);
+    const dto = projectDto(saving);
 
     // then
     expect(dto).to.deep.equal({
@@ -80,7 +80,7 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
       canRollback: true,
       canReApply: false,
       canFinish: true,
-      category: "refund",
+      category: "saving",
     });
   });
 
@@ -91,10 +91,10 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
     const logs = new TransferLogs([
       new TransferLog(new ProjectAmount(10), new Date(), false),
     ]);
-    const refund = new Saving("1", name, target, logs);
+    const saving = new Saving("1", name, target, logs);
 
     // when
-    const dto = projectDto(refund);
+    const dto = projectDto(saving);
 
     // then
     expect(dto).to.deep.equal({
@@ -105,7 +105,7 @@ describe("Unit | Consumers | Dtos | projectDto", function () {
       canRollback: false,
       canReApply: true,
       canFinish: false,
-      category: "refund",
+      category: "saving",
     });
   });
 });
