@@ -38,6 +38,7 @@ describe("Integration | Providers | Persistence | Repositories | ProjectReposito
         })
       ).toDomain();
       expect(persistedRefund).to.deep.equal(refund);
+      expect(persistedRefund).to.instanceOf(Refund);
     });
 
     it("should save the saving", async () => {
@@ -59,6 +60,7 @@ describe("Integration | Providers | Persistence | Repositories | ProjectReposito
         })
       ).toDomain();
       expect(persistedSaving).to.deep.equal(saving);
+      expect(persistedSaving).to.instanceOf(Saving);
     });
   });
 

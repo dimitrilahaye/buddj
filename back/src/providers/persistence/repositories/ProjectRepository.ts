@@ -28,7 +28,6 @@ export default class TypeormProjectRepository implements ProjectRepository {
     });
   }
 
-  // save / rollback / re-apply / add amount
   async save(project: Project): Promise<void> {
     const dao = ProjectDao.fromDomain(project);
     await dao.save();

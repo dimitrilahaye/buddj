@@ -21,6 +21,7 @@ const errorHandler = (
     case "TransferableWeeklyBudgetNotFoundError":
     case "YearlySavingsIdDoesNotExistError":
     case "MonthlyTemplateDoesNotExistError":
+    case "ProjectNotFoundError":
       statusCode = 404;
       break;
     case "AccountInitialBalanceError":
@@ -40,6 +41,7 @@ const errorHandler = (
     case "ProjectNameCanNotBeEmptyError":
     case "ProjectTargetMustBePositiveError":
     case "ProjectAmountMustBePositiveError":
+    case "UnknownCategoryError":
       statusCode = 422;
       break;
     default:

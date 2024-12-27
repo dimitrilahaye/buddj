@@ -1,3 +1,10 @@
+class ProjectNotFoundError extends Error {
+  constructor() {
+    super("Aucun projet trouvé pour l'id donné");
+    this.name = "ProjectNotFoundError";
+  }
+}
+
 class AddedInactiveLogError extends Error {
   constructor() {
     super("Vous ne pouvez pas ajouter un montant inactif");
@@ -35,10 +42,19 @@ class ProjectAmountMustBePositiveError extends Error {
   }
 }
 
+class UnknownCategoryError extends Error {
+  constructor(category: string) {
+    super(`La catégorie "${category}" n'existe pas`);
+    this.name = "UnknownCategoryError";
+  }
+}
+
 export {
   AddedInactiveLogError,
   AddedOlderLogError,
   ProjectNameCanNotBeEmptyError,
   ProjectTargetMustBePositiveError,
   ProjectAmountMustBePositiveError,
+  ProjectNotFoundError,
+  UnknownCategoryError,
 };
