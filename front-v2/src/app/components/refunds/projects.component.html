@@ -31,7 +31,11 @@
               [loading]="isLoading"
             ></app-button-icon>
             <!-- edit project -->
-            <app-button-icon icon="fa-edit" size="small"></app-button-icon>
+            <app-button-icon
+              icon="fa-edit"
+              size="small"
+              (click)="openEditModal(project)"
+            ></app-button-icon>
             <!-- remove project -->
             <app-button-icon
               icon="fa-trash-can"
@@ -57,11 +61,12 @@
     </app-card>
   </ng-container>
   }
-  <button class="add-project" (click)="openSlidingModal('creation')">
+  <button class="add-project" (click)="openCreateModal()">
     <i class="fa-solid fa-plus"></i>
   </button>
 </div>
 
+<!-- creation modal -->
 @if (slidingModalIsOpen('creation')) {
 <app-sliding-modal
   [isOpen]="slidingModalIsOpen('creation')"
@@ -98,7 +103,47 @@
     ></app-button>
   </div>
 </app-sliding-modal>
-} @if(slidingModalIsOpen('numpad')) {
+}
+<!-- update modal -->
+@if (slidingModalIsOpen('update')) {
+<app-sliding-modal
+  [isOpen]="slidingModalIsOpen('update')"
+  (close)="closeSlidingModal($event, 'update')"
+>
+  <div class="modal-container">
+    <!-- project name -->
+    <input
+      class="input"
+      type="text"
+      [value]="updatingProject()?.name"
+      (input)="updateUpdatingProjectName($event)"
+      [required]="true"
+      placeholder="Nom"
+    />
+    <!-- project target -->
+    <input
+      class="input"
+      type="number"
+      step="0.01"
+      [required]="true"
+      [value]="updatingProject()?.target"
+      (click)="openSlidingModal('numpad')"
+      inputmode="none"
+      autocomplete="off"
+      readonly
+    />
+
+    <app-button
+      [variant]="'danger'"
+      [label]="updateButtonLabel"
+      [loading]="isLoading"
+      (click)="updateProject($event)"
+    ></app-button>
+  </div>
+</app-sliding-modal>
+}
+<!-- create numpad -->
+@if(slidingModalIsOpen('numpad')) {
 <app-sliding-modal
   [isOpen]="slidingModalIsOpen('numpad')"
   (close)="closeSlidingModal($event, 'numpad')"
@@ -106,6 +151,18 @@
   <app-numpad
     [value]="creatingProject()?.target?.toString() ?? '0'"
     (submitted)="updateCreatingProjectTarget($event)"
+  ></app-numpad>
+</app-sliding-modal>
+}
+<!-- update numpad -->
+@if(slidingModalIsOpen('numpad')) {
+<app-sliding-modal
+  [isOpen]="slidingModalIsOpen('numpad')"
+  (close)="closeSlidingModal($event, 'numpad')"
+>
+  <app-numpad
+    [value]="updatingProject()?.target?.toString() ?? '0'"
+    (submitted)="updateUpdatingProjectTarget($event)"
   ></app-numpad>
 </app-sliding-modal>
 }

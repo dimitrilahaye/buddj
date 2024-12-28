@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import ProjectsServiceInterface, {
   Category,
   CreateCommand,
+  UpdateCommand,
 } from './projects.service.interface';
 import { map, Observable, tap } from 'rxjs';
 import { Response } from '../../models/response.model';
@@ -25,7 +26,7 @@ export class ProjectsService implements ProjectsServiceInterface {
     this.apiUrl = environment.apiUrl;
   }
 
-  updateProject(project: Project): Observable<void> {
+  updateProject(project: UpdateCommand): Observable<void> {
     return this.http
       .patch<Response<Project>>(`${this.apiUrl}/projects/${project.id}`, {
         name: project.name,

@@ -8,9 +8,10 @@ export interface CreateCommand {
   target: number;
   category: Category;
 }
+export type UpdateCommand = Pick<Project, 'id' | 'name' | 'target'>;
 
 export default interface ProjectsServiceInterface {
-  updateProject(project: Project): Observable<void>;
+  updateProject(project: UpdateCommand): Observable<void>;
   rollback(project: Project): Observable<void>;
   reApply(project: Project): Observable<void>;
   remove(project: Project): Observable<void>;
