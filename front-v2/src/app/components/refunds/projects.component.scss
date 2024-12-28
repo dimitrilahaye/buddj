@@ -1,3 +1,7 @@
+@import "../../../styles/variables";
+@import "../../../styles/typo";
+@import "../../../styles/tags";
+
 .content {
     margin-top: 40px;
 }
@@ -22,4 +26,14 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     z-index: 19;
-  }
+}
+
+.modal-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;   
+}
+
+.input {
+    @extend %input;
+}
