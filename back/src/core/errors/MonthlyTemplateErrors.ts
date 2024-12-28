@@ -1,43 +1,41 @@
 class MonthlyTemplateNameCanNotBeEmptyError extends Error {
   constructor() {
-    super("MonthlyTemplate: template name can not be empty");
+    super("Le nom ne peut être vide");
     this.name = "MonthlyTemplateNameCanNotBeEmptyError";
   }
 }
 
 class MonthlyTemplateDoesNotExistError extends Error {
   constructor() {
-    super("MonthlyTemplate: template with given id does not exist");
+    super("Template inconnu");
     this.name = "MonthlyTemplateDoesNotExistError";
   }
 }
 
 class MonthlyOutflowTemplateLabelCanNotBeEmptyError extends Error {
   constructor() {
-    super("MonthlyOutflowTemplate: outflow label can not be empty");
+    super("Le libellé ne peut pas être vide");
     this.name = "MonthlyOutflowTemplateLabelCanNotBeEmptyError";
   }
 }
 
 class MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError extends Error {
   constructor() {
-    super("MonthlyOutflowTemplate: outflow amount must be greater than 0");
+    super("Le montant de la sortie doit être positif");
     this.name = "MonthlyOutflowTemplateAmountMustBeGreaterThanZeroError";
   }
 }
 
 class MonthlyBudgetTemplateNameCanNotBeEmptyError extends Error {
   constructor() {
-    super("MonthlyBudgetTemplate: budget name can not be empty");
+    super("Le nom ne peut pas être vide");
     this.name = "MonthlyBudgetTemplateNameCanNotBeEmptyError";
   }
 }
 
 class MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError extends Error {
   constructor() {
-    super(
-      "MonthlyBudgetTemplate: outflow initial balance must be greater than 0"
-    );
+    super("Le solde initial du budget doit être positif");
     this.name = "MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError";
   }
 }

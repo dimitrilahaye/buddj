@@ -1,6 +1,6 @@
 class TransferBalanceIntoMonthError extends Error {
   constructor() {
-    super("TransferBalanceIntoMonth: invalid command");
+    super("Erreur lors du transfert");
     this.name = "TransferBalanceIntoMonthError";
   }
 }

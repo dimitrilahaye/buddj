@@ -1,6 +1,6 @@
 class AccountInitialBalanceError extends Error {
   constructor() {
-    super("Account: initial balance should be greater than 0");
+    super("Le solde initial doit être positif");
     this.name = "AccountInitialBalanceError";
   }
 }

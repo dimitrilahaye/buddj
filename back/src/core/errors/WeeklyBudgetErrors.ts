@@ -1,20 +1,20 @@
 class WeeklyBudgetNotFoundError extends Error {
   constructor() {
-    super("WeeklyBudget: not found");
+    super("Budget inconnu");
     this.name = "WeeklyBudgetNotFoundError";
   }
 }
 
 class AccountBudgetNameCantBeEmptyError extends Error {
   constructor() {
-    super("AccountBudget: the name can not be empty");
+    super("Le nom ne peut pas être vide");
     this.name = "AccountBudgetNameCantBeEmptyError";
   }
 }
 
 class AccountBudgetCanNotBeRemovedError extends Error {
   constructor() {
-    super("AccountBudget: this budget can not be removed");
+    super("Vous ne pouvez pas supprimer ce budget");
     this.name = "AccountBudgetCanNotBeRemovedError";
   }
 }
