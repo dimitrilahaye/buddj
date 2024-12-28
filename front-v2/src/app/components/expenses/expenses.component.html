@@ -99,7 +99,15 @@
                 ({{ getPendingInfo(week.id) | shortDate }})
               </span>
               &nbsp;
-              {{ getBudgetsInfos(week.id) }}
+              {{
+                getNumberOfWaitingExpenses(week.id)
+                  | i18nPlural
+                    : {
+                        "=0": "aucune dépense en attente",
+                        "=1": "une dépense en attente",
+                        other: "# dépenses en attente"
+                      }
+              }}
             </div>
             <div class="expenses-list__balance">
               <span>Solde :</span>
@@ -209,7 +217,15 @@
               </button>
             </div>
             <div class="expenses-list__infos">
-              {{ getBudgetsInfos(week.id) }}
+              {{
+                getNumberOfWaitingExpenses(week.id)
+                  | i18nPlural
+                    : {
+                        "=0": "aucune dépense en attente",
+                        "=1": "une dépense en attente",
+                        other: "# dépenses en attente"
+                      }
+              }}
             </div>
             <div class="expenses-list__balance">
               <span>Solde :</span>
