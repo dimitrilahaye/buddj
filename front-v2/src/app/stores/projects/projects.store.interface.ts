@@ -6,7 +6,7 @@ export default interface ProjectStoreInterface {
   replace(project: Project): void;
   remove(project: Project): void;
   add(project: Project): void;
-  addAll(projects: Project[]): void;
+  addAll(projects: Project[], category: Category): void;
   getAllByCategory(category: Category): Signal<Project[] | null>;
 }
 

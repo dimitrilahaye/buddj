@@ -1,1 +1,12 @@
-<p>projects works!</p>
+<app-header-back-button></app-header-back-button>
+<div class="content">
+  @if(hasProjects()) {
+  <app-tips>
+    <p>{{ tipsLabel }}</p>
+    <img width="50%" [src]="tipsImage" alt="" />
+  </app-tips>
+  } @else { Soon... }
+  <button class="add-project">
+    <i class="fa-solid fa-plus"></i>
+  </button>
+</div>
