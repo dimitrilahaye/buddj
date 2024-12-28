@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;   
-    margin-top: 40px;
+    margin-top: 60px;
     padding-top: 5px;
     padding-bottom: 80px;
 }
@@ -80,9 +80,9 @@
     bottom: 20px;
     left: 20px;
     background-color: var(--color-950);
-    font-size: 40px;
+    font-size: 30px;
     color: white;
-    border: none;
+    border: 5px solid white;
     border-radius: 50%;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;

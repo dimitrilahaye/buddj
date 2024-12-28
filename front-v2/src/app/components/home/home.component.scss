@@ -67,6 +67,7 @@
     height: 50px;
     width: 50px;
     border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
     &--active {
       background-color: var(--color-800);
@@ -130,7 +131,7 @@
 
 .content {
   height: 75%;
-  margin-top: 145px;
+  margin-top: 155px;
   padding: 20px 5px 0 5px;
   box-sizing: border-box;
 }
