@@ -187,13 +187,12 @@ export class ExpensesComponent implements AfterViewInit {
     return this.budgetsUnfolded ? 'Tout replier' : 'Tout déplier';
   }
 
-  getBudgetsInfos(weekId: string) {
+  getNumberOfWaitingExpenses(weekId: string) {
     const expensesForWeekId = this.getExpensesByWeekId(weekId);
-    const totalExpenses = expensesForWeekId.length;
-    const checkedExpenses = expensesForWeekId.filter(
+    const waitingExpenses = expensesForWeekId.filter(
       (e) => !e.isChecked
     ).length;
-    return `${checkedExpenses} non-prélevées / ${totalExpenses}`;
+    return waitingExpenses;
   }
 
   toggleBudgetsUnfolded() {
