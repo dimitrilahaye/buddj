@@ -86,7 +86,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: 'project',
+    path: 'projects',
     component: ProjectsComponent,
     canActivate: [authGuard],
     resolve: {
