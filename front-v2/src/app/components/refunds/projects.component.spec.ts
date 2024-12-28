@@ -7,6 +7,8 @@ import { ProjectStore } from '../../stores/projects/projects.store';
 import { PROJECTS_SERVICE } from '../../services/projects/projects.service.interface';
 import { TOASTER_SERVICE } from '../../services/toaster/toaster.service.interface';
 import { ToasterService } from '../../services/toaster/toaster.service';
+import { CONFETTI_SERVICE } from '../../services/confetti/confetti.service.interface';
+import { ConfettiService } from '../../services/confetti/confetti.service';
 
 describe('ProjectsComponent', () => {
   let component: ProjectsComponent;
@@ -31,6 +33,7 @@ describe('ProjectsComponent', () => {
         { provide: PROJECT_STORE, useClass: ProjectStore },
         { provide: PROJECTS_SERVICE, useValue: projectServiceStub },
         { provide: TOASTER_SERVICE, useClass: ToasterService },
+        { provide: CONFETTI_SERVICE, useClass: ConfettiService },
       ],
     }).compileComponents();
 

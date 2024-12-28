@@ -23,8 +23,19 @@ import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
 import { CommonModule } from '@angular/common';
+import ConfettiServiceInterface, {
+  CONFETTI_SERVICE,
+} from '../../services/confetti/confetti.service.interface';
 
-type SlidingModal = 'creation' | 'update' | 'numpad';
+type ModalNames =
+  | 'creation'
+  | 'update'
+  | 'add-amount'
+  | 'remove'
+  | 'numpad-create'
+  | 'numpad-update'
+  | 'numpad-add-amount';
+type LoadingFor = 'rollback' | 'reApply' | 'finish';
 
 @Component({
   selector: 'app-projects',
@@ -36,10 +47,14 @@ type SlidingModal = 'creation' | 'update' | 'numpad';
 export class ProjectsComponent implements OnInit {
   category: Category | undefined;
   projects: Signal<Project[] | null> = signal(null);
-  openSlidingModals: Set<SlidingModal> = new Set<SlidingModal>();
+  openModals = new Set<ModalNames>();
   creatingProject = model<CreateCommand | null>(null);
   isLoading = false;
+  loadingFor = new Map<LoadingFor, string>();
   updatingProject = model<Project | null>(null);
+  addAmount = model<number>(0);
+  projectForAddingAmount: Project | null = null;
+  projectToRemove: Project | null = null;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -47,7 +62,9 @@ export class ProjectsComponent implements OnInit {
     @Inject(PROJECT_STORE) private readonly store: ProjectStoreInterface,
     @Inject(PROJECTS_SERVICE)
     private readonly service: ProjectsServiceInterface,
-    @Inject(TOASTER_SERVICE) private readonly toaster: ToasterServiceInterface
+    @Inject(TOASTER_SERVICE) private readonly toaster: ToasterServiceInterface,
+    @Inject(CONFETTI_SERVICE)
+    private readonly confetti: ConfettiServiceInterface
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +79,18 @@ export class ProjectsComponent implements OnInit {
 
   hasProjects() {
     return this.projects() !== null && this.projects()!.length > 0;
+  }
+
+  isLoadingFor(loadingFor: LoadingFor, id: string) {
+    return this.loadingFor.get(loadingFor) === id;
+  }
+
+  startLoadFor(loadingFor: LoadingFor, id: string) {
+    this.loadingFor.set(loadingFor, id);
+  }
+
+  stopLoadFor(loadingFor: LoadingFor) {
+    return this.loadingFor.delete(loadingFor);
   }
 
   get tipsLabel() {
@@ -106,13 +135,31 @@ export class ProjectsComponent implements OnInit {
       : 'Reste à économiser :';
   }
 
-  closeSlidingModal(event: Event, modal: SlidingModal) {
-    event.stopPropagation();
-    this.openSlidingModals.delete(modal);
+  get removeLabel() {
+    return this.category === 'refund'
+      ? 'Supprimer le remboursement'
+      : "Supprimer l'économie";
   }
 
-  openSlidingModal(modal: SlidingModal) {
-    this.openSlidingModals.add(modal);
+  get toasterRemoveMessage() {
+    return this.category === 'refund'
+      ? 'Votre remboursement a bien été supprimé !'
+      : 'Votre économie a bien été supprimée !';
+  }
+
+  get toasterFinishMessage() {
+    return this.category === 'refund'
+      ? 'Félicitations ! Votre remboursement est désormais completé !'
+      : 'Félicitations ! Votre économie est désormais completée !';
+  }
+
+  closeModal(event: Event, modal: ModalNames) {
+    event.stopPropagation();
+    this.openModals.delete(modal);
+  }
+
+  openModal(modal: ModalNames) {
+    this.openModals.add(modal);
   }
 
   openCreateModal() {
@@ -121,16 +168,21 @@ export class ProjectsComponent implements OnInit {
       name: '',
       target: 0,
     });
-    this.openSlidingModal('creation');
+    this.openModal('creation');
+  }
+
+  openRemoveModalFor(project: Project) {
+    this.projectToRemove = project;
+    this.openModal('remove');
   }
 
   openEditModal(project: Project) {
     this.updatingProject.set(project);
-    this.openSlidingModal('update');
+    this.openModal('update');
   }
 
-  slidingModalIsOpen(modal: SlidingModal): boolean {
-    return this.openSlidingModals.has(modal);
+  modalIsOpen(modal: ModalNames): boolean {
+    return this.openModals.has(modal);
   }
 
   updateCreatingProjectName(event: Event) {
@@ -157,7 +209,7 @@ export class ProjectsComponent implements OnInit {
         target: Number(value),
       };
     });
-    this.openSlidingModals.delete('numpad');
+    this.openModals.delete('numpad-create');
   }
 
   updateUpdatingProjectName(event: Event) {
@@ -184,7 +236,13 @@ export class ProjectsComponent implements OnInit {
         target: Number(value),
       };
     });
-    this.openSlidingModals.delete('numpad');
+    this.openModals.delete('numpad-update');
+  }
+
+  updateAddAmountValue(target: string) {
+    const value = Number(target.replace(',', '.')).toFixed(2);
+    this.addAmount.update(() => Number(value));
+    this.openModals.delete('numpad-add-amount');
   }
 
   createProject(event: Event) {
@@ -199,7 +257,7 @@ export class ProjectsComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.isLoading = false;
-          this.closeSlidingModal(event, 'creation');
+          this.closeModal(event, 'creation');
         })
       )
       .subscribe(() => {
@@ -219,11 +277,107 @@ export class ProjectsComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.isLoading = false;
-          this.closeSlidingModal(event, 'update');
+          this.closeModal(event, 'update');
         })
       )
       .subscribe(() => {
         this.toaster.success(this.toasterUpdateMessage);
+      });
+  }
+
+  addAmountTo(project: Project) {
+    this.projectForAddingAmount = project;
+    this.openModal('add-amount');
+  }
+
+  addAmountToProject(event: Event) {
+    event.stopPropagation();
+    if (this.projectForAddingAmount === null) {
+      return;
+    }
+    this.isLoading = true;
+    this.service
+      .addAmount(this.projectForAddingAmount, this.addAmount())
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.closeModal(event, 'add-amount');
+          this.projectForAddingAmount = null;
+          this.addAmount.set(0);
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success('Votre montant a bien été ajouté !');
+      });
+  }
+
+  finishProject(event: Event, project: Project) {
+    event.stopPropagation();
+    this.startLoadFor('finish', project.id);
+    this.service
+      .remove(project)
+      .pipe(
+        finalize(() => {
+          this.stopLoadFor('finish');
+          this.confetti.launch();
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success(this.toasterFinishMessage);
+      });
+  }
+
+  removeProject(event: Event) {
+    event.stopPropagation();
+    if (this.projectToRemove === null) {
+      return;
+    }
+    this.isLoading = true;
+    this.service
+      .remove(this.projectToRemove)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.closeModal(event, 'remove');
+          this.projectToRemove = null;
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success(this.toasterRemoveMessage);
+      });
+  }
+
+  rollback(event: Event, project: Project) {
+    event.stopPropagation();
+    this.startLoadFor('rollback', project.id);
+    this.isLoading = true;
+    this.service
+      .rollback(project)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.stopLoadFor('rollback');
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success("L'historique a bien été mis à jour !");
+      });
+  }
+
+  reApply(event: Event, project: Project) {
+    event.stopPropagation();
+    this.startLoadFor('reApply', project.id);
+    this.isLoading = true;
+    this.service
+      .reApply(project)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.stopLoadFor('reApply');
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success("L'historique a bien été mis à jour !");
       });
   }
 }
