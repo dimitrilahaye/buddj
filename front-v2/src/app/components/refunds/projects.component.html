@@ -5,7 +5,58 @@
     <p>{{ tipsLabel }}</p>
     <img width="50%" [src]="tipsImage" alt="" />
   </app-tips>
-  } @else { Soon... }
+  } @else {
+  <ng-container *ngFor="let project of projects()">
+    <app-card>
+      <div class="project">
+        <div class="project__header">
+          <span class="project-header__name">{{ project.name }}</span>
+          <span class="project-header__actions">
+            <!-- roll back -->
+            <app-button-icon
+              icon="fa-arrow-rotate-left"
+              size="small"
+              [disabled]="!project.canRollback"
+            ></app-button-icon>
+            <!-- re-apply -->
+            <app-button-icon
+              icon="fa-arrow-rotate-right"
+              size="small"
+              [disabled]="!project.canReApply"
+            ></app-button-icon>
+            <!-- add amount -->
+            <app-button-icon
+              icon="fa-plus"
+              size="small"
+              [loading]="isLoading"
+            ></app-button-icon>
+            <!-- edit project -->
+            <app-button-icon icon="fa-edit" size="small"></app-button-icon>
+            <!-- remove project -->
+            <app-button-icon
+              icon="fa-trash-can"
+              size="small"
+              [loading]="isLoading"
+            ></app-button-icon>
+            <!-- finish project -->
+            <app-button-icon
+              icon="fa-flag-checkered"
+              size="small"
+              [disabled]="!project.canFinish"
+            ></app-button-icon>
+          </span>
+        </div>
+        <div class="project__info">
+          <span class="project-info__label">{{ loaderLabel }}</span>
+          <app-progress-bar
+            [currentValue]="project.leftAmount"
+            [total]="project.target"
+          ></app-progress-bar>
+        </div>
+      </div>
+    </app-card>
+  </ng-container>
+  }
   <button class="add-project" (click)="openSlidingModal('creation')">
     <i class="fa-solid fa-plus"></i>
   </button>

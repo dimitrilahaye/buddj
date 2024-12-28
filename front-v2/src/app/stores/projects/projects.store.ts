@@ -24,7 +24,9 @@ export class ProjectStore implements ProjectStoreInterface {
         return [project];
       }
       const filteredProjects = projects.filter((p) => p.id !== project.id);
-      return [...filteredProjects, project];
+      return [...filteredProjects, project].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
     });
   }
 
@@ -36,7 +38,7 @@ export class ProjectStore implements ProjectStoreInterface {
         return null;
       }
       const filteredProjects = projects.filter((p) => p.id !== project.id);
-      return [...filteredProjects];
+      return [...filteredProjects].sort((a, b) => a.name.localeCompare(b.name));
     });
   }
 
@@ -47,14 +49,16 @@ export class ProjectStore implements ProjectStoreInterface {
       if (projects === null) {
         return null;
       }
-      return [...projects, project];
+      return [...projects, project].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
     });
   }
 
   addAll(projects: Project[], category: Category): void {
     const all = category === 'refund' ? this._allRefund : this._allSaving;
     all.update(() => {
-      return projects;
+      return projects.sort((a, b) => a.name.localeCompare(b.name));
     });
   }
 }

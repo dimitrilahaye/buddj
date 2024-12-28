@@ -22,13 +22,14 @@ import { finalize } from 'rxjs';
 import ToasterServiceInterface, {
   TOASTER_SERVICE,
 } from '../../services/toaster/toaster.service.interface';
+import { CommonModule } from '@angular/common';
 
 type SlidingModal = 'creation' | 'update' | 'numpad';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [HeaderBackButtonComponent, DesignSystemModule],
+  imports: [CommonModule, HeaderBackButtonComponent, DesignSystemModule],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
 })
@@ -87,6 +88,12 @@ export class ProjectsComponent implements OnInit {
       : 'Votre économie a été crée !';
   }
 
+  get loaderLabel() {
+    return this.category === 'refund'
+      ? 'Reste à rembourser :'
+      : 'Reste à économiser :';
+  }
+
   closeSlidingModal(event: Event, modal: SlidingModal) {
     event.stopPropagation();
     this.openSlidingModals.delete(modal);
@@ -123,14 +130,14 @@ export class ProjectsComponent implements OnInit {
   }
 
   updateCreatingProjectTarget(target: string) {
-    const value = Number(target);
+    const value = Number(target.replace(',', '.')).toFixed(2);
     this.creatingProject.update((project) => {
       if (project === null) {
         return project;
       }
       return {
         ...project,
-        target: value,
+        target: Number(value),
       };
     });
     this.openSlidingModals.delete('numpad');

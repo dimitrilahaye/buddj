@@ -3,7 +3,66 @@
 @import "../../../styles/tags";
 
 .content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;   
     margin-top: 40px;
+}
+
+.project {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5px;
+    gap: 10px;
+
+    &__header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+
+        app-progress-bar {
+            flex: 1;
+        }
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 5px;
+
+        app-progress-bar {
+            flex: 1;
+        }
+    }
+}
+
+.project-info {
+    &__label {
+        font-size: var(--text-5);
+    }
+}
+
+.project-header {
+    &__name {
+        @extend %ellipsis;
+        @extend %title-3;
+  
+        white-space: nowrap;
+        margin: 0;
+    }
+    &__actions {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 5px;
+    }
 }
 
 .add-project {
