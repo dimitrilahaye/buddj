@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { ResolveFn } from '@angular/router';
 
-import { refundResolver } from './refund.resolver';
+import { projectResolver } from './project.resolver';
 import { PROJECTS_SERVICE } from '../../services/projects/projects.service.interface';
 import { PROJECT_STORE } from '../../stores/projects/projects.store.interface';
 
-describe('refundResolver', () => {
+describe('projectResolver', () => {
   const executeResolver: ResolveFn<void> = (...resolverParameters) =>
-    TestBed.runInInjectionContext(() => refundResolver(...resolverParameters));
+    TestBed.runInInjectionContext(() => projectResolver(...resolverParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
