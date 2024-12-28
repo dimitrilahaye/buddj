@@ -83,7 +83,7 @@ export class ProjectsService implements ProjectsServiceInterface {
     return this.http
       .get<Response<Project[]>>(`${this.apiUrl}/projects/category/${category}`)
       .pipe(
-        tap(({ data }) => this.store.addAll(data)),
+        tap(({ data }) => this.store.addAll(data, category)),
         map(() => void 0)
       );
   }

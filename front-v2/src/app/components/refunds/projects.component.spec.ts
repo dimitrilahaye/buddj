@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProjectsComponent } from './projects.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PROJECT_STORE } from '../../stores/projects/projects.store.interface';
+import { ProjectStore } from '../../stores/projects/projects.store';
 
 describe('ProjectsComponent', () => {
   let component: ProjectsComponent;
@@ -20,6 +22,7 @@ describe('ProjectsComponent', () => {
       providers: [
         Router,
         { provide: ActivatedRoute, useValue: activatedRouteStub },
+        { provide: PROJECT_STORE, useClass: ProjectStore },
       ],
     }).compileComponents();
 
