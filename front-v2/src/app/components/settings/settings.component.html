@@ -91,7 +91,7 @@
       <div class="menu-category-actions__action">
         <app-button-icon
           icon="fa-piggy-bank"
-          [disabled]="true"
+          (click)="navigateToProject('saving', $event)"
         ></app-button-icon>
         <span class="menu-category-actions-action__label">Économies</span>
       </div>

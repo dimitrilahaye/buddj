@@ -35,6 +35,8 @@ import { PROJECTS_SERVICE } from './services/projects/projects.service.interface
 import { ProjectsService } from './services/projects/projects.service';
 import { PROJECT_STORE } from './stores/projects/projects.store.interface';
 import { ProjectStore } from './stores/projects/projects.store';
+import { CONFETTI_SERVICE } from './services/confetti/confetti.service.interface';
+import { ConfettiService } from './services/confetti/confetti.service';
 
 registerLocaleData(localeFr);
 
@@ -91,6 +93,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: TOASTER_SERVICE,
       useClass: ToasterService,
+    },
+    {
+      provide: CONFETTI_SERVICE,
+      useClass: ConfettiService,
     },
   ],
 };
