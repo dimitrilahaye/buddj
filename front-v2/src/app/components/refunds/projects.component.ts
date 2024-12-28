@@ -82,10 +82,22 @@ export class ProjectsComponent implements OnInit {
       : 'Ajouter cette économie';
   }
 
+  get updateButtonLabel() {
+    return this.category === 'refund'
+      ? 'Modifier ce remboursement'
+      : 'Modifier cette économie';
+  }
+
   get toasterCreationMessage() {
     return this.category === 'refund'
       ? 'Votre remboursement a été crée !'
       : 'Votre économie a été crée !';
+  }
+
+  get toasterUpdateMessage() {
+    return this.category === 'refund'
+      ? 'Votre remboursement a bien été modifié !'
+      : 'Votre économie a bien été modifié !';
   }
 
   get loaderLabel() {
@@ -100,16 +112,21 @@ export class ProjectsComponent implements OnInit {
   }
 
   openSlidingModal(modal: SlidingModal) {
-    switch (modal) {
-      case 'creation':
-        this.creatingProject.set({
-          category: this.category!,
-          name: '',
-          target: 0,
-        });
-        break;
-    }
     this.openSlidingModals.add(modal);
+  }
+
+  openCreateModal() {
+    this.creatingProject.set({
+      category: this.category!,
+      name: '',
+      target: 0,
+    });
+    this.openSlidingModal('creation');
+  }
+
+  openEditModal(project: Project) {
+    this.updatingProject.set(project);
+    this.openSlidingModal('update');
   }
 
   slidingModalIsOpen(modal: SlidingModal): boolean {
@@ -143,6 +160,33 @@ export class ProjectsComponent implements OnInit {
     this.openSlidingModals.delete('numpad');
   }
 
+  updateUpdatingProjectName(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.updatingProject.update((project) => {
+      if (project === null) {
+        return project;
+      }
+      return {
+        ...project,
+        name: value,
+      };
+    });
+  }
+
+  updateUpdatingProjectTarget(target: string) {
+    const value = Number(target.replace(',', '.')).toFixed(2);
+    this.updatingProject.update((project) => {
+      if (project === null) {
+        return project;
+      }
+      return {
+        ...project,
+        target: Number(value),
+      };
+    });
+    this.openSlidingModals.delete('numpad');
+  }
+
   createProject(event: Event) {
     event.stopPropagation();
     if (this.creatingProject() === null) {
@@ -160,6 +204,26 @@ export class ProjectsComponent implements OnInit {
       )
       .subscribe(() => {
         this.toaster.success(this.toasterCreationMessage);
+      });
+  }
+
+  updateProject(event: Event) {
+    event.stopPropagation();
+    if (this.updatingProject() === null) {
+      return;
+    }
+    const { id, name, target } = this.updatingProject()!;
+    this.isLoading = true;
+    this.service
+      .updateProject({ id, name, target })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.closeSlidingModal(event, 'update');
+        })
+      )
+      .subscribe(() => {
+        this.toaster.success(this.toasterUpdateMessage);
       });
   }
 }
