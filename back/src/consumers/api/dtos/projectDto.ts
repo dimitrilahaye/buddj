@@ -5,7 +5,7 @@ interface ProjectDto {
   id: string;
   name: string;
   target: number;
-  leftAmount: number;
+  totalAmount: number;
   canRollback: boolean;
   canReApply: boolean;
   canFinish: boolean;
@@ -19,10 +19,10 @@ export default function projectDto(model: Project): ProjectDto {
     id: model.id,
     name: model.name.value,
     target: model.target.value,
-    leftAmount: model.leftAmount(),
+    totalAmount: model.totalAmount(),
     canRollback: model.canRollback(),
     canReApply: model.canReApply(),
-    canFinish: model.leftAmount() === 0,
+    canFinish: model.totalAmount() === model.target.value,
     category: model instanceof Refund ? "refund" : "saving",
   };
 }

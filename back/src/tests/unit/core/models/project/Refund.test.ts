@@ -83,12 +83,12 @@ describe("Unit | Core | Models | Project | Refund", function () {
       expect(lastLog?.amount.value).to.be.equal(20);
       expect(lastLog?.date.getTime()).to.be.equal(logDate.getTime());
       expect(lastLog?.isActive).to.be.true;
-      expect(refund.leftAmount()).to.be.equal(180);
+      expect(refund.totalAmount()).to.be.equal(20);
     });
   });
 
-  describe("#leftAmount", () => {
-    it("should return the right left amount when left is positive", () => {
+  describe("#totalAmount", () => {
+    it("should return the right total amount when it is less than target", () => {
       // given
       const name = new ProjectName("iPhone");
       const target = new ProjectTarget(200);
@@ -100,13 +100,13 @@ describe("Unit | Core | Models | Project | Refund", function () {
       const refund = new Refund("1", name, target, logs);
 
       // when
-      const leftAmount = refund.leftAmount();
+      const totalAmount = refund.totalAmount();
 
       // then
-      expect(leftAmount).to.be.equal(180);
+      expect(totalAmount).to.be.equal(20);
     });
 
-    it("should return the right left amount when left is not positive", () => {
+    it("should return the right total amount when it is greater than target", () => {
       // given
       const name = new ProjectName("iPhone");
       const target = new ProjectTarget(200);
@@ -116,10 +116,10 @@ describe("Unit | Core | Models | Project | Refund", function () {
       const refund = new Refund("1", name, target, logs);
 
       // when
-      const leftAmount = refund.leftAmount();
+      const totalAmount = refund.totalAmount();
 
       // then
-      expect(leftAmount).to.be.equal(0);
+      expect(totalAmount).to.be.equal(200);
     });
   });
 
@@ -189,13 +189,13 @@ describe("Unit | Core | Models | Project | Refund", function () {
       ]);
       const refund = new Refund("1", name, target, logs);
 
-      expect(refund.leftAmount()).to.be.equal(190);
+      expect(refund.totalAmount()).to.be.equal(10);
 
       // when
       refund.rollback();
 
       // then
-      expect(refund.leftAmount()).to.be.equal(200);
+      expect(refund.totalAmount()).to.be.equal(0);
     });
   });
 
@@ -209,13 +209,13 @@ describe("Unit | Core | Models | Project | Refund", function () {
       ]);
       const refund = new Refund("1", name, target, logs);
 
-      expect(refund.leftAmount()).to.be.equal(200);
+      expect(refund.totalAmount()).to.be.equal(0);
 
       // when
       refund.reApply();
 
       // then
-      expect(refund.leftAmount()).to.be.equal(190);
+      expect(refund.totalAmount()).to.be.equal(10);
     });
   });
 });
