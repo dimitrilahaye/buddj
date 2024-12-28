@@ -83,12 +83,12 @@ describe("Unit | Core | Models | Project | Saving", function () {
       expect(lastLog?.amount.value).to.be.equal(20);
       expect(lastLog?.date.getTime()).to.be.equal(logDate.getTime());
       expect(lastLog?.isActive).to.be.true;
-      expect(saving.leftAmount()).to.be.equal(180);
+      expect(saving.totalAmount()).to.be.equal(20);
     });
   });
 
-  describe("#leftAmount", () => {
-    it("should return the right left amount when left is positive", () => {
+  describe("#totalAmount", () => {
+    it("should return the right total amount when it is less than target", () => {
       // given
       const name = new ProjectName("iPhone");
       const target = new ProjectTarget(200);
@@ -100,13 +100,13 @@ describe("Unit | Core | Models | Project | Saving", function () {
       const saving = new Saving("1", name, target, logs);
 
       // when
-      const leftAmount = saving.leftAmount();
+      const totalAmount = saving.totalAmount();
 
       // then
-      expect(leftAmount).to.be.equal(180);
+      expect(totalAmount).to.be.equal(20);
     });
 
-    it("should return the right left amount when left is not positive", () => {
+    it("should return the right total amount when it is greater than target", () => {
       // given
       const name = new ProjectName("iPhone");
       const target = new ProjectTarget(200);
@@ -116,10 +116,10 @@ describe("Unit | Core | Models | Project | Saving", function () {
       const saving = new Saving("1", name, target, logs);
 
       // when
-      const leftAmount = saving.leftAmount();
+      const totalAmount = saving.totalAmount();
 
       // then
-      expect(leftAmount).to.be.equal(0);
+      expect(totalAmount).to.be.equal(200);
     });
   });
 
@@ -189,13 +189,13 @@ describe("Unit | Core | Models | Project | Saving", function () {
       ]);
       const saving = new Saving("1", name, target, logs);
 
-      expect(saving.leftAmount()).to.be.equal(190);
+      expect(saving.totalAmount()).to.be.equal(10);
 
       // when
       saving.rollback();
 
       // then
-      expect(saving.leftAmount()).to.be.equal(200);
+      expect(saving.totalAmount()).to.be.equal(0);
     });
   });
 
@@ -209,13 +209,13 @@ describe("Unit | Core | Models | Project | Saving", function () {
       ]);
       const saving = new Saving("1", name, target, logs);
 
-      expect(saving.leftAmount()).to.be.equal(200);
+      expect(saving.totalAmount()).to.be.equal(0);
 
       // when
       saving.reApply();
 
       // then
-      expect(saving.leftAmount()).to.be.equal(190);
+      expect(saving.totalAmount()).to.be.equal(10);
     });
   });
 });

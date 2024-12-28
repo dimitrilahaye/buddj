@@ -34,16 +34,15 @@ export default abstract class Project {
     this.logs.add(new TransferLog(amount, new Date(), true));
   }
 
-  leftAmount() {
+  totalAmount() {
     const activeLogs = this.logs.getActiveLogs();
     const totalAmount = activeLogs.reduce((total, log) => {
       return Number((total + log.amount.value).toFixed(2));
     }, 0);
-    const leftAmount = this.target.value - totalAmount;
-    if (leftAmount < 0) {
-      return 0;
+    if (totalAmount > this.target.value) {
+      return this.target.value;
     }
-    return Number(leftAmount.toFixed(2));
+    return Number(totalAmount.toFixed(2));
   }
 
   rollback() {

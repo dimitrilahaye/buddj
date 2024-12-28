@@ -4,7 +4,7 @@ interface Project {
   id: string;
   name: string;
   target: number;
-  leftAmount: number;
+  totalAmount: number;
   canRollback: boolean;
   canReApply: boolean;
   canFinish: boolean;
