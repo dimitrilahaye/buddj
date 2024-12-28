@@ -1,15 +1,15 @@
 class WeeklyExpenseAmountError extends Error {
-    constructor() {
-        super('WeeklyExpense: amount should be greater than 0');
-        this.name = 'WeeklyExpenseAmountError';
-    }
+  constructor() {
+    super("Le montant doit être positif");
+    this.name = "WeeklyExpenseAmountError";
+  }
 }
 
 class WeeklyExpenseNotFoundError extends Error {
-    constructor() {
-        super('WeeklyExpense: not found');
-        this.name = 'WeeklyExpenseNotFoundError';
-    }
+  constructor() {
+    super("Sortie inconnue");
+    this.name = "WeeklyExpenseNotFoundError";
+  }
 }
 
-export {WeeklyExpenseAmountError, WeeklyExpenseNotFoundError};
+export { WeeklyExpenseAmountError, WeeklyExpenseNotFoundError };

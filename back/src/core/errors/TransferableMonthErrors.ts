@@ -1,13 +1,13 @@
 class TransferableAccountNotFoundError extends Error {
   constructor() {
-    super("TransferableAccount: not found");
+    super("Compte inconnu");
     this.name = "TransferableAccountNotFoundError";
   }
 }
 
 class TransferableWeeklyBudgetNotFoundError extends Error {
   constructor() {
-    super("TransferableWeeklyBudget: not found");
+    super("Budget inconnu");
     this.name = "TransferableWeeklyBudgetNotFoundError";
   }
 }

@@ -1,20 +1,20 @@
 class YearlySavingsAddError extends Error {
   constructor() {
-    super("Yearly savings: month must be between 1 and 12");
+    super("Mois incorrect");
     this.name = "YearlySavingsAddError";
   }
 }
 
 class YearlySavingsIdDoesNotExistError extends Error {
   constructor() {
-    super("Yearly savings: saving not found");
+    super("Économie annuelle inconnue");
     this.name = "YearlySavingsIdDoesNotExistError";
   }
 }
 
 class YearlySavingTypeDoesNotExistError extends Error {
   constructor() {
-    super("Yearly savings: type does not exist");
+    super("Ce type d'économie annuelle est inconnu");
     this.name = "YearlySavingTypeDoesNotExistError";
   }
 }
