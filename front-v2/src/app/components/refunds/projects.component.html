@@ -1,12 +1,60 @@
 <app-header-back-button></app-header-back-button>
 <div class="content">
-  @if(hasProjects()) {
+  @if(!hasProjects()) {
   <app-tips>
     <p>{{ tipsLabel }}</p>
     <img width="50%" [src]="tipsImage" alt="" />
   </app-tips>
   } @else { Soon... }
-  <button class="add-project">
+  <button class="add-project" (click)="openSlidingModal('creation')">
     <i class="fa-solid fa-plus"></i>
   </button>
 </div>
+
+@if (slidingModalIsOpen('creation')) {
+<app-sliding-modal
+  [isOpen]="slidingModalIsOpen('creation')"
+  (close)="closeSlidingModal($event, 'creation')"
+>
+  <div class="modal-container">
+    <!-- project name -->
+    <input
+      class="input"
+      type="text"
+      [value]="creatingProject()?.name"
+      (input)="updateCreatingProjectName($event)"
+      [required]="true"
+      placeholder="Nom"
+    />
+    <!-- project target -->
+    <input
+      class="input"
+      type="number"
+      step="0.01"
+      [required]="true"
+      [value]="creatingProject()?.target"
+      (click)="openSlidingModal('numpad')"
+      inputmode="none"
+      autocomplete="off"
+      readonly
+    />
+
+    <app-button
+      [variant]="'danger'"
+      [label]="createButtonLabel"
+      [loading]="isLoading"
+      (click)="createProject($event)"
+    ></app-button>
+  </div>
+</app-sliding-modal>
+} @if(slidingModalIsOpen('numpad')) {
+<app-sliding-modal
+  [isOpen]="slidingModalIsOpen('numpad')"
+  (close)="closeSlidingModal($event, 'numpad')"
+>
+  <app-numpad
+    [value]="creatingProject()?.target?.toString() ?? '0'"
+    (submitted)="updateCreatingProjectTarget($event)"
+  ></app-numpad>
+</app-sliding-modal>
+}
