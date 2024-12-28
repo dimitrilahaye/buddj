@@ -109,7 +109,7 @@ export class SettingsComponent {
 
   navigateToProject(category: Category, event: Event) {
     event.stopPropagation();
-    this.router.navigate(['project'], {
+    this.router.navigate(['projects'], {
       queryParams: { category },
     });
   }

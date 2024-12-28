@@ -41,8 +41,8 @@ export class ProjectsComponent implements OnInit {
 
   get tipsLabel() {
     return this.category === 'refund'
-      ? "Vous n'avez pas encore ajouté de remboursement 🙂"
-      : "Vous n'avez pas encore ajouté d'économie 🙂";
+      ? "Vous n'avez pas encore crée de remboursement 🙂"
+      : "Vous n'avez pas encore crée d'économie 🙂";
   }
 
   get tipsImage() {
