@@ -19,6 +19,7 @@ import {
 import { finalize } from 'rxjs';
 import { MonthlyBudget } from '../../models/monthlyBudget.model';
 import { HeaderBackButtonComponent } from '../header-back-button/header-back-button.component';
+import { Category } from '../../services/projects/projects.service.interface';
 
 @Component({
   selector: 'app-settings',
@@ -106,9 +107,11 @@ export class SettingsComponent {
     this.router.navigate(['yearly-outflows']);
   }
 
-  navigateToRefunds(event: Event) {
+  navigateToProject(category: Category, event: Event) {
     event.stopPropagation();
-    this.router.navigate(['refunds']);
+    this.router.navigate(['project'], {
+      queryParams: { category },
+    });
   }
 
   archiveCurrentMonth(event: Event) {
