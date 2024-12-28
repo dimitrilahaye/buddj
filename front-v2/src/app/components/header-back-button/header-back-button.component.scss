@@ -13,6 +13,8 @@
     padding: 10px;
     box-sizing: border-box;
     align-items: flex-start;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
     button {
         @extend %text-30;
