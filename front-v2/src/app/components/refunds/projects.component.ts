@@ -131,8 +131,8 @@ export class ProjectsComponent implements OnInit {
 
   get loaderLabel() {
     return this.category === 'refund'
-      ? 'Reste à rembourser :'
-      : 'Reste à économiser :';
+      ? 'Total remboursé :'
+      : 'Total économisé :';
   }
 
   get removeLabel() {

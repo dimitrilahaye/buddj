@@ -52,34 +52,32 @@
 }
 
 .outflows {
-    &__month {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding: 5px 0;
-        margin: 5px;
-    }
-}
+  &__month {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 5px 0;
+      margin: 5px;
+  }
 
-.outflows {
-    &__list {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding-bottom: 10px;
+  &__list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-bottom: 10px;
 
-        ::ng-deep app-tips {
-          .tips {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-          }
+      ::ng-deep app-tips {
+        .tips {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
         }
+      }
 
-        &--hide {
-          display: none;
-        }
-    }
+      &--hide {
+        display: none;
+      }
+  }
 }
 
 .outflows-month {
@@ -123,7 +121,7 @@
     &__list {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 10px;
     }
 }
 
