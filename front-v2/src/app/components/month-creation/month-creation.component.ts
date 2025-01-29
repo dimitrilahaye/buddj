@@ -599,8 +599,7 @@ export class MonthCreationComponent implements OnInit {
   }
 
   private formatToDate(val: string) {
-    const currentDay = new Date().getDate();
-    const dateValue = new Date(`${val}-${currentDay}`);
+    const dateValue = new Date(`${val}-01`);
     return dateValue;
   }
 
@@ -654,7 +653,6 @@ export class MonthCreationComponent implements OnInit {
         ],
         month: this.formatToDate(raw.month),
       };
-      console.info(month);
       this.createNewMonth(month);
     } else {
       console.log('Form is invalid');
