@@ -48,7 +48,7 @@ const errorHandler = (
       statusCode = 500;
       break;
   }
-  console.log(statusCode, error.message);
+  console.error(statusCode, error.message);
   response.status(statusCode).json({
     success: false,
     message: error.message,

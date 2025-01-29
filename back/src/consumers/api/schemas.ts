@@ -9,6 +9,7 @@ function validSchema<T extends ZodSchema>(
   const parsedData = schema.safeParse(data);
   if (!parsedData.success) {
     const [firstError] = parsedData.error.errors;
+    console.error(parsedData.error.errors);
     throw new RequestValidationError("", firstError.message);
   }
 
