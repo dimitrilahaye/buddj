@@ -60,7 +60,7 @@
     "@types/mocha": "^10.0.10",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
-    "@types/pg": "^8.11.10",
+    "@types/pg": "^8.11.11",
     "@types/sinon": "^17.0.3",
     "@types/sinon-chai": "^3.2.12",
     "@types/supertest": "^6.0.2",
