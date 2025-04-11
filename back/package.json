@@ -70,7 +70,7 @@
     "cross-env": "^7.0.3",
     "esbuild": "^0.25.2",
     "mocha": "^11.1.0",
-    "sinon": "^19.0.5",
+    "sinon": "^20.0.0",
     "sinon-chai": "^3.7.0",
     "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
