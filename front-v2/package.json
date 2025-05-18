@@ -27,7 +27,7 @@
     "@fortawesome/angular-fontawesome": "^0.15.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@ngneat/overview": "^6.1.1",
-    "@ngxpert/hot-toast": "^3.1.1",
+    "@ngxpert/hot-toast": "^4.2.0",
     "@use-gesture/vanilla": "10.3.1",
     "canvas-confetti": "^1.9.3",
     "ngxtension": "5.0.0",
