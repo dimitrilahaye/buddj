@@ -24,7 +24,7 @@
     "@angular/platform-browser-dynamic": "^18.2.11",
     "@angular/router": "^18.2.11",
     "@angular/service-worker": "^18.2.11",
-    "@fortawesome/angular-fontawesome": "^0.15.0",
+    "@fortawesome/angular-fontawesome": "^2.0.1",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@ngneat/overview": "^6.1.1",
     "@ngxpert/hot-toast": "^3.1.1",
