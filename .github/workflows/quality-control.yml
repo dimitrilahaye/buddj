@@ -7,7 +7,25 @@ on:
     branches: [ main ]
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      back: ${{ steps.filter.outputs.back }}
+      front_v3: ${{ steps.filter.outputs.front_v3 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            back: 'back/**'
+            front_v3: 'front-v3/**'
+
   back_checks:
+    needs: [ changes ]
+    if: needs.changes.outputs.back == 'true'
     name: Back ~ Quality Checks
     runs-on: ubuntu-latest
     container: node:22.14.0-bookworm-slim
@@ -58,34 +76,36 @@ jobs:
         YEARLY: ${{ secrets.YEARLY }}
         YEARLY_BUDGETS: ${{ secrets.YEARLY_BUDGETS }}
 
-  front_v3_checks:
-    name: Front v3 ~ Quality Checks
+  front_checks:
+    name: Front ~ Quality Checks
+    needs: [ changes ]
+    if: needs.changes.outputs.front_v3 == 'true'
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Front v3 ~ Use Node
+    - name: Front ~ Use Node
       uses: actions/setup-node@v4
       with:
         node-version: "22.14.0"
 
-    - name: Front v3 ~ Install
+    - name: Front ~ Install
       working-directory: ./front-v3
       run: npm install
 
-    - name: Front v3 ~ Lint
+    - name: Back ~ ESLint checks
       working-directory: ./front-v3
       run: npm run lint
 
-    - name: Front v3 ~ Build
+    - name: Front ~ Build
       working-directory: ./front-v3
       run: npm run build
 
   back_CD:
     name: Back ~ Deployment
-    if: github.event_name == 'push'
-    needs: [ back_checks, front_v3_checks ]
+    needs: [ changes, back_checks ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.back == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -98,12 +118,13 @@ jobs:
 
   # front_CD:
   #   name: Front ~ Deployment
-  #   needs: [ back_checks, front_v3_checks, back_CD ]
+  #   needs: [ changes, front_checks ]
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.front_v3 == 'true'
   #   runs-on: ubuntu-latest
-  #
+
   #   steps:
   #   - uses: actions/checkout@v4
-  #
+
   #   - name: Deploy
   #     env:
   #       deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP }}
