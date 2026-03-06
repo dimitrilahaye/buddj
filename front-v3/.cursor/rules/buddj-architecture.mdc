@@ -1,0 +1,111 @@
+# Buddj PWA — Architecture et conventions
+
+## Stack
+
+- **Langage** : TypeScript uniquement, sans framework (pas de React, Vue, Angular).
+- **UI** : Web Components (Custom Elements v1, Shadow DOM optionnel).
+- **Build** : Vite.
+- **PWA** : Service Worker (Workbox / Vite PWA) pour cache et offline.
+
+---
+
+## Architecture hexagonale
+
+Trois couches claires :
+
+1. **Présentation** : Web Components qui affichent l’état et déclenchent les cas d’usage. Aucune logique métier, aucune dépendance directe à l’API.
+2. **Métier** : Domaine (entités, types) + ports in (use-cases) + état global (store). Toute la logique et les règles métier vivent ici.
+3. **Datasource** : Implémentation des ports out (ex. client API Buddj). Seule couche qui fait des appels HTTP ou accède à des données externes.
+
+Le domaine ne dépend jamais du détail technique (fetch, Web Components, etc.). Les adapters (components, client API) dépendent des ports (interfaces).
+
+### Structure de dossiers
+
+```
+src/
+├── domain/
+│   ├── entities/           # Charge, Budget, Expense, MonthYear…
+│   ├── ports/
+│   │   ├── in/             # use-cases (GetRecurringCharges, UpdateBalance, TransferToBudget…)
+│   │   └── out/            # IBuddjApi (contrat pour l’API)
+│   └── services/           # Implémentations des cas d’usage
+├── application/
+│   ├── store/              # État global réactif
+│   └── bootstrap.ts        # Wiring : store + use-cases + adapters
+├── adapters/
+│   ├── in/
+│   │   └── components/     # Web Components (voir organisation component-driven ci-dessous)
+│   │       ├── icons/     # Atomes : icônes (edit, delete, transfer, save, toggle)
+│   │       ├── atoms/     # Atomes : text-ellipsis, amount, btn-add
+│   │       ├── molecules/ # Molécules : charge-item, expense-item, budget-totals…
+│   │       ├── organisms/ # Organismes : nav, summary-bar, section-header, charge-group, budget-card…
+│   │       └── screens/   # Écrans : screen-recurring, screen-budgets
+│   └── out/
+│       └── api/            # BuddjApiClient implémentant IBuddjApi
+├── shared/                 # Utilitaires, types partagés, config
+├── main.ts
+└── sw.ts
+```
+
+### Flux de données
+
+- Les Web Components lisent le **store** et s’abonnent à ses changements.
+- Les actions utilisateur appellent des **use-cases** (ports in), jamais l’API directement.
+- Les use-cases mettent à jour le **store** et appellent les **ports out** (API) pour persister ou charger.
+- Aucun appel `fetch` ou référence à l’API dans les components.
+
+### Organisation component-driven (composants)
+
+Les Web Components sont organisés en couches, des plus atomiques aux écrans :
+
+- **`icons/`** — Atomes : icônes réutilisables (edit, delete, transfer, save, toggle).
+- **`atoms/`** — Atomes : briques de base (texte avec ellipsis, montant, bouton ajouter).
+- **`molecules/`** — Molécules : assemblages simples (ligne de charge, ligne de dépense, totaux budget).
+- **`organisms/`** — Organismes : blocs composés (barre récap, groupe de charges/budgets, carte budget, section-header, nav).
+- **`screens/`** — Écrans : pages complètes (Charges récurrentes, Mes budgets).
+
+Les composants des niveaux supérieurs utilisent ceux des niveaux inférieurs. Dans `main.ts`, l'ordre d'import est : icons → atoms → molecules → organisms → screens, pour que les dépendances soient enregistrées avant utilisation.
+
+---
+
+## Style UI de l’app
+
+- **Thème** : sombre (fond gris-bleuté / navy), accents en dégradés (rose/coral, menthe, or, violet/bleu). Pas de thème "corporate" neutre.
+- **Typo** : titres en font dédiée (ex. Outfit), corps en lisible (ex. DM Sans). Hiérarchie claire (titres, sous-titres, labels).
+- **Composants** : coins arrondis (`--radius`, `--radius-lg`), ombres légères et effet "glow" au survol sur les boutons et cartes. Bordures fines semi-transparentes.
+- **Couleurs** : variables CSS (ex. `--bg`, `--bg-card`, `--navy`, `--coral`, `--mint`, `--gold`, `--coral-glow`, `--mint-glow`). Cohérence avec le prototype existant (dark, funky, lisible).
+- **Listes** : items compacts, une ligne par élément quand possible ; ellipsis sur les libellés trop longs. Boutons d’action en icônes de taille uniforme.
+- **Accessibilité** : contraste suffisant, `aria-label` / `title` sur les boutons icônes, focus visible (`:focus-visible`).
+
+---
+
+## Conventions de code
+
+### Arguments nommés (objet unique)
+
+Tous les arguments de méthodes, fonctions et constructeurs doivent être passés sous forme d’un **objet nommé**. Pas de paramètres positionnels multiples.
+
+- **À faire** : `call({ id: 123, name: "toto" })` ou `new Service({ api, store })`.
+- **À éviter** : `call(123, "toto")` ou `new Service(api, store)`.
+
+Cela vaut pour les use-cases, les constructeurs, les fonctions publiques du domaine et des adapters. Les signatures doivent ressembler à :
+
+```ts
+// Bon
+function getCharge({ id }: { id: string }) { … }
+transferToBudget({ amount, budgetId }: { amount: number; budgetId: string }) { … }
+
+// À éviter
+function getCharge(id: string) { … }
+transferToBudget(amount: number, budgetId: string) { … }
+```
+
+Exception acceptable : fonctions purement internes à un fichier, très simples (ex. helpers à 1 argument). Dans le doute, privilégier l’objet nommé.
+
+---
+
+## Rappels
+
+- Les Web Components n’importent que les ports in (use-cases) ou le store, et des types du domaine.
+- Les use-cases orchestrent le store et les ports out ; ils ne contiennent pas de `fetch` ni de logique DOM.
+- L’adapter API implémente le port out (interface) et concentre URLs, headers, sérialisation et gestion offline/cache.
