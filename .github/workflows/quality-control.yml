@@ -84,6 +84,7 @@ jobs:
 
   back_CD:
     name: Back ~ Deployment
+    if: github.event_name == 'push'
     needs: [ back_checks, front_v3_checks ]
     runs-on: ubuntu-latest
 
