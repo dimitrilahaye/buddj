@@ -69,7 +69,7 @@
     "chai-as-promised": "^8.0.1",
     "cross-env": "^7.0.3",
     "esbuild": "^0.25.2",
-    "mocha": "^11.1.0",
+    "mocha": "^11.7.5",
     "sinon": "^20.0.0",
     "sinon-chai": "^3.7.0",
     "supertest": "^7.1.0",
