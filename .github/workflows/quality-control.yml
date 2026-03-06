@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       back: ${{ steps.filter.outputs.back }}
-      front_v2: ${{ steps.filter.outputs.front_v2 }}
+      front: ${{ steps.filter.outputs.front }}
     steps:
       - uses: actions/checkout@v6
 
@@ -21,7 +21,7 @@ jobs:
         with:
           filters: |
             back: 'back/**'
-            front_v2: 'front-v2/**'
+            front: 'front-v3/**'
 
   back_checks:
     needs: [ changes ]
@@ -79,7 +79,7 @@ jobs:
   front_checks:
     name: Front ~ Quality Checks
     needs: [ changes ]
-    if: needs.changes.outputs.front_v2 == 'true'
+    if: needs.changes.outputs.front == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -91,30 +91,16 @@ jobs:
         node-version: "22.22.1"
 
     - name: Front ~ Install
-      working-directory: ./front-v2
+      working-directory: ./front-v3
       run: npm install
 
-    - name: Front ~ Generate environment.ts
-      working-directory: ./front-v2
-      run: |
-        cp src/environments/environment.template.ts src/environments/environment.ts
-        sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.ts
-        sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.ts
-
-    - name: Front ~ Generate environment.production.ts
-      working-directory: ./front-v2
-      run: |
-        cp src/environments/environment.template.ts src/environments/environment.production.ts
-        sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.production.ts
-        sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.production.ts
-
     - name: Back ~ ESLint checks
-      working-directory: ./front-v2
+      working-directory: ./front-v3
       run: npm run lint
 
-    - name: Front ~ Tests
-      working-directory: ./front-v2
-      run: npm run test:headless
+    - name: Front ~ Build
+      working-directory: ./front-v3
+      run: npm run build
 
   back_CD:
     name: Back ~ Deployment
@@ -133,7 +119,7 @@ jobs:
   front_CD:
     name: Front ~ Deployment
     needs: [ changes, front_checks ]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.front_v2 == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.front == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -141,5 +127,5 @@ jobs:
 
     - name: Deploy
       env:
-        deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP }}
+        deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP_v3 }}
       run: curl "$deploy_url"
