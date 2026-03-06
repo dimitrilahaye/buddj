@@ -2,6 +2,10 @@
   "extends": [
     "config:recommended"
   ],
+  "ignorePaths": [
+    "front/**",
+    "front-v2/**"
+  ],
   "timezone": "Europe/Paris",
   "schedule": [
     "after 10:00 am and before 5:00 pm on Monday"
