@@ -63,7 +63,7 @@
     "@types/pg": "^8.18.0",
     "@types/sinon": "^17.0.4",
     "@types/sinon-chai": "^3.2.12",
-    "@types/supertest": "^6.0.3",
+    "@types/supertest": "^7.2.0",
     "@types/uuid": "^11.0.0",
     "chai": "^4.5.0",
     "chai-as-promised": "^8.0.1",
@@ -72,7 +72,7 @@
     "mocha": "^11.7.5",
     "sinon": "^20.0.0",
     "sinon-chai": "^3.7.0",
-    "supertest": "^7.1.0",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
