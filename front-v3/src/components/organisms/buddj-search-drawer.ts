@@ -1,0 +1,167 @@
+/**
+ * Shell générique pour les drawers de recherche (charges, dépenses, etc.).
+ * Gère uniquement : structure UI (backdrop, panneau, champ recherche, zone résultats),
+ * filtre par label/montant, groupement par clé, rendu des sections.
+ * La logique métier (collecte, création des lignes miroir) est fournie via la config.
+ */
+import { escapeAttr } from '../../shared/escape.js';
+
+export interface SearchDrawerEntry {
+  label: string;
+  amount: string;
+  icon: string;
+  element: HTMLElement;
+  [key: string]: unknown;
+}
+
+export interface SearchDrawerConfig {
+  title: string;
+  placeholder: string;
+  inputLabel?: string;
+  getEntries: () => SearchDrawerEntry[];
+  getGroupKey: (entry: SearchDrawerEntry) => string;
+  createMirrorRow: (entry: SearchDrawerEntry) => HTMLElement;
+  rowWrapperClass: string;
+  eventName?: string;
+}
+
+export type BuddjSearchDrawerElement = HTMLElement & { open: (config: SearchDrawerConfig) => void };
+
+const DATA_BACKDROP = 'data-search-drawer-backdrop';
+const DATA_INPUT = 'data-search-drawer-input';
+const DATA_RESULTS = 'data-search-drawer-results';
+
+export class BuddjSearchDrawer extends HTMLElement {
+  static readonly tagName = 'buddj-search-drawer';
+
+  private _query = '';
+  private _config: SearchDrawerConfig | null = null;
+
+  open(config: SearchDrawerConfig): void {
+    this._query = '';
+    this._config = config;
+    this.render();
+    this.classList.add('search-drawer--open');
+    this.attachListeners();
+    this.updateResults();
+    const input = this.querySelector<HTMLInputElement>(`[${DATA_INPUT}]`);
+    requestAnimationFrame(() => input?.focus());
+  }
+
+  close(): void {
+    const eventName = this._config?.eventName;
+    this.classList.remove('search-drawer--open');
+    this._query = '';
+    this._config = null;
+    if (eventName) {
+      this.dispatchEvent(new CustomEvent(eventName, { detail: { query: '' }, bubbles: true }));
+    }
+  }
+
+  private normalizeAmount(s: string): string {
+    return s.toLowerCase().replace(/\s/g, '').replace('€', '');
+  }
+
+  private updateResults(): void {
+    const config = this._config;
+    if (!config) return;
+
+    const entries = config.getEntries();
+    const q = this._query.trim().toLowerCase();
+    const filtered =
+      q === ''
+        ? []
+        : entries.filter((e) => {
+            const label = e.label.toLowerCase();
+            const amountNorm = this.normalizeAmount(e.amount);
+            return label.includes(q) || amountNorm.includes(q);
+          });
+
+    const container = this.querySelector(`[${DATA_RESULTS}]`);
+    if (!container) return;
+
+    if (filtered.length === 0) {
+      container.innerHTML = q
+        ? '<p class="search-drawer-empty">Aucun résultat</p>'
+        : '<p class="search-drawer-hint">Saisissez un intitulé ou un montant pour filtrer.</p>';
+      this.dispatchSearchEvent();
+      return;
+    }
+
+    const byGroup = new Map<string, SearchDrawerEntry[]>();
+    filtered.forEach((entry) => {
+      const key = config.getGroupKey(entry);
+      const list = byGroup.get(key) ?? [];
+      list.push(entry);
+      byGroup.set(key, list);
+    });
+
+    container.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+    byGroup.forEach((entries, groupKey) => {
+      const section = document.createElement('section');
+      section.className = 'search-drawer-group';
+      const title = document.createElement('h3');
+      title.className = 'search-drawer-group-title';
+      title.textContent = groupKey;
+      section.appendChild(title);
+      const list = document.createElement('ul');
+      list.className = 'search-drawer-list';
+      entries.forEach((entry) => {
+        const wrap = document.createElement('li');
+        wrap.className = 'search-drawer-item';
+        const rowWrap = document.createElement('div');
+        rowWrap.className = `search-drawer-item-row ${config.rowWrapperClass}`;
+        rowWrap.appendChild(config.createMirrorRow(entry));
+        wrap.appendChild(rowWrap);
+        list.appendChild(wrap);
+      });
+      section.appendChild(list);
+      fragment.appendChild(section);
+    });
+    container.setAttribute('aria-live', 'polite');
+    container.appendChild(fragment);
+    this.dispatchSearchEvent();
+  }
+
+  private dispatchSearchEvent(): void {
+    if (this._config?.eventName) {
+      this.dispatchEvent(new CustomEvent(this._config.eventName, { detail: { query: this._query }, bubbles: true }));
+    }
+  }
+
+  private render(): void {
+    const config = this._config;
+    if (!config) return;
+
+    const inputLabel = config.inputLabel ?? 'Par intitulé ou montant';
+    this.innerHTML = `
+      <div class="search-drawer-backdrop" ${DATA_BACKDROP}></div>
+      <div class="search-drawer-panel" role="dialog" aria-modal="true" aria-label="${escapeAttr(config.title)}">
+        <div class="search-drawer-header">
+          <h2 class="search-drawer-title">Rechercher</h2>
+        </div>
+        <div class="search-drawer-body">
+          <div class="search-drawer-results" ${DATA_RESULTS}></div>
+          <label class="search-drawer-field">
+            <span class="search-drawer-label">${escapeAttr(inputLabel)}</span>
+            <input type="search" class="search-drawer-input" ${DATA_INPUT} placeholder="${escapeAttr(config.placeholder)}" value="${escapeAttr(this._query)}" aria-label="Rechercher par intitulé ou montant" autocomplete="off">
+          </label>
+        </div>
+      </div>
+    `;
+  }
+
+  private attachListeners(): void {
+    const backdrop = this.querySelector(`[${DATA_BACKDROP}]`);
+    backdrop?.addEventListener('click', () => this.close());
+
+    const input = this.querySelector<HTMLInputElement>(`[${DATA_INPUT}]`);
+    input?.addEventListener('input', () => {
+      this._query = input.value ?? '';
+      this.updateResults();
+    });
+  }
+}
+
+customElements.define(BuddjSearchDrawer.tagName, BuddjSearchDrawer);
