@@ -58,47 +58,33 @@ jobs:
         YEARLY: ${{ secrets.YEARLY }}
         YEARLY_BUDGETS: ${{ secrets.YEARLY_BUDGETS }}
 
-  front_checks:
-    name: Front ~ Quality Checks
+  front_v3_checks:
+    name: Front v3 ~ Quality Checks
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Front ~ Use Node
+    - name: Front v3 ~ Use Node
       uses: actions/setup-node@v4
       with:
         node-version: "22.14.0"
 
-    - name: Front ~ Install
-      working-directory: ./front-v2
+    - name: Front v3 ~ Install
+      working-directory: ./front-v3
       run: npm install
 
-    - name: Front ~ Generate environment.ts
-      working-directory: ./front-v2
-      run: |
-        cp src/environments/environment.template.ts src/environments/environment.ts
-        sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.ts
-        sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.ts
-
-    - name: Front ~ Generate environment.production.ts
-      working-directory: ./front-v2
-      run: |
-        cp src/environments/environment.template.ts src/environments/environment.production.ts
-        sed -i "s#API_URL#${{ secrets.API_URL }}#g" src/environments/environment.production.ts
-        sed -i "s#COOKIE_NAME#${{ secrets.COOKIE_NAME }}#g" src/environments/environment.production.ts
-
-    - name: Back ~ ESLint checks
-      working-directory: ./front-v2
+    - name: Front v3 ~ Lint
+      working-directory: ./front-v3
       run: npm run lint
 
-    - name: Front ~ Tests
-      working-directory: ./front-v2
-      run: npm run test:headless
+    - name: Front v3 ~ Build
+      working-directory: ./front-v3
+      run: npm run build
 
   back_CD:
     name: Back ~ Deployment
-    needs: [ back_checks, front_checks ]
+    needs: [ back_checks, front_v3_checks ]
     runs-on: ubuntu-latest
 
     steps:
@@ -109,15 +95,15 @@ jobs:
         deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_API }}
       run: curl "$deploy_url"
 
-  front_CD:
-    name: Front ~ Deployment
-    needs: [ back_checks, front_checks, back_CD ]
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Deploy
-      env:
-        deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP }}
-      run: curl "$deploy_url"
+  # front_CD:
+  #   name: Front ~ Deployment
+  #   needs: [ back_checks, front_v3_checks, back_CD ]
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #
+  #   - name: Deploy
+  #     env:
+  #       deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP }}
+  #     run: curl "$deploy_url"
