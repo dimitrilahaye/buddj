@@ -104,8 +104,13 @@ jobs:
 
   back_CD:
     name: Back ~ Deployment
-    needs: [ changes, back_checks ]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.back == 'true'
+    needs: [ changes, back_checks, front_checks ]
+    if: |
+      always() &&
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.changes.outputs.back == 'true' &&
+      needs.back_checks.result == 'success' &&
+      (needs.front_checks.result == 'success' || needs.front_checks.result == 'skipped')
     runs-on: ubuntu-latest
 
     steps:
@@ -118,8 +123,13 @@ jobs:
 
   front_CD:
     name: Front ~ Deployment
-    needs: [ changes, front_checks ]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.front == 'true'
+    needs: [ changes, front_checks, back_CD ]
+    if: |
+      always() &&
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.changes.outputs.front == 'true' &&
+      needs.front_checks.result == 'success' &&
+      (needs.back_CD.result == 'success' || needs.back_CD.result == 'skipped')
     runs-on: ubuntu-latest
 
     steps:
