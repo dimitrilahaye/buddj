@@ -7,7 +7,25 @@ on:
     branches: [ main ]
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      back: ${{ steps.filter.outputs.back }}
+      front_v2: ${{ steps.filter.outputs.front_v2 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            back: 'back/**'
+            front_v2: 'front-v2/**'
+
   back_checks:
+    needs: [ changes ]
+    if: needs.changes.outputs.back == 'true'
     name: Back ~ Quality Checks
     runs-on: ubuntu-latest
     container: node:22.14.0-bookworm-slim
@@ -60,6 +78,8 @@ jobs:
 
   front_checks:
     name: Front ~ Quality Checks
+    needs: [ changes ]
+    if: needs.changes.outputs.front_v2 == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -98,7 +118,8 @@ jobs:
 
   back_CD:
     name: Back ~ Deployment
-    needs: [ back_checks, front_checks ]
+    needs: [ changes, back_checks ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.back == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -111,7 +132,8 @@ jobs:
 
   front_CD:
     name: Front ~ Deployment
-    needs: [ back_checks, front_checks, back_CD ]
+    needs: [ changes, front_checks ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.front_v2 == 'true'
     runs-on: ubuntu-latest
 
     steps:
