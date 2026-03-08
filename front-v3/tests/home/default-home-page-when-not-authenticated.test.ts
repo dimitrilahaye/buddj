@@ -14,4 +14,15 @@ describe("home quand l'utilisateur n'est pas authentifié", () => {
     expect(window.location.pathname).toBe('/');
     expect(screen.getByRole('heading', { level: 1, name: 'Welcome on Buddj!' })).exist;
   });
+
+  it('masque la modal de chargement une fois la vérification terminée', async () => {
+    document.body.innerHTML = '<main id="screen-outlet" role="main"></main>';
+    window.history.replaceState(null, '', '/');
+
+    bootstrap({ authService: createAuthServiceFromInMemory(false) });
+
+    await new Promise((r) => setTimeout(r, 150));
+
+    expect(screen.queryByRole('status', { name: 'Connexion à Buddj! en cours' })).toBeNull();
+  });
 });

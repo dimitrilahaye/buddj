@@ -33,8 +33,15 @@ export class AuthStore extends Store<AuthState> {
       if (isAuthenticated && this._onAuthenticatedRedirect) {
         this._onAuthenticatedRedirect();
       }
-    } catch {
+      if (isAuthenticated) {
+        this.emitStateChange('isAuthenticated:success');
+      } else {
+        this.emitStateChange('isAuthenticated:notAuthenticated');
+      }
+    } catch (err) {
       this.setState({ isLoading: false });
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('isAuthenticated:failure', { message });
     }
   }
 }
