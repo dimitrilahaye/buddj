@@ -1,14 +1,13 @@
+import { Store } from '../store.js';
 import { DEFAULT_AUTH_STATE, type AuthState } from './auth-state.js';
 
 export type CheckUserIsAuthenticatedFn = () => Promise<boolean>;
 
 /**
- * Store auth : étend EventTarget, state AuthState, action checkUserIsAuthenticated,
+ * Store auth : state AuthState, action checkUserIsAuthenticated,
  * event "isAuthenticated:loading" pendant la vérification.
  */
-export class AuthStore extends EventTarget {
-  private state: AuthState = { ...DEFAULT_AUTH_STATE };
-
+export class AuthStore extends Store<AuthState> {
   constructor({
     checkUserIsAuthenticated,
     onAuthenticatedRedirect,
@@ -16,7 +15,7 @@ export class AuthStore extends EventTarget {
     checkUserIsAuthenticated: CheckUserIsAuthenticatedFn;
     onAuthenticatedRedirect?: () => void;
   }) {
-    super();
+    super(DEFAULT_AUTH_STATE);
     this.addEventListener('checkUserIsAuthenticated', () => this.handleCheckUserIsAuthenticated());
     this._checkUserIsAuthenticated = checkUserIsAuthenticated;
     this._onAuthenticatedRedirect = onAuthenticatedRedirect;
@@ -24,28 +23,6 @@ export class AuthStore extends EventTarget {
 
   private _checkUserIsAuthenticated: CheckUserIsAuthenticatedFn;
   private _onAuthenticatedRedirect?: () => void;
-
-  getState(): AuthState {
-    return { ...this.state };
-  }
-
-  setState(partial: Partial<AuthState>): void {
-    this.state = { ...this.state, ...partial };
-  }
-
-  /**
-   * Émet un event d’état (store → WC). Payload minimal dans detail.
-   */
-  emitStateChange<T>(name: string, detail?: T): void {
-    this.dispatchEvent(new CustomEvent(name, { detail }));
-  }
-
-  /**
-   * Helper pour les WC : envoie une action au store (synchrone).
-   */
-  emitAction(name: string, payload?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { detail: payload }));
-  }
 
   private async handleCheckUserIsAuthenticated(): Promise<void> {
     this.setState({ isLoading: true });
