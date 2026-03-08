@@ -144,24 +144,47 @@ const routes: RouteDef[] = [
 
 const router = createRouter({ outlet, routes, defaultMonthId: DEFAULT_MONTH_ID });
 
-function applyRoute(match: { name: string; params: Record<string, string> }): void {
-  const isNewMonth = match.name === 'new-month';
-  const isArchived = match.name === 'archived';
-  const isSavings = match.name === 'savings';
-  const isReimbursements = match.name === 'reimbursements';
-  const isTemplates = match.name === 'templates';
-  const isTemplateDetail = match.name === 'template-detail';
-  const isAnnualOutflows = match.name === 'annual-outflows';
-  const isStandalone = isNewMonth || isArchived || isSavings || isReimbursements || isTemplates || isTemplateDetail || isAnnualOutflows;
+/** Routes sans onglet mois (nav masque le sélecteur, layout type « page standalone »). */
+const STANDALONE_ROUTE_NAMES = new Set([
+  'new-month',
+  'archived',
+  'savings',
+  'reimbursements',
+  'templates',
+  'template-detail',
+  'annual-outflows',
+]);
 
-  document.body.classList.toggle('route-outflows', match.name === 'outflows');
-  document.body.classList.toggle('route-budgets', match.name === 'budgets');
-  document.body.classList.toggle('route-templates', isTemplates || isTemplateDetail);
-  document.body.classList.toggle('route-annual-outflows', isAnnualOutflows);
-  document.body.classList.toggle('route-new-month', isNewMonth);
-  document.body.classList.toggle('route-archived', isArchived);
-  document.body.classList.toggle('route-savings', isSavings);
-  document.body.classList.toggle('route-reimbursements', isReimbursements);
+/** Classes body à toggler selon la route courante. */
+function getBodyClassToggles(match: { name: string }): Array<{ class: string; active: boolean }> {
+  return [
+  { class: 'route-outflows', active: match.name === 'outflows' },
+  { class: 'route-budgets', active: match.name === 'budgets' },
+  { class: 'route-templates', active: match.name === 'templates' || match.name === 'template-detail' },
+  { class: 'route-annual-outflows', active: match.name === 'annual-outflows' },
+  { class: 'route-new-month', active: match.name === 'new-month' },
+  { class: 'route-archived', active: match.name === 'archived' },
+  { class: 'route-savings', active: match.name === 'savings' },
+  { class: 'route-reimbursements', active: match.name === 'reimbursements' },
+  ];
+}
+
+/** Pour chaque href du burger, noms de routes qui activent ce lien. */
+const BURGER_LINK_ACTIVE_BY_HREF: Record<string, string[]> = {
+  '/new-month': ['new-month'],
+  '/archived': ['archived'],
+  '/templates': ['templates', 'template-detail'],
+  '/annual-outflows': ['annual-outflows'],
+  '/savings': ['savings'],
+  '/reimbursements': ['reimbursements'],
+};
+
+function applyRoute(match: { name: string; params: Record<string, string> }): void {
+  const isStandalone = STANDALONE_ROUTE_NAMES.has(match.name);
+
+  getBodyClassToggles(match).forEach(({ class: cls, active }) => {
+    document.body.classList.toggle(cls, active);
+  });
 
   const nav = document.querySelector('buddj-nav');
   if (nav) {
@@ -173,22 +196,8 @@ function applyRoute(match: { name: string; params: Record<string, string> }): vo
   const burgerLinks = burgerPanel?.querySelectorAll('.burger-panel-list .burger-panel-link') ?? [];
   burgerLinks.forEach((link) => {
     const href = link.getAttribute('href');
-    const isNewMonthLink = href === '/new-month';
-    const isArchivedLink = href === '/archived';
-    const isTemplatesLink = href === '/templates';
-    const isAnnualOutflowsLink = href === '/annual-outflows';
-    const isSavingsLink = href === '/savings';
-    const isReimbursementsLink = href === '/reimbursements';
-    link.classList.toggle(
-      'burger-panel-link--active',
-      (isNewMonth && isNewMonthLink) ||
-        (isArchived && isArchivedLink) ||
-        (isTemplates && isTemplatesLink) ||
-        (isTemplateDetail && isTemplatesLink) ||
-        (isAnnualOutflows && isAnnualOutflowsLink) ||
-        (isSavings && isSavingsLink) ||
-        (isReimbursements && isReimbursementsLink)
-    );
+    const activeRouteNames = href ? BURGER_LINK_ACTIVE_BY_HREF[href] ?? [] : [];
+    link.classList.toggle('burger-panel-link--active', activeRouteNames.includes(match.name));
   });
 }
 
