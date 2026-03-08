@@ -62,5 +62,6 @@ export default defineConfig({
         ],
       },
     }),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- conflit de types Vite (projet) vs Vitest (plugins)
   ] as any,
 });
