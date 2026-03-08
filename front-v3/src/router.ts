@@ -58,17 +58,28 @@ function matchPath(pathname: string, route: RouteDef): RouteMatch | null {
   return { name: route.name, params, path: pathname };
 }
 
+export type DefaultRoute = {
+  name: string;
+  path: string;
+  params?: Record<string, string>;
+};
+
 export function createRouter({
   outlet,
   routes,
   defaultMonthId = DEFAULT_MONTH_ID,
+  defaultRoute,
 }: {
   outlet: HTMLElement;
   routes: RouteDef[];
   defaultMonthId?: string;
+  defaultRoute?: DefaultRoute;
 }) {
   type Listener = (match: RouteMatch) => void;
   const listeners: Listener[] = [];
+  const fallbackMatch: RouteMatch = defaultRoute
+    ? { name: defaultRoute.name, params: defaultRoute.params ?? {}, path: defaultRoute.path }
+    : { name: 'budgets', params: { monthId: defaultMonthId }, path: `/budgets/${defaultMonthId}` };
 
   function getPath(): string {
     return window.location.pathname || '/';
@@ -86,7 +97,7 @@ export function createRouter({
     const path = getPath();
     const m = findMatch(path);
     if (m) return m;
-    return { name: 'budgets', params: { monthId: defaultMonthId }, path: `/budgets/${defaultMonthId}` };
+    return fallbackMatch;
   }
 
   function navigate(path: string): void {
@@ -139,7 +150,7 @@ export function createRouter({
     window.addEventListener('popstate', emit);
     const path = getPath();
     if (!findMatch(path)) {
-      replace(`/budgets/${defaultMonthId}`);
+      replace(fallbackMatch.path);
       return getCurrent();
     }
     emit();

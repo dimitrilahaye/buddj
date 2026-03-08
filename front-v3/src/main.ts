@@ -47,14 +47,20 @@ import './components/organisms/buddj-budget-card.js';
 import './components/organisms/buddj-budget-group.js';
 import './components/organisms/buddj-template-budget-card.js';
 import { createRouter } from './router.js';
-import { createRoutes, DEFAULT_MONTH_ID } from './router-config.js';
+import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 
 const outlet = document.getElementById('screen-outlet')!;
 const routes = createRoutes(outlet);
-const router = createRouter({ outlet, routes, defaultMonthId: DEFAULT_MONTH_ID });
+const router = createRouter({
+  outlet,
+  routes,
+  defaultMonthId: DEFAULT_MONTH_ID,
+  defaultRoute: DEFAULT_ROUTE,
+});
 
 /** Routes sans onglet mois (nav masque le sélecteur, layout type « page standalone »). */
 const STANDALONE_ROUTE_NAMES = new Set([
+  'home',
   'new-month',
   'archived',
   'savings',
@@ -67,6 +73,7 @@ const STANDALONE_ROUTE_NAMES = new Set([
 /** Classes body à toggler selon la route courante. */
 function getBodyClassToggles(match: { name: string }): Array<{ class: string; active: boolean }> {
   return [
+  { class: 'route-home', active: match.name === 'home' },
   { class: 'route-outflows', active: match.name === 'outflows' },
   { class: 'route-budgets', active: match.name === 'budgets' },
   { class: 'route-templates', active: match.name === 'templates' || match.name === 'template-detail' },
