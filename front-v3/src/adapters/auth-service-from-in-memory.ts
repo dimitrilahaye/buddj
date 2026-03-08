@@ -5,9 +5,11 @@ import type { AuthService } from '../application/auth/auth-service.js';
  */
 export function createAuthServiceFromInMemory(result: boolean): AuthService {
   return {
+    login(): void {
+      // No-op en test / démo
+    },
     async isAuthenticated(): Promise<boolean> {
       await new Promise((r) => setTimeout(r, 100));
-      // throw new Error('test');
       return result;
     },
   };

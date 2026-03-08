@@ -63,10 +63,17 @@ export class BuddjScreenHome extends HTMLElement {
           Si vous êtes intéressés, veuillez contacter son auteur
           <a href="mailto:contact@dimitrilahaye.net">contact@dimitrilahaye.net</a>.
         </p>
-        <a href="#" class="home-cta btn btn--primary" id="home-signin">Sign in</a>
+        <a href="#" class="home-cta btn btn--primary" id="home-signin" role="button">Sign in</a>
       </div>
     `;
     this.appendChild(main);
+    const signInBtn = main.querySelector('#home-signin');
+    if (signInBtn && this.store) {
+      signInBtn.addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        this.store!.emitAction('userSignIn');
+      });
+    }
   }
 
   disconnectedCallback(): void {

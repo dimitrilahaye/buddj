@@ -7,6 +7,7 @@ import { bootstrap } from '../../src/bootstrap.js';
 /** AuthService qui rejette avec un message (simule une erreur API). */
 function createFailingAuthService(message: string): AuthService {
   return {
+    login(): void {},
     async isAuthenticated(): Promise<boolean> {
       throw new Error(message);
     },
@@ -18,16 +19,18 @@ describe('toast d’erreur quand la vérification auth échoue', () => {
     vi.restoreAllMocks();
   });
 
-  it('affiche un toast d’erreur (rouge) avec le message renvoyé', async () => {
+  it('en cas d’erreur API : modal de loading disparaît, toast erreur apparaît, on reste sur /', async () => {
     document.body.innerHTML = '<main id="screen-outlet" role="main"></main><buddj-toast></buddj-toast>';
     window.history.replaceState(null, '', '/');
 
-    const errorMessage = 'Erreur réseau : impossible de joindre le serveur.';
+    const errorMessage = 'Erreur serveur.';
     bootstrap({ authService: createFailingAuthService(errorMessage) });
 
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 150));
 
+    expect(screen.queryByRole('status', { name: 'Connexion à Buddj! en cours' })).toBeNull();
     expect(screen.getByRole('alert', { name: errorMessage })).exist;
+    expect(window.location.pathname).toBe('/');
   });
 
   it('affiche un toast d’erreur quand le service renvoie 401', async () => {

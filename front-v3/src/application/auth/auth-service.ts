@@ -1,6 +1,7 @@
 /**
- * Port pour vérifier si l’utilisateur est authentifié.
+ * Port auth : vérification d’authentification et login (redirection OAuth).
  */
 export interface AuthService {
   isAuthenticated(): Promise<boolean>;
+  login(): void;
 }
