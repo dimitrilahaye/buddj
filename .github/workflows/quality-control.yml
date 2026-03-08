@@ -85,6 +85,10 @@ jobs:
     needs: [ changes ]
     if: needs.changes.outputs.front == 'true'
     runs-on: ubuntu-latest
+    env:
+      # Exposées au code via import.meta.env (Vite/Vitest n’expose que les vars préfixées VITE_).
+      # Pour override en CI : ajouter la variable d’repo (Settings > Variables) ou le secret VITE_API_URL.
+      VITE_API_URL: ${{ vars.VITE_API_URL }}
 
     steps:
     - uses: actions/checkout@v6
