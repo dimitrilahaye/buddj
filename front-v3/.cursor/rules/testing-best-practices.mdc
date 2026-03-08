@@ -1,0 +1,67 @@
+---
+description: Bonnes pratiques de tests avec Testing Library — sélecteurs par rôle, a11y, tests résistants à la refacto
+globs: **/*.test.ts **/*.spec.ts **/test/** *.test.ts
+alwaysApply: false
+---
+
+# Tests — Testing Library et sélecteurs par rôle
+
+On utilise **Testing Library** (`@testing-library/dom`) pour tester le front-v3. Règle centrale : **ne sélectionner les éléments que par rôle (et nom accessible)**, pas par classe CSS, id ou structure du DOM.
+
+## Pourquoi les sélecteurs par rôle
+
+- Si l’UI respecte l’**accessibilité** (rôles, noms accessibles, labels), les tests ciblent le même « contrat » que les utilisateurs (dont ceux qui utilisent des lecteurs d’écran).
+- Les tests **résistent à la refacto** : changement de classes, de structure HTML ou de composants internes ne casse pas les tests tant que le rôle et le nom restent les mêmes.
+- Éviter `data-testid` / classes / id comme première option : ils couplent le test à l’implémentation.
+
+## Règles de sélection
+
+### À utiliser en priorité
+
+- **`getByRole(role, { name })`** — boutons, liens, headings, listbox, etc. Le `name` correspond au nom accessible (texte visible, `aria-label`, contenu de `<label>` associé).
+- **`getByLabelText`** — champs de formulaire associés à un `<label>`.
+- **`getByPlaceholderText`** — uniquement si pas de label visible (à limiter).
+- **`getByText`** — pour du contenu texte non interactif (avec précaution : préférer un rôle + name si l’élément a un rôle).
+- **`getByTitle`** — si l’info est exposée via l’attribut `title` (tooltip).
+- Variantes **`findBy*`** pour l’async, **`queryBy*`** quand l’élément peut être absent.
+
+Exemples :
+
+```ts
+// Bouton avec texte ou aria-label
+getByRole('button', { name: /rechercher/i });
+getByRole('button', { name: 'Désarchiver' });
+
+// Lien
+getByRole('link', { name: 'Mois archivés' });
+
+// Titre de section
+getByRole('heading', { name: 'Charges récurrentes', level: 1 });
+
+// Liste
+getByRole('list', { name: 'Liste des mois archivés' });
+getByRole('listitem', { name: /janvier 2024/i });
+```
+
+### À éviter (sauf dernier recours)
+
+- **Sélecteurs CSS** : `.class`, `#id`, `[data-testid="…"]` — couplage fort à l’implémentation.
+- **Requêtes par tag** : `getByTagName`, structure du DOM (`querySelector`) — idem.
+- **`data-testid`** : acceptable seulement si aucun rôle/nom accessible ne peut identifier l’élément (et dans ce cas, documenter pourquoi et viser à améliorer l’a11y).
+
+## Côté composants : permettre les tests par rôle
+
+Pour que les tests puissent utiliser uniquement des rôles :
+
+- Donner aux éléments interactifs un **rôle implicite ou explicite** (bouton → `button` ou `role="button"`) et un **nom accessible** (`aria-label`, texte du bouton, ou `<label>` pour les champs).
+- Utiliser des **landmarks** et **headings** sémantiques (`<header>`, `<main>`, `<h1>`–`<h6>`, `<nav>`).
+- Pour les listes : `<ul>`/`<ol>` + `aria-label` sur la liste si besoin, `<li>` pour les items.
+- Icônes seules (sans texte) : **`aria-label`** ou **`title`** pour décrire l’action (ex. « Rechercher », « Supprimer »).
+
+Si un élément n’est pas trouvable par rôle/name, c’est souvent un signal pour améliorer l’accessibilité du composant.
+
+## Récap
+
+- **Testing Library** + **sélecteurs par rôle (et nom accessible)** uniquement.
+- **Pas de sélecteurs CSS** dans les tests ; si besoin, améliorer l’a11y du composant pour qu’il soit identifiable par rôle.
+- En respectant l’a11y, on obtient des tests **stables face à la refacto** et alignés avec l’usage réel de l’interface.
