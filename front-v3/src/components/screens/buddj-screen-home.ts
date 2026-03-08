@@ -1,10 +1,21 @@
 /**
  * Écran d’accueil : logo, description de l’app, disclaimer, contact, CTA Sign in.
  */
+import type { AuthStore } from '../../application/auth/auth-store.js';
+
 export class BuddjScreenHome extends HTMLElement {
   static readonly tagName = 'buddj-screen-home';
 
+  private store?: AuthStore;
+
+  init({ store }: { store: AuthStore }): void {
+    this.store = store;
+  }
+
   connectedCallback(): void {
+    if (this.store) {
+      this.store.emitAction('checkUserIsAuthenticated');
+    }
     if (this.querySelector('.home-content')) return;
     const main = document.createElement('main');
     main.id = 'home';
