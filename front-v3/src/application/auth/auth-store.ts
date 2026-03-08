@@ -5,7 +5,7 @@ export type CheckUserIsAuthenticatedFn = () => Promise<boolean>;
 
 /**
  * Store auth : state AuthState, action checkUserIsAuthenticated,
- * event "isAuthenticated:loading" pendant la vérification.
+ * events "isAuthenticated:loading", "isUserAuthenticatedChecked" ({ isAuthenticated }), "isAuthenticated:failure" ({ message }).
  */
 export class AuthStore extends Store<AuthState> {
   constructor({
@@ -33,11 +33,7 @@ export class AuthStore extends Store<AuthState> {
       if (isAuthenticated && this._onAuthenticatedRedirect) {
         this._onAuthenticatedRedirect();
       }
-      if (isAuthenticated) {
-        this.emitStateChange('isAuthenticated:success');
-      } else {
-        this.emitStateChange('isAuthenticated:notAuthenticated');
-      }
+      this.emitStateChange('isUserAuthenticatedChecked', { isAuthenticated });
     } catch (err) {
       this.setState({ isLoading: false });
       const message = err instanceof Error ? err.message : String(err);
