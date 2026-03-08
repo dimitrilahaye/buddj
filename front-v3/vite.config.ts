@@ -19,8 +19,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Buddj',
-        short_name: 'Buddj',
+        name: 'Buddj!',
+        short_name: 'Buddj!',
         description: 'Gestion de budget',
         theme_color: '#ed8002',
         background_color: '#1a1b24',
