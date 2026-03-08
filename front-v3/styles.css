@@ -3186,6 +3186,9 @@ body.route-budgets .screen-sticky-header-wrap {
 body.route-outflows .screen-sticky-header-wrap .screen-header,
 body.route-budgets .screen-sticky-header-wrap .screen-header {
   margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 
 body.route-outflows .recurring-list,
