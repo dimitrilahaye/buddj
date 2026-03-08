@@ -1,13 +1,13 @@
 /**
- * Toast global : affiche un message temporaire (succès, warning, etc.).
- * API : show({ message, durationMs?, variant?: 'success' | 'warning' })
+ * Toast global : affiche un message temporaire (succès, warning, erreur).
+ * API : show({ message, durationMs?, variant?: 'success' | 'warning' | 'error' })
  */
 import { escapeHtml } from '../../shared/escape.js';
 
 export interface ToastShowOptions {
   message: string;
   durationMs?: number;
-  variant?: 'success' | 'warning';
+  variant?: 'success' | 'warning' | 'error';
 }
 
 export type BuddjToastElement = HTMLElement & { show: (o: ToastShowOptions) => void };
@@ -26,8 +26,9 @@ export class BuddjToast extends HTMLElement {
     if (this._hideTimer) clearTimeout(this._hideTimer);
     const durationMs = options.durationMs ?? 1250;
     const variant = options.variant ?? 'success';
-    this.classList.remove('toast--warning');
+    this.classList.remove('toast--warning', 'toast--error');
     if (variant === 'warning') this.classList.add('toast--warning');
+    if (variant === 'error') this.classList.add('toast--error');
     this.innerHTML = `
       <div class="toast-message" role="status">${escapeHtml(options.message)}</div>
     `;

@@ -6,6 +6,7 @@ import { buildConfigFromEnv } from './config.js';
 import type { AuthService } from './application/auth/auth-service.js';
 import { AuthStore } from './application/auth/auth-store.js';
 import { checkUserIsAuthenticated } from './application/auth/check-user-is-authenticated.js';
+import { createAuthServiceFromApi } from './adapters/auth-service-from-api.js';
 import { createAuthServiceFromInMemory } from './adapters/auth-service-from-in-memory.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
@@ -51,7 +52,7 @@ export type BootstrapOptions = {
 
 export function bootstrap(options?: BootstrapOptions): void {
   const config = options?.config ?? buildConfigFromEnv();
-  const authService = options?.authService ?? createAuthServiceFromInMemory(false);
+  const authService = options?.authService ?? createAuthServiceFromApi({ apiUrl: config.apiUrl });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 
