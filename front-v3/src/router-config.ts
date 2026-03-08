@@ -18,7 +18,7 @@ export const DEFAULT_MONTH_ID = '2024-04';
 
 export const DEFAULT_ROUTE: DefaultRoute = { name: 'home', path: '/' };
 
-export function createRoutes(outlet: HTMLElement): RouteDef[] {
+export function createRoutes(): RouteDef[] {
   return [
     {
       name: 'home',
