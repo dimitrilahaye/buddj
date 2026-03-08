@@ -6,9 +6,16 @@ import type { AuthService } from '../application/auth/auth-service.js';
 import { handleHttpError } from '../shared/http-error.js';
 
 export function createAuthServiceFromApi({ apiUrl }: { apiUrl: string }): AuthService {
+  const baseUrl = apiUrl.replace(/\/$/, '');
   return {
+    login(): void {
+      window.open(
+        `${baseUrl}/auth/google?returnTo=${encodeURIComponent(window.location.origin)}`,
+        '_self'
+      );
+    },
     async isAuthenticated(): Promise<boolean> {
-      const url = `${apiUrl.replace(/\/$/, '')}/me`;
+      const url = `${baseUrl}/me`;
       let response: Response;
       try {
         response = await fetch(url, {

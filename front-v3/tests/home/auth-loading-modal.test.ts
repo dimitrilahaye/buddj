@@ -7,6 +7,7 @@ import { bootstrap } from '../../src/bootstrap.js';
 /** AuthService qui résout après un délai (pour garder la modal de chargement visible). */
 function createDelayedAuthService(result: boolean, delayMs: number): AuthService {
   return {
+    login(): void {},
     async isAuthenticated(): Promise<boolean> {
       await new Promise((r) => setTimeout(r, delayMs));
       return result;

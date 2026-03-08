@@ -6,6 +6,7 @@ import { buildConfigFromEnv } from './config.js';
 import type { AuthService } from './application/auth/auth-service.js';
 import { AuthStore } from './application/auth/auth-store.js';
 import { checkUserIsAuthenticated } from './application/auth/check-user-is-authenticated.js';
+import { userSignIn } from './application/auth/user-sign-in.js';
 import { createAuthServiceFromApi } from './adapters/auth-service-from-api.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
@@ -60,6 +61,7 @@ export function bootstrap(options?: BootstrapOptions): void {
   let router: ReturnType<typeof createRouter>;
   const authStore = new AuthStore({
     checkUserIsAuthenticated: () => checkUserIsAuthenticated({ authService }),
+    userSignIn: () => userSignIn({ authService }),
     onAuthenticatedRedirect: () => router.navigate(`/budgets/${DEFAULT_MONTH_ID}`),
   });
 

@@ -1,22 +1,26 @@
 import { Store } from '../store.js';
 import { DEFAULT_AUTH_STATE, type AuthState } from './auth-state.js';
+import type { UserSignInFn } from './user-sign-in.js';
 
 export type CheckUserIsAuthenticatedFn = () => Promise<boolean>;
 
 /**
- * Store auth : state AuthState, action checkUserIsAuthenticated,
+ * Store auth : state AuthState, actions checkUserIsAuthenticated / userSignIn,
  * events "isAuthenticated:loading", "isUserAuthenticatedChecked" ({ isAuthenticated }), "isAuthenticated:failure" ({ message }).
  */
 export class AuthStore extends Store<AuthState> {
   constructor({
     checkUserIsAuthenticated,
+    userSignIn: userSignInFn,
     onAuthenticatedRedirect,
   }: {
     checkUserIsAuthenticated: CheckUserIsAuthenticatedFn;
+    userSignIn: UserSignInFn;
     onAuthenticatedRedirect?: () => void;
   }) {
     super(DEFAULT_AUTH_STATE);
     this.addEventListener('checkUserIsAuthenticated', () => this.handleCheckUserIsAuthenticated());
+    this.addEventListener('userSignIn', () => userSignInFn());
     this._checkUserIsAuthenticated = checkUserIsAuthenticated;
     this._onAuthenticatedRedirect = onAuthenticatedRedirect;
   }
