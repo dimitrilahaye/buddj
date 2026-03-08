@@ -5138,6 +5138,7 @@ buddj-toast.toast--visible {
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--mint);
+  text-align: center;
 }
 
 buddj-toast.toast--warning .toast-message {
