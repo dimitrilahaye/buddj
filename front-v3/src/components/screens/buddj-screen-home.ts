@@ -86,10 +86,7 @@ export class BuddjScreenHome extends HTMLElement {
     const onLoading = (): void => {
       this._loadingModal?.show(LOADING_TEXT);
     };
-    const onSuccess = (): void => {
-      this._loadingModal?.hide();
-    };
-    const onNotAuthenticated = (): void => {
+    const onUserAuthenticatedChecked = (): void => {
       this._loadingModal?.hide();
     };
     const onFailure = (e: Event): void => {
@@ -99,14 +96,12 @@ export class BuddjScreenHome extends HTMLElement {
     };
 
     this.store!.addEventListener('isAuthenticated:loading', onLoading);
-    this.store!.addEventListener('isAuthenticated:success', onSuccess);
-    this.store!.addEventListener('isAuthenticated:notAuthenticated', onNotAuthenticated);
+    this.store!.addEventListener('isUserAuthenticatedChecked', onUserAuthenticatedChecked);
     this.store!.addEventListener('isAuthenticated:failure', onFailure);
 
     this._unsubscribe = (): void => {
       this.store!.removeEventListener('isAuthenticated:loading', onLoading);
-      this.store!.removeEventListener('isAuthenticated:success', onSuccess);
-      this.store!.removeEventListener('isAuthenticated:notAuthenticated', onNotAuthenticated);
+      this.store!.removeEventListener('isUserAuthenticatedChecked', onUserAuthenticatedChecked);
       this.store!.removeEventListener('isAuthenticated:failure', onFailure);
     };
   }
