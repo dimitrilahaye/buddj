@@ -50,7 +50,7 @@ import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 
 const outlet = document.getElementById('screen-outlet')!;
-const routes = createRoutes(outlet);
+const routes = createRoutes();
 const router = createRouter({
   outlet,
   routes,
