@@ -20,4 +20,10 @@ export default [
       },
     },
   },
+  {
+    files: ['tests/**', '**/*.test.ts', '**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-expressions': 'off',
+    },
+  },
 ];
