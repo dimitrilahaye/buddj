@@ -18,10 +18,10 @@ export function createAuthServiceFromApi({ apiUrl }: { apiUrl: string }): AuthSe
         });
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Erreur réseau';
-        handleHttpError({ message });
+        return handleHttpError({ message });
       }
       if (response.ok) return true;
-      let message = 'An unknown error occurred';
+      let message = 'Erreur réseau';
       try {
         const body = await response.json();
         if (body && typeof body.message === 'string') message = body.message;

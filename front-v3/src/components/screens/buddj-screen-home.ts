@@ -1,10 +1,10 @@
 /**
  * Écran d’accueil : logo, description de l’app, disclaimer, contact, CTA Sign in.
- * Écoute les events auth du store (loading, success, notAuthenticated, failure) pour afficher / masquer les modales.
+ * Écoute les events auth du store (loading, userAuthenticatedChecked, failure) : modal de chargement, toast d’erreur en cas d’échec.
  */
 import type { AuthStore } from '../../application/auth/auth-store.js';
 import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
-import type { BuddjErrorModal } from '../molecules/buddj-error-modal.js';
+import { getToast } from '../atoms/buddj-toast.js';
 
 const LOADING_TEXT = 'Connexion à Buddj! en cours';
 
@@ -13,7 +13,6 @@ export class BuddjScreenHome extends HTMLElement {
 
   private store?: AuthStore;
   private _loadingModal?: BuddjLoadingModal;
-  private _errorModal?: BuddjErrorModal;
   private _unsubscribe?: () => void;
 
   init({ store }: { store: AuthStore }): void {
@@ -77,11 +76,8 @@ export class BuddjScreenHome extends HTMLElement {
   private attachAuthModalsAndListeners(): void {
     if (this._loadingModal) return;
     const loadingModal = document.createElement('buddj-loading-modal') as BuddjLoadingModal;
-    const errorModal = document.createElement('buddj-error-modal') as BuddjErrorModal;
     this._loadingModal = loadingModal;
-    this._errorModal = errorModal;
     this.appendChild(loadingModal);
-    this.appendChild(errorModal);
 
     const onLoading = (): void => {
       this._loadingModal?.show(LOADING_TEXT);
@@ -92,7 +88,7 @@ export class BuddjScreenHome extends HTMLElement {
     const onFailure = (e: Event): void => {
       this._loadingModal?.hide();
       const message = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Une erreur est survenue.';
-      this._errorModal?.show({ message });
+      getToast()?.show({ message, variant: 'error', durationMs: 3000 });
     };
 
     this.store!.addEventListener('isAuthenticated:loading', onLoading);

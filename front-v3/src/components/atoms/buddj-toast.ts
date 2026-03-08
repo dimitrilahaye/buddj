@@ -29,8 +29,10 @@ export class BuddjToast extends HTMLElement {
     this.classList.remove('toast--warning', 'toast--error');
     if (variant === 'warning') this.classList.add('toast--warning');
     if (variant === 'error') this.classList.add('toast--error');
+    const role = variant === 'error' ? 'alert' : 'status';
+    const safeMessage = escapeHtml(options.message);
     this.innerHTML = `
-      <div class="toast-message" role="status">${escapeHtml(options.message)}</div>
+      <div class="toast-message" role="${role}" aria-label="${safeMessage}" aria-live="${variant === 'error' ? 'assertive' : 'polite'}">${safeMessage}</div>
     `;
     this.classList.add('toast--visible');
     this._hideTimer = setTimeout(() => {
