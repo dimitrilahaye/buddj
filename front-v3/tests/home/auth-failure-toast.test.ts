@@ -14,6 +14,18 @@ function createFailingAuthService(message: string): AuthService {
   };
 }
 
+/** AuthService in-memory : isAuthenticated résout, login() throw (pour tester userSignIn:failure). */
+function createAuthServiceWithFailingLogin(loginError: string): AuthService {
+  return {
+    login(): void {
+      throw new Error(loginError);
+    },
+    async isAuthenticated(): Promise<boolean> {
+      return false;
+    },
+  };
+}
+
 describe('toast d’erreur quand la vérification auth échoue', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -57,5 +69,30 @@ describe('toast d’erreur quand la vérification auth échoue', () => {
     const toast = screen.getByRole('alert', { name: "Vous n'êtes pas connectés" });
     expect(toast).exist;
     expect(toast.textContent).toContain("Vous n'êtes pas connectés");
+  });
+});
+
+describe('toast d’erreur quand le user clique Sign In et login() throw', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('store émet userSignIn:failure, le WC affiche l’erreur dans un toast', async () => {
+    document.body.innerHTML = '<main id="screen-outlet" role="main"></main><buddj-toast></buddj-toast>';
+    window.history.replaceState(null, '', '/');
+
+    const loginErrorMessage = 'Impossible d’ouvrir la fenêtre de connexion.';
+    bootstrap({ authService: createAuthServiceWithFailingLogin(loginErrorMessage) });
+
+    await new Promise((r) => setTimeout(r, 150));
+
+    const signInBtn = screen.getByRole('button', { name: 'Sign in' });
+    signInBtn.click();
+
+    await new Promise((r) => setTimeout(r, 50));
+
+    const toast = screen.getByRole('alert', { name: loginErrorMessage });
+    expect(toast).exist;
+    expect(toast.textContent).toContain(loginErrorMessage);
   });
 });

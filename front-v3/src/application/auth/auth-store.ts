@@ -6,7 +6,8 @@ export type CheckUserIsAuthenticatedFn = () => Promise<boolean>;
 
 /**
  * Store auth : state AuthState, actions checkUserIsAuthenticated / userSignIn,
- * events "isAuthenticated:loading", "isUserAuthenticatedChecked" ({ isAuthenticated }), "isAuthenticated:failure" ({ message }).
+ * events "isAuthenticated:loading", "isUserAuthenticatedChecked" ({ isAuthenticated }), "isAuthenticated:failure" ({ message }),
+ * "userSignIn:failure" ({ message }).
  */
 export class AuthStore extends Store<AuthState> {
   constructor({
@@ -20,13 +21,24 @@ export class AuthStore extends Store<AuthState> {
   }) {
     super(DEFAULT_AUTH_STATE);
     this.addEventListener('checkUserIsAuthenticated', () => this.handleCheckUserIsAuthenticated());
-    this.addEventListener('userSignIn', () => userSignInFn());
+    this.addEventListener('userSignIn', () => this.handleUserSignIn());
     this._checkUserIsAuthenticated = checkUserIsAuthenticated;
+    this._userSignIn = userSignInFn;
     this._onAuthenticatedRedirect = onAuthenticatedRedirect;
   }
 
   private _checkUserIsAuthenticated: CheckUserIsAuthenticatedFn;
+  private _userSignIn: UserSignInFn;
   private _onAuthenticatedRedirect?: () => void;
+
+  private handleUserSignIn(): void {
+    try {
+      this._userSignIn();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('userSignIn:failure', { message });
+    }
+  }
 
   private async handleCheckUserIsAuthenticated(): Promise<void> {
     this.setState({ isLoading: true });

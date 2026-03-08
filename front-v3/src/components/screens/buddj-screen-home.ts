@@ -97,15 +97,21 @@ export class BuddjScreenHome extends HTMLElement {
       const message = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Une erreur est survenue.';
       getToast()?.show({ message, variant: 'error', durationMs: 3000 });
     };
+    const onUserSignInFailure = (e: Event): void => {
+      const message = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Une erreur est survenue.';
+      getToast()?.show({ message, variant: 'error', durationMs: 3000 });
+    };
 
     this.store!.addEventListener('isAuthenticated:loading', onLoading);
     this.store!.addEventListener('isUserAuthenticatedChecked', onUserAuthenticatedChecked);
     this.store!.addEventListener('isAuthenticated:failure', onFailure);
+    this.store!.addEventListener('userSignIn:failure', onUserSignInFailure);
 
     this._unsubscribe = (): void => {
       this.store!.removeEventListener('isAuthenticated:loading', onLoading);
       this.store!.removeEventListener('isUserAuthenticatedChecked', onUserAuthenticatedChecked);
       this.store!.removeEventListener('isAuthenticated:failure', onFailure);
+      this.store!.removeEventListener('userSignIn:failure', onUserSignInFailure);
     };
   }
 }
