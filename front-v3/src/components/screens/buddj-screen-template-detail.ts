@@ -6,6 +6,7 @@ import type { ChargeItemData } from './buddj-screen-recurring.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { formatEuros } from '../../shared/goal.js';
 import { escapeHtml } from '../../shared/escape.js';
+import { entryMatchesSearch } from '../../shared/search.js';
 import { TEMPLATE_DEFAULT_CHANGED } from './buddj-screen-templates.js';
 
 const TEMPLATE_CHARGES: ChargeItemData[] = [
@@ -77,25 +78,25 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
   private _budgets: { name: string; icon: string; allocated: number }[] = [...TEMPLATE_BUDGETS];
   private _chargeSearchListener = (e: Event): void => {
     const ev = e as CustomEvent<{ query: string }>;
-    const query = (ev.detail?.query ?? '').trim().toLowerCase();
+    const query = (ev.detail?.query ?? '').trim();
     const main = this.querySelector('#template-detail');
     if (!main) return;
     main.querySelectorAll('buddj-charge-item').forEach((item) => {
-      const label = (item.getAttribute('label') ?? '').toLowerCase();
-      const amount = (item.getAttribute('amount') ?? '').replace(/\s/g, '').replace('€', '').toLowerCase();
-      const match = query === '' || label.includes(query) || amount.includes(query);
+      const label = item.getAttribute('label') ?? '';
+      const amount = item.getAttribute('amount') ?? '';
+      const match = entryMatchesSearch(label, amount, query);
       (item as HTMLElement).style.display = match ? '' : 'none';
     });
   };
   private _expenseSearchListener = (e: Event): void => {
     const ev = e as CustomEvent<{ query: string }>;
-    const query = (ev.detail?.query ?? '').trim().toLowerCase();
+    const query = (ev.detail?.query ?? '').trim();
     const main = this.querySelector('#template-detail');
     if (!main) return;
     main.querySelectorAll('buddj-expense-item').forEach((item) => {
-      const desc = (item.getAttribute('desc') ?? '').toLowerCase();
-      const amount = (item.getAttribute('amount') ?? '').replace(/\s/g, '').replace('€', '').toLowerCase();
-      const match = query === '' || desc.includes(query) || amount.includes(query);
+      const desc = item.getAttribute('desc') ?? '';
+      const amount = item.getAttribute('amount') ?? '';
+      const match = entryMatchesSearch(desc, amount, query);
       (item as HTMLElement).style.display = match ? '' : 'none';
     });
   };
