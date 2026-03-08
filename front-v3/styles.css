@@ -3072,6 +3072,14 @@ body.route-annual-outflows {
   overflow-x: hidden;
 }
 
+body.route-savings #screen-outlet,
+body.route-reimbursements #screen-outlet,
+body.route-templates #screen-outlet,
+body.route-annual-outflows #screen-outlet {
+  flex: 1;
+  min-height: 0;
+}
+
 body.route-savings buddj-screen-savings,
 body.route-reimbursements buddj-screen-reimbursements,
 body.route-templates buddj-screen-templates,
@@ -3103,6 +3111,16 @@ body.route-annual-outflows buddj-screen-annual-outflows main.screen {
   overflow: hidden;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Outlets : le conteneur des screens doit prendre l’espace restant pour que le scroll fonctionne */
+#screen-outlet {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
 }
 
 /* Outflows / Budgets : hauteur viewport fixe, header fixe, seule la liste scroll */

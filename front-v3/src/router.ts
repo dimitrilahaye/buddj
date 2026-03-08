@@ -1,5 +1,6 @@
 /**
- * Routeur minimal : routes avec paramètres (ex. :monthId), History API, abonnement aux changements.
+ * Routeur : routes avec paramètres (ex. :monthId), History API, outlet unique.
+ * Chaque route enregistre un handler qui monte le WC screen dans l’outlet et reçoit params + query.
  */
 
 export type RouteMatch = {
@@ -8,12 +9,32 @@ export type RouteMatch = {
   path: string;
 };
 
+/** Contexte passé au handler : params du path, query string, outlet pour monter le screen. */
+export type RouteContext = {
+  name: string;
+  params: Record<string, string>;
+  query: Record<string, string>;
+  path: string;
+  outlet: HTMLElement;
+};
+
+export type RouteHandler = (ctx: RouteContext) => void | HTMLElement | Promise<HTMLElement>;
+
 export type RouteDef = {
   name: string;
-  pattern: string; // ex. '/outflows/:monthId'
+  pattern: string;
+  handle: RouteHandler;
 };
 
 const DEFAULT_MONTH_ID = '2024-04';
+
+function getQuery(): Record<string, string> {
+  const q: Record<string, string> = {};
+  new URLSearchParams(window.location.search).forEach((value, key) => {
+    q[key] = value;
+  });
+  return q;
+}
 
 function pathToRegex(pattern: string): { re: RegExp; keys: string[] } {
   const keys: string[] = [];
@@ -27,7 +48,8 @@ function pathToRegex(pattern: string): { re: RegExp; keys: string[] } {
 
 function matchPath(pathname: string, route: RouteDef): RouteMatch | null {
   const { re, keys } = pathToRegex(route.pattern);
-  const m = pathname.replace(/\?.*$/, '').match(re);
+  const pathOnly = pathname.replace(/\?.*$/, '');
+  const m = pathOnly.match(re);
   if (!m) return null;
   const params: Record<string, string> = {};
   keys.forEach((key, i) => {
@@ -37,9 +59,11 @@ function matchPath(pathname: string, route: RouteDef): RouteMatch | null {
 }
 
 export function createRouter({
+  outlet,
   routes,
   defaultMonthId = DEFAULT_MONTH_ID,
 }: {
+  outlet: HTMLElement;
   routes: RouteDef[];
   defaultMonthId?: string;
 }) {
@@ -77,9 +101,30 @@ export function createRouter({
     emit();
   }
 
+  async function runHandler(match: RouteMatch): Promise<void> {
+    const route = routes.find((r) => r.name === match.name);
+    if (!route?.handle) return;
+    const ctx: RouteContext = {
+      name: match.name,
+      params: match.params,
+      query: getQuery(),
+      path: match.path,
+      outlet,
+    };
+    const result = route.handle(ctx);
+    if (result instanceof HTMLElement) {
+      outlet.replaceChildren(result);
+    } else if (result != null && typeof (result as Promise<HTMLElement>).then === 'function') {
+      const el = await (result as Promise<HTMLElement>);
+      if (el instanceof HTMLElement) outlet.replaceChildren(el);
+    }
+  }
+
   function emit(): void {
     const match = getCurrent();
-    listeners.forEach((fn) => fn(match));
+    runHandler(match).then(() => {
+      listeners.forEach((fn) => fn(match));
+    });
   }
 
   function subscribe(fn: Listener): () => void {
@@ -97,20 +142,9 @@ export function createRouter({
       replace(`/budgets/${defaultMonthId}`);
       return getCurrent();
     }
+    emit();
     return getCurrent();
   }
 
   return { getCurrent, navigate, replace, subscribe, init };
 }
-
-export const ROUTES: RouteDef[] = [
-  { name: 'new-month', pattern: '/new-month' },
-  { name: 'archived', pattern: '/archived' },
-  { name: 'savings', pattern: '/savings' },
-  { name: 'reimbursements', pattern: '/reimbursements' },
-  { name: 'templates', pattern: '/templates' },
-  { name: 'template-detail', pattern: '/templates/:id' },
-  { name: 'annual-outflows', pattern: '/annual-outflows' },
-  { name: 'outflows', pattern: '/outflows/:monthId' },
-  { name: 'budgets', pattern: '/budgets/:monthId' },
-];
