@@ -1,10 +1,11 @@
 /**
  * Shell générique pour les drawers de recherche (charges, dépenses, etc.).
  * Gère uniquement : structure UI (backdrop, panneau, champ recherche, zone résultats),
- * filtre par label/montant, groupement par clé, rendu des sections.
+ * filtre par label/montant (normalisé, insensible aux accents), groupement par clé, rendu des sections.
  * La logique métier (collecte, création des lignes miroir) est fournie via la config.
  */
 import { escapeAttr } from '../../shared/escape.js';
+import { entryMatchesSearch } from '../../shared/search.js';
 
 export interface SearchDrawerEntry {
   label: string;
@@ -58,24 +59,16 @@ export class BuddjSearchDrawer extends HTMLElement {
     }
   }
 
-  private normalizeAmount(s: string): string {
-    return s.toLowerCase().replace(/\s/g, '').replace('€', '');
-  }
-
   private updateResults(): void {
     const config = this._config;
     if (!config) return;
 
     const entries = config.getEntries();
-    const q = this._query.trim().toLowerCase();
+    const q = this._query.trim();
     const filtered =
       q === ''
         ? []
-        : entries.filter((e) => {
-            const label = e.label.toLowerCase();
-            const amountNorm = this.normalizeAmount(e.amount);
-            return label.includes(q) || amountNorm.includes(q);
-          });
+        : entries.filter((e) => entryMatchesSearch(e.label, e.amount, q));
 
     const container = this.querySelector(`[${DATA_RESULTS}]`);
     if (!container) return;

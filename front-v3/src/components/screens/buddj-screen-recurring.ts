@@ -3,6 +3,7 @@
  * Filtrage en temps réel par intitulé ou montant via le drawer de recherche.
  */
 import type { BuddjChargeSearchDrawerElement } from '../organisms/buddj-charge-search-drawer.js';
+import { entryMatchesSearch } from '../../shared/search.js';
 
 export interface ChargeItemData {
   icon: string;
@@ -59,15 +60,14 @@ export class BuddjScreenRecurring extends HTMLElement {
 
   private _searchListener = (e: Event): void => {
     const ev = e as CustomEvent<{ query: string }>;
-    const query = (ev.detail?.query ?? '').trim().toLowerCase();
+    const query = (ev.detail?.query ?? '').trim();
     const main = this.querySelector('#recurring');
     if (!main) return;
     const items = main.querySelectorAll('buddj-charge-item');
     items.forEach((item) => {
-      const label = (item.getAttribute('label') ?? '').toLowerCase();
-      const amount = (item.getAttribute('amount') ?? '').replace(/\s/g, '').replace('€', '').toLowerCase();
-      const match =
-        query === '' || label.includes(query) || amount.includes(query);
+      const label = item.getAttribute('label') ?? '';
+      const amount = item.getAttribute('amount') ?? '';
+      const match = entryMatchesSearch(label, amount, query);
       (item as HTMLElement).style.display = match ? '' : 'none';
     });
   };
