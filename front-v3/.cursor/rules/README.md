@@ -9,3 +9,4 @@ Point d’entrée vers les règles du projet. Chaque fichier `.mdc` est une règ
 | [style-ui.mdc](./style-ui.mdc) | Style UI : thème sombre, typo, composants, couleurs, accessibilité |
 | [named-arguments-convention.mdc](./named-arguments-convention.mdc) | Conventions de code : arguments nommés (objet unique) pour méthodes, fonctions et constructeurs |
 | [dry-shared-types-and-utils.mdc](./dry-shared-types-and-utils.mdc) | DRY : mutualisation des types (à partir de 3 doublons) et des fonctions (à partir de 2 doublons) dans `shared/` |
+| [store-events-and-injection.mdc](./store-events-and-injection.mdc) | Store EventTarget, events par slice (actions = verbe, état = entité + participe passé), injection explicite, `emitAction`, flux réactivité et testabilité |
