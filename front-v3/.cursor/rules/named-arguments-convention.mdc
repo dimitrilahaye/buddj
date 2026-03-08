@@ -1,0 +1,26 @@
+---
+description: Arguments nommés (objet unique) pour méthodes, fonctions et constructeurs
+globs: **/*.ts
+alwaysApply: false
+---
+
+# Conventions de code — Arguments nommés
+
+Tous les arguments de méthodes, fonctions et constructeurs doivent être passés sous forme d’un **objet nommé**. Pas de paramètres positionnels multiples.
+
+- **À faire** : `call({ id: 123, name: "toto" })` ou `new Service({ api, store })`.
+- **À éviter** : `call(123, "toto")` ou `new Service(api, store)`.
+
+Cela vaut pour les use-cases, les constructeurs, les fonctions publiques du domaine et des adapters. Les signatures doivent ressembler à :
+
+```ts
+// Bon
+function getCharge({ id }: { id: string }) { … }
+transferToBudget({ amount, budgetId }: { amount: number; budgetId: string }) { … }
+
+// À éviter
+function getCharge(id: string) { … }
+transferToBudget(amount: number, budgetId: string) { … }
+```
+
+Exception acceptable : fonctions purement internes à un fichier, très simples (ex. helpers à 1 argument). Dans le doute, privilégier l’objet nommé.
