@@ -20,7 +20,11 @@ export const DEFAULT_MONTH_ID = '2024-04';
 
 export const DEFAULT_ROUTE: DefaultRoute = { name: 'home', path: '/' };
 
-export function createRoutes(authStore: AuthStore): RouteDef[] {
+export function createRoutes({
+  authStore,
+}: {
+  authStore: AuthStore;
+}): RouteDef[] {
   return [
     {
       name: 'home',
