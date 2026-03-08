@@ -1,14 +1,5 @@
 # Buddj PWA — Architecture et conventions
 
-## Stack
-
-- **Langage** : TypeScript uniquement, sans framework (pas de React, Vue, Angular).
-- **UI** : Web Components (Custom Elements v1, Shadow DOM optionnel).
-- **Build** : Vite.
-- **PWA** : Service Worker (Workbox / Vite PWA) pour cache et offline.
-
----
-
 ## Architecture hexagonale
 
 Trois couches claires :
@@ -65,42 +56,6 @@ Les Web Components sont organisés en couches, des plus atomiques aux écrans :
 - **`screens/`** — Écrans : pages complètes (Charges récurrentes, Mes budgets).
 
 Les composants des niveaux supérieurs utilisent ceux des niveaux inférieurs. Dans `main.ts`, l'ordre d'import est : icons → atoms → molecules → organisms → screens, pour que les dépendances soient enregistrées avant utilisation.
-
----
-
-## Style UI de l’app
-
-- **Thème** : sombre (fond gris-bleuté / navy), accents en dégradés (rose/coral, menthe, or, violet/bleu). Pas de thème "corporate" neutre.
-- **Typo** : titres en font dédiée (ex. Outfit), corps en lisible (ex. DM Sans). Hiérarchie claire (titres, sous-titres, labels).
-- **Composants** : coins arrondis (`--radius`, `--radius-lg`), ombres légères et effet "glow" au survol sur les boutons et cartes. Bordures fines semi-transparentes.
-- **Couleurs** : variables CSS (ex. `--bg`, `--bg-card`, `--navy`, `--coral`, `--mint`, `--gold`, `--coral-glow`, `--mint-glow`). Cohérence avec le prototype existant (dark, funky, lisible).
-- **Listes** : items compacts, une ligne par élément quand possible ; ellipsis sur les libellés trop longs. Boutons d’action en icônes de taille uniforme.
-- **Accessibilité** : contraste suffisant, `aria-label` / `title` sur les boutons icônes, focus visible (`:focus-visible`).
-
----
-
-## Conventions de code
-
-### Arguments nommés (objet unique)
-
-Tous les arguments de méthodes, fonctions et constructeurs doivent être passés sous forme d’un **objet nommé**. Pas de paramètres positionnels multiples.
-
-- **À faire** : `call({ id: 123, name: "toto" })` ou `new Service({ api, store })`.
-- **À éviter** : `call(123, "toto")` ou `new Service(api, store)`.
-
-Cela vaut pour les use-cases, les constructeurs, les fonctions publiques du domaine et des adapters. Les signatures doivent ressembler à :
-
-```ts
-// Bon
-function getCharge({ id }: { id: string }) { … }
-transferToBudget({ amount, budgetId }: { amount: number; budgetId: string }) { … }
-
-// À éviter
-function getCharge(id: string) { … }
-transferToBudget(amount: number, budgetId: string) { … }
-```
-
-Exception acceptable : fonctions purement internes à un fichier, très simples (ex. helpers à 1 argument). Dans le doute, privilégier l’objet nommé.
 
 ---
 

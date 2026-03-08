@@ -1,0 +1,44 @@
+---
+description: Éviter la duplication de types et de fonctions en mutualisant dans shared
+globs: **/*.ts
+alwaysApply: false
+---
+
+# DRY — Types et fonctions partagés
+
+## Types dupliqués (à partir de 3 occurrences)
+
+Dès qu’un même typage est répété **au moins 3 fois** (ex. type d’élément de drawer, type de config), le définir une seule fois et le réutiliser.
+
+- **Où** : dans le fichier qui définit le composant/contract (ex. le shell du drawer), ou dans un fichier de types partagés si utilisé par plusieurs modules.
+- **Forme** : type intersection pour les Custom Elements qui étendent `HTMLElement` et exposent des méthodes (ex. `open`).
+
+```ts
+// ✅ Bon — type exporté une fois, réutilisé partout
+export type BuddjSearchDrawerElement = HTMLElement & { open: (config: SearchDrawerConfig) => void };
+
+// Utilisation
+const drawer = document.getElementById('search-drawer') as BuddjSearchDrawerElement;
+```
+
+Ne pas répéter `HTMLElement & { open: (...) => void }` dans plusieurs fichiers ; importer `BuddjSearchDrawerElement` (ou équivalent) depuis le module qui définit le composant.
+
+---
+
+## Fonctions dupliquées (à partir de 2 occurrences)
+
+Dès qu’une **même logique** (fonction ou petit groupe de fonctions) apparaît dans **au moins 2 composants** (ou 2 endroits), la déplacer dans `src/shared/` pour rester DRY.
+
+- **Où** : `src/shared/` — un fichier par domaine logique (ex. `search.ts`, `format.ts`, `validation.ts`).
+- **Exporter** les fonctions et types nécessaires ; les importer dans les composants.
+
+```ts
+// ✅ Bon — shared/search.ts
+export function normalizeForSearch(text: string): string { … }
+export function entryMatchesSearch(label: string, amount: string, query: string): boolean { … }
+
+// Dans les components : import depuis shared
+import { entryMatchesSearch } from '../../shared/search.js';
+```
+
+Éviter de copier-coller la même logique (normalisation, formatage, prédicat de filtre, etc.) dans plusieurs écrans ou organisms.

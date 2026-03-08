@@ -1,0 +1,12 @@
+---
+description: Stack technique du projet front-v3 (langage, UI, build, PWA)
+globs: **/*
+alwaysApply: false
+---
+
+# Stack
+
+- **Langage** : TypeScript uniquement, sans framework (pas de React, Vue, Angular).
+- **UI** : Web Components (Custom Elements v1, Shadow DOM optionnel).
+- **Build** : Vite.
+- **PWA** : Service Worker (Workbox / Vite PWA) pour cache et offline.

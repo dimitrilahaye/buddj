@@ -1,0 +1,14 @@
+---
+description: Style UI de l'app — thème, typo, composants, couleurs, accessibilité
+globs: **/*.css,**/*.scss,**/*.ts,**/*.tsx
+alwaysApply: false
+---
+
+# Style UI de l'app
+
+- **Thème** : sombre (fond gris-bleuté / navy), accents en dégradés (rose/coral, menthe, or, violet/bleu). Pas de thème "corporate" neutre.
+- **Typo** : titres en font dédiée (ex. Outfit), corps en lisible (ex. DM Sans). Hiérarchie claire (titres, sous-titres, labels).
+- **Composants** : coins arrondis (`--radius`, `--radius-lg`), ombres légères et effet "glow" au survol sur les boutons et cartes. Bordures fines semi-transparentes.
+- **Couleurs** : variables CSS (ex. `--bg`, `--bg-card`, `--navy`, `--coral`, `--mint`, `--gold`, `--coral-glow`, `--mint-glow`). Cohérence avec le prototype existant (dark, funky, lisible).
+- **Listes** : items compacts, une ligne par élément quand possible ; ellipsis sur les libellés trop longs. Boutons d'action en icônes de taille uniforme.
+- **Accessibilité** : contraste suffisant, `aria-label` / `title` sur les boutons icônes, focus visible (`:focus-visible`).
