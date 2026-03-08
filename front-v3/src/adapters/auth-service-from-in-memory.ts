@@ -6,6 +6,8 @@ import type { AuthService } from '../application/auth/auth-service.js';
 export function createAuthServiceFromInMemory(result: boolean): AuthService {
   return {
     async isAuthenticated(): Promise<boolean> {
+      await new Promise((r) => setTimeout(r, 1000));
+      // throw new Error('test');
       return result;
     },
   };

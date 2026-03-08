@@ -18,6 +18,8 @@ import './components/molecules/buddj-expense-item.js';
 import './components/molecules/buddj-allocated-remaining.js';
 import './components/molecules/buddj-budget-pending.js';
 import './components/molecules/buddj-confirm-modal.js';
+import './components/molecules/buddj-loading-modal.js';
+import './components/molecules/buddj-error-modal.js';
 import './components/molecules/buddj-toggle-all.js';
 import './components/atoms/buddj-toast.js';
 import './components/organisms/buddj-nav.js';
