@@ -1,6 +1,8 @@
 /**
- * Bootstrap de l’app : auth, router, routes. Exporté pour permettre aux tests d’injecter authService.
+ * Bootstrap de l’app : config (vars d’env), auth, router, routes. Exporté pour permettre aux tests d’injecter config et authService.
  */
+import type { AppConfig } from './config.js';
+import { buildConfigFromEnv } from './config.js';
 import type { AuthService } from './application/auth/auth-service.js';
 import { AuthStore } from './application/auth/auth-store.js';
 import { checkUserIsAuthenticated } from './application/auth/check-user-is-authenticated.js';
@@ -43,11 +45,14 @@ const BURGER_LINK_ACTIVE_BY_HREF: Record<string, string[]> = {
 };
 
 export type BootstrapOptions = {
+  config?: AppConfig;
   authService?: AuthService;
 };
 
 export function bootstrap(options?: BootstrapOptions): void {
+  const config = options?.config ?? buildConfigFromEnv();
   const authService = options?.authService ?? createAuthServiceFromInMemory(false);
+  // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 
   // let requis : authStore a besoin de router dans onAuthenticatedRedirect, router dépend de authStore pour createRoutes
@@ -58,7 +63,7 @@ export function bootstrap(options?: BootstrapOptions): void {
     onAuthenticatedRedirect: () => router.navigate(`/budgets/${DEFAULT_MONTH_ID}`),
   });
 
-  const routes = createRoutes(authStore);
+  const routes = createRoutes({ authStore });
   router = createRouter({
     outlet,
     routes,
