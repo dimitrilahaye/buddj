@@ -25,8 +25,8 @@ export function createAuthServiceFromApi({ apiUrl }: { apiUrl: string }): AuthSe
       try {
         const body = await response.json();
         if (body && typeof body.message === 'string') message = body.message;
-      } catch {
-        // body non JSON ou vide
+      } catch(e) {
+        console.error('Erreur lors de la lecture du corps de la réponse', e);
       }
       handleHttpError({ status: response.status, message });
     },
