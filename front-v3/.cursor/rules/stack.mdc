@@ -1,5 +1,5 @@
 ---
-description: Stack technique du projet front-v3 (langage, UI, build, PWA)
+description: Stack technique du projet front-v3 (langage, UI, build, PWA, tests)
 globs: **/*
 alwaysApply: false
 ---
@@ -10,3 +10,4 @@ alwaysApply: false
 - **UI** : Web Components (Custom Elements v1, Shadow DOM optionnel).
 - **Build** : Vite.
 - **PWA** : Service Worker (Workbox / Vite PWA) pour cache et offline.
+- **Tests** : Vitest (runner), @testing-library/dom (requêtes et assertions DOM), happy-dom (environnement DOM pour les tests).
