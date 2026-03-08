@@ -5145,3 +5145,9 @@ buddj-toast.toast--warning .toast-message {
   color: #d4a84b;
   box-shadow: 0 2px 12px rgba(220, 160, 60, 0.2);
 }
+
+buddj-toast.toast--error .toast-message {
+  border-color: rgba(224, 122, 95, 0.5);
+  color: var(--coral);
+  box-shadow: 0 2px 12px var(--coral-glow);
+}
