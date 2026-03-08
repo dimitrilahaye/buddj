@@ -13,18 +13,21 @@ import './components/screens/buddj-screen-templates.js';
 import './components/screens/buddj-screen-template-detail.js';
 import './components/screens/buddj-screen-annual-outflows.js';
 import type { DefaultRoute, RouteDef } from './router.js';
+import type { AuthStore } from './application/auth/auth-store.js';
+import { BuddjScreenHome } from './components/screens/buddj-screen-home.js';
 
 export const DEFAULT_MONTH_ID = '2024-04';
 
 export const DEFAULT_ROUTE: DefaultRoute = { name: 'home', path: '/' };
 
-export function createRoutes(): RouteDef[] {
+export function createRoutes(authStore: AuthStore): RouteDef[] {
   return [
     {
       name: 'home',
       pattern: '/',
       handle(ctx) {
-        const el = document.createElement('buddj-screen-home');
+        const el = document.createElement('buddj-screen-home') as BuddjScreenHome;
+        el.init({ store: authStore });
         ctx.outlet.replaceChildren(el);
       },
     },

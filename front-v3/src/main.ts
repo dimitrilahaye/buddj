@@ -1,5 +1,5 @@
 /**
- * Point d’entrée : Web Components + routeur (outlet unique, un screen monté à la fois).
+ * Point d'entrée : Web Components + bootstrap (router, auth, routes).
  */
 import '../styles.css';
 import './components/icons/buddj-icon-edit.js';
@@ -46,85 +46,15 @@ import './components/organisms/buddj-charge-group.js';
 import './components/organisms/buddj-budget-card.js';
 import './components/organisms/buddj-budget-group.js';
 import './components/organisms/buddj-template-budget-card.js';
-import { createRouter } from './router.js';
-import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
+import type { AuthService } from './application/auth/auth-service.js';
+import { bootstrap } from './bootstrap.js';
 
-const outlet = document.getElementById('screen-outlet')!;
-const routes = createRoutes();
-const router = createRouter({
-  outlet,
-  routes,
-  defaultMonthId: DEFAULT_MONTH_ID,
-  defaultRoute: DEFAULT_ROUTE,
-});
-
-/** Routes sans onglet mois (nav masque le sélecteur, layout type « page standalone »). */
-const STANDALONE_ROUTE_NAMES = new Set([
-  'home',
-  'new-month',
-  'archived',
-  'savings',
-  'reimbursements',
-  'templates',
-  'template-detail',
-  'annual-outflows',
-]);
-
-/** Classes body à toggler selon la route courante. */
-function getBodyClassToggles(match: { name: string }): Array<{ class: string; active: boolean }> {
-  return [
-  { class: 'route-home', active: match.name === 'home' },
-  { class: 'route-outflows', active: match.name === 'outflows' },
-  { class: 'route-budgets', active: match.name === 'budgets' },
-  { class: 'route-templates', active: match.name === 'templates' || match.name === 'template-detail' },
-  { class: 'route-annual-outflows', active: match.name === 'annual-outflows' },
-  { class: 'route-new-month', active: match.name === 'new-month' },
-  { class: 'route-archived', active: match.name === 'archived' },
-  { class: 'route-savings', active: match.name === 'savings' },
-  { class: 'route-reimbursements', active: match.name === 'reimbursements' },
-  ];
-}
-
-/** Pour chaque href du burger, noms de routes qui activent ce lien. */
-const BURGER_LINK_ACTIVE_BY_HREF: Record<string, string[]> = {
-  '/new-month': ['new-month'],
-  '/archived': ['archived'],
-  '/templates': ['templates', 'template-detail'],
-  '/annual-outflows': ['annual-outflows'],
-  '/savings': ['savings'],
-  '/reimbursements': ['reimbursements'],
-};
-
-function applyRoute(match: { name: string; params: Record<string, string> }): void {
-  const isStandalone = STANDALONE_ROUTE_NAMES.has(match.name);
-
-  getBodyClassToggles(match).forEach(({ class: cls, active }) => {
-    document.body.classList.toggle(cls, active);
-  });
-
-  const nav = document.querySelector('buddj-nav');
-  if (nav) {
-    (nav as HTMLElement).setAttribute('month-id', match.params.monthId ?? DEFAULT_MONTH_ID);
-    (nav as unknown as { setActiveRoute: (name: string) => void }).setActiveRoute(isStandalone ? '' : match.name);
+declare global {
+  interface Window {
+    __INJECT_AUTH_SERVICE__?: AuthService;
   }
-
-  const burgerPanel = document.querySelector('buddj-burger-panel');
-  const burgerLinks = burgerPanel?.querySelectorAll('.burger-panel-list .burger-panel-link') ?? [];
-  burgerLinks.forEach((link) => {
-    const href = link.getAttribute('href');
-    const activeRouteNames = href ? BURGER_LINK_ACTIVE_BY_HREF[href] ?? [] : [];
-    link.classList.toggle('burger-panel-link--active', activeRouteNames.includes(match.name));
-  });
 }
 
-document.addEventListener('click', (e) => {
-  const a = (e.target as Element).closest(
-    'a[href^="/outflows/"], a[href^="/budgets/"], a[href="/new-month"], a[href="/archived"], a[href="/annual-outflows"], a[href="/savings"], a[href="/reimbursements"], a[href="/templates"], a[href^="/templates/"]'
-  );
-  if (!a || (a as HTMLAnchorElement).target === '_blank') return;
-  e.preventDefault();
-  router.navigate((a as HTMLAnchorElement).getAttribute('href')!);
-});
-
-router.subscribe(applyRoute);
-router.init();
+bootstrap(
+  window.__INJECT_AUTH_SERVICE__ ? { authService: window.__INJECT_AUTH_SERVICE__ } : undefined
+);
