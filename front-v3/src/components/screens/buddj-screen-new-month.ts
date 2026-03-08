@@ -98,6 +98,10 @@ export class BuddjScreenNewMonth extends HTMLElement {
   private _rappelChargesIncluded = true;
   private _rappelBudgetsIncluded = true;
 
+  connectedCallback(): void {
+    this.open();
+  }
+
   open(): void {
     this._month = new Date().getMonth();
     this._year = CURRENT_YEAR;
