@@ -6,7 +6,7 @@ describe('app bootstrap', () => {
     document.body.innerHTML = '<main id="screen-outlet" role="main"></main>';
     window.history.replaceState(null, '', '/');
 
-    await import('../src/main.js');
+    await import('../../src/main.js');
 
     expect(screen.getByRole('heading', { level: 1, name: 'Welcome on Buddj!' })).exist;
   });
