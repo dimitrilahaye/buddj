@@ -1,9 +1,12 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   root: '.',
   publicDir: 'public',
+  test: {
+    environment: 'happy-dom',
+  },
   server: {
     port: 3847,
   },
@@ -59,5 +62,5 @@ export default defineConfig({
         ],
       },
     }),
-  ],
+  ] as any,
 });
