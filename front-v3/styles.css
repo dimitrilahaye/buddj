@@ -3059,9 +3059,10 @@ body.route-annual-outflows .global-header buddj-summary-bar {
   display: none;
 }
 
-/* Économies / Remboursements / Templates : scroll dans le contenu, header fixe */
+/* Économies / Remboursements / Templates / Archivés : scroll dans le contenu, header fixe */
 body.route-savings,
 body.route-reimbursements,
+body.route-archived,
 body.route-templates,
 body.route-annual-outflows {
   display: flex;
@@ -3074,6 +3075,7 @@ body.route-annual-outflows {
 
 body.route-savings #screen-outlet,
 body.route-reimbursements #screen-outlet,
+body.route-archived #screen-outlet,
 body.route-templates #screen-outlet,
 body.route-annual-outflows #screen-outlet {
   flex: 1;
@@ -3082,6 +3084,7 @@ body.route-annual-outflows #screen-outlet {
 
 body.route-savings buddj-screen-savings,
 body.route-reimbursements buddj-screen-reimbursements,
+body.route-archived buddj-screen-archived,
 body.route-templates buddj-screen-templates,
 body.route-templates buddj-screen-template-detail,
 body.route-annual-outflows buddj-screen-annual-outflows {
@@ -3098,6 +3101,7 @@ body.route-annual-outflows buddj-screen-annual-outflows {
 
 body.route-savings buddj-screen-savings main.screen,
 body.route-reimbursements buddj-screen-reimbursements main.screen,
+body.route-archived buddj-screen-archived main.screen,
 body.route-templates buddj-screen-templates main.screen,
 body.route-templates buddj-screen-template-detail main.screen,
 body.route-annual-outflows buddj-screen-annual-outflows main.screen {
@@ -3196,6 +3200,42 @@ body.route-budgets .budget-list {
 /* ========== Écran Mois archivés ========== */
 buddj-screen-archived {
   display: none;
+}
+
+.archived-sticky-wrap {
+  flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
+  background: var(--bg);
+}
+
+.archived-sticky-wrap .screen-header {
+  margin-bottom: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+}
+
+.archived-sticky-wrap .screen-header .title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+body.route-archived buddj-screen-archived .archived-section {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 1.25rem 2rem;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ========== Écrans Templates ========== */
@@ -4181,8 +4221,8 @@ buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-panel {
   border-color: rgba(220, 160, 60, 0.7);
 }
 
-.archived-section {
-  margin-top: 1rem;
+body.route-archived .archived-section {
+  margin-top: 0;
 }
 
 .archived-list {
