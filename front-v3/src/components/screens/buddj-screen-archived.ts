@@ -10,6 +10,32 @@ const ARCHIVED_MONTHS = [
   { id: '2024-01', label: 'Janvier 2024' },
   { id: '2024-02', label: 'Février 2024' },
   { id: '2023-12', label: 'Décembre 2023' },
+  { id: '2023-11', label: 'Novembre 2023' },
+  { id: '2023-10', label: 'Octobre 2023' },
+  { id: '2023-09', label: 'Septembre 2023' },
+  { id: '2023-08', label: 'Août 2023' },
+  { id: '2023-07', label: 'Juillet 2023' },
+  { id: '2023-06', label: 'Juin 2023' },
+  { id: '2023-05', label: 'Mai 2023' },
+  { id: '2023-04', label: 'Avril 2023' },
+  { id: '2023-03', label: 'Mars 2023' },
+  { id: '2023-02', label: 'Février 2023' },
+  { id: '2023-01', label: 'Janvier 2023' },
+  { id: '2022-12', label: 'Décembre 2022' },
+  { id: '2022-11', label: 'Novembre 2022' },
+  { id: '2022-10', label: 'Octobre 2022' },
+  { id: '2022-09', label: 'Septembre 2022' },
+  { id: '2022-08', label: 'Août 2022' },
+  { id: '2022-07', label: 'Juillet 2022' },
+  { id: '2022-06', label: 'Juin 2022' },
+  { id: '2022-05', label: 'Mai 2022' },
+  { id: '2022-04', label: 'Avril 2022' },
+  { id: '2022-03', label: 'Mars 2022' },
+  { id: '2022-02', label: 'Février 2022' },
+  { id: '2022-01', label: 'Janvier 2022' },
+  { id: '2021-12', label: 'Décembre 2021' },
+  { id: '2021-11', label: 'Novembre 2021' },
+  { id: '2021-10', label: 'Octobre 2021' },
 ];
 
 export class BuddjScreenArchived extends HTMLElement {
@@ -32,11 +58,13 @@ export class BuddjScreenArchived extends HTMLElement {
       </li>`
     ).join('');
     main.innerHTML = `
-      <header class="screen-header">
-        <h1 class="title">Mois archivés</h1>
-      </header>
-      <section class="archived-section">
-        <ul class="archived-list" aria-label="Liste des mois archivés">
+      <div class="screen-sticky-header-wrap archived-sticky-wrap">
+        <header class="screen-header">
+          <h1 class="title">Mois archivés</h1>
+        </header>
+      </div>
+      <section class="archived-section" aria-label="Liste des mois archivés">
+        <ul class="archived-list">
           ${listHtml}
         </ul>
         ${ARCHIVED_MONTHS.length === 0 ? '<p class="archived-empty">Aucun mois archivé.</p>' : ''}
