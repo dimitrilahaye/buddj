@@ -110,22 +110,53 @@ function buildApi(
     res.status(200).send(data);
   });
 
+  const allowedRedirectOrigins = envVars.frontUrl.map((url) =>
+    url.replace(/\/$/, "")
+  );
+
+  const isValidRedirectUrl = (urlToCheck: string): boolean => {
+    try {
+      const origin = new URL(urlToCheck).origin.replace(/\/$/, "");
+      return allowedRedirectOrigins.some((allowed) => origin === allowed);
+    } catch {
+      return false;
+    }
+  };
+
   // accessType seems not to be a property of auth options
-  router.get(
-    "/auth/google",
-    passport.authenticate("google", {
+  router.get("/auth/google", (req: Request, res: Response, next: NextFunction) => {
+    const returnTo = req.query.returnTo as string | undefined;
+    const authOptions: { scope: string[]; accessType: string; prompt: string; state?: string } = {
       scope: envVars.scopes.split(" "),
       // @ts-ignore
       accessType: "offline",
       prompt: "consent",
-    })
-  );
+    };
+    if (returnTo && isValidRedirectUrl(returnTo)) {
+      authOptions.state = returnTo;
+    }
+    passport.authenticate("google", authOptions)(req, res, next);
+  });
   router.get(
     "/auth/google/callback",
-    passport.authenticate("google", {
-      failureRedirect: "/",
-      successRedirect: envVars.frontRedirectUrl,
-    })
+    (req: Request, res: Response, next: NextFunction) => {
+      passport.authenticate(
+        "google",
+        (err: Error | null, user: Express.User | false) => {
+          if (err) return next(err);
+          if (!user) return res.redirect("/");
+          req.logIn(user, (loginErr) => {
+            if (loginErr) return next(loginErr);
+            const stateReturnTo = req.query.state as string | undefined;
+            const redirectUrl =
+              stateReturnTo && isValidRedirectUrl(stateReturnTo)
+                ? stateReturnTo
+                : envVars.frontRedirectUrl;
+            return res.redirect(redirectUrl);
+          });
+        }
+      )(req, res, next);
+    }
   );
 
   const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
