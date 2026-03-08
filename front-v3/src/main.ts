@@ -1,6 +1,5 @@
 /**
- * Point d’entrée : Web Components + routeur (outflows/:monthId, budgets/:monthId).
- * Les composants d’icônes sont enregistrés en premier pour être disponibles partout.
+ * Point d’entrée : Web Components + routeur (outlet unique, un screen monté à la fois).
  */
 import '../styles.css';
 import './components/icons/buddj-icon-edit.js';
@@ -56,22 +55,96 @@ import './components/screens/buddj-screen-reimbursements.js';
 import './components/screens/buddj-screen-templates.js';
 import './components/screens/buddj-screen-template-detail.js';
 import './components/screens/buddj-screen-annual-outflows.js';
-import { createRouter, ROUTES } from './router.js';
+import type { RouteDef } from './router.js';
+import { createRouter } from './router.js';
 
-const router = createRouter({ routes: ROUTES, defaultMonthId: '2024-04' });
+const DEFAULT_MONTH_ID = '2024-04';
+const outlet = document.getElementById('screen-outlet')!;
+
+const routes: RouteDef[] = [
+  {
+    name: 'new-month',
+    pattern: '/new-month',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-new-month');
+      ctx.outlet.replaceChildren(el);
+    },
+  },
+  {
+    name: 'archived',
+    pattern: '/archived',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-archived');
+      ctx.outlet.replaceChildren(el);
+    },
+  },
+  {
+    name: 'savings',
+    pattern: '/savings',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-savings');
+      ctx.outlet.replaceChildren(el);
+    },
+  },
+  {
+    name: 'reimbursements',
+    pattern: '/reimbursements',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-reimbursements');
+      ctx.outlet.replaceChildren(el);
+    },
+  },
+  {
+    name: 'template-detail',
+    pattern: '/templates/:id',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-template-detail');
+      el.setAttribute('template-id', ctx.params.id ?? '');
+      el.setAttribute('is-default', 'false');
+      ctx.outlet.replaceChildren(el);
+    },
+  },
+  {
+    name: 'templates',
+    pattern: '/templates',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-templates');
+      ctx.outlet.replaceChildren(el);
+    },
+  },
+  {
+    name: 'annual-outflows',
+    pattern: '/annual-outflows',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-annual-outflows');
+      ctx.outlet.replaceChildren(el);
+    },
+  },
+  {
+    name: 'outflows',
+    pattern: '/outflows/:monthId',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-recurring');
+      ctx.outlet.replaceChildren(el);
+      const main = document.getElementById('recurring');
+      if (main) main.setAttribute('data-month-id', ctx.params.monthId ?? '');
+    },
+  },
+  {
+    name: 'budgets',
+    pattern: '/budgets/:monthId',
+    handle(ctx) {
+      const el = document.createElement('buddj-screen-budgets');
+      ctx.outlet.replaceChildren(el);
+      const main = document.getElementById('budgets');
+      if (main) main.setAttribute('data-month-id', ctx.params.monthId ?? '');
+    },
+  },
+];
+
+const router = createRouter({ outlet, routes, defaultMonthId: DEFAULT_MONTH_ID });
 
 function applyRoute(match: { name: string; params: Record<string, string> }): void {
-  const screenOutflows = document.querySelector('buddj-screen-recurring');
-  const screenBudgets = document.querySelector('buddj-screen-budgets');
-  const screenNewMonth = document.getElementById('new-month-screen') as HTMLElement & { open: () => void; close: () => void };
-  const screenArchived = document.getElementById('archived-screen');
-  const screenSavings = document.getElementById('savings-screen');
-  const screenReimbursements = document.getElementById('reimbursements-screen');
-  const screenTemplates = document.querySelector('buddj-screen-templates');
-  const screenTemplateDetail = document.querySelector('buddj-screen-template-detail');
-  const screenAnnualOutflows = document.querySelector('buddj-screen-annual-outflows');
-  const nav = document.querySelector('buddj-nav');
-
   const isNewMonth = match.name === 'new-month';
   const isArchived = match.name === 'archived';
   const isSavings = match.name === 'savings';
@@ -90,41 +163,11 @@ function applyRoute(match: { name: string; params: Record<string, string> }): vo
   document.body.classList.toggle('route-savings', isSavings);
   document.body.classList.toggle('route-reimbursements', isReimbursements);
 
-  if (screenOutflows) (screenOutflows as HTMLElement).style.display = !isStandalone && match.name === 'outflows' ? '' : 'none';
-  if (screenBudgets) (screenBudgets as HTMLElement).style.display = !isStandalone && match.name === 'budgets' ? '' : 'none';
-  if (screenArchived) (screenArchived as HTMLElement).style.display = isArchived ? 'block' : 'none';
-  if (screenSavings) (screenSavings as HTMLElement).style.display = isSavings ? 'flex' : 'none';
-  if (screenReimbursements) (screenReimbursements as HTMLElement).style.display = isReimbursements ? 'flex' : 'none';
-  if (screenTemplates) (screenTemplates as HTMLElement).style.display = isTemplates ? '' : 'none';
-  if (screenTemplateDetail) {
-    (screenTemplateDetail as HTMLElement).style.display = isTemplateDetail ? '' : 'none';
-    if (isTemplateDetail) {
-      const templateId = match.params.id ?? '';
-      screenTemplateDetail.setAttribute('template-id', templateId);
-      const listEl = screenTemplates as { getTemplateById?(id: string): { isDefault?: boolean } | undefined } | null;
-      const template = listEl?.getTemplateById?.(templateId);
-      screenTemplateDetail.setAttribute('is-default', template?.isDefault === true ? 'true' : 'false');
-    }
-  }
-
-  if (screenAnnualOutflows) {
-    (screenAnnualOutflows as HTMLElement).style.display = isAnnualOutflows ? 'flex' : 'none';
-  }
-
-  if (screenNewMonth) {
-    if (isNewMonth) screenNewMonth.open();
-    else screenNewMonth.close();
-  }
-
+  const nav = document.querySelector('buddj-nav');
   if (nav) {
-    (nav as HTMLElement).setAttribute('month-id', match.params.monthId ?? '2024-04');
+    (nav as HTMLElement).setAttribute('month-id', match.params.monthId ?? DEFAULT_MONTH_ID);
     (nav as unknown as { setActiveRoute: (name: string) => void }).setActiveRoute(isStandalone ? '' : match.name);
   }
-
-  const mainOutflows = document.getElementById('recurring');
-  const mainBudgets = document.getElementById('budgets');
-  if (mainOutflows) mainOutflows.setAttribute('data-month-id', match.params.monthId ?? '');
-  if (mainBudgets) mainBudgets.setAttribute('data-month-id', match.params.monthId ?? '');
 
   const burgerPanel = document.querySelector('buddj-burger-panel');
   const burgerLinks = burgerPanel?.querySelectorAll('.burger-panel-list .burger-panel-link') ?? [];
@@ -160,4 +203,3 @@ document.addEventListener('click', (e) => {
 
 router.subscribe(applyRoute);
 router.init();
-applyRoute(router.getCurrent());
