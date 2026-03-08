@@ -3051,6 +3051,7 @@ body.route-new-month {
   overflow: hidden;
 }
 
+body.route-home .global-header buddj-summary-bar,
 body.route-new-month .global-header buddj-summary-bar,
 body.route-archived .global-header buddj-summary-bar,
 body.route-savings .global-header buddj-summary-bar,
@@ -3060,7 +3061,8 @@ body.route-annual-outflows .global-header buddj-summary-bar {
   display: none;
 }
 
-/* Économies / Remboursements / Templates / Archivés : scroll dans le contenu, header fixe */
+/* Économies / Remboursements / Templates / Archivés / Home : scroll dans le contenu, header fixe */
+body.route-home,
 body.route-savings,
 body.route-reimbursements,
 body.route-archived,
@@ -3074,6 +3076,7 @@ body.route-annual-outflows {
   overflow-x: hidden;
 }
 
+body.route-home #screen-outlet,
 body.route-savings #screen-outlet,
 body.route-reimbursements #screen-outlet,
 body.route-archived #screen-outlet,
@@ -3083,6 +3086,7 @@ body.route-annual-outflows #screen-outlet {
   min-height: 0;
 }
 
+body.route-home buddj-screen-home,
 body.route-savings buddj-screen-savings,
 body.route-reimbursements buddj-screen-reimbursements,
 body.route-archived buddj-screen-archived,
@@ -3100,6 +3104,7 @@ body.route-annual-outflows buddj-screen-annual-outflows {
   overflow: hidden;
 }
 
+body.route-home buddj-screen-home main.screen,
 body.route-savings buddj-screen-savings main.screen,
 body.route-reimbursements buddj-screen-reimbursements main.screen,
 body.route-archived buddj-screen-archived main.screen,
@@ -3116,6 +3121,99 @@ body.route-annual-outflows buddj-screen-annual-outflows main.screen {
   overflow: hidden;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* ========== Écran Home ========== */
+buddj-screen-home {
+  display: none;
+}
+
+body.route-home buddj-screen-home main.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+body.route-home .home-content {
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+body.route-home .home-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+body.route-home .home-header .home-logo {
+  max-width: 100%;
+  height: auto;
+}
+
+body.route-home .home-header h1 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+body.route-home .home-description {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--navy-soft);
+}
+
+body.route-home .home-disclaimer {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--navy-soft);
+}
+
+body.route-home .home-contact {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--navy-soft);
+}
+
+body.route-home .home-contact a {
+  color: var(--coral);
+  text-decoration: underline;
+}
+
+body.route-home .home-contact a:hover {
+  color: var(--coral-glow, var(--coral));
+}
+
+body.route-home .home-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--bg);
+  background: linear-gradient(135deg, var(--coral), var(--mint));
+  border: none;
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.route-home .home-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(237, 128, 2, 0.35);
 }
 
 /* Outlets : le conteneur des screens doit prendre l’espace restant pour que le scroll fonctionne */
