@@ -36,7 +36,7 @@ type Vars = {
   scopes: string;
   scriptId: string;
   sessionSecret: string;
-  frontUrl: string;
+  frontUrl: string[];
   frontRedirectUrl: string;
   dbUrl: string;
   dbPort: number;

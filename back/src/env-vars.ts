@@ -40,7 +40,7 @@ export default {
   scopes: process.env.SCOPES as string,
   scriptId: process.env.SCRIPT_ID as string,
   sessionSecret: process.env.SESSION_SECRET as string,
-  frontUrl: process.env.FRONT_URL as string,
+  frontUrl: (process.env.FRONT_URL as string).split(",") as string[],
   frontRedirectUrl: process.env.FRONT_REDIRECT_URL as string,
   template: JSON.parse(process.env.TEMPLATE as string) as any,
   ...(dbConfig as DbConfig),
