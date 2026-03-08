@@ -1,0 +1,90 @@
+---
+description: Store EventTarget, events par slice, injection explicite, emitAction, flux réactivité et testabilité
+globs: **/*.ts
+alwaysApply: false
+---
+
+# Store, events et injection
+
+Règles pour le store réactif, les Custom Events (actions / état), l’injection du store dans les Web Components et la testabilité.
+
+## Base du store : EventTarget + CustomEvent
+
+- Le store **étend EventTarget** (API native du navigateur). Pas d’EventEmitter ni de lib externe.
+- Les payloads passent dans **`detail`** des `CustomEvent`.
+- **Testabilité** : même chaîne qu’en prod, avec un mock de l’API : `mock IBuddjApi → use-case → store → web component`.
+
+## Deux familles d’events
+
+### 1. Actions (WC → store)
+
+- **Convention** : **verbe** (infinitif / impératif), ex. `loadRecurringCharges`, `updateBalance`, `takeExpense`.
+- Pas de préfixe (`action:…`).
+- Le WC déclenche une action via **`store.emitAction('nomAction', payload)`** (helper qui fait `dispatchEvent(new CustomEvent('nomAction', { detail: payload }))`). Le payload est ce dont le store a besoin pour exécuter l’action (ex. `takeExpense` → `{ expenseId }`).
+- Appel **synchrone** côté WC : pas d’`await` sur l’action.
+
+### 2. État (store → WC)
+
+- **Convention** : **entité (ou slice) + participe passé**, ex. `expenseTaken`, `chargesLoaded`, `budgetsUpdated`, `recurringChargesLoaded`.
+- Plusieurs events par slice (un par type de changement pertinent).
+- Le store émet après mise à jour de l’état. **`detail` ne contient que les données nécessaires à la mise à jour** (payload minimal), pas l’état complet. Ex. pour `expenseTaken` : `detail: { expenseId, taken }`.
+- **Le payload d’un event d’état n’est pas forcément le même que celui de l’action qui l’a déclenché** : l’action peut envoyer `{ expenseId }`, l’event d’état peut envoyer `{ expenseId, taken }` pour que le WC sache quoi afficher.
+- Les WC **écoutent** ces events et mettent à jour leur DOM à partir de `detail` uniquement (mise à jour ciblée).
+- **Typage fort** : pour chaque event d’état, définir une interface (ou un type) pour le `detail`, sans suffixe `Detail` (ex. `ExpenseTaken`). Utiliser `CustomEvent<ExpenseTaken>`. Côté store et côté WC, `e.detail` est alors explicitement typé (pas de cast).
+
+## Flux de réactivité
+
+1. Utilisateur clique → WC appelle **`store.emitAction('takeExpense', { expenseId })`** (synchrone, retour immédiat).
+2. Le store a enregistré un listener sur cet event → il appelle le **use-case** (async).
+3. Use-case → **adapter API** → fetch → réponse.
+4. Use-case met à jour le store (ex. `store.setState(partial)` ou méthode dédiée).
+5. Le store émet l’event d’état (ex. `expenseTaken`) avec dans `detail` **uniquement les données à mettre à jour** (ex. `{ expenseId, taken }`).
+6. Les WC abonnés reçoivent l’event et **mettent à jour leur DOM** à partir de `detail` (mise à jour ciblée, pas de relecture de l’état complet).
+
+## Enregistrement des handlers d’actions
+
+- Le **store enregistre lui-même** ses listeners d’actions (dans son constructeur ou une méthode d’init).
+- Il reçoit les **use-cases** au constructeur et branche chaque event d’action sur le use-case correspondant.
+- Le bootstrap crée : API → use-cases (avec `api` + `store`) → store (avec use-cases), puis injecte le store dans l’app.
+
+## Injection explicite du store dans les Web Components
+
+- Les WC **ne récupèrent pas** le store via un contexte global (`window`, `getStore()`).
+- Le store est **injecté explicitement** après la création du composant : `el.init({ store })` ou `el.setStore(store)` (avant ou au montage).
+- Le bootstrap (ou le code qui monte l’app) fait `document.createElement('buddj-screen-…')` puis `el.init({ store })` avant d’ajouter au DOM.
+- En test : même schéma avec le store issu du bootstrap de test (mock API).
+
+## Côté Web Component
+
+- **Au clic** : `this.store.emitAction('takeExpense', { expenseId })` (sans `await`).
+- **Au montage** : `this.store.addEventListener('expenseTaken', this._onExpenseTaken)` (et éventuellement lecture initiale `this._renderFromState(this.store.getState())` pour le premier rendu).
+- **Au démontage** : `this.store.removeEventListener('expenseTaken', this._onExpenseTaken)` pour éviter fuites mémoire et double rendu.
+
+La callback des events d’état reçoit dans `detail` **uniquement les données à mettre à jour**, avec un **typage explicite** via `CustomEvent<NomType>` (sans suffixe `Detail`). Définir le type du `detail` (ex. `ExpenseTaken`), puis l’utiliser dans la signature du listener. Exemple :
+
+```ts
+// Type du detail pour l’event expenseTaken (ex. dans domain/types ou application/store)
+export interface ExpenseTaken {
+  expenseId: number;
+  taken: boolean;
+}
+
+// Dans le WC : e.detail est typé { expenseId: number, taken: boolean }
+private _onExpenseTaken = (e: CustomEvent<ExpenseTaken>): void => {
+  const { expenseId, taken } = e.detail;
+  this._updateExpenseRow(expenseId, taken); // met à jour la ligne correspondante
+};
+```
+
+Côté store, utiliser un **wrapper typé** `emitStateChange` pour émettre. Les payloads **action** et **changement d’état** peuvent différer :
+
+- **Action** (user a coché une dépense) : `store.emitAction('takeExpense', { expenseId })`.
+- **Changement d’état** (store notifie que c’est fait) : `this.emitStateChange<ExpenseTaken>('expenseTaken', { expenseId, taken })`.
+
+- **`emitAction`** : réservé au **WC** qui envoie une action au store (ex. `store.emitAction('takeExpense', { expenseId })`).
+- **`emitStateChange`** (ou équivalent) : utilisé par le **store** pour notifier les WC (ex. `this.emitStateChange<ExpenseTaken>('expenseTaken', { expenseId, taken })`).
+
+## Rappels
+
+- Les arguments des actions et des méthodes du store respectent la convention **arguments nommés** (objet unique).
+- Le use-case reçoit `{ api: IBuddjApi, store }` et met à jour le store après l’appel API ; il ne retourne pas l’état au store (le store est mis à jour depuis le use-case).
