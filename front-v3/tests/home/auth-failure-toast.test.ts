@@ -13,9 +13,9 @@ function createFailingAuthService(message: string): AuthService {
   };
 }
 
-describe("modal d'erreur quand la vérification auth échoue", () => {
-  it('affiche la modal d’erreur avec le message renvoyé par l’API', async () => {
-    document.body.innerHTML = '<main id="screen-outlet" role="main"></main>';
+describe('toast d’erreur quand la vérification auth échoue', () => {
+  it('affiche un toast d’erreur (rouge) avec le message renvoyé', async () => {
+    document.body.innerHTML = '<main id="screen-outlet" role="main"></main><buddj-toast></buddj-toast>';
     window.history.replaceState(null, '', '/');
 
     const errorMessage = 'Erreur réseau : impossible de joindre le serveur.';
@@ -23,7 +23,6 @@ describe("modal d'erreur quand la vérification auth échoue", () => {
 
     await new Promise((r) => setTimeout(r, 100));
 
-    expect(screen.getByRole('alertdialog', { name: 'Erreur' })).exist;
-    expect(screen.getByText(errorMessage)).exist;
+    expect(screen.getByRole('alert', { name: errorMessage })).exist;
   });
 });
