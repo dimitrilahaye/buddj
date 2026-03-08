@@ -26,7 +26,7 @@ jobs:
   back_checks:
     needs: [ changes ]
     if: needs.changes.outputs.back == 'true'
-    name: Back ~ Quality Checks
+    name: ⚙️ Back — Continuous Integration
     runs-on: ubuntu-latest
     container: node:22.22.1-bookworm-slim
 
@@ -41,20 +41,20 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Back ~ Use Node
+    - name: 🟢 Back — Use Node
       uses: actions/setup-node@v6
       with:
         node-version: "22.22.1"
 
-    - name: Back ~ Install
+    - name: 📦 Back — Install
       working-directory: ./back
       run: npm install
 
-    - name: Back ~ ESLint checks
+    - name: ✅ Back — ESLint checks
       working-directory: ./back
       run: npm run lint
 
-    - name: Back ~ Tests
+    - name: 🧪 Back — Tests
       working-directory: ./back
       run: npm run tf
       env:
@@ -76,8 +76,12 @@ jobs:
         YEARLY: ${{ secrets.YEARLY }}
         YEARLY_BUDGETS: ${{ secrets.YEARLY_BUDGETS }}
 
+    - name: 🚧 Back — Build
+      working-directory: ./back
+      run: npm run build
+
   front_checks:
-    name: Front ~ Quality Checks
+    name: 📱 Front — Continuous Integration
     needs: [ changes ]
     if: needs.changes.outputs.front == 'true'
     runs-on: ubuntu-latest
@@ -85,25 +89,29 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Front ~ Use Node
+    - name: 🟢 Front — Use Node
       uses: actions/setup-node@v6
       with:
         node-version: "22.22.1"
 
-    - name: Front ~ Install
+    - name: 📦 Front — Install
       working-directory: ./front-v3
       run: npm install
 
-    - name: Back ~ ESLint checks
+    - name: ✅ Front — ESLint checks
       working-directory: ./front-v3
       run: npm run lint
 
-    - name: Front ~ Build
+    - name: 🧪 Front — Tests
+      working-directory: ./front-v3
+      run: npm run test:run
+
+    - name: 🚧 Front — Build
       working-directory: ./front-v3
       run: npm run build
 
   back_CD:
-    name: Back ~ Deployment
+    name: ⚙️ Back — Continuous Deployment
     needs: [ changes, back_checks, front_checks ]
     if: |
       always() &&
@@ -116,13 +124,13 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Deploy
+    - name: 🚀 Back — Deployment
       env:
         deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_API }}
       run: curl "$deploy_url"
 
   front_CD:
-    name: Front ~ Deployment
+    name: 📱 Front — Continuous Deployment
     needs: [ changes, front_checks, back_CD ]
     if: |
       always() &&
@@ -135,7 +143,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Deploy
+    - name: 🚀 Front — Deployment
       env:
         deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_APP_v3 }}
       run: curl "$deploy_url"
