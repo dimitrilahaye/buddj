@@ -14,6 +14,20 @@ Règles pour le store réactif, les Custom Events (actions / état), l’injecti
 - Les payloads passent dans **`detail`** des `CustomEvent`.
 - **Testabilité** : même chaîne qu’en prod, avec un mock de l’API : `mock IBuddjApi → use-case → store → web component`.
 
+## Classe générique `Store<T>`
+
+Un store concret (ex. `AuthStore`, store des charges/budgets) **étend la classe abstraite** `Store<T>` (`src/application/store.ts`). Le type générique **`T`** est le type de l’état (ex. `AuthState`).
+
+**API exposée :**
+
+- **`constructor(initialState: T)`** — état initial (objet).
+- **`getState(): T`** — retourne une copie de l’état (lecture seule pour les appelants).
+- **`setState(partial: Partial<T>): void`** — fusionne `partial` dans l’état interne (utilisé par le store ou les use-cases après un appel API).
+- **`emitStateChange<TDetail>(name: string, detail?: TDetail): void`** — émet un event d’état (store → WC). Le nom est celui de l’event (ex. `'expenseTaken'`), `detail` est le payload minimal.
+- **`emitAction(name: string, payload?: unknown): void`** — utilisé par les **WC** pour envoyer une action au store (store s’écoute lui-même sur ce nom d’event).
+
+Le store concret enregistre dans son constructeur les listeners (ex. `this.addEventListener('takeExpense', ...)`) qui appellent les use-cases puis mettent à jour l’état et émettent les events d’état via `emitStateChange`.
+
 ## Deux familles d’events
 
 ### 1. Actions (WC → store)
