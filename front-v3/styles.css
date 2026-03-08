@@ -344,9 +344,9 @@ buddj-icon-save {
   padding: 1.5rem 1.25rem 3rem;
 }
 
-.screen-header {
+/* .screen-header {
   margin-bottom: 1.25rem;
-}
+} */
 
 .screen-header-row {
   display: flex;
@@ -822,6 +822,7 @@ buddj-screen-new-month .new-month-row-amount {
 .budget-group-title-block {
   flex: 1;
   min-width: 0;
+  padding: 0.55rem 0;
 }
 
 .budget-group-recap {
@@ -3175,8 +3176,9 @@ body.route-budgets main#budgets {
 body.route-outflows .screen-sticky-header-wrap,
 body.route-budgets .screen-sticky-header-wrap {
   flex-shrink: 0;
-  background: var(--bg);
-  padding: 1.5rem 1.25rem 0;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
 }
 
 body.route-budgets .screen-sticky-header-wrap {
@@ -3185,10 +3187,29 @@ body.route-budgets .screen-sticky-header-wrap {
 
 body.route-outflows .screen-sticky-header-wrap .screen-header,
 body.route-budgets .screen-sticky-header-wrap .screen-header {
-  margin-bottom: 1.25rem;
-  padding-bottom: 1rem;
+  width: 100%;
+  /* margin-bottom: 1.25rem; */
+  padding: 1rem 1.25rem;
+  box-sizing: border-box;
+  background: var(--bg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+body.route-outflows .screen-sticky-header-wrap .screen-header-row,
+body.route-budgets .screen-sticky-header-wrap .screen-header-row {
+  width: 100%;
+}
+
+body.route-outflows .screen-sticky-header-wrap .screen-header .title,
+body.route-budgets .screen-sticky-header-wrap .screen-header .title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+  flex: 1;
+  min-width: 0;
 }
 
 body.route-outflows .recurring-list,

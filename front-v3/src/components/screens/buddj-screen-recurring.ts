@@ -87,7 +87,7 @@ export class BuddjScreenRecurring extends HTMLElement {
         </header>
       </div>
       <section class="recurring-list">
-        <buddj-section-header title="Mes charges"></buddj-section-header>
+        <buddj-section-header></buddj-section-header>
       </section>
     `;
     const listSection = main.querySelector('.recurring-list')!;
