@@ -8,6 +8,9 @@ export function createAuthServiceFromInMemory(result: boolean): AuthService {
     login(): void {
       // No-op en test / démo
     },
+    async logout(): Promise<void> {
+      // No-op en test / démo
+    },
     async isAuthenticated(): Promise<boolean> {
       await new Promise((r) => setTimeout(r, 100));
       return result;

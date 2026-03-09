@@ -8,6 +8,7 @@ import { bootstrap } from '../../src/bootstrap.js';
 function createDelayedAuthService(result: boolean, delayMs: number): AuthService {
   return {
     login(): void {},
+    async logout(): Promise<void> {},
     async isAuthenticated(): Promise<boolean> {
       await new Promise((r) => setTimeout(r, delayMs));
       return result;
