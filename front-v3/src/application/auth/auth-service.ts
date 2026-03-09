@@ -1,7 +1,8 @@
 /**
- * Port auth : vérification d’authentification et login (redirection OAuth).
+ * Port auth : vérification d’authentification, login (redirection OAuth) et logout.
  */
 export interface AuthService {
   isAuthenticated(): Promise<boolean>;
   login(): void;
+  logout(): Promise<void>;
 }

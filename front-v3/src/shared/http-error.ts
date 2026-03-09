@@ -8,15 +8,40 @@ import { getToast } from '../components/atoms/buddj-toast.js';
  * Affiche le message d’erreur adapté dans le toast (variant error) puis lance une Error dont le message est ce texte.
  * À appeler quand une requête HTTP échoue (status 4xx/5xx ou erreur réseau). Le catch n’a qu’à utiliser err.message.
  */
-export function handleHttpError({
-  status,
-  message,
-}: {
-  status?: number;
-  message: string;
-}): never {
+const DEFAULT_ERROR_MESSAGE = 'Erreur réseau';
+
+function messageFromUnknown(err: unknown): string {
+  return err instanceof Error ? err.message : DEFAULT_ERROR_MESSAGE;
+}
+
+/**
+ * Affiche le message d'erreur adapté dans le toast (variant error) puis lance une Error dont le message est ce texte.
+ * Accepte soit { status?, message } soit { status?, err } ; si err est fourni, message dérivé via err instanceof Error ? err.message : 'Erreur réseau'.
+ */
+export function handleHttpError(
+  arg: { status?: number; message: string } | { status?: number; err: unknown }
+): never {
   const toaster = getToast();
-  const displayMessage = status === 401 ? "Vous n'êtes pas connectés" : message;
+  const message = 'message' in arg ? arg.message : messageFromUnknown(arg.err);
+  const displayMessage = arg.status === 401 ? "Vous n'êtes pas connectés" : message;
   toaster?.show({ message: displayMessage, variant: 'error', durationMs: 3000 });
   throw new Error(displayMessage);
+}
+
+/**
+ * Lit le message d'erreur depuis le corps JSON de la réponse (body.message), sinon utilise defaultMessage,
+ * puis appelle handleHttpError. À utiliser pour toute réponse !response.ok.
+ */
+export async function handleNotOkResponse(
+  response: Response,
+  defaultMessage = DEFAULT_ERROR_MESSAGE
+): Promise<never> {
+  let message = defaultMessage;
+  try {
+    const body = await response.json();
+    if (body && typeof body.message === 'string') message = body.message;
+  } catch (e) {
+    console.error('Erreur lors de la lecture du corps de la réponse', e);
+  }
+  handleHttpError({ status: response.status, message });
 }

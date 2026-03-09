@@ -8,6 +8,7 @@ import { bootstrap } from '../../src/bootstrap.js';
 function createFailingAuthService(message: string): AuthService {
   return {
     login(): void {},
+    async logout(): Promise<void> {},
     async isAuthenticated(): Promise<boolean> {
       throw new Error(message);
     },
@@ -20,6 +21,7 @@ function createAuthServiceWithFailingLogin(loginError: string): AuthService {
     login(): void {
       throw new Error(loginError);
     },
+    async logout(): Promise<void> {},
     async isAuthenticated(): Promise<boolean> {
       return false;
     },

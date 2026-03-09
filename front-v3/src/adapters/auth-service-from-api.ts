@@ -3,7 +3,7 @@
  * Utilise la config (apiUrl) injectée au constructeur.
  */
 import type { AuthService } from '../application/auth/auth-service.js';
-import { handleHttpError } from '../shared/http-error.js';
+import { handleHttpError, handleNotOkResponse } from '../shared/http-error.js';
 
 export function createAuthServiceFromApi({ apiUrl }: { apiUrl: string }): AuthService {
   const baseUrl = apiUrl.replace(/\/$/, '');
@@ -13,6 +13,21 @@ export function createAuthServiceFromApi({ apiUrl }: { apiUrl: string }): AuthSe
         `${baseUrl}/auth/google?returnTo=${encodeURIComponent(window.location.origin)}`,
         '_self'
       );
+    },
+    async logout(): Promise<void> {
+      const url = `${baseUrl}/auth/logout`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      return;
     },
     async isAuthenticated(): Promise<boolean> {
       const url = `${baseUrl}/me`;
@@ -24,18 +39,11 @@ export function createAuthServiceFromApi({ apiUrl }: { apiUrl: string }): AuthSe
           headers: { Accept: 'application/json' },
         });
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Erreur réseau';
-        return handleHttpError({ message });
+        return handleHttpError({ err });
       }
       if (response.ok) return true;
-      let message = 'Erreur réseau';
-      try {
-        const body = await response.json();
-        if (body && typeof body.message === 'string') message = body.message;
-      } catch(e) {
-        console.error('Erreur lors de la lecture du corps de la réponse', e);
-      }
-      handleHttpError({ status: response.status, message });
+      await handleNotOkResponse(response);
+      return false; // unreachable : handleNotOkResponse lance
     },
   };
 }

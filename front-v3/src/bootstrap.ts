@@ -7,9 +7,11 @@ import type { AuthService } from './application/auth/auth-service.js';
 import { AuthStore } from './application/auth/auth-store.js';
 import { checkUserIsAuthenticated } from './application/auth/check-user-is-authenticated.js';
 import { userSignIn } from './application/auth/user-sign-in.js';
+import { userLogout } from './application/auth/user-logout.js';
 import { createAuthServiceFromApi } from './adapters/auth-service-from-api.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
+import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
 
 const STANDALONE_ROUTE_NAMES = new Set([
   'home',
@@ -62,8 +64,13 @@ export function bootstrap(options?: BootstrapOptions): void {
   const authStore = new AuthStore({
     checkUserIsAuthenticated: () => checkUserIsAuthenticated({ authService }),
     userSignIn: () => userSignIn({ authService }),
+    userLogout: () => userLogout({ authService }),
     onAuthenticatedRedirect: () => router.navigate(`/budgets/${DEFAULT_MONTH_ID}`),
+    onLogoutSuccess: () => router.replace('/'),
   });
+
+  const burgerPanel = document.querySelector('buddj-burger-panel') as BuddjBurgerPanel;
+  burgerPanel?.init?.({ store: authStore });
 
   const routes = createRoutes({ authStore });
   router = createRouter({
