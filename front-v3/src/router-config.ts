@@ -20,10 +20,22 @@ export const DEFAULT_MONTH_ID = '2024-04';
 
 export const DEFAULT_ROUTE: DefaultRoute = { name: 'home', path: '/' };
 
+function wrapGuard(authStore: AuthStore, redirectToHome: () => void, handle: RouteDef['handle']): RouteDef['handle'] {
+  return (ctx) => {
+    if (!authStore.getIsAuthenticated()) {
+      redirectToHome();
+      return;
+    }
+    return handle(ctx);
+  };
+}
+
 export function createRoutes({
   authStore,
+  redirectToHome,
 }: {
   authStore: AuthStore;
+  redirectToHome: () => void;
 }): RouteDef[] {
   return [
     {
@@ -38,80 +50,80 @@ export function createRoutes({
     {
       name: 'new-month',
       pattern: '/new-month',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-new-month');
         ctx.outlet.replaceChildren(el);
-      },
+      }),
     },
     {
       name: 'archived',
       pattern: '/archived',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-archived');
         ctx.outlet.replaceChildren(el);
-      },
+      }),
     },
     {
       name: 'savings',
       pattern: '/savings',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-savings');
         ctx.outlet.replaceChildren(el);
-      },
+      }),
     },
     {
       name: 'reimbursements',
       pattern: '/reimbursements',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-reimbursements');
         ctx.outlet.replaceChildren(el);
-      },
+      }),
     },
     {
       name: 'template-detail',
       pattern: '/templates/:id',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-template-detail');
         el.setAttribute('template-id', ctx.params.id ?? '');
         el.setAttribute('is-default', 'false');
         ctx.outlet.replaceChildren(el);
-      },
+      }),
     },
     {
       name: 'templates',
       pattern: '/templates',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-templates');
         ctx.outlet.replaceChildren(el);
-      },
+      }),
     },
     {
       name: 'annual-outflows',
       pattern: '/annual-outflows',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-annual-outflows');
         ctx.outlet.replaceChildren(el);
-      },
+      }),
     },
     {
       name: 'outflows',
       pattern: '/outflows/:monthId',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-recurring');
         ctx.outlet.replaceChildren(el);
         const main = document.getElementById('recurring');
         if (main) main.setAttribute('data-month-id', ctx.params.monthId ?? '');
-      },
+      }),
     },
     {
       name: 'budgets',
       pattern: '/budgets/:monthId',
-      handle(ctx) {
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-budgets');
         ctx.outlet.replaceChildren(el);
         const main = document.getElementById('budgets');
         if (main) main.setAttribute('data-month-id', ctx.params.monthId ?? '');
-      },
+      }),
     },
   ];
 }
