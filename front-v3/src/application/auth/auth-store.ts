@@ -41,6 +41,10 @@ export class AuthStore extends Store<AuthState> {
   private _onAuthenticatedRedirect?: () => void;
   private _onLogoutSuccess?: () => void;
 
+  getIsAuthenticated(): boolean {
+    return this.getState().isAuthenticated;
+  }
+
   private async handleAskForLogout(): Promise<void> {
     this.emitStateChange('askForLogout:loading');
     try {

@@ -72,7 +72,13 @@ export function bootstrap(options?: BootstrapOptions): void {
   const burgerPanel = document.querySelector('buddj-burger-panel') as BuddjBurgerPanel;
   burgerPanel?.init?.({ store: authStore });
 
-  const routes = createRoutes({ authStore });
+  const routes = createRoutes({
+    authStore,
+    redirectToHome: () => {
+      // Désynchroniser pour que les listeners de la navigation en cours (route protégée) ne réappliquent pas leurs classes après applyRoute(home)
+      setTimeout(() => router.replace('/'), 0);
+    },
+  });
   router = createRouter({
     outlet,
     routes,

@@ -100,16 +100,25 @@ export function createRouter({
     return fallbackMatch;
   }
 
+  /** Exécute le handler et les listeners pour un match donné (évite de dépendre de location.pathname à jour). */
+  function runForMatch(match: RouteMatch): void {
+    runHandler(match).then(() => {
+      listeners.forEach((fn) => fn(match));
+    });
+  }
+
   function navigate(path: string): void {
     if (path !== getPath()) {
       window.history.pushState(null, '', path);
-      emit();
+      const match = findMatch(path) ?? fallbackMatch;
+      runForMatch(match);
     }
   }
 
   function replace(path: string): void {
     window.history.replaceState(null, '', path);
-    emit();
+    const match = findMatch(path) ?? fallbackMatch;
+    runForMatch(match);
   }
 
   async function runHandler(match: RouteMatch): Promise<void> {
