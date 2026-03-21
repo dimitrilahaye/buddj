@@ -40,5 +40,21 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
     },
+    async deleteExpense({ monthId, weeklyBudgetId, expenseId }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/weekly/${encodeURIComponent(weeklyBudgetId)}/expenses/${encodeURIComponent(expenseId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
   };
 }

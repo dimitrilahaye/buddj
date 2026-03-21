@@ -12,6 +12,7 @@ import { userLogout } from './application/auth/user-logout.js';
 import { createAuthServiceFromApi } from './adapters/auth-service-from-api.js';
 import { createLoadUnarchivedMonths } from './application/month/load-unarchived-months.js';
 import { MonthStore } from './application/month/month-store.js';
+import { createDeleteExpense } from './application/month/delete-expense.js';
 import { createPutExpensesChecking } from './application/month/put-expenses-checking.js';
 import type { MonthService } from './application/month/month-service.js';
 import { createRouter } from './router.js';
@@ -64,7 +65,8 @@ export function bootstrap(options: BootstrapOptions): void {
   const authService = options.authService ?? createAuthServiceFromApi({ apiUrl: config.apiUrl });
   const loadUnarchivedMonths = createLoadUnarchivedMonths({ monthService: options.monthService });
   const putExpensesChecking = createPutExpensesChecking({ monthService: options.monthService });
-  const monthStore = new MonthStore({ loadUnarchivedMonths, putExpensesChecking });
+  const deleteExpense = createDeleteExpense({ monthService: options.monthService });
+  const monthStore = new MonthStore({ loadUnarchivedMonths, putExpensesChecking, deleteExpense });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 

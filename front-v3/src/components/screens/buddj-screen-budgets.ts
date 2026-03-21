@@ -3,10 +3,13 @@
  */
 import type { BuddjExpenseSearchDrawerElement } from '../organisms/buddj-expense-search-drawer.js';
 import {
+  LOADING_DELETE_EXPENSE_TEXT,
   LOADING_EXPENSES_CHECKING_TEXT,
+  type DeleteExpenseActionDetail,
   type MonthStore,
   type PutExpensesCheckingActionDetail,
 } from '../../application/month/month-store.js';
+import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
 import type { MonthView } from '../../application/month/month-view.js';
 import type { BudgetGroupData } from '../../application/month/month-types.js';
@@ -53,6 +56,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     this.appendChild(main);
     this.attachListeners();
     this.attachExpenseCheckingListener(main);
+    this.attachExpenseDeleteListener(main);
     if (this._monthStore && !this._monthListenersAttached) {
       this._attachMonthStoreListeners();
       this._monthStore.emitAction('loadUnarchivedMonths');
@@ -76,6 +80,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.addEventListener('expensesCheckingLoading', this._onExpensesCheckingLoading);
     this._monthStore.addEventListener('expensesCheckingLoaded', this._onExpensesCheckingLoaded);
     this._monthStore.addEventListener('expensesCheckingFailed', this._onExpensesCheckingFailed);
+    this._monthStore.addEventListener('expenseDeleteLoading', this._onExpenseDeleteLoading);
+    this._monthStore.addEventListener('expenseDeleteLoaded', this._onExpenseDeleteLoaded);
+    this._monthStore.addEventListener('expenseDeleteFailed', this._onExpenseDeleteFailed);
     this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
   }
 
@@ -87,6 +94,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.removeEventListener('expensesCheckingLoading', this._onExpensesCheckingLoading);
     this._monthStore.removeEventListener('expensesCheckingLoaded', this._onExpensesCheckingLoaded);
     this._monthStore.removeEventListener('expensesCheckingFailed', this._onExpensesCheckingFailed);
+    this._monthStore.removeEventListener('expenseDeleteLoading', this._onExpenseDeleteLoading);
+    this._monthStore.removeEventListener('expenseDeleteLoaded', this._onExpenseDeleteLoaded);
+    this._monthStore.removeEventListener('expenseDeleteFailed', this._onExpenseDeleteFailed);
     this._monthStore.removeEventListener('currentMonthChanged', this._onCurrentMonthChanged);
     this._monthListenersAttached = false;
     this._loadingModal?.hide();
@@ -113,6 +123,19 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._loadingModal?.hide();
   };
 
+  private _onExpenseDeleteLoading = (): void => {
+    this._loadingModal?.show(LOADING_DELETE_EXPENSE_TEXT);
+  };
+
+  private _onExpenseDeleteLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'La dépense a bien été supprimée' });
+  };
+
+  private _onExpenseDeleteFailed = (): void => {
+    this._loadingModal?.hide();
+  };
+
   private _onCurrentMonthChanged = (e: Event): void => {
     const ev = e as CustomEvent<{ month: MonthView | null }>;
     this._renderBudgetGroups(ev.detail?.month ?? null);
@@ -123,7 +146,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     if (!listSection) return;
     const openKeys = new Set<string>();
     for (const card of listSection.querySelectorAll('buddj-budget-card')) {
-      const details = card.querySelector('details.budget-details');
+      const details = card.querySelector('details.budget-details') as HTMLDetailsElement | null;
       if (details?.open) openKeys.add(openBudgetKey(card));
     }
     listSection.replaceChildren();
@@ -176,6 +199,16 @@ export class BuddjScreenBudgets extends HTMLElement {
       const { expenseId, weeklyBudgetId, isChecked } = ev.detail ?? {};
       if (!expenseId || !weeklyBudgetId || isChecked === undefined) return;
       this._monthStore.emitAction('putExpensesChecking', { expenseId, weeklyBudgetId, isChecked });
+    });
+  }
+
+  private attachExpenseDeleteListener(main: HTMLElement): void {
+    main.addEventListener('buddj-expense-delete-confirmed', (e) => {
+      if (!this._monthStore) return;
+      const ev = e as CustomEvent<Partial<DeleteExpenseActionDetail>>;
+      const { expenseId, weeklyBudgetId } = ev.detail ?? {};
+      if (!expenseId || !weeklyBudgetId) return;
+      this._monthStore.emitAction('deleteExpense', { expenseId, weeklyBudgetId });
     });
   }
 }

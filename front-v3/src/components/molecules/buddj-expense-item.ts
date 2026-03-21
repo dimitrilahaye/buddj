@@ -85,6 +85,18 @@ export class BuddjExpenseItem extends HTMLElement {
       modal?.show({
         title: `Voulez-vous vraiment supprimer la dépense "${desc}" ?`,
         onConfirm: () => {
+          const expenseId = this.getAttribute('expense-id') ?? '';
+          const card = this.closest('buddj-budget-card');
+          const weeklyBudgetId = card?.getAttribute('weekly-budget-id') ?? '';
+          if (expenseId && weeklyBudgetId) {
+            this.dispatchEvent(
+              new CustomEvent('buddj-expense-delete-confirmed', {
+                bubbles: true,
+                detail: { expenseId, weeklyBudgetId },
+              }),
+            );
+            return;
+          }
           const toast = getToast();
           toast?.show({ message: 'La dépense a bien été supprimée' });
         },
