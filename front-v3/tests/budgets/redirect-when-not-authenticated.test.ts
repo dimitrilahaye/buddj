@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createAuthServiceFromInMemory } from '../../src/adapters/auth-service-from-in-memory.js';
-import { DEFAULT_MONTH_ID } from '../../src/router-config.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
 
@@ -18,7 +17,7 @@ describe('page Budgets', () => {
     await new Promise((r) => setTimeout(r, 150));
 
     const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
-    window.history.replaceState(null, '', `/budgets/${DEFAULT_MONTH_ID}`);
+    window.history.replaceState(null, '', '/budgets');
     replaceStateSpy.mockClear();
 
     window.dispatchEvent(new PopStateEvent('popstate'));
