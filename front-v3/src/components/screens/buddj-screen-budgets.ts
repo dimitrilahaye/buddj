@@ -13,6 +13,15 @@ import type { BudgetGroupData } from '../../application/month/month-types.js';
 
 const LOADING_MONTHS_TEXT = 'Chargement des mois en cours';
 
+function openBudgetKey(card: Element): string {
+  const wid = card.getAttribute('weekly-budget-id');
+  if (wid) return `wid:${wid}`;
+  const group = card.closest('buddj-budget-group');
+  const groupTitle = group?.getAttribute('title') ?? '';
+  const name = card.getAttribute('name') ?? '';
+  return `grp:${groupTitle}|${name}`;
+}
+
 export class BuddjScreenBudgets extends HTMLElement {
   static readonly tagName = 'buddj-screen-budgets';
 
@@ -112,6 +121,11 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _renderBudgetGroups(month: MonthView | null): void {
     const listSection = this.querySelector('.budget-list');
     if (!listSection) return;
+    const openKeys = new Set<string>();
+    for (const card of listSection.querySelectorAll('buddj-budget-card')) {
+      const details = card.querySelector('details.budget-details');
+      if (details?.open) openKeys.add(openBudgetKey(card));
+    }
     listSection.replaceChildren();
     const groups: BudgetGroupData[] = month?.budgetGroups ?? [];
     for (const group of groups) {
@@ -137,6 +151,10 @@ export class BuddjScreenBudgets extends HTMLElement {
         groupEl.appendChild(cardEl);
       }
       listSection.appendChild(groupEl);
+    }
+    for (const card of listSection.querySelectorAll('buddj-budget-card')) {
+      if (!openKeys.has(openBudgetKey(card))) continue;
+      card.querySelector('details.budget-details')?.setAttribute('open', '');
     }
   }
 
