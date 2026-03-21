@@ -4,7 +4,6 @@
  */
 import './components/screens/buddj-screen-home.js';
 import './components/screens/buddj-screen-recurring.js';
-import './components/screens/buddj-screen-budgets.js';
 import './components/screens/buddj-screen-new-month.js';
 import './components/screens/buddj-screen-archived.js';
 import './components/screens/buddj-screen-savings.js';
@@ -14,7 +13,9 @@ import './components/screens/buddj-screen-template-detail.js';
 import './components/screens/buddj-screen-annual-outflows.js';
 import type { DefaultRoute, RouteDef } from './router.js';
 import type { AuthStore } from './application/auth/auth-store.js';
+import type { MonthStore } from './application/month/month-store.js';
 import { BuddjScreenHome } from './components/screens/buddj-screen-home.js';
+import { BuddjScreenBudgets } from './components/screens/buddj-screen-budgets.js';
 
 export const DEFAULT_MONTH_ID = '2024-04';
 
@@ -32,9 +33,11 @@ function wrapGuard(authStore: AuthStore, redirectToHome: () => void, handle: Rou
 
 export function createRoutes({
   authStore,
+  monthStore,
   redirectToHome,
 }: {
   authStore: AuthStore;
+  monthStore: MonthStore;
   redirectToHome: () => void;
 }): RouteDef[] {
   return [
@@ -117,12 +120,11 @@ export function createRoutes({
     },
     {
       name: 'budgets',
-      pattern: '/budgets/:monthId',
+      pattern: '/budgets',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-budgets');
+        const el = new BuddjScreenBudgets();
+        el.init({ monthStore });
         ctx.outlet.replaceChildren(el);
-        const main = document.getElementById('budgets');
-        if (main) main.setAttribute('data-month-id', ctx.params.monthId ?? '');
       }),
     },
   ];

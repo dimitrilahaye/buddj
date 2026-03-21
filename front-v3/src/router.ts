@@ -79,7 +79,7 @@ export function createRouter({
   const listeners: Listener[] = [];
   const fallbackMatch: RouteMatch = defaultRoute
     ? { name: defaultRoute.name, params: defaultRoute.params ?? {}, path: defaultRoute.path }
-    : { name: 'budgets', params: { monthId: defaultMonthId }, path: `/budgets/${defaultMonthId}` };
+    : { name: 'budgets', params: {}, path: '/budgets' };
 
   function getPath(): string {
     return window.location.pathname || '/';

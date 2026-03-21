@@ -48,3 +48,4 @@ import './components/organisms/buddj-charge-group.js';
 import './components/organisms/buddj-budget-card.js';
 import './components/organisms/buddj-budget-group.js';
 import './components/organisms/buddj-template-budget-card.js';
+import './components/screens/buddj-screen-budgets.js';

@@ -1,5 +1,6 @@
 /**
- * Bootstrap de l’app : config (vars d’env), auth, router, routes. Exporté pour permettre aux tests d’injecter config et authService.
+ * Bootstrap de l’app : config (vars d’env), auth, router, routes.
+ * `monthService` est obligatoire (composition : `main.ts` injecte l’API, les tests un in-memory).
  */
 import type { AppConfig } from './config.js';
 import { buildConfigFromEnv } from './config.js';
@@ -9,9 +10,13 @@ import { checkUserIsAuthenticated } from './application/auth/check-user-is-authe
 import { userSignIn } from './application/auth/user-sign-in.js';
 import { userLogout } from './application/auth/user-logout.js';
 import { createAuthServiceFromApi } from './adapters/auth-service-from-api.js';
+import { createLoadUnarchivedMonths } from './application/month/load-unarchived-months.js';
+import { MonthStore } from './application/month/month-store.js';
+import type { MonthService } from './application/month/month-service.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
+import type { BuddjSummaryBarElement } from './components/organisms/buddj-summary-bar.js';
 
 const STANDALONE_ROUTE_NAMES = new Set([
   'home',
@@ -50,11 +55,14 @@ const BURGER_LINK_ACTIVE_BY_HREF: Record<string, string[]> = {
 export type BootstrapOptions = {
   config?: AppConfig;
   authService?: AuthService;
+  monthService: MonthService;
 };
 
-export function bootstrap(options?: BootstrapOptions): void {
-  const config = options?.config ?? buildConfigFromEnv();
-  const authService = options?.authService ?? createAuthServiceFromApi({ apiUrl: config.apiUrl });
+export function bootstrap(options: BootstrapOptions): void {
+  const config = options.config ?? buildConfigFromEnv();
+  const authService = options.authService ?? createAuthServiceFromApi({ apiUrl: config.apiUrl });
+  const loadUnarchivedMonths = createLoadUnarchivedMonths({ monthService: options.monthService });
+  const monthStore = new MonthStore({ loadUnarchivedMonths });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 
@@ -65,7 +73,7 @@ export function bootstrap(options?: BootstrapOptions): void {
     checkUserIsAuthenticated: () => checkUserIsAuthenticated({ authService }),
     userSignIn: () => userSignIn({ authService }),
     userLogout: () => userLogout({ authService }),
-    onAuthenticatedRedirect: () => router.navigate(`/budgets/${DEFAULT_MONTH_ID}`),
+    onAuthenticatedRedirect: () => router.navigate('/budgets'),
     onLogoutSuccess: () => router.replace('/'),
   });
 
@@ -74,6 +82,7 @@ export function bootstrap(options?: BootstrapOptions): void {
 
   const routes = createRoutes({
     authStore,
+    monthStore,
     redirectToHome: () => {
       // Désynchroniser pour que les listeners de la navigation en cours (route protégée) ne réappliquent pas leurs classes après applyRoute(home)
       setTimeout(() => router.replace('/'), 0);
@@ -86,6 +95,13 @@ export function bootstrap(options?: BootstrapOptions): void {
     defaultRoute: DEFAULT_ROUTE,
   });
 
+  const summaryBar = document.querySelector('buddj-summary-bar') as BuddjSummaryBarElement | null;
+  summaryBar?.init({
+    monthStore,
+    getCurrentRouteName: () => router.getCurrent().name,
+    defaultMonthIdForNav: DEFAULT_MONTH_ID,
+  });
+
   function applyRoute(match: { name: string; params: Record<string, string> }): void {
     const isStandalone = STANDALONE_ROUTE_NAMES.has(match.name);
     getBodyClassToggles(match).forEach(({ class: cls, active }) => {
@@ -93,7 +109,6 @@ export function bootstrap(options?: BootstrapOptions): void {
     });
     const nav = document.querySelector('buddj-nav');
     if (nav) {
-      (nav as HTMLElement).setAttribute('month-id', match.params.monthId ?? DEFAULT_MONTH_ID);
       (nav as unknown as { setActiveRoute: (name: string) => void }).setActiveRoute(isStandalone ? '' : match.name);
     }
     const burgerPanel = document.querySelector('buddj-burger-panel');
@@ -107,7 +122,7 @@ export function bootstrap(options?: BootstrapOptions): void {
 
   document.addEventListener('click', (e) => {
     const a = (e.target as Element).closest(
-      'a[href^="/outflows/"], a[href^="/budgets/"], a[href="/new-month"], a[href="/archived"], a[href="/annual-outflows"], a[href="/savings"], a[href="/reimbursements"], a[href="/templates"], a[href^="/templates/"]'
+      'a[href^="/outflows/"], a[href="/budgets"], a[href="/new-month"], a[href="/archived"], a[href="/annual-outflows"], a[href="/savings"], a[href="/reimbursements"], a[href="/templates"], a[href^="/templates/"]'
     );
     if (!a || (a as HTMLAnchorElement).target === '_blank') return;
     e.preventDefault();
