@@ -6,6 +6,7 @@
  */
 import type { BuddjConfirmModalElement } from './buddj-confirm-modal.js';
 import { getToast } from '../atoms/buddj-toast.js';
+import { formatEuros } from '../../shared/goal.js';
 
 export class BuddjExpenseItem extends HTMLElement {
   static readonly tagName = 'buddj-expense-item';
@@ -38,6 +39,7 @@ export class BuddjExpenseItem extends HTMLElement {
     checkbox.id = cbId;
     checkbox.className = 'expense-taken';
     checkbox.title = 'Appuyer pour marquer comme débité ou non';
+    checkbox.setAttribute('aria-label', `Dépense ${desc}, ${formatEuros(amountNum)}`);
     checkbox.checked = taken;
     checkbox.slot = 'prefix';
 

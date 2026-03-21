@@ -7,6 +7,9 @@ import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { formatEuros } from '../../shared/goal.js';
 import { escapeHtml } from '../../shared/escape.js';
+import type { MonthStore } from '../../application/month/month-store.js';
+import type { MonthView } from '../../application/month/month-view.js';
+import { getCurrentMonth } from '../../application/month/month-state.js';
 
 function parseAmount(raw: string | null): number {
   if (raw == null || raw === '') return 0;
@@ -18,8 +21,32 @@ function parseAmount(raw: string | null): number {
 export class BuddjSummaryBar extends HTMLElement {
   static readonly tagName = 'buddj-summary-bar';
 
+  private _monthStore?: MonthStore;
+  private _getCurrentRouteName?: () => string;
+  private _defaultMonthIdForNav = '';
+  private _monthListenersBound = false;
+
   static get observedAttributes(): string[] {
     return ['balance-value', 'date', 'projected-balance'];
+  }
+
+  init({
+    monthStore,
+    getCurrentRouteName,
+    defaultMonthIdForNav,
+  }: {
+    monthStore: MonthStore;
+    getCurrentRouteName: () => string;
+    defaultMonthIdForNav: string;
+  }): void {
+    this._monthStore = monthStore;
+    this._getCurrentRouteName = getCurrentRouteName;
+    this._defaultMonthIdForNav = defaultMonthIdForNav;
+    if (this._monthListenersBound) return;
+    this._monthListenersBound = true;
+    this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
+    this.addEventListener('click', this._onNavMonthClick);
+    this._syncFromStoreState();
   }
 
   connectedCallback(): void {
@@ -28,6 +55,68 @@ export class BuddjSummaryBar extends HTMLElement {
     this.renderBalanceActions();
     this.attachBalanceListeners();
     this.attachDateListeners();
+    if (this._monthStore) {
+      this._syncFromStoreState();
+    }
+  }
+
+  private _onCurrentMonthChanged = (e: Event): void => {
+    const m = (e as CustomEvent<{ month: MonthView | null }>).detail?.month;
+    if (m) {
+      this.setAttribute('date', m.displayLabel);
+      this.setAttribute('balance-value', String(m.currentBalance));
+      this.setAttribute('projected-balance', String(m.projectedBalance));
+      this.renderBalanceActions();
+      this.attachBalanceListeners();
+    }
+    this._updateNavButtonsDisabled();
+    this._syncBuddjNavMonthIdFromStore();
+  };
+
+  /** Sur la route budgets, aligne `buddj-nav` sur le mois courant du store (lien Charges). */
+  private _syncBuddjNavMonthIdFromStore(): void {
+    if (this._getCurrentRouteName?.() !== 'budgets') return;
+    const nav = document.querySelector('buddj-nav');
+    if (!nav || !this._monthStore) return;
+    const id = this._monthStore.getCurrentMonthIdForNav() || this._defaultMonthIdForNav;
+    nav.setAttribute('month-id', id);
+  }
+
+  private _syncFromStoreState(): void {
+    if (!this._monthStore) return;
+    const m = getCurrentMonth({ state: this._monthStore.getState() });
+    if (m) {
+      this.setAttribute('date', m.displayLabel);
+      this.setAttribute('balance-value', String(m.currentBalance));
+      this.setAttribute('projected-balance', String(m.projectedBalance));
+      this.renderBalanceActions();
+      this.attachBalanceListeners();
+    }
+    this._updateNavButtonsDisabled();
+    this._syncBuddjNavMonthIdFromStore();
+  }
+
+  private _onNavMonthClick = (e: Event): void => {
+    const btn = (e.target as Element).closest('.btn--nav-month');
+    if (!btn || !this._monthStore) return;
+    const row = this.querySelector('.summary-date-row');
+    const buttons = row ? Array.from(row.querySelectorAll('.btn--nav-month')) : [];
+    const idx = buttons.indexOf(btn as HTMLButtonElement);
+    if (idx === 0) this._monthStore.emitAction('goToPreviousMonth');
+    else if (idx === 1) this._monthStore.emitAction('goToNextMonth');
+  };
+
+  private _updateNavButtonsDisabled(): void {
+    if (!this._monthStore) return;
+    const { months, currentIndex } = this._monthStore.getState();
+    const row = this.querySelector('.summary-date-row');
+    if (!row) return;
+    const buttons = row.querySelectorAll('.btn--nav-month');
+    const prev = buttons[0] as HTMLButtonElement | undefined;
+    const next = buttons[1] as HTMLButtonElement | undefined;
+    const empty = months.length === 0;
+    if (prev) prev.disabled = empty || currentIndex <= 0;
+    if (next) next.disabled = empty || currentIndex >= months.length - 1;
   }
 
   attributeChangedCallback(name: string, _old: string | null, newValue: string | null): void {
@@ -174,5 +263,8 @@ export class BuddjSummaryBar extends HTMLElement {
     });
   }
 }
+
+/** `<buddj-summary-bar>` : typage après `querySelector` / appel à `init` depuis le bootstrap. */
+export type BuddjSummaryBarElement = BuddjSummaryBar;
 
 customElements.define(BuddjSummaryBar.tagName, BuddjSummaryBar);

@@ -1,110 +1,27 @@
 /**
- * Écran Mes budgets : header + groupes de budgets construits à partir d’un tableau de données.
+ * Écran Mes budgets : charge les mois non archivés, barre récap + liste depuis MonthStore.
  */
 import type { BuddjExpenseSearchDrawerElement } from '../organisms/buddj-expense-search-drawer.js';
+import type { MonthStore } from '../../application/month/month-store.js';
+import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
+import type { MonthView } from '../../application/month/month-view.js';
+import type { BudgetGroupData } from '../../application/month/month-types.js';
 
-export interface BudgetExpense {
-  icon: string;
-  desc: string;
-  amount: number;
-  taken?: boolean;
-}
-
-export interface Budget {
-  name: string;
-  icon: string;
-  allocated: number;
-  expenses: BudgetExpense[];
-}
-
-export interface BudgetGroupData {
-  title: string;
-  previous?: boolean;
-  /** Groupe de budgets annuels (à faire ressortir au-dessus des budgets du mois). */
-  annual?: boolean;
-  showAdd?: boolean;
-  budgets: Budget[];
-}
-
-const BUDGET_GROUPS: BudgetGroupData[] = [
-  {
-    title: 'Budgets des mois précédents',
-    previous: true,
-    budgets: [
-      {
-        name: 'Entretien voiture',
-        icon: '🚗',
-        allocated: 80,
-        expenses: [
-          { icon: '🛢️', desc: 'Vidange', amount: 25, taken: true },
-          { icon: '🛞', desc: 'Contrôle technique', amount: 35, taken: true },
-          { icon: '⛽', desc: 'Plein', amount: 12 },
-          { icon: '🧴', desc: 'Liquide lave-glace', amount: 8 },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Budgets annuels',
-    annual: true,
-    budgets: [
-      {
-        name: 'Assurance habitation',
-        icon: '🛡️',
-        allocated: 420,
-        expenses: [
-          { icon: '📋', desc: 'Prime annuelle', amount: 420, taken: true },
-        ],
-      },
-      {
-        name: 'Entretien maison',
-        icon: '🏠',
-        allocated: 500,
-        expenses: [
-          { icon: '🔧', desc: 'Chaudière', amount: 120, taken: true },
-          { icon: '🪟', desc: 'Vitrier', amount: 80 },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Budgets d'Avril 2024",
-    showAdd: true,
-    budgets: [
-      {
-        name: 'Vacances',
-        icon: '🏖️',
-        allocated: 350,
-        expenses: [
-          { icon: '🚄', desc: 'Billet train', amount: 45, taken: true },
-          { icon: '🏨', desc: 'Réservation hôtel deux nuits avec petit-déjeuner inclus au bord de la mer', amount: 90 },
-          { icon: '🚗', desc: 'Location voiture 3 jours', amount: 75, taken: true },
-          { icon: '🎫', desc: 'Activités (plongée, visite)', amount: 40 },
-          { icon: '🍽️', desc: 'Restaurant sur place', amount: 30, taken: true },
-          { icon: '🎁', desc: 'Souvenirs', amount: 15 },
-        ],
-      },
-      {
-        name: 'Sorties',
-        icon: '🎬',
-        allocated: 120,
-        expenses: [
-          { icon: '🍽️', desc: 'Restaurant', amount: 42, taken: true },
-          { icon: '🎬', desc: 'Cinéma', amount: 14 },
-          { icon: '🍺', desc: 'Bar', amount: 22, taken: true },
-          { icon: '🎸', desc: 'Concert', amount: 38 },
-          { icon: '☕', desc: 'Café', amount: 12, taken: true },
-        ],
-      },
-    ],
-  },
-];
+const LOADING_MONTHS_TEXT = 'Chargement des mois en cours';
 
 export class BuddjScreenBudgets extends HTMLElement {
   static readonly tagName = 'buddj-screen-budgets';
 
+  private _monthStore?: MonthStore;
+  private _loadingModal?: BuddjLoadingModal;
+  private _monthListenersAttached = false;
+
+  init({ monthStore }: { monthStore: MonthStore }): void {
+    this._monthStore = monthStore;
+  }
+
   connectedCallback(): void {
-    if (this.querySelector('.budget-list')) return;
+    if (this.querySelector('#budgets')) return;
     const main = document.createElement('main');
     main.id = 'budgets';
     main.className = 'screen screen--budgets';
@@ -120,12 +37,64 @@ export class BuddjScreenBudgets extends HTMLElement {
       </div>
       <section class="budget-list"></section>
     `;
-    const listSection = main.querySelector('.budget-list')!;
-    for (const group of BUDGET_GROUPS) {
+    this.appendChild(main);
+    this.attachListeners();
+    if (this._monthStore && !this._monthListenersAttached) {
+      this._attachMonthStoreListeners();
+      this._monthStore.emitAction('loadUnarchivedMonths');
+    }
+  }
+
+  disconnectedCallback(): void {
+    this._detachMonthStoreListeners();
+  }
+
+  private _attachMonthStoreListeners(): void {
+    if (!this._monthStore || this._monthListenersAttached) return;
+    this._monthListenersAttached = true;
+    const loadingModal = document.createElement('buddj-loading-modal') as BuddjLoadingModal;
+    this._loadingModal = loadingModal;
+    this.appendChild(loadingModal);
+
+    this._monthStore.addEventListener('unarchivedMonthsLoading', this._onUnarchivedMonthsLoading);
+    this._monthStore.addEventListener('unarchivedMonthsLoaded', this._onUnarchivedMonthsLoaded);
+    this._monthStore.addEventListener('unarchivedMonthsLoadFailed', this._onUnarchivedMonthsLoaded);
+    this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
+  }
+
+  private _detachMonthStoreListeners(): void {
+    if (!this._monthStore || !this._monthListenersAttached) return;
+    this._monthStore.removeEventListener('unarchivedMonthsLoading', this._onUnarchivedMonthsLoading);
+    this._monthStore.removeEventListener('unarchivedMonthsLoaded', this._onUnarchivedMonthsLoaded);
+    this._monthStore.removeEventListener('unarchivedMonthsLoadFailed', this._onUnarchivedMonthsLoaded);
+    this._monthStore.removeEventListener('currentMonthChanged', this._onCurrentMonthChanged);
+    this._monthListenersAttached = false;
+    this._loadingModal?.hide();
+    this._loadingModal = undefined;
+  }
+
+  private _onUnarchivedMonthsLoading = (): void => {
+    this._loadingModal?.show(LOADING_MONTHS_TEXT);
+  };
+
+  private _onUnarchivedMonthsLoaded = (): void => {
+    this._loadingModal?.hide();
+  };
+
+  private _onCurrentMonthChanged = (e: Event): void => {
+    const ev = e as CustomEvent<{ month: MonthView | null }>;
+    this._renderBudgetGroups(ev.detail?.month ?? null);
+  };
+
+  private _renderBudgetGroups(month: MonthView | null): void {
+    const listSection = this.querySelector('.budget-list');
+    if (!listSection) return;
+    listSection.replaceChildren();
+    const groups: BudgetGroupData[] = month?.budgetGroups ?? [];
+    for (const group of groups) {
       const groupEl = document.createElement('buddj-budget-group');
       groupEl.setAttribute('title', group.title);
       if (group.previous) groupEl.setAttribute('previous', '');
-      if (group.annual) groupEl.setAttribute('annual', '');
       if (group.showAdd) groupEl.setAttribute('show-add', '');
       for (const budget of group.budgets) {
         const cardEl = document.createElement('buddj-budget-card');
@@ -144,8 +113,6 @@ export class BuddjScreenBudgets extends HTMLElement {
       }
       listSection.appendChild(groupEl);
     }
-    this.appendChild(main);
-    this.attachListeners();
   }
 
   private attachListeners(): void {
@@ -155,7 +122,6 @@ export class BuddjScreenBudgets extends HTMLElement {
         e.preventDefault();
         const drawer = document.getElementById('expense-search-drawer') as BuddjExpenseSearchDrawerElement;
         drawer?.open();
-        return;
       }
     });
   }
