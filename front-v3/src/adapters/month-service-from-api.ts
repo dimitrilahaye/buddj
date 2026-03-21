@@ -1,0 +1,26 @@
+import type { MonthService } from '../application/month/month-service.js';
+import { getReponseDataOrFail } from '../shared/get-reponse-data-or-fail.js';
+import { handleHttpError, handleNotOkResponse } from '../shared/http-error.js';
+import { type ApiMonthPayload, mapApiMonthPayloadToView } from './map-api-month-to-view.js';
+
+export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): MonthService {
+  const baseUrl = apiUrl.replace(/\/$/, '');
+  return {
+    async getUnarchivedMonths() {
+      const url = `${baseUrl}/months/unarchived`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload[]>(response, '/months/unarchived');
+      return data.map((row) => mapApiMonthPayloadToView(row));
+    },
+  };
+}
