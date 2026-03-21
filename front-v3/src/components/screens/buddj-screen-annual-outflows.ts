@@ -3,7 +3,7 @@
  * Header + sticky « Total par mois » (somme / 12) + liste scrollable des 12 mois.
  * Inspiré de l’UX du détail template (recap, charge-group, budget-group).
  */
-import type { ChargeItemData } from './buddj-screen-recurring.js';
+import type { ChargeItemData } from '../../application/month/month-types.js';
 import { formatEuros } from '../../shared/goal.js';
 import { escapeHtml } from '../../shared/escape.js';
 

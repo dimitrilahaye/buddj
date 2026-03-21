@@ -4,25 +4,7 @@
  */
 import type { BuddjChargeSearchDrawerElement } from '../organisms/buddj-charge-search-drawer.js';
 import { entryMatchesSearch } from '../../shared/search.js';
-
-export interface ChargeItemData {
-  icon: string;
-  label: string;
-  amount: number;
-  taken?: boolean;
-  previous?: boolean;
-}
-
-export interface ChargeGroupData {
-  title?: string;
-  previous?: boolean;
-  /** Groupe de charges annuelles (à faire ressortir au-dessus des charges du mois). */
-  annual?: boolean;
-  showAdd?: boolean;
-  addLabel?: string;
-  addTitle?: string;
-  charges: ChargeItemData[];
-}
+import type { ChargeGroupData } from '../../application/month/month-types.js';
 
 const CHARGE_GROUPS: ChargeGroupData[] = [
   {

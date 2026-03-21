@@ -1,10 +1,10 @@
 import { Store } from '../store.js';
 import { DEFAULT_MONTH_STATE, getCurrentMonth, type MonthState } from './month-state.js';
-import type { LoadUnarchivedMonthsFn } from './load-unarchived-months.js';
+import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
 import type { MonthView } from './month-view.js';
 
 export class MonthStore extends Store<MonthState> {
-  constructor({ loadUnarchivedMonths }: { loadUnarchivedMonths: LoadUnarchivedMonthsFn }) {
+  constructor({ loadUnarchivedMonths }: { loadUnarchivedMonths: LoadUnarchivedMonthsUseCase }) {
     super(DEFAULT_MONTH_STATE);
     this._loadUnarchivedMonths = loadUnarchivedMonths;
     this.addEventListener('loadUnarchivedMonths', () => void this.handleLoadUnarchivedMonths());
@@ -12,10 +12,26 @@ export class MonthStore extends Store<MonthState> {
     this.addEventListener('goToNextMonth', () => this.handleGoToNextMonth());
   }
 
-  private _loadUnarchivedMonths: LoadUnarchivedMonthsFn;
+  private _loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
 
   private async handleLoadUnarchivedMonths(): Promise<void> {
-    await this._loadUnarchivedMonths({ store: this });
+    this.setState({ isLoadingMonths: true, loadMonthsErrorMessage: null });
+    this.emitStateChange('unarchivedMonthsLoading');
+    try {
+      const months = await this._loadUnarchivedMonths();
+      this.setState({
+        months,
+        currentIndex: 0,
+        isLoadingMonths: false,
+        loadMonthsErrorMessage: null,
+      });
+      this.emitStateChange('unarchivedMonthsLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.setState({ isLoadingMonths: false, loadMonthsErrorMessage: message });
+      this.emitStateChange('unarchivedMonthsLoadFailed', { message });
+    }
   }
 
   private handleGoToPreviousMonth(): void {

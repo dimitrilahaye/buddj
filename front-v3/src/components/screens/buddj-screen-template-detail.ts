@@ -2,7 +2,7 @@
  * Écran Détail d’un template : total charges + budgets, switch « Par défaut »,
  * sections repliables (charges récurrentes mensuelles, budgets mensuels) avec recherche, ajout, suppression.
  */
-import type { ChargeItemData } from './buddj-screen-recurring.js';
+import type { ChargeItemData } from '../../application/month/month-types.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { formatEuros } from '../../shared/goal.js';
 import { escapeHtml } from '../../shared/escape.js';
