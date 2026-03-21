@@ -106,6 +106,17 @@ export class BuddjBudgetCard extends HTMLElement {
     modal?.show({
       title: `Voulez-vous vraiment supprimer le budget "${name}" ?`,
       onConfirm: () => {
+        const weeklyBudgetId = this.getAttribute('weekly-budget-id') ?? '';
+        if (weeklyBudgetId) {
+          this.dispatchEvent(
+            new CustomEvent('buddj-budget-delete-confirmed', {
+              bubbles: true,
+              composed: true,
+              detail: { budgetId: weeklyBudgetId },
+            }),
+          );
+          return;
+        }
         const toast = getToast();
         toast?.show({ message: 'Le budget a bien été supprimé' });
       },

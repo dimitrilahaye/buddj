@@ -9,4 +9,5 @@ export interface MonthService {
     weeklyBudgetId: string;
     expenseId: string;
   }): Promise<MonthView>;
+  deleteBudget(input: { monthId: string; budgetId: string }): Promise<MonthView>;
 }

@@ -1,6 +1,7 @@
 import { applyCheckingPayloadToMonthView } from '../application/month/expenses-checking-payload.js';
 import type { MonthService } from '../application/month/month-service.js';
 import type { MonthView } from '../application/month/month-view.js';
+import { removeBudgetFromMonthView } from '../application/month/remove-budget-from-month-view.js';
 import { removeExpenseFromMonthView } from '../application/month/remove-expense-from-month-view.js';
 
 function deepCloneMonths(source: MonthView[]): MonthView[] {
@@ -15,6 +16,7 @@ export function createMonthServiceFromInMemory({
   delayMs = 0,
   putDelayMs,
   deleteDelayMs,
+  deleteBudgetDelayMs,
 }: {
   months: MonthView[];
   /** Délai simulé pour `getUnarchivedMonths`. */
@@ -23,10 +25,13 @@ export function createMonthServiceFromInMemory({
   putDelayMs?: number;
   /** Délai simulé pour `deleteExpense` (défaut : `delayMs`). */
   deleteDelayMs?: number;
+  /** Délai simulé pour `deleteBudget` (défaut : `delayMs`). */
+  deleteBudgetDelayMs?: number;
 }): MonthService {
   let months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
   const waitDelete = deleteDelayMs ?? delayMs;
+  const waitDeleteBudget = deleteBudgetDelayMs ?? delayMs;
   return {
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
@@ -50,5 +55,27 @@ export function createMonthServiceFromInMemory({
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
     },
+    async deleteBudget({ monthId, budgetId }) {
+      if (waitDeleteBudget > 0) await new Promise((r) => setTimeout(r, waitDeleteBudget));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const month = months[idx];
+      if (weeklyBudgetHasUncheckedExpense(month, budgetId)) {
+        throw new Error('Vous ne pouvez pas supprimer ce budget');
+      }
+      const updated = removeBudgetFromMonthView(month, budgetId);
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
   };
+}
+
+function weeklyBudgetHasUncheckedExpense(month: MonthView, weeklyBudgetId: string): boolean {
+  for (const g of month.budgetGroups) {
+    for (const b of g.budgets) {
+      if (b.weeklyBudgetId !== weeklyBudgetId) continue;
+      return b.expenses.some((e) => !e.taken);
+    }
+  }
+  return false;
 }

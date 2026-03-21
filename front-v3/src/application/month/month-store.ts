@@ -4,6 +4,7 @@ import {
   buildExpensesCheckingPayload,
 } from './expenses-checking-payload.js';
 import { DEFAULT_MONTH_STATE, getCurrentMonth, type MonthState } from './month-state.js';
+import type { DeleteBudgetUseCase } from './delete-budget.js';
 import type { DeleteExpenseUseCase } from './delete-expense.js';
 import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
 import type { PutExpensesCheckingUseCase } from './put-expenses-checking.js';
@@ -11,6 +12,7 @@ import type { MonthView } from './month-view.js';
 
 export const LOADING_EXPENSES_CHECKING_TEXT = 'Mise à jour des dépenses en cours';
 export const LOADING_DELETE_EXPENSE_TEXT = 'Suppression de la dépense en cours';
+export const LOADING_DELETE_BUDGET_TEXT = 'Suppression du budget en cours';
 
 export type PutExpensesCheckingActionDetail = {
   weeklyBudgetId: string;
@@ -23,20 +25,28 @@ export type DeleteExpenseActionDetail = {
   expenseId: string;
 };
 
+export type DeleteBudgetActionDetail = {
+  /** Id enveloppe / budget hebdo (route `.../budgets/:budgetId`). */
+  budgetId: string;
+};
+
 export class MonthStore extends Store<MonthState> {
   constructor({
     loadUnarchivedMonths,
     putExpensesChecking,
     deleteExpense,
+    deleteBudget,
   }: {
     loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
     putExpensesChecking: PutExpensesCheckingUseCase;
     deleteExpense: DeleteExpenseUseCase;
+    deleteBudget: DeleteBudgetUseCase;
   }) {
     super(DEFAULT_MONTH_STATE);
     this._loadUnarchivedMonths = loadUnarchivedMonths;
     this._putExpensesChecking = putExpensesChecking;
     this._deleteExpense = deleteExpense;
+    this._deleteBudget = deleteBudget;
     this.addEventListener('loadUnarchivedMonths', () => void this.handleLoadUnarchivedMonths());
     this.addEventListener('goToPreviousMonth', () => this.handleGoToPreviousMonth());
     this.addEventListener('goToNextMonth', () => this.handleGoToNextMonth());
@@ -48,11 +58,16 @@ export class MonthStore extends Store<MonthState> {
       const d = (e as CustomEvent<DeleteExpenseActionDetail>).detail;
       if (d?.expenseId && d.weeklyBudgetId) void this.handleDeleteExpense(d);
     });
+    this.addEventListener('deleteBudget', (e: Event) => {
+      const d = (e as CustomEvent<DeleteBudgetActionDetail>).detail;
+      if (d?.budgetId) void this.handleDeleteBudget(d);
+    });
   }
 
   private _loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
   private _putExpensesChecking: PutExpensesCheckingUseCase;
   private _deleteExpense: DeleteExpenseUseCase;
+  private _deleteBudget: DeleteBudgetUseCase;
 
   private async handleLoadUnarchivedMonths(): Promise<void> {
     this.setState({ isLoadingMonths: true, loadMonthsErrorMessage: null });
@@ -129,6 +144,23 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('expenseDeleteFailed', { message });
+    }
+  }
+
+  private async handleDeleteBudget(detail: DeleteBudgetActionDetail): Promise<void> {
+    const state = this.getState();
+    const month = getCurrentMonth({ state });
+    if (!month) return;
+    this.emitStateChange('budgetDeleteLoading');
+    try {
+      const updated = await this._deleteBudget({ monthId: month.id, budgetId: detail.budgetId });
+      const months = state.months.map((m) => (m.id === updated.id ? updated : m));
+      this.setState({ months });
+      this.emitStateChange('budgetDeleteLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('budgetDeleteFailed', { message });
     }
   }
 

@@ -14,6 +14,11 @@ function messageFromUnknown(err: unknown): string {
   return err instanceof Error ? err.message : DEFAULT_ERROR_MESSAGE;
 }
 
+/** Message d’erreur à partir d’une exception fetch (réseau, etc.) — sans toast. */
+export function errorMessageFromUnknown(err: unknown): string {
+  return messageFromUnknown(err);
+}
+
 /**
  * Affiche le message d'erreur adapté dans le toast (variant error) puis lance une Error dont le message est ce texte.
  * Accepte soit { status?, message } soit { status?, err } ; si err est fourni, message dérivé via err instanceof Error ? err.message : 'Erreur réseau'.
@@ -29,13 +34,13 @@ export function handleHttpError(
 }
 
 /**
- * Lit le message d'erreur depuis le corps JSON de la réponse (body.message), sinon utilise defaultMessage,
- * puis appelle handleHttpError. À utiliser pour toute réponse !response.ok.
+ * Lit le message d’erreur depuis une réponse HTTP non OK (body.message si JSON, sinon defaultMessage).
+ * Pour 401, retourne le libellé dédié — aligné sur handleHttpError (sans toast).
  */
-export async function handleNotOkResponse(
+export async function readHttpErrorMessageFromResponse(
   response: Response,
   defaultMessage = DEFAULT_ERROR_MESSAGE
-): Promise<never> {
+): Promise<string> {
   let message = defaultMessage;
   try {
     const body = await response.json();
@@ -43,5 +48,18 @@ export async function handleNotOkResponse(
   } catch (e) {
     console.error('Erreur lors de la lecture du corps de la réponse', e);
   }
+  if (response.status === 401) return "Vous n'êtes pas connectés";
+  return message;
+}
+
+/**
+ * Lit le message d'erreur depuis le corps JSON de la réponse (body.message), sinon utilise defaultMessage,
+ * puis appelle handleHttpError. À utiliser pour toute réponse !response.ok.
+ */
+export async function handleNotOkResponse(
+  response: Response,
+  defaultMessage = DEFAULT_ERROR_MESSAGE
+): Promise<never> {
+  const message = await readHttpErrorMessageFromResponse(response, defaultMessage);
   handleHttpError({ status: response.status, message });
 }
