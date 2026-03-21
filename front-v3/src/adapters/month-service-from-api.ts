@@ -1,3 +1,4 @@
+import type { ExpensesCheckingPayload } from '../application/month/expenses-checking-payload.js';
 import type { MonthService } from '../application/month/month-service.js';
 import { getReponseDataOrFail } from '../shared/get-reponse-data-or-fail.js';
 import { handleHttpError, handleNotOkResponse } from '../shared/http-error.js';
@@ -21,6 +22,23 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       if (!response.ok) await handleNotOkResponse(response);
       const data = await getReponseDataOrFail<ApiMonthPayload[]>(response, '/months/unarchived');
       return data.map((row) => mapApiMonthPayloadToView(row));
+    },
+    async putExpensesChecking(monthId, body) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/expenses/checking`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
     },
   };
 }

@@ -60,9 +60,11 @@ function mapWeeklyBudgetToBudget({
     name: text,
     icon,
     allocated,
+    weeklyBudgetId: wb.id,
     expenses: wb.expenses.map((e) => {
       const pe = splitLeadingEmoji({ label: e.label, defaultIcon: DEFAULT_ITEM_ICON });
       return {
+        id: e.id,
         icon: pe.icon,
         desc: pe.text,
         amount: Number(e.amount),

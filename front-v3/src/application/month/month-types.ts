@@ -1,5 +1,7 @@
 /** Dépense rattachée à un budget (enveloppe). */
 export interface BudgetExpense {
+  /** Id API (requis pour PUT expenses/checking). */
+  id?: string;
   icon: string;
   desc: string;
   amount: number;
@@ -10,6 +12,8 @@ export interface Budget {
   name: string;
   icon: string;
   allocated: number;
+  /** Id hebdomadaire API (`account.weeklyBudgets[].id`). */
+  weeklyBudgetId?: string;
   expenses: BudgetExpense[];
 }
 
