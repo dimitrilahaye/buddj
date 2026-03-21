@@ -3521,10 +3521,6 @@ body.route-budgets .screen-sticky-header-wrap {
   padding: 0;
 }
 
-body.route-budgets .screen-sticky-header-wrap {
-  padding-top: 0.75rem;
-}
-
 body.route-outflows .screen-sticky-header-wrap .screen-header,
 body.route-budgets .screen-sticky-header-wrap .screen-header {
   width: 100%;
@@ -3559,6 +3555,10 @@ body.route-budgets .budget-list {
   overflow-y: auto;
   padding: 0 1.25rem 3rem;
   -webkit-overflow-scrolling: touch;
+}
+
+body.route-budgets .budget-list {
+  padding-top: 0.5rem;
 }
 
 /* ========== Écran Mois archivés ========== */
