@@ -63,7 +63,15 @@ export class BuddjExpenseItem extends HTMLElement {
       const toast = getToast();
       const message = checkbox.checked ? 'La dépense a bien été cochée' : 'La dépense a bien été décochée';
       toast?.show({ message });
-      this.dispatchEvent(new CustomEvent('buddj-expense-taken-change', { bubbles: true }));
+      const expenseId = this.getAttribute('expense-id') ?? '';
+      const card = this.closest('buddj-budget-card');
+      const weeklyBudgetId = card?.getAttribute('weekly-budget-id') ?? '';
+      this.dispatchEvent(
+        new CustomEvent('buddj-expense-taken-change', {
+          bubbles: true,
+          detail: { expenseId, weeklyBudgetId, isChecked: checkbox.checked },
+        }),
+      );
     });
   }
 

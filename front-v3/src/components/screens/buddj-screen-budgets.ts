@@ -2,7 +2,11 @@
  * Écran Mes budgets : charge les mois non archivés, barre récap + liste depuis MonthStore.
  */
 import type { BuddjExpenseSearchDrawerElement } from '../organisms/buddj-expense-search-drawer.js';
-import type { MonthStore } from '../../application/month/month-store.js';
+import {
+  LOADING_EXPENSES_CHECKING_TEXT,
+  type MonthStore,
+  type PutExpensesCheckingActionDetail,
+} from '../../application/month/month-store.js';
 import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
 import type { MonthView } from '../../application/month/month-view.js';
 import type { BudgetGroupData } from '../../application/month/month-types.js';
@@ -39,6 +43,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     `;
     this.appendChild(main);
     this.attachListeners();
+    this.attachExpenseCheckingListener(main);
     if (this._monthStore && !this._monthListenersAttached) {
       this._attachMonthStoreListeners();
       this._monthStore.emitAction('loadUnarchivedMonths');
@@ -59,6 +64,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.addEventListener('unarchivedMonthsLoading', this._onUnarchivedMonthsLoading);
     this._monthStore.addEventListener('unarchivedMonthsLoaded', this._onUnarchivedMonthsLoaded);
     this._monthStore.addEventListener('unarchivedMonthsLoadFailed', this._onUnarchivedMonthsLoaded);
+    this._monthStore.addEventListener('expensesCheckingLoading', this._onExpensesCheckingLoading);
+    this._monthStore.addEventListener('expensesCheckingLoaded', this._onExpensesCheckingLoaded);
+    this._monthStore.addEventListener('expensesCheckingFailed', this._onExpensesCheckingFailed);
     this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
   }
 
@@ -67,6 +75,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.removeEventListener('unarchivedMonthsLoading', this._onUnarchivedMonthsLoading);
     this._monthStore.removeEventListener('unarchivedMonthsLoaded', this._onUnarchivedMonthsLoaded);
     this._monthStore.removeEventListener('unarchivedMonthsLoadFailed', this._onUnarchivedMonthsLoaded);
+    this._monthStore.removeEventListener('expensesCheckingLoading', this._onExpensesCheckingLoading);
+    this._monthStore.removeEventListener('expensesCheckingLoaded', this._onExpensesCheckingLoaded);
+    this._monthStore.removeEventListener('expensesCheckingFailed', this._onExpensesCheckingFailed);
     this._monthStore.removeEventListener('currentMonthChanged', this._onCurrentMonthChanged);
     this._monthListenersAttached = false;
     this._loadingModal?.hide();
@@ -78,6 +89,18 @@ export class BuddjScreenBudgets extends HTMLElement {
   };
 
   private _onUnarchivedMonthsLoaded = (): void => {
+    this._loadingModal?.hide();
+  };
+
+  private _onExpensesCheckingLoading = (): void => {
+    this._loadingModal?.show(LOADING_EXPENSES_CHECKING_TEXT);
+  };
+
+  private _onExpensesCheckingLoaded = (): void => {
+    this._loadingModal?.hide();
+  };
+
+  private _onExpensesCheckingFailed = (): void => {
     this._loadingModal?.hide();
   };
 
@@ -101,11 +124,13 @@ export class BuddjScreenBudgets extends HTMLElement {
         cardEl.setAttribute('name', budget.name);
         cardEl.setAttribute('icon', budget.icon);
         cardEl.setAttribute('allocated', String(budget.allocated));
+        if (budget.weeklyBudgetId) cardEl.setAttribute('weekly-budget-id', budget.weeklyBudgetId);
         for (const exp of budget.expenses) {
           const itemEl = document.createElement('buddj-expense-item');
           itemEl.setAttribute('icon', exp.icon);
           itemEl.setAttribute('desc', exp.desc);
           itemEl.setAttribute('amount', String(exp.amount));
+          if (exp.id) itemEl.setAttribute('expense-id', exp.id);
           if (exp.taken) itemEl.setAttribute('taken', '');
           cardEl.appendChild(itemEl);
         }
@@ -123,6 +148,16 @@ export class BuddjScreenBudgets extends HTMLElement {
         const drawer = document.getElementById('expense-search-drawer') as BuddjExpenseSearchDrawerElement;
         drawer?.open();
       }
+    });
+  }
+
+  private attachExpenseCheckingListener(main: HTMLElement): void {
+    main.addEventListener('buddj-expense-taken-change', (e) => {
+      if (!this._monthStore) return;
+      const ev = e as CustomEvent<Partial<PutExpensesCheckingActionDetail>>;
+      const { expenseId, weeklyBudgetId, isChecked } = ev.detail ?? {};
+      if (!expenseId || !weeklyBudgetId || isChecked === undefined) return;
+      this._monthStore.emitAction('putExpensesChecking', { expenseId, weeklyBudgetId, isChecked });
     });
   }
 }
