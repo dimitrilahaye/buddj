@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createAuthServiceFromInMemory } from '../../src/adapters/auth-service-from-in-memory.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { monthServiceEmpty } from '../helpers/month-service-empty.js';
 
 describe('page Templates', () => {
   afterEach(() => {
@@ -13,7 +14,7 @@ describe('page Templates', () => {
     document.body.innerHTML = '<main id="screen-outlet" role="main"></main>';
     window.history.replaceState(null, '', '/');
 
-    bootstrap({ authService: createAuthServiceFromInMemory(false) });
+    bootstrap({ authService: createAuthServiceFromInMemory(false), monthService: monthServiceEmpty });
     await new Promise((r) => setTimeout(r, 150));
 
     const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
@@ -30,7 +31,7 @@ describe('page Templates', () => {
     document.body.innerHTML = '<main id="screen-outlet" role="main"></main>';
     window.history.replaceState(null, '', '/');
 
-    bootstrap({ authService: createAuthServiceFromInMemory(false) });
+    bootstrap({ authService: createAuthServiceFromInMemory(false), monthService: monthServiceEmpty });
     await new Promise((r) => setTimeout(r, 150));
 
     const replaceStateSpy = vi.spyOn(window.history, 'replaceState');

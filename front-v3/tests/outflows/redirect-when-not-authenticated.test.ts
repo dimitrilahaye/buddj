@@ -3,6 +3,7 @@ import { createAuthServiceFromInMemory } from '../../src/adapters/auth-service-f
 import { DEFAULT_MONTH_ID } from '../../src/router-config.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { monthServiceEmpty } from '../helpers/month-service-empty.js';
 
 describe('page Outflows (Charges)', () => {
   afterEach(() => {
@@ -14,7 +15,7 @@ describe('page Outflows (Charges)', () => {
     document.body.innerHTML = '<main id="screen-outlet" role="main"></main>';
     window.history.replaceState(null, '', '/');
 
-    bootstrap({ authService: createAuthServiceFromInMemory(false) });
+    bootstrap({ authService: createAuthServiceFromInMemory(false), monthService: monthServiceEmpty });
     await new Promise((r) => setTimeout(r, 150));
 
     const replaceStateSpy = vi.spyOn(window.history, 'replaceState');

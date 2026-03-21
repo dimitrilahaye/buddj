@@ -3,6 +3,7 @@ import { screen } from '@testing-library/dom';
 import type { AuthService } from '../../src/application/auth/auth-service.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { monthServiceEmpty } from '../helpers/month-service-empty.js';
 
 /** AuthService qui rejette avec un message (simule une erreur API). */
 function createFailingAuthService(message: string): AuthService {
@@ -38,7 +39,7 @@ describe('toast d’erreur quand la vérification auth échoue', () => {
     window.history.replaceState(null, '', '/');
 
     const errorMessage = 'Erreur serveur.';
-    bootstrap({ authService: createFailingAuthService(errorMessage) });
+    bootstrap({ authService: createFailingAuthService(errorMessage), monthService: monthServiceEmpty });
 
     await new Promise((r) => setTimeout(r, 150));
 
@@ -64,7 +65,7 @@ describe('toast d’erreur quand la vérification auth échoue', () => {
       )
     );
 
-    bootstrap({ config: { apiUrl: 'http://localhost:8080' } });
+    bootstrap({ config: { apiUrl: 'http://localhost:8080' }, monthService: monthServiceEmpty });
 
     await new Promise((r) => setTimeout(r, 150));
 
@@ -84,7 +85,7 @@ describe('toast d’erreur quand le user clique Sign In et login() throw', () =>
     window.history.replaceState(null, '', '/');
 
     const loginErrorMessage = 'Impossible d’ouvrir la fenêtre de connexion.';
-    bootstrap({ authService: createAuthServiceWithFailingLogin(loginErrorMessage) });
+    bootstrap({ authService: createAuthServiceWithFailingLogin(loginErrorMessage), monthService: monthServiceEmpty });
 
     await new Promise((r) => setTimeout(r, 150));
 

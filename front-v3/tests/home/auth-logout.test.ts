@@ -3,6 +3,7 @@ import { screen } from '@testing-library/dom';
 import type { AuthService } from '../../src/application/auth/auth-service.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { monthServiceEmpty } from '../helpers/month-service-empty.js';
 
 /** AuthService authentifié : isAuthenticated true, logout() ne résout jamais (pour garder la modal visible). */
 function createAuthServiceWithPendingLogout(): AuthService {
@@ -56,7 +57,7 @@ describe('logout (menu burger)', () => {
       '<main id="screen-outlet" role="main"></main><buddj-nav></buddj-nav><buddj-burger-panel id="burger-panel"></buddj-burger-panel><buddj-toast></buddj-toast>';
     window.history.replaceState(null, '', '/');
 
-    bootstrap({ authService: createAuthServiceWithPendingLogout() });
+    bootstrap({ authService: createAuthServiceWithPendingLogout(), monthService: monthServiceEmpty });
     await waitForRedirectToBudgets();
 
     screen.getByRole('button', { name: 'Ouvrir le menu' }).click();
@@ -76,7 +77,7 @@ describe('logout (menu burger)', () => {
     window.history.replaceState(null, '', '/');
 
     const errorMessage = 'Erreur serveur lors de la déconnexion.';
-    bootstrap({ authService: createAuthServiceWithFailingLogout(errorMessage) });
+    bootstrap({ authService: createAuthServiceWithFailingLogout(errorMessage), monthService: monthServiceEmpty });
     await waitForRedirectToBudgets();
 
     const currentPath = window.location.pathname;
@@ -100,7 +101,7 @@ describe('logout (menu burger)', () => {
 
     const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
 
-    bootstrap({ authService: createAuthServiceWithSuccessLogout() });
+    bootstrap({ authService: createAuthServiceWithSuccessLogout(), monthService: monthServiceEmpty });
     await waitForRedirectToBudgets();
 
     replaceStateSpy.mockClear();

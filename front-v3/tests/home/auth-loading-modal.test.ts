@@ -3,6 +3,7 @@ import { screen } from '@testing-library/dom';
 import type { AuthService } from '../../src/application/auth/auth-service.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { monthServiceEmpty } from '../helpers/month-service-empty.js';
 
 /** AuthService qui résout après un délai (pour garder la modal de chargement visible). */
 function createDelayedAuthService(result: boolean, delayMs: number): AuthService {
@@ -23,6 +24,7 @@ describe('modal de chargement (auth)', () => {
 
     bootstrap({
       authService: createDelayedAuthService(false, 80),
+      monthService: monthServiceEmpty,
     });
 
     await new Promise((r) => setTimeout(r, 20));

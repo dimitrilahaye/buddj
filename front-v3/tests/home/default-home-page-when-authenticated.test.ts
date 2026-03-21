@@ -3,13 +3,14 @@ import { screen } from '@testing-library/dom';
 import { createAuthServiceFromInMemory } from '../../src/adapters/auth-service-from-in-memory.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { monthServiceEmpty } from '../helpers/month-service-empty.js';
 
 describe("home quand l'utilisateur est authentifié", () => {
   it('redirige vers /budgets et masque la modal de chargement', async () => {
     document.body.innerHTML = '<main id="screen-outlet" role="main"></main>';
     window.history.replaceState(null, '', '/');
 
-    bootstrap({ authService: createAuthServiceFromInMemory(true) });
+    bootstrap({ authService: createAuthServiceFromInMemory(true), monthService: monthServiceEmpty });
 
     await new Promise((r) => setTimeout(r, 100));
 
