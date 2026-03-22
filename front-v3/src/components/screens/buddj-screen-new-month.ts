@@ -3,7 +3,7 @@
  * rappels (annuelles, mois précédents), solde prévisionnel, CTA.
  */
 import type { BuddjConfirmModalElement } from '../molecules/buddj-confirm-modal.js';
-import type { BudgetChargeDrawerOnValidate } from '../organisms/buddj-budget-add-drawer.js';
+import type { BuddjBudgetAddDrawerElement, BudgetChargeDrawerOnValidate } from '../organisms/buddj-budget-add-drawer.js';
 import type { BuddjNewMonthChargeSearchDrawerElement } from '../organisms/buddj-new-month-charge-search-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from '../organisms/buddj-calculator-drawer.js';
@@ -413,23 +413,22 @@ export class BuddjScreenNewMonth extends HTMLElement {
   }
 
   private openAddBudget(): void {
-    const drawer = document.getElementById('budget-add-drawer') as HTMLElement & { open: (o?: object) => void };
-    drawer?.open?.();
-    const handler = (e: Event): void => {
-      const ev = e as CustomEvent<{ label: string; amount: string; emoji: string }>;
-      this._budgets.push({
-        id: 'b' + Date.now(),
-        icon: ev.detail?.emoji ?? '💰',
-        label: ev.detail?.label ?? '',
-        amount: parseAmount(ev.detail?.amount ?? '0'),
-        hidden: false,
-      });
-      document.removeEventListener('buddj-budget-add-done', handler);
-      this.render();
-      this.attachListeners();
-      this.updateProjected();
-    };
-    document.addEventListener('buddj-budget-add-done', handler);
+    const drawer = document.getElementById('budget-add-drawer') as BuddjBudgetAddDrawerElement | null;
+    drawer?.open?.({
+      onValidate: (label: string, amount: string, emoji: string) => {
+        this._budgets.push({
+          id: 'b' + Date.now(),
+          icon: emoji ?? '💰',
+          label,
+          amount: parseAmount(amount),
+          hidden: false,
+        });
+        getToast()?.show({ message: 'Le budget a bien été ajouté' });
+        this.render();
+        this.attachListeners();
+        this.updateProjected();
+      },
+    });
   }
 
   private deleteCharge(id: string): void {
@@ -501,9 +500,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
   private editBudget(id: string): void {
     const b = this._budgets.find((x) => x.id === id);
     if (!b) return;
-    const drawer = document.getElementById('budget-add-drawer') as HTMLElement & {
-      open: (o: { title?: string; initialLabel: string; initialAmount: string; initialEmoji: string; onValidate: BudgetChargeDrawerOnValidate }) => void;
-    };
+    const drawer = document.getElementById('budget-add-drawer') as BuddjBudgetAddDrawerElement | null;
     drawer?.open?.({
       title: 'Modifier le budget',
       initialLabel: b.label,
@@ -513,6 +510,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
         b.label = label;
         b.amount = parseAmount(amount);
         b.icon = emoji;
+        getToast()?.show({ message: 'Le budget a bien été modifié' });
         this.render();
         this.attachListeners();
         this.updateProjected();

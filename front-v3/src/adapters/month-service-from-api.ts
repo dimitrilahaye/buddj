@@ -77,6 +77,23 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
     },
+    async createBudget({ monthId, name, initialBalance }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/budgets/`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, initialBalance }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
     async deleteBudget({ monthId, budgetId }) {
       const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/budgets/${encodeURIComponent(budgetId)}`;
       let response: Response;

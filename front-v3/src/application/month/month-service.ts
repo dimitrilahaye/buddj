@@ -16,4 +16,9 @@ export interface MonthService {
     label: string;
     amount: number;
   }): Promise<MonthView>;
+  createBudget(input: {
+    monthId: string;
+    name: string;
+    initialBalance: number;
+  }): Promise<MonthView>;
 }

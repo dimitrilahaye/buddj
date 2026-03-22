@@ -6,6 +6,7 @@ import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { parseEurosToNumber } from '../../shared/goal.js';
 
 const DEFAULT_BUDGET_EMOJI = '💰';
 
@@ -21,7 +22,7 @@ export interface BudgetAddDrawerOptions {
   onValidate?: BudgetChargeDrawerOnValidate;
 }
 
-export type BuddjBudgetAddDrawerElement = HTMLElement & { open: () => void };
+export type BuddjBudgetAddDrawerElement = HTMLElement & { open: (opts?: BudgetAddDrawerOptions) => void };
 
 export class BuddjBudgetAddDrawer extends HTMLElement {
   static readonly tagName = 'buddj-budget-add-drawer';
@@ -144,14 +145,25 @@ export class BuddjBudgetAddDrawer extends HTMLElement {
       toast?.show({ message: 'Le champ libellé est requis', variant: 'warning' });
       return;
     }
-    this.close();
     if (this._onValidate) {
+      this.close();
       this._onValidate(this._label, this._amount, this._emoji);
-      toast?.show({ message: 'Le budget a bien été modifié' });
-    } else {
-      this.dispatchEvent(new CustomEvent('buddj-budget-add-done', { bubbles: true, detail: { label: this._label, amount: this._amount, emoji: this._emoji } }));
-      toast?.show({ message: 'Le budget a bien été ajouté' });
+      return;
     }
+    const initialBalance = parseEurosToNumber(this._amount);
+    if (initialBalance <= 0) {
+      toast?.show({ message: 'Le montant doit être supérieur à 0', variant: 'warning' });
+      return;
+    }
+    const apiName = `${this._emoji} ${this._label}`.trim();
+    this.close();
+    this.dispatchEvent(
+      new CustomEvent('buddj-budget-create-submit', {
+        bubbles: true,
+        composed: true,
+        detail: { name: apiName, initialBalance },
+      }),
+    );
   }
 }
 

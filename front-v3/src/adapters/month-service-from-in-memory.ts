@@ -1,3 +1,4 @@
+import { addBudgetToMonthView } from '../application/month/add-budget-to-month-view.js';
 import { addExpenseToMonthView } from '../application/month/add-expense-to-month-view.js';
 import { applyCheckingPayloadToMonthView } from '../application/month/expenses-checking-payload.js';
 import type { MonthService } from '../application/month/month-service.js';
@@ -19,6 +20,7 @@ export function createMonthServiceFromInMemory({
   deleteDelayMs,
   deleteBudgetDelayMs,
   createExpenseDelayMs,
+  createBudgetDelayMs,
 }: {
   months: MonthView[];
   /** Délai simulé pour `getUnarchivedMonths`. */
@@ -31,12 +33,15 @@ export function createMonthServiceFromInMemory({
   deleteBudgetDelayMs?: number;
   /** Délai simulé pour `createExpense` (défaut : `delayMs`). */
   createExpenseDelayMs?: number;
+  /** Délai simulé pour `createBudget` (défaut : `delayMs`). */
+  createBudgetDelayMs?: number;
 }): MonthService {
   const months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
   const waitDelete = deleteDelayMs ?? delayMs;
   const waitDeleteBudget = deleteBudgetDelayMs ?? delayMs;
   const waitCreateExpense = createExpenseDelayMs ?? delayMs;
+  const waitCreateBudget = createBudgetDelayMs ?? delayMs;
   return {
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
@@ -69,6 +74,19 @@ export function createMonthServiceFromInMemory({
         id: expenseId,
         apiLabel: label,
         amount,
+      });
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
+    async createBudget({ monthId, name, initialBalance }) {
+      if (waitCreateBudget > 0) await new Promise((r) => setTimeout(r, waitCreateBudget));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const weeklyBudgetId = crypto.randomUUID();
+      const updated = addBudgetToMonthView(months[idx], {
+        weeklyBudgetId,
+        apiName: name,
+        initialBalance,
       });
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
