@@ -2,9 +2,11 @@
  * Écran Charges récurrentes : header avec icône recherche + section avec titre, groupes de charges construits à partir d’un tableau de données.
  * Filtrage en temps réel par intitulé ou montant via le drawer de recherche.
  */
+import type { BuddjChargeAddDrawerElement } from '../organisms/buddj-charge-add-drawer.js';
 import type { BuddjChargeSearchDrawerElement } from '../organisms/buddj-charge-search-drawer.js';
 import { entryMatchesSearch } from '../../shared/search.js';
 import type { ChargeGroupData } from '../../application/month/month-types.js';
+import { escapeAttr } from '../../shared/escape.js';
 
 const CHARGE_GROUPS: ChargeGroupData[] = [
   {
@@ -37,6 +39,11 @@ const CHARGE_GROUPS: ChargeGroupData[] = [
   },
 ];
 
+const HEADER_ADD_CHARGE = CHARGE_GROUPS.find((g) => g.showAdd);
+const HEADER_ADD_CHARGE_TITLE_ATTR = escapeAttr(
+  HEADER_ADD_CHARGE?.addTitle ?? 'Ajouter une charge récurrente'
+);
+
 export class BuddjScreenRecurring extends HTMLElement {
   static readonly tagName = 'buddj-screen-recurring';
 
@@ -65,6 +72,11 @@ export class BuddjScreenRecurring extends HTMLElement {
           <div class="screen-header-row screen-header-row--title">
             <h1 class="title">Charges récurrentes</h1>
             <buddj-icon-search title="Rechercher par intitulé ou montant" aria-label="Ouvrir la recherche"></buddj-icon-search>
+            ${
+              HEADER_ADD_CHARGE
+                ? `<buddj-btn-add label="" title="${HEADER_ADD_CHARGE_TITLE_ATTR}" data-header-add-charge></buddj-btn-add>`
+                : ''
+            }
           </div>
         </header>
       </div>
@@ -78,7 +90,10 @@ export class BuddjScreenRecurring extends HTMLElement {
       if (group.previous) groupEl.setAttribute('previous', '');
       if (group.annual) groupEl.setAttribute('annual', '');
       if (group.title) groupEl.setAttribute('title', group.title);
-      if (group.showAdd) groupEl.setAttribute('show-add', '');
+      if (group.showAdd) {
+        groupEl.setAttribute('show-add', '');
+        groupEl.setAttribute('hide-inline-add', '');
+      }
       if (group.addLabel) groupEl.setAttribute('add-label', group.addLabel);
       if (group.addTitle) groupEl.setAttribute('add-title', group.addTitle);
       for (const charge of group.charges) {
@@ -103,9 +118,16 @@ export class BuddjScreenRecurring extends HTMLElement {
 
   private attachListeners(): void {
     this.addEventListener('click', (e) => {
-      if ((e.target as Element).closest('buddj-icon-search')) {
+      const target = e.target as Element;
+      if (target.closest('buddj-icon-search')) {
         e.preventDefault();
         const drawer = document.getElementById('charge-search-drawer') as BuddjChargeSearchDrawerElement;
+        drawer?.open();
+        return;
+      }
+      if (target.closest('[data-header-add-charge]')) {
+        e.preventDefault();
+        const drawer = document.getElementById('charge-add-drawer') as BuddjChargeAddDrawerElement;
         drawer?.open();
       }
     });

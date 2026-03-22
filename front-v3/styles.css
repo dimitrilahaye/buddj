@@ -370,6 +370,10 @@ buddj-icon-save {
   flex-shrink: 0;
 }
 
+.screen-header-row--title buddj-btn-add {
+  flex-shrink: 0;
+}
+
 .screen-header-row .buddj-icon-search__svg {
   width: 1.25rem;
   height: 1.25rem;
@@ -776,6 +780,16 @@ buddj-screen-new-month .new-month-row-amount {
   background: linear-gradient(135deg, #c96a52, #b85a42);
   color: var(--white);
   box-shadow: 0 4px 14px var(--coral-glow);
+}
+
+.btn--add--icon-only {
+  padding: 0.45rem 0.55rem;
+  min-width: 2.25rem;
+  justify-content: center;
+}
+
+.btn--add--icon-only .btn-icon {
+  margin-right: 0;
 }
 
 /* Bouton transférer le reste */

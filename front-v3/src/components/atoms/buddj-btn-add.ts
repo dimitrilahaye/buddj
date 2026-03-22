@@ -1,5 +1,5 @@
 /**
- * Bouton « Ajouter » réutilisable : avec label (coral, texte + icône) ou icône seule (sans label, style menthe).
+ * Bouton « Ajouter » réutilisable (coral) : texte + « + », ou `label=""` pour n’afficher que le « + » (même style).
  */
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 
@@ -21,11 +21,13 @@ export class BuddjBtnAdd extends HTMLElement {
   private render(): void {
     const label = this.getAttribute('label') ?? '';
     const title = this.getAttribute('title') ?? 'Ajouter';
+    const iconOnly = label.trim() === '';
+    const compactClass = iconOnly ? ' btn--add--icon-only' : '';
 
     this.innerHTML = `
-    <button type="button" class="btn btn--add" title="${escapeAttr(title)}" aria-label="${escapeAttr(title)}">
+    <button type="button" class="btn btn--add${compactClass}" title="${escapeAttr(title)}" aria-label="${escapeAttr(title)}">
       <span class="btn-icon" aria-hidden="true">+</span>
-      ${escapeHtml(label)}
+      ${iconOnly ? '' : escapeHtml(label)}
     </button>
   `;
   }

@@ -32,20 +32,29 @@ export class BuddjChargeGroup extends HTMLElement {
     const searchHtml = showSearch
       ? `<buddj-icon-search class="template-section-search charge-group-search" title="Rechercher dans les charges" aria-label="Rechercher les charges"></buddj-icon-search>`
       : '';
+    const hideInlineAdd = this.hasAttribute('hide-inline-add');
     if (showAdd) {
-      div.innerHTML = `
+      const addBtnHtml = hideInlineAdd
+        ? ''
+        : `<buddj-btn-add label="${escapeAttr(addLabel)}" title="${escapeAttr(addTitle)}"></buddj-btn-add>`;
+      const actionsInner = `${addBtnHtml}${searchHtml}`;
+      const hasActionsRow = actionsInner.trim() !== '';
+      if (hasActionsRow) {
+        div.innerHTML = `
         <div class="charge-group-title-row">
           <div class="charge-group-title-block">
             <h3 class="charge-group-title">${escapeHtml(title)}</h3>
             ${recapHtml}
           </div>
           <div class="charge-group-actions">
-            <buddj-btn-add label="${escapeAttr(addLabel)}" title="${escapeAttr(addTitle)}"></buddj-btn-add>
-            ${searchHtml}
+            ${actionsInner}
           </div>
         </div>
         <ul class="charge-list"></ul>
       `;
+      } else {
+        div.innerHTML = `<div class="charge-group-title-block"><h3 class="charge-group-title">${escapeHtml(title)}</h3>${recapHtml}</div><ul class="charge-list"></ul>`;
+      }
     } else {
       div.innerHTML = `<div class="charge-group-title-block"><h3 class="charge-group-title">${escapeHtml(title)}</h3>${recapHtml}</div><ul class="charge-list"></ul>`;
     }
@@ -74,7 +83,7 @@ export class BuddjChargeGroup extends HTMLElement {
     this.innerHTML = '';
     this.appendChild(div);
 
-    if (showAdd) {
+    if (showAdd && !hideInlineAdd) {
       const addBtn = div.querySelector('buddj-btn-add');
       addBtn?.addEventListener('click', () => {
         const drawer = document.getElementById('charge-add-drawer') as BuddjChargeAddDrawerElement;

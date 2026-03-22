@@ -1,6 +1,7 @@
 /**
  * Écran Mes budgets : charge les mois non archivés, barre récap + liste depuis MonthStore.
  */
+import type { BuddjBudgetAddDrawerElement } from '../organisms/buddj-budget-add-drawer.js';
 import type { BuddjExpenseSearchDrawerElement } from '../organisms/buddj-expense-search-drawer.js';
 import {
   LOADING_DELETE_BUDGET_TEXT,
@@ -50,6 +51,7 @@ export class BuddjScreenBudgets extends HTMLElement {
             <h1 class="title">Mes budgets</h1>
             <buddj-icon-search title="Rechercher par intitulé ou montant" aria-label="Ouvrir la recherche"></buddj-icon-search>
             <buddj-toggle-all target-selector=".budget-details" title-expand="Déplier tous les budgets" title-collapse="Replier tous les budgets"></buddj-toggle-all>
+            <buddj-btn-add label="" title="Ajouter un budget" data-budget-header-add hidden></buddj-btn-add>
           </div>
         </header>
       </div>
@@ -177,8 +179,13 @@ export class BuddjScreenBudgets extends HTMLElement {
     }
     listSection.replaceChildren();
     const groups: BudgetGroupData[] = month?.budgetGroups ?? [];
+    const headerAddBtn = this.querySelector('[data-budget-header-add]');
+    if (headerAddBtn) {
+      headerAddBtn.toggleAttribute('hidden', !groups.some((g) => g.showAdd));
+    }
     for (const group of groups) {
       const groupEl = document.createElement('buddj-budget-group');
+      groupEl.setAttribute('hide-inline-add', '');
       groupEl.setAttribute('title', group.title);
       if (group.previous) groupEl.setAttribute('previous', '');
       if (group.showAdd) groupEl.setAttribute('show-add', '');
@@ -213,6 +220,13 @@ export class BuddjScreenBudgets extends HTMLElement {
       if (target.closest('buddj-icon-search')) {
         e.preventDefault();
         const drawer = document.getElementById('expense-search-drawer') as BuddjExpenseSearchDrawerElement;
+        drawer?.open();
+        return;
+      }
+      const headerAdd = target.closest('[data-budget-header-add]');
+      if (headerAdd && !headerAdd.hasAttribute('hidden')) {
+        e.preventDefault();
+        const drawer = document.getElementById('budget-add-drawer') as BuddjBudgetAddDrawerElement;
         drawer?.open();
       }
     });

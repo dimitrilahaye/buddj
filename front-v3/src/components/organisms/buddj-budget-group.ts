@@ -34,22 +34,37 @@ export class BuddjBudgetGroup extends HTMLElement {
     const searchHtml = showSearch
       ? `<buddj-icon-search class="template-section-search template-section-search--expenses budget-group-search" title="Rechercher un budget" aria-label="Rechercher un budget"></buddj-icon-search>`
       : '';
+    const hideInlineAdd = this.hasAttribute('hide-inline-add');
     const div = document.createElement('div');
     div.className = groupClass;
     if (showAdd) {
-      div.innerHTML = `
+      const addBtnHtml = hideInlineAdd
+        ? ''
+        : `<buddj-btn-add label="Ajouter un budget" title="Ajouter un budget" data-budget-add-btn></buddj-btn-add>`;
+      const actionsInner = `${addBtnHtml}${searchHtml}`;
+      const hasActionsRow = actionsInner.trim() !== '';
+      if (hasActionsRow) {
+        div.innerHTML = `
         <div class="budget-group-title-row">
           <div class="budget-group-title-block">
             <h3 class="budget-group-title">${escapeHtml(title)}</h3>
             ${recapHtml}
           </div>
           <div class="budget-group-actions">
-            <buddj-btn-add label="Ajouter un budget" title="Ajouter un budget" data-budget-add-btn></buddj-btn-add>
-            ${searchHtml}
+            ${actionsInner}
           </div>
         </div>
         <div class="budget-group-list"></div>
       `;
+      } else {
+        div.innerHTML = `
+        <div class="budget-group-title-block">
+          <h3 class="budget-group-title">${escapeHtml(title)}</h3>
+          ${recapHtml}
+        </div>
+        <div class="budget-group-list"></div>
+      `;
+      }
       const addBtn = div.querySelector('[data-budget-add-btn]');
       addBtn?.addEventListener('click', () => {
         const drawer = document.getElementById('budget-add-drawer') as BuddjBudgetAddDrawerElement;
