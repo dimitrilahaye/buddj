@@ -2,6 +2,7 @@
  * Drawer de recherche des dépenses. Délègue l’UI au shell buddj-search-drawer ;
  * ne contient que la logique de collecte et de création des lignes miroir pour les dépenses.
  */
+import { formatEuros } from '../../shared/goal.js';
 import type { BuddjSearchDrawerElement, SearchDrawerEntry } from './buddj-search-drawer.js';
 
 const CHECKBOX_ID_PREFIX = 'buddj-expense-search-cb-';
@@ -58,6 +59,10 @@ export class BuddjExpenseSearchDrawer extends HTMLElement {
     checkbox.id = cbId;
     checkbox.className = 'expense-taken';
     checkbox.title = 'Appuyer pour marquer comme débité ou non';
+    checkbox.setAttribute(
+      'aria-label',
+      `Dépense ${entry.label}, ${formatEuros(parseFloat(String(entry.amount)) || 0)}`,
+    );
     checkbox.checked = realCheckbox?.checked ?? false;
     checkbox.slot = 'prefix';
 
