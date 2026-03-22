@@ -104,7 +104,7 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
           headers: { Accept: 'application/json' },
         });
       } catch (err) {
-        throw new Error(errorMessageFromUnknown(err));
+        throw new Error(errorMessageFromUnknown(err), { cause: err });
       }
       if (!response.ok) {
         const message = await readHttpErrorMessageFromResponse(response, `Erreur ${response.status}`);
