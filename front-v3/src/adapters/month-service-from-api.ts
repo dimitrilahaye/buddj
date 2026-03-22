@@ -113,5 +113,22 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
     },
+    async updateBudget({ monthId, budgetId, name }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/budgets/${encodeURIComponent(budgetId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
   };
 }

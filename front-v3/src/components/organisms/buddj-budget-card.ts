@@ -90,6 +90,18 @@ export class BuddjBudgetCard extends HTMLElement {
       initialLabel: currentName,
       initialEmoji: currentIcon,
       onValidate: (newName: string, newEmoji: string) => {
+        const weeklyBudgetId = this.getAttribute('weekly-budget-id') ?? '';
+        const apiName = `${newEmoji} ${newName}`.trim();
+        if (weeklyBudgetId) {
+          this.dispatchEvent(
+            new CustomEvent('buddj-budget-update-confirmed', {
+              bubbles: true,
+              composed: true,
+              detail: { budgetId: weeklyBudgetId, name: apiName },
+            }),
+          );
+          return;
+        }
         this.setAttribute('name', newName);
         this.setAttribute('icon', newEmoji);
         const nameEl = this.querySelector('.budget-name-text');

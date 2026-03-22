@@ -108,7 +108,6 @@ export class BuddjBudgetEditDrawer extends HTMLElement {
     }
     this._onValidate?.(label, this._emoji);
     this.close();
-    toast?.show({ message: 'Le budget a bien été modifié' });
   }
 }
 

@@ -4,6 +4,7 @@ import { applyCheckingPayloadToMonthView } from '../application/month/expenses-c
 import type { MonthService } from '../application/month/month-service.js';
 import type { MonthView } from '../application/month/month-view.js';
 import { removeBudgetFromMonthView } from '../application/month/remove-budget-from-month-view.js';
+import { updateBudgetInMonthView } from '../application/month/update-budget-in-month-view.js';
 import { removeExpenseFromMonthView } from '../application/month/remove-expense-from-month-view.js';
 
 function deepCloneMonths(source: MonthView[]): MonthView[] {
@@ -21,6 +22,7 @@ export function createMonthServiceFromInMemory({
   deleteBudgetDelayMs,
   createExpenseDelayMs,
   createBudgetDelayMs,
+  updateBudgetDelayMs,
 }: {
   months: MonthView[];
   /** Délai simulé pour `getUnarchivedMonths`. */
@@ -35,6 +37,8 @@ export function createMonthServiceFromInMemory({
   createExpenseDelayMs?: number;
   /** Délai simulé pour `createBudget` (défaut : `delayMs`). */
   createBudgetDelayMs?: number;
+  /** Délai simulé pour `updateBudget` (défaut : `delayMs`). */
+  updateBudgetDelayMs?: number;
 }): MonthService {
   const months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
@@ -42,6 +46,7 @@ export function createMonthServiceFromInMemory({
   const waitDeleteBudget = deleteBudgetDelayMs ?? delayMs;
   const waitCreateExpense = createExpenseDelayMs ?? delayMs;
   const waitCreateBudget = createBudgetDelayMs ?? delayMs;
+  const waitUpdateBudget = updateBudgetDelayMs ?? delayMs;
   return {
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
@@ -100,6 +105,14 @@ export function createMonthServiceFromInMemory({
         throw new Error('Vous ne pouvez pas supprimer ce budget');
       }
       const updated = removeBudgetFromMonthView(month, budgetId);
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
+    async updateBudget({ monthId, budgetId, name }) {
+      if (waitUpdateBudget > 0) await new Promise((r) => setTimeout(r, waitUpdateBudget));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const updated = updateBudgetInMonthView(months[idx], budgetId, name);
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
     },
