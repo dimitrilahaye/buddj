@@ -1,4 +1,3 @@
-import type { ExpensesCheckingPayload } from '../application/month/expenses-checking-payload.js';
 import type { MonthService } from '../application/month/month-service.js';
 import { getReponseDataOrFail } from '../shared/get-reponse-data-or-fail.js';
 import {

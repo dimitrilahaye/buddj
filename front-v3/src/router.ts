@@ -26,8 +26,6 @@ export type RouteDef = {
   handle: RouteHandler;
 };
 
-const DEFAULT_MONTH_ID = '2024-04';
-
 function getQuery(): Record<string, string> {
   const q: Record<string, string> = {};
   new URLSearchParams(window.location.search).forEach((value, key) => {
@@ -67,7 +65,6 @@ export type DefaultRoute = {
 export function createRouter({
   outlet,
   routes,
-  defaultMonthId = DEFAULT_MONTH_ID,
   defaultRoute,
 }: {
   outlet: HTMLElement;

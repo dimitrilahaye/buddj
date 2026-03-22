@@ -32,7 +32,7 @@ export function createMonthServiceFromInMemory({
   /** Délai simulé pour `createExpense` (défaut : `delayMs`). */
   createExpenseDelayMs?: number;
 }): MonthService {
-  let months = deepCloneMonths(initialMonths);
+  const months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
   const waitDelete = deleteDelayMs ?? delayMs;
   const waitDeleteBudget = deleteBudgetDelayMs ?? delayMs;
