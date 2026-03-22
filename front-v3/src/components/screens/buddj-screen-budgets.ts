@@ -163,6 +163,8 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _onCurrentMonthChanged = (e: Event): void => {
     const ev = e as CustomEvent<{ month: MonthView | null }>;
     this._renderBudgetGroups(ev.detail?.month ?? null);
+    const drawer = document.getElementById('expense-search-drawer') as BuddjExpenseSearchDrawerElement | null;
+    drawer?.refresh();
   };
 
   private _renderBudgetGroups(month: MonthView | null): void {

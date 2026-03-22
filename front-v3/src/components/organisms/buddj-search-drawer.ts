@@ -26,7 +26,10 @@ export interface SearchDrawerConfig {
   eventName?: string;
 }
 
-export type BuddjSearchDrawerElement = HTMLElement & { open: (config: SearchDrawerConfig) => void };
+export type BuddjSearchDrawerElement = HTMLElement & {
+  open: (config: SearchDrawerConfig) => void;
+  refresh: () => void;
+};
 
 const DATA_BACKDROP = 'data-search-drawer-backdrop';
 const DATA_INPUT = 'data-search-drawer-input';
@@ -47,6 +50,12 @@ export class BuddjSearchDrawer extends HTMLElement {
     this.updateResults();
     const input = this.querySelector<HTMLInputElement>(`[${DATA_INPUT}]`);
     requestAnimationFrame(() => input?.focus());
+  }
+
+  /** Recalcule les entrées (ex. après suppression d’une dépense) en conservant la requête courante. */
+  refresh(): void {
+    if (!this.classList.contains('search-drawer--open') || !this._config) return;
+    this.updateResults();
   }
 
   close(): void {

@@ -7,7 +7,7 @@ import type { BuddjSearchDrawerElement, SearchDrawerEntry } from './buddj-search
 const CHECKBOX_ID_PREFIX = 'buddj-expense-search-cb-';
 const EVENT_SEARCH = 'buddj-expense-search';
 
-export type BuddjExpenseSearchDrawerElement = HTMLElement & { open: () => void };
+export type BuddjExpenseSearchDrawerElement = HTMLElement & { open: () => void; refresh: () => void };
 
 interface ExpenseEntry extends SearchDrawerEntry {
   budgetName: string;
@@ -23,6 +23,10 @@ export class BuddjExpenseSearchDrawer extends HTMLElement {
   connectedCallback(): void {
     if (this.querySelector('buddj-search-drawer')) return;
     this.appendChild(document.createElement('buddj-search-drawer'));
+  }
+
+  refresh(): void {
+    getShell(this)?.refresh();
   }
 
   open(): void {
