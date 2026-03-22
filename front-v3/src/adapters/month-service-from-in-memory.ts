@@ -1,3 +1,4 @@
+import { addExpenseToMonthView } from '../application/month/add-expense-to-month-view.js';
 import { applyCheckingPayloadToMonthView } from '../application/month/expenses-checking-payload.js';
 import type { MonthService } from '../application/month/month-service.js';
 import type { MonthView } from '../application/month/month-view.js';
@@ -9,7 +10,7 @@ function deepCloneMonths(source: MonthView[]): MonthView[] {
 }
 
 /**
- * État mutable en closure : `getUnarchivedMonths`, `putExpensesChecking` et `deleteExpense` partagent les mêmes mois.
+ * État mutable en closure : les opérations partagent les mêmes mois en mémoire.
  */
 export function createMonthServiceFromInMemory({
   months: initialMonths,
@@ -17,6 +18,7 @@ export function createMonthServiceFromInMemory({
   putDelayMs,
   deleteDelayMs,
   deleteBudgetDelayMs,
+  createExpenseDelayMs,
 }: {
   months: MonthView[];
   /** Délai simulé pour `getUnarchivedMonths`. */
@@ -27,11 +29,14 @@ export function createMonthServiceFromInMemory({
   deleteDelayMs?: number;
   /** Délai simulé pour `deleteBudget` (défaut : `delayMs`). */
   deleteBudgetDelayMs?: number;
+  /** Délai simulé pour `createExpense` (défaut : `delayMs`). */
+  createExpenseDelayMs?: number;
 }): MonthService {
   let months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
   const waitDelete = deleteDelayMs ?? delayMs;
   const waitDeleteBudget = deleteBudgetDelayMs ?? delayMs;
+  const waitCreateExpense = createExpenseDelayMs ?? delayMs;
   return {
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
@@ -52,6 +57,19 @@ export function createMonthServiceFromInMemory({
       const idx = months.findIndex((m) => m.id === monthId);
       if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
       const updated = removeExpenseFromMonthView(months[idx], weeklyBudgetId, expenseId);
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
+    async createExpense({ monthId, weeklyBudgetId, label, amount }) {
+      if (waitCreateExpense > 0) await new Promise((r) => setTimeout(r, waitCreateExpense));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const expenseId = crypto.randomUUID();
+      const updated = addExpenseToMonthView(months[idx], weeklyBudgetId, {
+        id: expenseId,
+        apiLabel: label,
+        amount,
+      });
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
     },

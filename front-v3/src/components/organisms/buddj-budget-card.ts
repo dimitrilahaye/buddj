@@ -188,7 +188,8 @@ export class BuddjBudgetCard extends HTMLElement {
       e.preventDefault();
       e.stopPropagation();
       const drawer = document.getElementById('expense-add-drawer') as BuddjExpenseAddDrawerElement;
-      drawer?.open();
+      const weeklyBudgetId = this.getAttribute('weekly-budget-id') ?? '';
+      drawer?.open({ weeklyBudgetId });
     });
   }
 

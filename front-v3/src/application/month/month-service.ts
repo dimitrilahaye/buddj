@@ -10,4 +10,10 @@ export interface MonthService {
     expenseId: string;
   }): Promise<MonthView>;
   deleteBudget(input: { monthId: string; budgetId: string }): Promise<MonthView>;
+  createExpense(input: {
+    monthId: string;
+    weeklyBudgetId: string;
+    label: string;
+    amount: number;
+  }): Promise<MonthView>;
 }

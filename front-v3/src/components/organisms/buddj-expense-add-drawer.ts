@@ -6,10 +6,15 @@ import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { parseEurosToNumber } from '../../shared/goal.js';
 
 const DEFAULT_EXPENSE_EMOJI = '🛒';
 
-export type BuddjExpenseAddDrawerElement = HTMLElement & { open: () => void };
+export type BuddjExpenseAddDrawerOpenOptions = { weeklyBudgetId?: string };
+
+export type BuddjExpenseAddDrawerElement = HTMLElement & {
+  open: (opts?: BuddjExpenseAddDrawerOpenOptions) => void;
+};
 
 export class BuddjExpenseAddDrawer extends HTMLElement {
   static readonly tagName = 'buddj-expense-add-drawer';
@@ -17,8 +22,10 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
   private _label = '';
   private _amount = '0,00 €';
   private _emoji = DEFAULT_EXPENSE_EMOJI;
+  private _weeklyBudgetId = '';
 
-  open(): void {
+  open(opts?: BuddjExpenseAddDrawerOpenOptions): void {
+    this._weeklyBudgetId = opts?.weeklyBudgetId ?? '';
     this._label = '';
     this._amount = '0,00 €';
     this._emoji = DEFAULT_EXPENSE_EMOJI;
@@ -126,8 +133,28 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
       toast?.show({ message: 'Le champ libellé est requis', variant: 'warning' });
       return;
     }
+    if (!this._weeklyBudgetId) {
+      toast?.show({ message: 'Impossible d’associer la dépense à un budget', variant: 'warning' });
+      return;
+    }
+    const amountNum = parseEurosToNumber(this._amount);
+    if (amountNum <= 0) {
+      toast?.show({ message: 'Le montant doit être supérieur à 0', variant: 'warning' });
+      return;
+    }
+    const apiLabel = `${this._emoji} ${this._label}`.trim();
     this.close();
-    toast?.show({ message: 'La dépense a bien été ajoutée' });
+    this.dispatchEvent(
+      new CustomEvent('buddj-expense-add-submit', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          weeklyBudgetId: this._weeklyBudgetId,
+          label: apiLabel,
+          amount: amountNum,
+        },
+      }),
+    );
   }
 }
 

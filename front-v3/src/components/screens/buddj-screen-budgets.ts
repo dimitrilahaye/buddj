@@ -4,9 +4,11 @@
 import type { BuddjBudgetAddDrawerElement } from '../organisms/buddj-budget-add-drawer.js';
 import type { BuddjExpenseSearchDrawerElement } from '../organisms/buddj-expense-search-drawer.js';
 import {
+  LOADING_CREATE_EXPENSE_TEXT,
   LOADING_DELETE_BUDGET_TEXT,
   LOADING_DELETE_EXPENSE_TEXT,
   LOADING_EXPENSES_CHECKING_TEXT,
+  type CreateExpenseActionDetail,
   type DeleteBudgetActionDetail,
   type DeleteExpenseActionDetail,
   type MonthStore,
@@ -39,6 +41,14 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore = monthStore;
   }
 
+  private _onExpenseAddSubmit = (e: Event): void => {
+    if (!this._monthStore) return;
+    const ev = e as CustomEvent<CreateExpenseActionDetail>;
+    const { weeklyBudgetId, label, amount } = ev.detail ?? {};
+    if (!weeklyBudgetId || !label || amount === undefined) return;
+    this._monthStore.emitAction('createExpense', { weeklyBudgetId, label, amount });
+  };
+
   connectedCallback(): void {
     if (this.querySelector('#budgets')) return;
     const main = document.createElement('main');
@@ -58,6 +68,7 @@ export class BuddjScreenBudgets extends HTMLElement {
       <section class="budget-list"></section>
     `;
     this.appendChild(main);
+    document.addEventListener('buddj-expense-add-submit', this._onExpenseAddSubmit);
     this.attachListeners();
     this.attachExpenseCheckingListener(main);
     this.attachExpenseDeleteListener(main);
@@ -69,6 +80,7 @@ export class BuddjScreenBudgets extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    document.removeEventListener('buddj-expense-add-submit', this._onExpenseAddSubmit);
     this._detachMonthStoreListeners();
   }
 
@@ -91,6 +103,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.addEventListener('budgetDeleteLoading', this._onBudgetDeleteLoading);
     this._monthStore.addEventListener('budgetDeleteLoaded', this._onBudgetDeleteLoaded);
     this._monthStore.addEventListener('budgetDeleteFailed', this._onBudgetDeleteFailed);
+    this._monthStore.addEventListener('expenseCreateLoading', this._onExpenseCreateLoading);
+    this._monthStore.addEventListener('expenseCreateLoaded', this._onExpenseCreateLoaded);
+    this._monthStore.addEventListener('expenseCreateFailed', this._onExpenseCreateFailed);
     this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
   }
 
@@ -108,6 +123,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.removeEventListener('budgetDeleteLoading', this._onBudgetDeleteLoading);
     this._monthStore.removeEventListener('budgetDeleteLoaded', this._onBudgetDeleteLoaded);
     this._monthStore.removeEventListener('budgetDeleteFailed', this._onBudgetDeleteFailed);
+    this._monthStore.removeEventListener('expenseCreateLoading', this._onExpenseCreateLoading);
+    this._monthStore.removeEventListener('expenseCreateLoaded', this._onExpenseCreateLoaded);
+    this._monthStore.removeEventListener('expenseCreateFailed', this._onExpenseCreateFailed);
     this._monthStore.removeEventListener('currentMonthChanged', this._onCurrentMonthChanged);
     this._monthListenersAttached = false;
     this._loadingModal?.hide();
@@ -160,6 +178,19 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur';
     getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+  };
+
+  private _onExpenseCreateLoading = (): void => {
+    this._loadingModal?.show(LOADING_CREATE_EXPENSE_TEXT);
+  };
+
+  private _onExpenseCreateLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'La dépense a bien été ajoutée' });
+  };
+
+  private _onExpenseCreateFailed = (): void => {
+    this._loadingModal?.hide();
   };
 
   private _onCurrentMonthChanged = (e: Event): void => {

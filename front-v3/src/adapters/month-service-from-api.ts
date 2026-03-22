@@ -61,6 +61,23 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
     },
+    async createExpense({ monthId, weeklyBudgetId, label, amount }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/weeks/${encodeURIComponent(weeklyBudgetId)}/expenses`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, amount }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
     async deleteBudget({ monthId, budgetId }) {
       const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/budgets/${encodeURIComponent(budgetId)}`;
       let response: Response;
