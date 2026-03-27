@@ -24,6 +24,7 @@ import {
 
 export const LOADING_EXPENSES_CHECKING_TEXT = 'Mise à jour des dépenses en cours';
 export const LOADING_OUTFLOWS_CHECKING_TEXT = 'Mise à jour des charges en cours';
+export const LOADING_CURRENT_BALANCE_UPDATE_TEXT = 'Mise à jour du solde en cours';
 export const LOADING_DELETE_EXPENSE_TEXT = 'Suppression de la dépense en cours';
 export const LOADING_DELETE_OUTFLOW_TEXT = 'Suppression de la charge en cours';
 export const LOADING_DELETE_BUDGET_TEXT = 'Suppression du budget en cours';
@@ -42,6 +43,10 @@ export type PutExpensesCheckingActionDetail = {
 export type PutOutflowsCheckingActionDetail = {
   outflowId: string;
   isChecked: boolean;
+};
+
+export type UpdateCurrentBalanceActionDetail = {
+  currentBalance: number;
 };
 
 export type DeleteExpenseActionDetail = {
@@ -146,6 +151,10 @@ export class MonthStore extends Store<MonthState> {
     this.addEventListener('putOutflowsChecking', (e: Event) => {
       const d = (e as CustomEvent<PutOutflowsCheckingActionDetail>).detail;
       if (d?.outflowId) void this.handlePutOutflowsChecking(d);
+    });
+    this.addEventListener('updateCurrentBalance', (e: Event) => {
+      const d = (e as CustomEvent<UpdateCurrentBalanceActionDetail>).detail;
+      if (d?.currentBalance !== undefined) void this.handleUpdateCurrentBalance(d);
     });
     this.addEventListener('deleteExpense', (e: Event) => {
       const d = (e as CustomEvent<DeleteExpenseActionDetail>).detail;
@@ -274,6 +283,33 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('outflowsCheckingFailed', { message });
+    }
+  }
+
+  private async handleUpdateCurrentBalance(detail: UpdateCurrentBalanceActionDetail): Promise<void> {
+    const state = this.getState();
+    const month = getCurrentMonth({ state });
+    if (!month) return;
+    const body = {
+      currentBalance: detail.currentBalance,
+      outflows: (month.outflows ?? []).map((o) => ({
+        id: o.id,
+        pendingFrom: o.pendingFrom,
+        label: o.label,
+        amount: o.amount,
+        isChecked: o.isChecked,
+      })),
+    };
+    this.emitStateChange('currentBalanceUpdateLoading');
+    try {
+      const updated = await this._putOutflowsChecking({ monthId: month.id, body });
+      const months = state.months.map((m) => (m.id === updated.id ? updated : m));
+      this.setState({ months });
+      this.emitStateChange('currentBalanceUpdateLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('currentBalanceUpdateFailed', { message });
     }
   }
 

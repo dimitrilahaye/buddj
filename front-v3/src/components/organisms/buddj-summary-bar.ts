@@ -8,8 +8,10 @@ import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js'
 import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 import { escapeHtml } from '../../shared/escape.js';
 import type { MonthStore } from '../../application/month/month-store.js';
+import { LOADING_CURRENT_BALANCE_UPDATE_TEXT } from '../../application/month/month-store.js';
 import type { MonthView } from '../../application/month/month-view.js';
 import { getCurrentMonth } from '../../application/month/month-state.js';
+import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
 
 export class BuddjSummaryBar extends HTMLElement {
   static readonly tagName = 'buddj-summary-bar';
@@ -18,6 +20,7 @@ export class BuddjSummaryBar extends HTMLElement {
   private _getCurrentRouteName?: () => string;
   private _defaultMonthIdForNav = '';
   private _monthListenersBound = false;
+  private _loadingModal?: BuddjLoadingModal;
 
   static get observedAttributes(): string[] {
     return ['balance-value', 'date', 'projected-balance'];
@@ -38,7 +41,14 @@ export class BuddjSummaryBar extends HTMLElement {
     if (this._monthListenersBound) return;
     this._monthListenersBound = true;
     this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
+    this._monthStore.addEventListener('currentBalanceUpdateLoading', this._onCurrentBalanceUpdateLoading);
+    this._monthStore.addEventListener('currentBalanceUpdateLoaded', this._onCurrentBalanceUpdateLoaded);
+    this._monthStore.addEventListener('currentBalanceUpdateFailed', this._onCurrentBalanceUpdateFailed);
     this.addEventListener('click', this._onNavMonthClick);
+    if (!this._loadingModal) {
+      this._loadingModal = document.createElement('buddj-loading-modal') as BuddjLoadingModal;
+      this.appendChild(this._loadingModal);
+    }
     this._syncFromStoreState();
   }
 
@@ -216,11 +226,7 @@ export class BuddjSummaryBar extends HTMLElement {
         startWithInitialValue: true,
         onValidate: (value: string) => {
           const num = parseEurosToNumber(value);
-          this.setAttribute('balance-value', String(num));
-          this.renderBalanceActions();
-          this.attachBalanceListeners();
-          const toast = getToast();
-          toast?.show({ message: 'Le solde a bien été enregistré' });
+          this._monthStore?.emitAction('updateCurrentBalance', { currentBalance: num });
         },
         onCancel: () => {},
       });
@@ -273,6 +279,21 @@ export class BuddjSummaryBar extends HTMLElement {
       });
     });
   }
+
+  private _onCurrentBalanceUpdateLoading = (): void => {
+    this._loadingModal?.show(LOADING_CURRENT_BALANCE_UPDATE_TEXT);
+  };
+
+  private _onCurrentBalanceUpdateLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'Le solde a bien été enregistré' });
+  };
+
+  private _onCurrentBalanceUpdateFailed = (e: Event): void => {
+    this._loadingModal?.hide();
+    const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de la mise à jour du solde';
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+  };
 }
 
 /** `<buddj-summary-bar>` : typage après `querySelector` / appel à `init` depuis le bootstrap. */

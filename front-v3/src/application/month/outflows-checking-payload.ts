@@ -52,6 +52,7 @@ export function applyOutflowsCheckingPayloadToMonthView(
   body: OutflowsCheckingPayload
 ): MonthView {
   const next = cloneMonthView(month);
+  next.currentBalance = body.currentBalance;
   next.outflows = body.outflows.map((o) => ({ ...o }));
   if (next.chargeGroups) {
     for (const group of next.chargeGroups) {
