@@ -19,6 +19,7 @@ import { createDeleteBudget } from './application/month/delete-budget.js';
 import { createDeleteExpense } from './application/month/delete-expense.js';
 import { createPutExpensesChecking } from './application/month/put-expenses-checking.js';
 import { createTransferFromWeeklyBudget } from './application/month/transfer-from-weekly-budget.js';
+import { createTransferFromAccount } from './application/month/transfer-from-account.js';
 import type { MonthService } from './application/month/month-service.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
@@ -76,6 +77,7 @@ export function bootstrap(options: BootstrapOptions): void {
   const createBudget = createCreateBudget({ monthService: options.monthService });
   const updateBudget = createUpdateBudget({ monthService: options.monthService });
   const transferFromWeeklyBudget = createTransferFromWeeklyBudget({ monthService: options.monthService });
+  const transferFromAccount = createTransferFromAccount({ monthService: options.monthService });
   const monthStore = new MonthStore({
     loadUnarchivedMonths,
     putExpensesChecking,
@@ -85,6 +87,7 @@ export function bootstrap(options: BootstrapOptions): void {
     createBudget,
     updateBudget,
     transferFromWeeklyBudget,
+    transferFromAccount,
   });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;

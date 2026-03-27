@@ -19,6 +19,7 @@ import {
   type PutExpensesCheckingActionDetail,
   type TransferFromWeeklyBudgetActionDetail,
   type UpdateBudgetActionDetail,
+  type TransferFromAccountActionDetail,
 } from '../../application/month/month-store.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
@@ -63,6 +64,14 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.emitAction('createBudget', { name, initialBalance });
   };
 
+  private _onAccountTransferSubmit = (e: Event): void => {
+    if (!this._monthStore) return;
+    const ev = e as CustomEvent<TransferFromAccountActionDetail>;
+    const { fromAccountId, toWeeklyBudgetId, amount } = ev.detail ?? {};
+    if (!fromAccountId || !toWeeklyBudgetId || amount === undefined || amount <= 0) return;
+    this._monthStore.emitAction('transferFromAccount', { fromAccountId, toWeeklyBudgetId, amount });
+  };
+
   connectedCallback(): void {
     if (this.querySelector('#budgets')) return;
     const main = document.createElement('main');
@@ -84,6 +93,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     this.appendChild(main);
     document.addEventListener('buddj-expense-add-submit', this._onExpenseAddSubmit);
     document.addEventListener('buddj-budget-create-submit', this._onBudgetCreateSubmit);
+    document.addEventListener('buddj-account-transfer-confirmed', this._onAccountTransferSubmit as EventListener);
     this.attachListeners();
     this.attachExpenseCheckingListener(main);
     this.attachExpenseDeleteListener(main);
@@ -99,6 +109,7 @@ export class BuddjScreenBudgets extends HTMLElement {
   disconnectedCallback(): void {
     document.removeEventListener('buddj-expense-add-submit', this._onExpenseAddSubmit);
     document.removeEventListener('buddj-budget-create-submit', this._onBudgetCreateSubmit);
+    document.removeEventListener('buddj-account-transfer-confirmed', this._onAccountTransferSubmit as EventListener);
     this._detachMonthStoreListeners();
   }
 

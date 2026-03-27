@@ -29,4 +29,10 @@ export interface MonthService {
     destinationId: string;
     amount: number;
   }): Promise<MonthView>;
+  transferFromAccount(input: {
+    monthId: string;
+    fromAccountId: string;
+    toWeeklyBudgetId: string;
+    amount: number;
+  }): Promise<MonthView>;
 }

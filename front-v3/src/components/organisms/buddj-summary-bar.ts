@@ -59,6 +59,7 @@ export class BuddjSummaryBar extends HTMLElement {
       this.setAttribute('date', m.displayLabel);
       this.setAttribute('balance-value', String(m.currentBalance));
       this.setAttribute('projected-balance', String(m.projectedBalance));
+      this.setAttribute('account-id', m.accountId ?? '');
       this.renderBalanceActions();
       this.attachBalanceListeners();
     }
@@ -82,6 +83,7 @@ export class BuddjSummaryBar extends HTMLElement {
       this.setAttribute('date', m.displayLabel);
       this.setAttribute('balance-value', String(m.currentBalance));
       this.setAttribute('projected-balance', String(m.projectedBalance));
+      this.setAttribute('account-id', m.accountId ?? '');
       this.renderBalanceActions();
       this.attachBalanceListeners();
     }
@@ -230,6 +232,8 @@ export class BuddjSummaryBar extends HTMLElement {
     const transferBtn = container.querySelector('buddj-icon-transfer');
     transferBtn?.addEventListener('click', () => {
       const maxAmount = this.formatProjectedBalance();
+      const sourceAccountId = this.getAttribute('account-id') ?? '';
+      if (!sourceAccountId) return;
       const budgetCards = document.querySelectorAll('#budgets buddj-budget-card');
       const destinations = Array.from(budgetCards).map((card) => ({
         id: card.getAttribute('weekly-budget-id') ?? '',
@@ -251,7 +255,21 @@ export class BuddjSummaryBar extends HTMLElement {
         maxAmount,
         maxLabel: 'Solde prévisionnel',
         destinations,
-        onTransfer: () => {},
+        onTransfer: (amount: string, destinationId: string) => {
+          const parsedAmount = parseEurosToNumber(amount);
+          if (!destinationId || parsedAmount <= 0) return;
+          this.dispatchEvent(
+            new CustomEvent('buddj-account-transfer-confirmed', {
+              bubbles: true,
+              composed: true,
+              detail: {
+                fromAccountId: sourceAccountId,
+                toWeeklyBudgetId: destinationId,
+                amount: parsedAmount,
+              },
+            }),
+          );
+        },
       });
     });
   }
