@@ -11,6 +11,7 @@ import type { DeleteExpenseUseCase } from './delete-expense.js';
 import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
 import type { PutExpensesCheckingUseCase } from './put-expenses-checking.js';
 import type { UpdateBudgetUseCase } from './update-budget.js';
+import type { TransferFromWeeklyBudgetUseCase } from './transfer-from-weekly-budget.js';
 import type { MonthView } from './month-view.js';
 
 export const LOADING_EXPENSES_CHECKING_TEXT = 'Mise à jour des dépenses en cours';
@@ -19,6 +20,7 @@ export const LOADING_DELETE_BUDGET_TEXT = 'Suppression du budget en cours';
 export const LOADING_CREATE_EXPENSE_TEXT = 'Ajout de la dépense en cours';
 export const LOADING_CREATE_BUDGET_TEXT = 'Ajout du budget en cours';
 export const LOADING_UPDATE_BUDGET_TEXT = 'Mise à jour du budget en cours';
+export const LOADING_TRANSFER_BUDGET_TEXT = 'Transfert en cours';
 
 export type PutExpensesCheckingActionDetail = {
   weeklyBudgetId: string;
@@ -55,6 +57,13 @@ export type UpdateBudgetActionDetail = {
   name: string;
 };
 
+export type TransferFromWeeklyBudgetActionDetail = {
+  fromWeeklyBudgetId: string;
+  destinationType: 'weekly-budget' | 'account';
+  destinationId: string;
+  amount: number;
+};
+
 export class MonthStore extends Store<MonthState> {
   constructor({
     loadUnarchivedMonths,
@@ -64,6 +73,7 @@ export class MonthStore extends Store<MonthState> {
     createExpense,
     createBudget,
     updateBudget,
+    transferFromWeeklyBudget,
   }: {
     loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
     putExpensesChecking: PutExpensesCheckingUseCase;
@@ -72,6 +82,7 @@ export class MonthStore extends Store<MonthState> {
     createExpense: CreateExpenseUseCase;
     createBudget: CreateBudgetUseCase;
     updateBudget: UpdateBudgetUseCase;
+    transferFromWeeklyBudget: TransferFromWeeklyBudgetUseCase;
   }) {
     super(DEFAULT_MONTH_STATE);
     this._loadUnarchivedMonths = loadUnarchivedMonths;
@@ -81,6 +92,7 @@ export class MonthStore extends Store<MonthState> {
     this._createExpense = createExpense;
     this._createBudget = createBudget;
     this._updateBudget = updateBudget;
+    this._transferFromWeeklyBudget = transferFromWeeklyBudget;
     this.addEventListener('loadUnarchivedMonths', () => void this.handleLoadUnarchivedMonths());
     this.addEventListener('goToPreviousMonth', () => this.handleGoToPreviousMonth());
     this.addEventListener('goToNextMonth', () => this.handleGoToNextMonth());
@@ -108,6 +120,12 @@ export class MonthStore extends Store<MonthState> {
       const d = (e as CustomEvent<UpdateBudgetActionDetail>).detail;
       if (d?.budgetId && d.name?.trim()) void this.handleUpdateBudget(d);
     });
+    this.addEventListener('transferFromWeeklyBudget', (e: Event) => {
+      const d = (e as CustomEvent<TransferFromWeeklyBudgetActionDetail>).detail;
+      if (!d?.fromWeeklyBudgetId || !d.destinationId || d.amount === undefined || d.amount <= 0) return;
+      if (d.destinationType !== 'weekly-budget' && d.destinationType !== 'account') return;
+      void this.handleTransferFromWeeklyBudget(d);
+    });
   }
 
   private _loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
@@ -117,6 +135,7 @@ export class MonthStore extends Store<MonthState> {
   private _createExpense: CreateExpenseUseCase;
   private _createBudget: CreateBudgetUseCase;
   private _updateBudget: UpdateBudgetUseCase;
+  private _transferFromWeeklyBudget: TransferFromWeeklyBudgetUseCase;
 
   private async handleLoadUnarchivedMonths(): Promise<void> {
     this.setState({ isLoadingMonths: true, loadMonthsErrorMessage: null });
@@ -274,6 +293,29 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('budgetDeleteFailed', { message });
+    }
+  }
+
+  private async handleTransferFromWeeklyBudget(detail: TransferFromWeeklyBudgetActionDetail): Promise<void> {
+    const state = this.getState();
+    const month = getCurrentMonth({ state });
+    if (!month) return;
+    this.emitStateChange('budgetTransferLoading');
+    try {
+      const updated = await this._transferFromWeeklyBudget({
+        monthId: month.id,
+        fromWeeklyBudgetId: detail.fromWeeklyBudgetId,
+        destinationType: detail.destinationType,
+        destinationId: detail.destinationId,
+        amount: detail.amount,
+      });
+      const months = state.months.map((m) => (m.id === updated.id ? updated : m));
+      this.setState({ months });
+      this.emitStateChange('budgetTransferLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('budgetTransferFailed', { message });
     }
   }
 

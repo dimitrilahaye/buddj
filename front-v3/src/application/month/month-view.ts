@@ -5,6 +5,7 @@ import type { BudgetGroupData } from './month-types.js';
  */
 export interface MonthView {
   id: string;
+  accountId?: string;
   /** Date du mois (ISO, ex. début de mois). */
   isoDate: string;
   /** Libellé affiché dans la barre récap (ex. « mars 2026 »). */

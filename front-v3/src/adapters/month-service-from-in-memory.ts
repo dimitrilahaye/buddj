@@ -23,6 +23,7 @@ export function createMonthServiceFromInMemory({
   createExpenseDelayMs,
   createBudgetDelayMs,
   updateBudgetDelayMs,
+  transferDelayMs,
 }: {
   months: MonthView[];
   /** Délai simulé pour `getUnarchivedMonths`. */
@@ -39,6 +40,8 @@ export function createMonthServiceFromInMemory({
   createBudgetDelayMs?: number;
   /** Délai simulé pour `updateBudget` (défaut : `delayMs`). */
   updateBudgetDelayMs?: number;
+  /** Délai simulé pour `transferFromWeeklyBudget` (défaut : `delayMs`). */
+  transferDelayMs?: number;
 }): MonthService {
   const months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
@@ -47,6 +50,7 @@ export function createMonthServiceFromInMemory({
   const waitCreateExpense = createExpenseDelayMs ?? delayMs;
   const waitCreateBudget = createBudgetDelayMs ?? delayMs;
   const waitUpdateBudget = updateBudgetDelayMs ?? delayMs;
+  const waitTransfer = transferDelayMs ?? delayMs;
   return {
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
@@ -116,6 +120,20 @@ export function createMonthServiceFromInMemory({
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
     },
+    async transferFromWeeklyBudget({ monthId, fromWeeklyBudgetId, destinationType, destinationId, amount }) {
+      if (waitTransfer > 0) await new Promise((r) => setTimeout(r, waitTransfer));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const updated = transferFromWeeklyBudgetInMonthView({
+        month: months[idx],
+        fromWeeklyBudgetId,
+        destinationType,
+        destinationId,
+        amount,
+      });
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
   };
 }
 
@@ -127,4 +145,48 @@ function weeklyBudgetHasUncheckedExpense(month: MonthView, weeklyBudgetId: strin
     }
   }
   return false;
+}
+
+function transferFromWeeklyBudgetInMonthView({
+  month,
+  fromWeeklyBudgetId,
+  destinationType,
+  destinationId,
+  amount,
+}: {
+  month: MonthView;
+  fromWeeklyBudgetId: string;
+  destinationType: 'weekly-budget' | 'account';
+  destinationId: string;
+  amount: number;
+}): MonthView {
+  const next: MonthView = deepCloneMonths([month])[0]!;
+  let sourceFound = false;
+  for (const g of next.budgetGroups) {
+    for (const b of g.budgets) {
+      if (b.weeklyBudgetId !== fromWeeklyBudgetId) continue;
+      sourceFound = true;
+      b.allocated = Math.round((b.allocated - amount) * 100) / 100;
+    }
+  }
+  if (!sourceFound) throw new Error(`Budget source introuvable : ${fromWeeklyBudgetId}`);
+
+  if (destinationType === 'weekly-budget') {
+    let destinationFound = false;
+    for (const g of next.budgetGroups) {
+      for (const b of g.budgets) {
+        if (b.weeklyBudgetId !== destinationId) continue;
+        destinationFound = true;
+        b.allocated = Math.round((b.allocated + amount) * 100) / 100;
+      }
+    }
+    if (!destinationFound) throw new Error(`Budget destination introuvable : ${destinationId}`);
+    return next;
+  }
+
+  if (next.accountId && destinationId !== next.accountId) {
+    throw new Error(`Compte destination introuvable : ${destinationId}`);
+  }
+  next.projectedBalance = Math.round((next.projectedBalance + amount) * 100) / 100;
+  return next;
 }

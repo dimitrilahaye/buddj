@@ -8,6 +8,7 @@ import type { BuddjNewMonthChargeSearchDrawerElement } from '../organisms/buddj-
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from '../organisms/buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { parseEurosToNumber } from '../../shared/goal.js';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -45,12 +46,6 @@ interface RappelItem {
   included: boolean;
   /** Nombre de dépenses en attente (budgets des mois précédents uniquement) */
   pendingExpensesCount?: number;
-}
-
-function parseAmount(s: string): number {
-  const cleaned = (s || '').replace(/\s/g, '').replace('€', '').replace(/restant.*/gi, '').trim().replace(',', '.');
-  const n = parseFloat(cleaned);
-  return Number.isNaN(n) ? 0 : n;
 }
 
 function formatAmount(n: number): string {
@@ -124,7 +119,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
   }
 
   private getProjectedBalance(): number {
-    const initial = parseAmount(this._initialBalance);
+    const initial = parseEurosToNumber(this._initialBalance);
     const chargesSum = this._charges.filter((c) => !c.hidden).reduce((s, c) => s + c.amount, 0);
     const budgetsSum = this._budgets.filter((b) => !b.hidden).reduce((s, b) => s + b.amount, 0);
     const rappelAnnuelSum = this._rappelAnnuelIncluded ? this._rappelAnnuel.reduce((s, r) => s + r.amount, 0) : 0;
@@ -401,7 +396,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
         id: 'c' + Date.now(),
         icon: ev.detail?.emoji ?? '🏠',
         label: ev.detail?.label ?? '',
-        amount: parseAmount(ev.detail?.amount ?? '0'),
+        amount: parseEurosToNumber(ev.detail?.amount ?? '0'),
         hidden: false,
       });
       document.removeEventListener('buddj-charge-add-done', handler);
@@ -420,7 +415,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
           id: 'b' + Date.now(),
           icon: emoji ?? '💰',
           label,
-          amount: parseAmount(amount),
+          amount: parseEurosToNumber(amount),
           hidden: false,
         });
         getToast()?.show({ message: 'Le budget a bien été ajouté' });
@@ -466,7 +461,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
       initialEmoji: c.icon,
       onValidate: (label: string, amount: string, emoji: string) => {
         c.label = label;
-        c.amount = parseAmount(amount);
+        c.amount = parseEurosToNumber(amount);
         c.icon = emoji;
         this.render();
         this.attachListeners();
@@ -508,7 +503,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
       initialEmoji: b.icon,
       onValidate: (label: string, amount: string, emoji: string) => {
         b.label = label;
-        b.amount = parseAmount(amount);
+        b.amount = parseEurosToNumber(amount);
         b.icon = emoji;
         getToast()?.show({ message: 'Le budget a bien été modifié' });
         this.render();

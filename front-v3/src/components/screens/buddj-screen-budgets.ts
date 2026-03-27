@@ -10,12 +10,14 @@ import {
   LOADING_DELETE_EXPENSE_TEXT,
   LOADING_EXPENSES_CHECKING_TEXT,
   LOADING_UPDATE_BUDGET_TEXT,
+  LOADING_TRANSFER_BUDGET_TEXT,
   type CreateBudgetActionDetail,
   type CreateExpenseActionDetail,
   type DeleteBudgetActionDetail,
   type DeleteExpenseActionDetail,
   type MonthStore,
   type PutExpensesCheckingActionDetail,
+  type TransferFromWeeklyBudgetActionDetail,
   type UpdateBudgetActionDetail,
 } from '../../application/month/month-store.js';
 import { getToast } from '../atoms/buddj-toast.js';
@@ -87,6 +89,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     this.attachExpenseDeleteListener(main);
     this.attachBudgetDeleteListener(main);
     this.attachBudgetUpdateListener(main);
+    this.attachBudgetTransferListener(main);
     if (this._monthStore && !this._monthListenersAttached) {
       this._attachMonthStoreListeners();
       this._monthStore.emitAction('loadUnarchivedMonths');
@@ -127,6 +130,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.addEventListener('budgetUpdateLoading', this._onBudgetUpdateLoading);
     this._monthStore.addEventListener('budgetUpdateLoaded', this._onBudgetUpdateLoaded);
     this._monthStore.addEventListener('budgetUpdateFailed', this._onBudgetUpdateFailed);
+    this._monthStore.addEventListener('budgetTransferLoading', this._onBudgetTransferLoading);
+    this._monthStore.addEventListener('budgetTransferLoaded', this._onBudgetTransferLoaded);
+    this._monthStore.addEventListener('budgetTransferFailed', this._onBudgetTransferFailed);
     this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
   }
 
@@ -153,6 +159,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.removeEventListener('budgetUpdateLoading', this._onBudgetUpdateLoading);
     this._monthStore.removeEventListener('budgetUpdateLoaded', this._onBudgetUpdateLoaded);
     this._monthStore.removeEventListener('budgetUpdateFailed', this._onBudgetUpdateFailed);
+    this._monthStore.removeEventListener('budgetTransferLoading', this._onBudgetTransferLoading);
+    this._monthStore.removeEventListener('budgetTransferLoaded', this._onBudgetTransferLoaded);
+    this._monthStore.removeEventListener('budgetTransferFailed', this._onBudgetTransferFailed);
     this._monthStore.removeEventListener('currentMonthChanged', this._onCurrentMonthChanged);
     this._monthListenersAttached = false;
     this._loadingModal?.hide();
@@ -248,6 +257,21 @@ export class BuddjScreenBudgets extends HTMLElement {
     getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
   };
 
+  private _onBudgetTransferLoading = (): void => {
+    this._loadingModal?.show(LOADING_TRANSFER_BUDGET_TEXT);
+  };
+
+  private _onBudgetTransferLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'Le transfert a bien été effectué' });
+  };
+
+  private _onBudgetTransferFailed = (e: Event): void => {
+    this._loadingModal?.hide();
+    const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors du transfert';
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+  };
+
   private _onCurrentMonthChanged = (e: Event): void => {
     const ev = e as CustomEvent<{ month: MonthView | null }>;
     this._renderBudgetGroups(ev.detail?.month ?? null);
@@ -258,6 +282,13 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _renderBudgetGroups(month: MonthView | null): void {
     const listSection = this.querySelector('.budget-list');
     if (!listSection) return;
+    if (month?.accountId) {
+      this.setAttribute('current-account-id', month.accountId);
+      this.querySelector('#budgets')?.setAttribute('data-account-id', month.accountId);
+    } else {
+      this.removeAttribute('current-account-id');
+      this.querySelector('#budgets')?.removeAttribute('data-account-id');
+    }
     const openKeys = new Set<string>();
     for (const card of listSection.querySelectorAll('buddj-budget-card')) {
       const details = card.querySelector('details.budget-details') as HTMLDetailsElement | null;
@@ -355,6 +386,21 @@ export class BuddjScreenBudgets extends HTMLElement {
       const { budgetId, name } = ev.detail ?? {};
       if (!budgetId || !name?.trim()) return;
       this._monthStore.emitAction('updateBudget', { budgetId, name: name.trim() });
+    });
+  }
+
+  private attachBudgetTransferListener(main: HTMLElement): void {
+    main.addEventListener('buddj-budget-transfer-confirmed', (e) => {
+      if (!this._monthStore) return;
+      const ev = e as CustomEvent<Partial<TransferFromWeeklyBudgetActionDetail>>;
+      const { fromWeeklyBudgetId, destinationType, destinationId, amount } = ev.detail ?? {};
+      if (!fromWeeklyBudgetId || !destinationId || !destinationType || amount === undefined || amount <= 0) return;
+      this._monthStore.emitAction('transferFromWeeklyBudget', {
+        fromWeeklyBudgetId,
+        destinationType,
+        destinationId,
+        amount,
+      });
     });
   }
 }

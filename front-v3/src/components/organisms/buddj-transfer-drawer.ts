@@ -5,6 +5,7 @@
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { parseEurosToNumber } from '../../shared/goal.js';
 
 export type TransferSource = 'outflows' | 'budget';
 
@@ -14,12 +15,6 @@ export interface TransferDestination {
   icon?: string;
   /** Montant actuel (parsable, ex. "145" ou "412,00"). */
   currentAmount: string;
-}
-
-function parseAmount(s: string): number {
-  const cleaned = (s || '').replace(/\s/g, '').replace('€', '').replace(/restant.*/gi, '').trim().replace(',', '.');
-  const n = parseFloat(cleaned);
-  return Number.isNaN(n) ? 0 : n;
 }
 
 function formatAmount(n: number): string {
@@ -63,10 +58,10 @@ export class BuddjTransferDrawer extends HTMLElement {
     const maxHint =
       this._source === 'outflows' ? `(${escapeHtml(this._maxLabel)})` : '(€ restants)';
     const maxLine = `Max. ${escapeHtml(this._maxAmount)} <span class="transfer-drawer-max-hint">${maxHint}</span>`;
-    const transferNum = parseAmount(this._amount);
+    const transferNum = parseEurosToNumber(this._amount);
     const destinationsHtml = this._destinations
       .map((d) => {
-        const current = parseAmount(d.currentAmount);
+        const current = parseEurosToNumber(d.currentAmount);
         const after = current + transferNum;
         const canRemettreAZero = current < 0;
         return `<div class="transfer-drawer-dest-row">
@@ -137,7 +132,7 @@ export class BuddjTransferDrawer extends HTMLElement {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const currentStr = (btn as HTMLElement).dataset.currentAmount ?? '0';
-        const current = parseAmount(currentStr);
+        const current = parseEurosToNumber(currentStr);
         if (current >= 0) return;
         this._amount = formatAmount(-current);
         this.updateAmountDisplay();
@@ -147,7 +142,7 @@ export class BuddjTransferDrawer extends HTMLElement {
 
   private openCalculator(): void {
     const calculator = document.getElementById('calculator-drawer') as BuddjCalculatorDrawerElement;
-    const hasAmount = parseAmount(this._amount) > 0;
+    const hasAmount = parseEurosToNumber(this._amount) > 0;
     calculator?.open({
       title: 'Montant',
       initialValue: this._amount,
@@ -170,17 +165,17 @@ export class BuddjTransferDrawer extends HTMLElement {
     const el = this.querySelector('[data-transfer-amount]');
     if (el) el.textContent = this._amount;
     this.querySelector('.transfer-drawer-field--amount')?.classList.remove('transfer-drawer-field--error');
-    const transferNum = parseAmount(this._amount);
+    const transferNum = parseEurosToNumber(this._amount);
     this.querySelectorAll('.transfer-drawer-dest').forEach((btn) => {
       const currentStr = (btn as HTMLElement).dataset.currentAmount ?? '0';
-      const current = parseAmount(currentStr);
+      const current = parseEurosToNumber(currentStr);
       const after = current + transferNum;
       const afterEl = btn.querySelector('.transfer-drawer-dest-after');
       if (afterEl) afterEl.textContent = formatAmount(after);
     });
     this.querySelectorAll('.transfer-drawer-dest-to-zero').forEach((btn) => {
       const currentStr = (btn as HTMLElement).dataset.currentAmount ?? '0';
-      const current = parseAmount(currentStr);
+      const current = parseEurosToNumber(currentStr);
       (btn as HTMLButtonElement).disabled = current >= 0;
     });
   }
@@ -195,8 +190,8 @@ export class BuddjTransferDrawer extends HTMLElement {
       toast?.show({ message: 'Le champ montant est requis', variant: 'warning' });
       return;
     }
-    const maxNum = parseAmount(this._maxAmount);
-    const amountNum = parseAmount(amount);
+    const maxNum = parseEurosToNumber(this._maxAmount);
+    const amountNum = parseEurosToNumber(amount);
     if (amountNum > maxNum) {
       this.querySelector('.transfer-drawer-field--amount')?.classList.add('transfer-drawer-field--error');
       toast?.show({ message: 'Le montant ne peut pas dépasser le maximum', variant: 'warning' });
@@ -204,7 +199,6 @@ export class BuddjTransferDrawer extends HTMLElement {
     }
     this._onTransfer?.(amount, destinationId);
     this.close();
-    toast?.show({ message: 'Le transfert a bien été effectué' });
   }
 }
 

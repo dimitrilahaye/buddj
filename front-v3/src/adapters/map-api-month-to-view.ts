@@ -31,6 +31,7 @@ export type ApiMonthPayload = {
     };
   };
   account: {
+    id: string;
     currentBalance: number;
     weeklyBudgets: ApiWeeklyBudgetRow[];
   };
@@ -110,6 +111,7 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
 
   return {
     id: payload.id,
+    accountId: payload.account?.id ?? '',
     isoDate,
     displayLabel,
     currentBalance: Number(payload.account?.currentBalance ?? 0),

@@ -10,7 +10,7 @@ import type { BudgetEditDrawerOnValidate } from './buddj-budget-edit-drawer.js';
 import type { BuddjExpenseAddDrawerElement } from './buddj-expense-add-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
-import { formatEuros } from '../../shared/goal.js';
+import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 
 export class BuddjBudgetCard extends HTMLElement {
   static readonly tagName = 'buddj-budget-card';
@@ -164,17 +164,24 @@ export class BuddjBudgetCard extends HTMLElement {
       const otherBudgets = allCards
         .filter((card) => card !== this)
         .map((card) => ({
-          id: (card.getAttribute('name') ?? '').replace(/\s+/g, '-').toLowerCase() || `budget-${Math.random().toString(36).slice(2)}`,
+          id: card.getAttribute('weekly-budget-id') ?? '',
           label: card.getAttribute('name') ?? 'Budget',
           icon: card.getAttribute('icon') ?? '💰',
           currentAmount: formatEuros(parseFloat(card.getAttribute('remaining') ?? '0') || 0),
-        }));
+        }))
+        .filter((d) => d.id);
       const afterChargesEl = document.querySelector('.summary-after .balance-value--highlight');
       const soldeFinMois = afterChargesEl?.textContent?.trim() ?? '0 €';
+      const accountId =
+        this.closest('buddj-screen-budgets')?.getAttribute('current-account-id') ??
+        document.querySelector('#budgets')?.getAttribute('data-account-id') ??
+        '';
       const destinations = [
         ...otherBudgets,
-        { id: 'solde-fin-mois', label: 'Solde fin de mois' as string, currentAmount: soldeFinMois },
+        { id: accountId, label: 'Solde fin de mois' as string, currentAmount: soldeFinMois },
       ];
+      const sourceBudgetId = this.getAttribute('weekly-budget-id') ?? '';
+      if (!sourceBudgetId || !accountId) return;
       const drawer = document.getElementById('transfer-drawer') as HTMLElement & {
         open: (o: {
           source: 'outflows' | 'budget';
@@ -189,7 +196,24 @@ export class BuddjBudgetCard extends HTMLElement {
         maxAmount,
         maxLabel: '',
         destinations,
-        onTransfer: () => {},
+        onTransfer: (amount: string, destinationId: string) => {
+          if (!destinationId) return;
+          const destinationType = otherBudgets.some((b) => b.id === destinationId) ? 'weekly-budget' : 'account';
+          const amountNum = parseEurosToNumber(amount);
+          if (amountNum <= 0) return;
+          this.dispatchEvent(
+            new CustomEvent('buddj-budget-transfer-confirmed', {
+              bubbles: true,
+              composed: true,
+              detail: {
+                fromWeeklyBudgetId: sourceBudgetId,
+                destinationId,
+                destinationType,
+                amount: amountNum,
+              },
+            }),
+          );
+        },
       });
     });
   }

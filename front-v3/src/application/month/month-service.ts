@@ -22,4 +22,11 @@ export interface MonthService {
     initialBalance: number;
   }): Promise<MonthView>;
   updateBudget(input: { monthId: string; budgetId: string; name: string }): Promise<MonthView>;
+  transferFromWeeklyBudget(input: {
+    monthId: string;
+    fromWeeklyBudgetId: string;
+    destinationType: 'weekly-budget' | 'account';
+    destinationId: string;
+    amount: number;
+  }): Promise<MonthView>;
 }

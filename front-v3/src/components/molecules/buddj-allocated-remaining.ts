@@ -3,13 +3,7 @@
  * Attributs allocated et remaining : nombres (le WC formate en « X € » / « X € restant »).
  */
 import { escapeHtml } from '../../shared/escape.js';
-import { formatEuros } from '../../shared/goal.js';
-
-function parseAmount(value: string | null): number {
-  if (value == null || value === '') return 0;
-  const n = parseFloat(String(value).replace(/\s/g, '').replace(',', '.').replace('€', '').trim());
-  return Number.isNaN(n) ? 0 : n;
-}
+import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 
 export class BuddjAllocatedRemaining extends HTMLElement {
   static readonly tagName = 'buddj-allocated-remaining';
@@ -27,8 +21,8 @@ export class BuddjAllocatedRemaining extends HTMLElement {
   }
 
   private render(): void {
-    const allocatedNum = parseAmount(this.getAttribute('allocated'));
-    const remainingNum = parseAmount(this.getAttribute('remaining'));
+    const allocatedNum = parseEurosToNumber(this.getAttribute('allocated') ?? '0');
+    const remainingNum = parseEurosToNumber(this.getAttribute('remaining') ?? '0');
     const allocatedStr = formatEuros(parseFloat(String(allocatedNum)) || 0);
     const remainingStr = formatEuros(parseFloat(String(remainingNum)) || 0) + ' restant';
     this.innerHTML = `

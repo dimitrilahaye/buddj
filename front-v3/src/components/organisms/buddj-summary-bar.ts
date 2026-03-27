@@ -5,18 +5,11 @@
  */
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
-import { formatEuros } from '../../shared/goal.js';
+import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 import { escapeHtml } from '../../shared/escape.js';
 import type { MonthStore } from '../../application/month/month-store.js';
 import type { MonthView } from '../../application/month/month-view.js';
 import { getCurrentMonth } from '../../application/month/month-state.js';
-
-function parseAmount(raw: string | null): number {
-  if (raw == null || raw === '') return 0;
-  const cleaned = String(raw).replace(/\s/g, '').replace(',', '.').replace('€', '').trim();
-  const n = parseFloat(cleaned);
-  return Number.isNaN(n) ? 0 : n;
-}
 
 export class BuddjSummaryBar extends HTMLElement {
   static readonly tagName = 'buddj-summary-bar';
@@ -124,19 +117,19 @@ export class BuddjSummaryBar extends HTMLElement {
     const val = newValue ?? '';
     if (name === 'balance-value') {
       const el = this.querySelector('.summary-balance-actions .balance-value');
-      if (el) el.textContent = formatEuros(parseAmount(val));
+      if (el) el.textContent = formatEuros(parseEurosToNumber(val));
     } else if (name === 'date') {
       const el = this.querySelector('.summary-date');
       if (el) el.textContent = val || this.date;
     } else if (name === 'projected-balance') {
       const el = this.querySelector('.summary-after .balance-value--highlight');
-      if (el) el.textContent = formatEuros(parseAmount(val));
+      if (el) el.textContent = formatEuros(parseEurosToNumber(val));
     }
   }
 
   /** Montant formaté pour affichage (solde actuel). */
   private formatBalanceValue(): string {
-    return formatEuros(parseAmount(this.getAttribute('balance-value')));
+    return formatEuros(parseEurosToNumber(this.getAttribute('balance-value') ?? '0'));
   }
 
   private get date(): string {
@@ -145,7 +138,7 @@ export class BuddjSummaryBar extends HTMLElement {
 
   /** Montant formaté pour affichage (solde prévisionnel). */
   private formatProjectedBalance(): string {
-    return formatEuros(parseAmount(this.getAttribute('projected-balance')));
+    return formatEuros(parseEurosToNumber(this.getAttribute('projected-balance') ?? '0'));
   }
 
   private renderFull(): string {
@@ -220,7 +213,7 @@ export class BuddjSummaryBar extends HTMLElement {
         initialValue: this.formatBalanceValue(),
         startWithInitialValue: true,
         onValidate: (value: string) => {
-          const num = parseAmount(value);
+          const num = parseEurosToNumber(value);
           this.setAttribute('balance-value', String(num));
           this.renderBalanceActions();
           this.attachBalanceListeners();
@@ -239,11 +232,11 @@ export class BuddjSummaryBar extends HTMLElement {
       const maxAmount = this.formatProjectedBalance();
       const budgetCards = document.querySelectorAll('#budgets buddj-budget-card');
       const destinations = Array.from(budgetCards).map((card) => ({
-        id: (card.getAttribute('name') ?? '').replace(/\s+/g, '-').toLowerCase() || `budget-${Math.random().toString(36).slice(2)}`,
+        id: card.getAttribute('weekly-budget-id') ?? '',
         label: card.getAttribute('name') ?? 'Budget',
         icon: card.getAttribute('icon') ?? '💰',
         currentAmount: card.getAttribute('remaining') ?? '0 €',
-      }));
+      })).filter((d) => d.id);
       const drawer = document.getElementById('transfer-drawer') as HTMLElement & {
         open: (o: {
           source: 'outflows' | 'budget';

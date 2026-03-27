@@ -35,7 +35,7 @@ export function formatEuros(n: number): string {
 
 /** Parse une chaîne type "1 240,00 €" ou "320.50" en nombre. */
 export function parseEurosToNumber(s: string): number {
-  const cleaned = s.replace(/\s/g, '').replace('€', '').trim().replace(',', '.');
+  const cleaned = s.replace(/\s/g, '').replace('€', '').replace(/restant.*/gi, '').trim().replace(',', '.');
   const n = parseFloat(cleaned);
   return Number.isNaN(n) ? 0 : n;
 }

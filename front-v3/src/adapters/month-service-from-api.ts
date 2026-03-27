@@ -130,5 +130,29 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
     },
+    async transferFromWeeklyBudget({
+      monthId,
+      fromWeeklyBudgetId,
+      destinationType,
+      destinationId,
+      amount,
+    }) {
+      const toSegment = destinationType === 'weekly-budget' ? 'weekly-budget' : 'account';
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/transfer/from/weekly-budget/${encodeURIComponent(fromWeeklyBudgetId)}/to/${toSegment}/${encodeURIComponent(destinationId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
   };
 }
