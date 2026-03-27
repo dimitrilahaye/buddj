@@ -124,7 +124,7 @@ export class BuddjBurgerPanel extends HTMLElement {
     const onFailure = (e: Event): void => {
       this._loadingModal?.hide();
       const message = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Une erreur est survenue.';
-      getToast()?.show({ message, variant: 'error', durationMs: 3000 });
+      getToast()?.show({ message, variant: 'error', durationMs: 1250 });
     };
 
     this.store.addEventListener('askForLogout:loading', onLoading);

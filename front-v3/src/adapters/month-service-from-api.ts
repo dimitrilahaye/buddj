@@ -78,6 +78,22 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
     },
+    async deleteOutflow({ monthId, outflowId }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/outflows/${encodeURIComponent(outflowId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
     async createExpense({ monthId, weeklyBudgetId, label, amount }) {
       const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/weeks/${encodeURIComponent(weeklyBudgetId)}/expenses`;
       let response: Response;

@@ -4,14 +4,17 @@
  */
 import type { BuddjChargeAddDrawerElement } from '../organisms/buddj-charge-add-drawer.js';
 import type { BuddjChargeSearchDrawerElement } from '../organisms/buddj-charge-search-drawer.js';
+import type { BuddjSearchDrawerElement } from '../organisms/buddj-search-drawer.js';
 import { entryMatchesSearch } from '../../shared/search.js';
 import type { ChargeGroupData } from '../../application/month/month-types.js';
 import { escapeAttr } from '../../shared/escape.js';
 import type { MonthStore } from '../../application/month/month-store.js';
 import {
   LOADING_CREATE_OUTFLOW_TEXT,
+  LOADING_DELETE_OUTFLOW_TEXT,
   LOADING_OUTFLOWS_CHECKING_TEXT,
   type CreateOutflowActionDetail,
+  type DeleteOutflowActionDetail,
   type PutOutflowsCheckingActionDetail,
 } from '../../application/month/month-store.js';
 import type { MonthView } from '../../application/month/month-view.js';
@@ -58,6 +61,7 @@ export class BuddjScreenRecurring extends HTMLElement {
     document.removeEventListener('buddj-charge-search', this._searchListener);
     document.removeEventListener('buddj-charge-add-done', this._onChargeAddDone as EventListener);
     this.removeEventListener('buddj-charge-taken-change', this._onChargeTakenChange as EventListener);
+    this.removeEventListener('buddj-charge-delete-confirmed', this._onChargeDeleteConfirmed as EventListener);
     this._detachMonthStoreListeners();
   }
 
@@ -130,6 +134,7 @@ export class BuddjScreenRecurring extends HTMLElement {
       }
     });
     this.addEventListener('buddj-charge-taken-change', this._onChargeTakenChange as EventListener);
+    this.addEventListener('buddj-charge-delete-confirmed', this._onChargeDeleteConfirmed as EventListener);
   }
 
   private _onChargeAddDone = (e: Event): void => {
@@ -148,6 +153,17 @@ export class BuddjScreenRecurring extends HTMLElement {
     const month = (e as CustomEvent<{ month: MonthView | null }>).detail?.month;
     this._chargeGroups = month?.chargeGroups ?? [];
     this.render();
+    const searchDrawer = document.getElementById('charge-search-drawer') as BuddjChargeSearchDrawerElement | null;
+    const shell = searchDrawer?.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
+    shell?.refresh();
+  };
+
+  private _onChargeDeleteConfirmed = (e: Event): void => {
+    if (!this._monthStore) return;
+    const ev = e as CustomEvent<Partial<DeleteOutflowActionDetail>>;
+    const outflowId = ev.detail?.outflowId;
+    if (!outflowId) return;
+    this._monthStore.emitAction('deleteOutflow', { outflowId });
   };
 
   private _onChargeTakenChange = (e: Event): void => {
@@ -168,6 +184,9 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._monthStore.addEventListener('outflowCreateLoading', this._onOutflowCreateLoading);
     this._monthStore.addEventListener('outflowCreateLoaded', this._onOutflowCreateLoaded);
     this._monthStore.addEventListener('outflowCreateFailed', this._onOutflowCreateFailed);
+    this._monthStore.addEventListener('outflowDeleteLoading', this._onOutflowDeleteLoading);
+    this._monthStore.addEventListener('outflowDeleteLoaded', this._onOutflowDeleteLoaded);
+    this._monthStore.addEventListener('outflowDeleteFailed', this._onOutflowDeleteFailed);
     this._monthStore.addEventListener('outflowsCheckingLoading', this._onOutflowsCheckingLoading);
     this._monthStore.addEventListener('outflowsCheckingLoaded', this._onOutflowsCheckingLoaded);
     this._monthStore.addEventListener('outflowsCheckingFailed', this._onOutflowsCheckingFailed);
@@ -183,6 +202,9 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._monthStore.removeEventListener('outflowCreateLoading', this._onOutflowCreateLoading);
     this._monthStore.removeEventListener('outflowCreateLoaded', this._onOutflowCreateLoaded);
     this._monthStore.removeEventListener('outflowCreateFailed', this._onOutflowCreateFailed);
+    this._monthStore.removeEventListener('outflowDeleteLoading', this._onOutflowDeleteLoading);
+    this._monthStore.removeEventListener('outflowDeleteLoaded', this._onOutflowDeleteLoaded);
+    this._monthStore.removeEventListener('outflowDeleteFailed', this._onOutflowDeleteFailed);
     this._monthStore.removeEventListener('outflowsCheckingLoading', this._onOutflowsCheckingLoading);
     this._monthStore.removeEventListener('outflowsCheckingLoaded', this._onOutflowsCheckingLoaded);
     this._monthStore.removeEventListener('outflowsCheckingFailed', this._onOutflowsCheckingFailed);
@@ -203,7 +225,22 @@ export class BuddjScreenRecurring extends HTMLElement {
   private _onOutflowCreateFailed = (e: Event): void => {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de l’ajout de la charge';
-    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
+  };
+
+  private _onOutflowDeleteLoading = (): void => {
+    this._loadingModal?.show(LOADING_DELETE_OUTFLOW_TEXT);
+  };
+
+  private _onOutflowDeleteLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'La charge a bien été supprimée' });
+  };
+
+  private _onOutflowDeleteFailed = (e: Event): void => {
+    this._loadingModal?.hide();
+    const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de la suppression de la charge';
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
   };
 
   private _onOutflowsCheckingLoading = (): void => {
@@ -218,7 +255,7 @@ export class BuddjScreenRecurring extends HTMLElement {
   private _onOutflowsCheckingFailed = (e: Event): void => {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de la mise à jour de la charge';
-    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
   };
 }
 

@@ -11,6 +11,10 @@ export interface MonthService {
     weeklyBudgetId: string;
     expenseId: string;
   }): Promise<MonthView>;
+  deleteOutflow(input: {
+    monthId: string;
+    outflowId: string;
+  }): Promise<MonthView>;
   deleteBudget(input: { monthId: string; budgetId: string }): Promise<MonthView>;
   createExpense(input: {
     monthId: string;

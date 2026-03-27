@@ -22,6 +22,7 @@ export function createMonthServiceFromInMemory({
   putDelayMs,
   putOutflowsDelayMs,
   deleteDelayMs,
+  deleteOutflowDelayMs,
   deleteBudgetDelayMs,
   createExpenseDelayMs,
   createOutflowDelayMs,
@@ -38,6 +39,8 @@ export function createMonthServiceFromInMemory({
   putOutflowsDelayMs?: number;
   /** Délai simulé pour `deleteExpense` (défaut : `delayMs`). */
   deleteDelayMs?: number;
+  /** Délai simulé pour `deleteOutflow` (défaut : `delayMs`). */
+  deleteOutflowDelayMs?: number;
   /** Délai simulé pour `deleteBudget` (défaut : `delayMs`). */
   deleteBudgetDelayMs?: number;
   /** Délai simulé pour `createExpense` (défaut : `delayMs`). */
@@ -55,6 +58,7 @@ export function createMonthServiceFromInMemory({
   const waitPut = putDelayMs ?? delayMs;
   const waitPutOutflows = putOutflowsDelayMs ?? delayMs;
   const waitDelete = deleteDelayMs ?? delayMs;
+  const waitDeleteOutflow = deleteOutflowDelayMs ?? delayMs;
   const waitDeleteBudget = deleteBudgetDelayMs ?? delayMs;
   const waitCreateExpense = createExpenseDelayMs ?? delayMs;
   const waitCreateOutflow = createOutflowDelayMs ?? delayMs;
@@ -89,6 +93,14 @@ export function createMonthServiceFromInMemory({
       const idx = months.findIndex((m) => m.id === monthId);
       if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
       const updated = removeExpenseFromMonthView(months[idx], weeklyBudgetId, expenseId);
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
+    async deleteOutflow({ monthId, outflowId }) {
+      if (waitDeleteOutflow > 0) await new Promise((r) => setTimeout(r, waitDeleteOutflow));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const updated = removeOutflowFromMonthView({ month: months[idx], outflowId });
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
     },
@@ -232,6 +244,24 @@ function addOutflowToMonthView({
     ...next.chargeGroups[currentGroupIdx],
     charges: [...next.chargeGroups[currentGroupIdx]!.charges, newCharge],
   };
+  return next;
+}
+
+function removeOutflowFromMonthView({
+  month,
+  outflowId,
+}: {
+  month: MonthView;
+  outflowId: string;
+}): MonthView {
+  const next: MonthView = deepCloneMonths([month])[0]!;
+  next.outflows = (next.outflows ?? []).filter((o) => o.id !== outflowId);
+  next.chargeGroups = (next.chargeGroups ?? [])
+    .map((group) => ({
+      ...group,
+      charges: group.charges.filter((c) => c.id !== outflowId),
+    }))
+    .filter((group) => group.previous || group.charges.length > 0);
   return next;
 }
 

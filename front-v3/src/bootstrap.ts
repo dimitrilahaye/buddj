@@ -18,6 +18,7 @@ import { createCreateExpense } from './application/month/create-expense.js';
 import { createCreateOutflow } from './application/month/create-outflow.js';
 import { createDeleteBudget } from './application/month/delete-budget.js';
 import { createDeleteExpense } from './application/month/delete-expense.js';
+import { createDeleteOutflow } from './application/month/delete-outflow.js';
 import { createPutExpensesChecking } from './application/month/put-expenses-checking.js';
 import { createPutOutflowsChecking } from './application/month/put-outflows-checking.js';
 import { createTransferFromWeeklyBudget } from './application/month/transfer-from-weekly-budget.js';
@@ -75,6 +76,7 @@ export function bootstrap(options: BootstrapOptions): void {
   const putExpensesChecking = createPutExpensesChecking({ monthService: options.monthService });
   const putOutflowsChecking = createPutOutflowsChecking({ monthService: options.monthService });
   const deleteExpense = createDeleteExpense({ monthService: options.monthService });
+  const deleteOutflow = createDeleteOutflow({ monthService: options.monthService });
   const deleteBudget = createDeleteBudget({ monthService: options.monthService });
   const createExpense = createCreateExpense({ monthService: options.monthService });
   const createBudget = createCreateBudget({ monthService: options.monthService });
@@ -87,6 +89,7 @@ export function bootstrap(options: BootstrapOptions): void {
     putExpensesChecking,
     putOutflowsChecking,
     deleteExpense,
+    deleteOutflow,
     deleteBudget,
     createExpense,
     createBudget,

@@ -9,6 +9,7 @@ import type { CreateExpenseUseCase } from './create-expense.js';
 import type { CreateOutflowUseCase } from './create-outflow.js';
 import type { DeleteBudgetUseCase } from './delete-budget.js';
 import type { DeleteExpenseUseCase } from './delete-expense.js';
+import type { DeleteOutflowUseCase } from './delete-outflow.js';
 import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
 import type { PutExpensesCheckingUseCase } from './put-expenses-checking.js';
 import type { PutOutflowsCheckingUseCase } from './put-outflows-checking.js';
@@ -24,6 +25,7 @@ import {
 export const LOADING_EXPENSES_CHECKING_TEXT = 'Mise à jour des dépenses en cours';
 export const LOADING_OUTFLOWS_CHECKING_TEXT = 'Mise à jour des charges en cours';
 export const LOADING_DELETE_EXPENSE_TEXT = 'Suppression de la dépense en cours';
+export const LOADING_DELETE_OUTFLOW_TEXT = 'Suppression de la charge en cours';
 export const LOADING_DELETE_BUDGET_TEXT = 'Suppression du budget en cours';
 export const LOADING_CREATE_EXPENSE_TEXT = 'Ajout de la dépense en cours';
 export const LOADING_CREATE_BUDGET_TEXT = 'Ajout du budget en cours';
@@ -45,6 +47,10 @@ export type PutOutflowsCheckingActionDetail = {
 export type DeleteExpenseActionDetail = {
   weeklyBudgetId: string;
   expenseId: string;
+};
+
+export type DeleteOutflowActionDetail = {
+  outflowId: string;
 };
 
 export type DeleteBudgetActionDetail = {
@@ -95,6 +101,7 @@ export class MonthStore extends Store<MonthState> {
     putExpensesChecking,
     putOutflowsChecking,
     deleteExpense,
+    deleteOutflow,
     deleteBudget,
     createExpense,
     createBudget,
@@ -107,6 +114,7 @@ export class MonthStore extends Store<MonthState> {
     putExpensesChecking: PutExpensesCheckingUseCase;
     putOutflowsChecking: PutOutflowsCheckingUseCase;
     deleteExpense: DeleteExpenseUseCase;
+    deleteOutflow: DeleteOutflowUseCase;
     deleteBudget: DeleteBudgetUseCase;
     createExpense: CreateExpenseUseCase;
     createBudget: CreateBudgetUseCase;
@@ -120,6 +128,7 @@ export class MonthStore extends Store<MonthState> {
     this._putExpensesChecking = putExpensesChecking;
     this._putOutflowsChecking = putOutflowsChecking;
     this._deleteExpense = deleteExpense;
+    this._deleteOutflow = deleteOutflow;
     this._deleteBudget = deleteBudget;
     this._createExpense = createExpense;
     this._createBudget = createBudget;
@@ -141,6 +150,10 @@ export class MonthStore extends Store<MonthState> {
     this.addEventListener('deleteExpense', (e: Event) => {
       const d = (e as CustomEvent<DeleteExpenseActionDetail>).detail;
       if (d?.expenseId && d.weeklyBudgetId) void this.handleDeleteExpense(d);
+    });
+    this.addEventListener('deleteOutflow', (e: Event) => {
+      const d = (e as CustomEvent<DeleteOutflowActionDetail>).detail;
+      if (d?.outflowId) void this.handleDeleteOutflow(d);
     });
     this.addEventListener('deleteBudget', (e: Event) => {
       const d = (e as CustomEvent<DeleteBudgetActionDetail>).detail;
@@ -179,6 +192,7 @@ export class MonthStore extends Store<MonthState> {
   private _putExpensesChecking: PutExpensesCheckingUseCase;
   private _putOutflowsChecking: PutOutflowsCheckingUseCase;
   private _deleteExpense: DeleteExpenseUseCase;
+  private _deleteOutflow: DeleteOutflowUseCase;
   private _deleteBudget: DeleteBudgetUseCase;
   private _createExpense: CreateExpenseUseCase;
   private _createBudget: CreateBudgetUseCase;
@@ -281,6 +295,26 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('expenseDeleteFailed', { message });
+    }
+  }
+
+  private async handleDeleteOutflow(detail: DeleteOutflowActionDetail): Promise<void> {
+    const state = this.getState();
+    const month = getCurrentMonth({ state });
+    if (!month) return;
+    this.emitStateChange('outflowDeleteLoading');
+    try {
+      const updated = await this._deleteOutflow({
+        monthId: month.id,
+        outflowId: detail.outflowId,
+      });
+      const months = state.months.map((m) => (m.id === updated.id ? updated : m));
+      this.setState({ months });
+      this.emitStateChange('outflowDeleteLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('outflowDeleteFailed', { message });
     }
   }
 

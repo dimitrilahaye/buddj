@@ -224,7 +224,7 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _onBudgetDeleteFailed = (e: Event): void => {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur';
-    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
   };
 
   private _onExpenseCreateLoading = (): void => {
@@ -265,7 +265,7 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _onBudgetUpdateFailed = (e: Event): void => {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur';
-    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
   };
 
   private _onBudgetTransferLoading = (): void => {
@@ -280,7 +280,7 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _onBudgetTransferFailed = (e: Event): void => {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors du transfert';
-    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
   };
 
   private _onCurrentMonthChanged = (e: Event): void => {

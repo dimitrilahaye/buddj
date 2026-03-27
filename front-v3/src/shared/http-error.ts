@@ -29,7 +29,7 @@ export function handleHttpError(
   const toaster = getToast();
   const message = 'message' in arg ? arg.message : messageFromUnknown(arg.err);
   const displayMessage = arg.status === 401 ? "Vous n'êtes pas connectés" : message;
-  toaster?.show({ message: displayMessage, variant: 'error', durationMs: 3000 });
+  toaster?.show({ message: displayMessage, variant: 'error', durationMs: 1250 });
   throw new Error(displayMessage);
 }
 

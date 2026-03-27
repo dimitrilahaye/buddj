@@ -4,7 +4,6 @@
  * Attribut amount : nombre (buddj-line-item formate en « X € »).
  */
 import type { BuddjConfirmModalElement } from './buddj-confirm-modal.js';
-import { getToast } from '../atoms/buddj-toast.js';
 
 const CHECKBOX_ID_PREFIX = 'buddj-charge-cb-';
 
@@ -76,8 +75,16 @@ export class BuddjChargeItem extends HTMLElement {
       modal?.show({
         title: `Voulez-vous vraiment supprimer la charge "${label}" ?`,
         onConfirm: () => {
-          const toast = getToast();
-          toast?.show({ message: 'La charge a bien été supprimée' });
+          const outflowId = this.getAttribute('outflow-id') ?? '';
+          if (outflowId) {
+            this.dispatchEvent(
+              new CustomEvent('buddj-charge-delete-confirmed', {
+                bubbles: true,
+                composed: true,
+                detail: { outflowId },
+              }),
+            );
+          }
         },
         onCancel: () => {},
       });
