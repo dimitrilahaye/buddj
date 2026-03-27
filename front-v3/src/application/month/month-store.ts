@@ -11,12 +11,18 @@ import type { DeleteBudgetUseCase } from './delete-budget.js';
 import type { DeleteExpenseUseCase } from './delete-expense.js';
 import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
 import type { PutExpensesCheckingUseCase } from './put-expenses-checking.js';
+import type { PutOutflowsCheckingUseCase } from './put-outflows-checking.js';
 import type { UpdateBudgetUseCase } from './update-budget.js';
 import type { TransferFromWeeklyBudgetUseCase } from './transfer-from-weekly-budget.js';
 import type { TransferFromAccountUseCase } from './transfer-from-account.js';
 import type { MonthView } from './month-view.js';
+import {
+  applyOutflowToggleToMonthView,
+  buildOutflowsCheckingPayload,
+} from './outflows-checking-payload.js';
 
 export const LOADING_EXPENSES_CHECKING_TEXT = 'Mise à jour des dépenses en cours';
+export const LOADING_OUTFLOWS_CHECKING_TEXT = 'Mise à jour des charges en cours';
 export const LOADING_DELETE_EXPENSE_TEXT = 'Suppression de la dépense en cours';
 export const LOADING_DELETE_BUDGET_TEXT = 'Suppression du budget en cours';
 export const LOADING_CREATE_EXPENSE_TEXT = 'Ajout de la dépense en cours';
@@ -28,6 +34,11 @@ export const LOADING_TRANSFER_BUDGET_TEXT = 'Transfert en cours';
 export type PutExpensesCheckingActionDetail = {
   weeklyBudgetId: string;
   expenseId: string;
+  isChecked: boolean;
+};
+
+export type PutOutflowsCheckingActionDetail = {
+  outflowId: string;
   isChecked: boolean;
 };
 
@@ -82,6 +93,7 @@ export class MonthStore extends Store<MonthState> {
   constructor({
     loadUnarchivedMonths,
     putExpensesChecking,
+    putOutflowsChecking,
     deleteExpense,
     deleteBudget,
     createExpense,
@@ -93,6 +105,7 @@ export class MonthStore extends Store<MonthState> {
   }: {
     loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
     putExpensesChecking: PutExpensesCheckingUseCase;
+    putOutflowsChecking: PutOutflowsCheckingUseCase;
     deleteExpense: DeleteExpenseUseCase;
     deleteBudget: DeleteBudgetUseCase;
     createExpense: CreateExpenseUseCase;
@@ -105,6 +118,7 @@ export class MonthStore extends Store<MonthState> {
     super(DEFAULT_MONTH_STATE);
     this._loadUnarchivedMonths = loadUnarchivedMonths;
     this._putExpensesChecking = putExpensesChecking;
+    this._putOutflowsChecking = putOutflowsChecking;
     this._deleteExpense = deleteExpense;
     this._deleteBudget = deleteBudget;
     this._createExpense = createExpense;
@@ -119,6 +133,10 @@ export class MonthStore extends Store<MonthState> {
     this.addEventListener('putExpensesChecking', (e: Event) => {
       const d = (e as CustomEvent<PutExpensesCheckingActionDetail>).detail;
       if (d?.expenseId && d.weeklyBudgetId) void this.handlePutExpensesChecking(d);
+    });
+    this.addEventListener('putOutflowsChecking', (e: Event) => {
+      const d = (e as CustomEvent<PutOutflowsCheckingActionDetail>).detail;
+      if (d?.outflowId) void this.handlePutOutflowsChecking(d);
     });
     this.addEventListener('deleteExpense', (e: Event) => {
       const d = (e as CustomEvent<DeleteExpenseActionDetail>).detail;
@@ -159,6 +177,7 @@ export class MonthStore extends Store<MonthState> {
 
   private _loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
   private _putExpensesChecking: PutExpensesCheckingUseCase;
+  private _putOutflowsChecking: PutOutflowsCheckingUseCase;
   private _deleteExpense: DeleteExpenseUseCase;
   private _deleteBudget: DeleteBudgetUseCase;
   private _createExpense: CreateExpenseUseCase;
@@ -222,6 +241,25 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('expensesCheckingFailed', { message });
+    }
+  }
+
+  private async handlePutOutflowsChecking(detail: PutOutflowsCheckingActionDetail): Promise<void> {
+    const state = this.getState();
+    const month = getCurrentMonth({ state });
+    if (!month) return;
+    const toggled = applyOutflowToggleToMonthView(month, detail);
+    const body = buildOutflowsCheckingPayload(toggled);
+    this.emitStateChange('outflowsCheckingLoading');
+    try {
+      const updated = await this._putOutflowsChecking({ monthId: month.id, body });
+      const months = state.months.map((m) => (m.id === updated.id ? updated : m));
+      this.setState({ months });
+      this.emitStateChange('outflowsCheckingLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('outflowsCheckingFailed', { message });
     }
   }
 

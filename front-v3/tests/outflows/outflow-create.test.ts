@@ -34,7 +34,7 @@ describe('ajout charge récurrente -> POST outflows', () => {
       account: {
         id: 'a66640a1-ab8e-472e-bdf9-5ba8207a8f2b',
         currentBalance: 4000,
-        outflows: [{ amount: 45, label: '🚋 TAN', isChecked: false, pendingFrom: null }],
+        outflows: [{ id: 'o-1', amount: 45, label: '🚋 TAN', isChecked: false, pendingFrom: null }],
         weeklyBudgets: [],
       },
     };

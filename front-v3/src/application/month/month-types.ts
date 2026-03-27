@@ -26,11 +26,20 @@ export interface BudgetGroupData {
 
 /** Charge récurrente (écran charges). */
 export interface ChargeItemData {
+  id?: string;
   icon: string;
   label: string;
   amount: number;
   taken?: boolean;
   previous?: boolean;
+}
+
+export interface OutflowData {
+  id: string;
+  pendingFrom: string | null;
+  label: string;
+  amount: number;
+  isChecked: boolean;
 }
 
 export interface ChargeGroupData {

@@ -34,9 +34,9 @@ describe('outflows affiche les charges du mois courant', () => {
         id: 'a66640a1-ab8e-472e-bdf9-5ba8207a8f2b',
         currentBalance: 4000,
         outflows: [
-          { amount: 699.41, label: '🏠 Loyer', isChecked: false, pendingFrom: null },
-          { amount: 45, label: '🚋 TAN', isChecked: false, pendingFrom: null },
-          { amount: 92.06, label: 'MACIF', isChecked: true, pendingFrom: '2026-02' },
+          { id: 'o-1', amount: 699.41, label: '🏠 Loyer', isChecked: false, pendingFrom: null },
+          { id: 'o-2', amount: 45, label: '🚋 TAN', isChecked: false, pendingFrom: null },
+          { id: 'o-3', amount: 92.06, label: 'MACIF', isChecked: true, pendingFrom: '2026-02' },
         ],
         weeklyBudgets: [],
       },

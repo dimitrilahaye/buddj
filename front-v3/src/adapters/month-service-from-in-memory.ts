@@ -1,6 +1,7 @@
 import { addBudgetToMonthView } from '../application/month/add-budget-to-month-view.js';
 import { addExpenseToMonthView } from '../application/month/add-expense-to-month-view.js';
 import { applyCheckingPayloadToMonthView } from '../application/month/expenses-checking-payload.js';
+import { applyOutflowsCheckingPayloadToMonthView } from '../application/month/outflows-checking-payload.js';
 import type { MonthService } from '../application/month/month-service.js';
 import type { MonthView } from '../application/month/month-view.js';
 import { removeBudgetFromMonthView } from '../application/month/remove-budget-from-month-view.js';
@@ -19,6 +20,7 @@ export function createMonthServiceFromInMemory({
   months: initialMonths,
   delayMs = 0,
   putDelayMs,
+  putOutflowsDelayMs,
   deleteDelayMs,
   deleteBudgetDelayMs,
   createExpenseDelayMs,
@@ -32,6 +34,8 @@ export function createMonthServiceFromInMemory({
   delayMs?: number;
   /** Délai simulé pour `putExpensesChecking` (défaut : `delayMs`). */
   putDelayMs?: number;
+  /** Délai simulé pour `putOutflowsChecking` (défaut : `delayMs`). */
+  putOutflowsDelayMs?: number;
   /** Délai simulé pour `deleteExpense` (défaut : `delayMs`). */
   deleteDelayMs?: number;
   /** Délai simulé pour `deleteBudget` (défaut : `delayMs`). */
@@ -49,6 +53,7 @@ export function createMonthServiceFromInMemory({
 }): MonthService {
   const months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
+  const waitPutOutflows = putOutflowsDelayMs ?? delayMs;
   const waitDelete = deleteDelayMs ?? delayMs;
   const waitDeleteBudget = deleteBudgetDelayMs ?? delayMs;
   const waitCreateExpense = createExpenseDelayMs ?? delayMs;
@@ -68,6 +73,14 @@ export function createMonthServiceFromInMemory({
       const updated = applyCheckingPayloadToMonthView(months[idx], body);
       // Simule un solde prévisionnel recalculé côté serveur (ex. dashboard.account.forecastBalance)
       updated.projectedBalance = Math.round((updated.projectedBalance + 73.6) * 10) / 10;
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
+    async putOutflowsChecking({ monthId, body }) {
+      if (waitPutOutflows > 0) await new Promise((r) => setTimeout(r, waitPutOutflows));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const updated = applyOutflowsCheckingPayloadToMonthView(months[idx], body);
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
     },
@@ -175,7 +188,19 @@ function addOutflowToMonthView({
   const next: MonthView = deepCloneMonths([month])[0]!;
   const currentGroupIdx = (next.chargeGroups ?? []).findIndex((g) => !g.previous);
   const parsed = splitLeadingEmoji({ label, defaultIcon: '💰' });
+  const outflowId = crypto.randomUUID();
+  next.outflows = [
+    ...(next.outflows ?? []),
+    {
+      id: outflowId,
+      pendingFrom: null,
+      label,
+      amount,
+      isChecked: false,
+    },
+  ];
   const newCharge = {
+    id: outflowId,
     icon: parsed.icon,
     label: parsed.text,
     amount,

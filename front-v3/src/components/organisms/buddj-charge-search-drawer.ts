@@ -12,6 +12,7 @@ export type BuddjChargeSearchDrawerElement = HTMLElement & { open: () => void };
 interface ChargeEntry extends SearchDrawerEntry {
   month: string;
   isTemplateContext?: boolean;
+  outflowId?: string;
 }
 
 function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
@@ -51,16 +52,23 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
       const cbId = CHECKBOX_ID_PREFIX + Math.random().toString(36).slice(2, 11);
       lineItem.setAttribute('checkable-for', cbId);
 
-      const realCheckbox = entry.element.querySelector<HTMLInputElement>('.charge-taken');
+      const getRealCheckbox = (): HTMLInputElement | null => {
+        const outflowId = entry.outflowId ?? '';
+        if (outflowId) {
+          return document.querySelector(`buddj-charge-item[outflow-id="${outflowId}"] .charge-taken`) as HTMLInputElement | null;
+        }
+        return entry.element.querySelector<HTMLInputElement>('.charge-taken');
+      };
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.id = cbId;
       checkbox.className = 'charge-taken';
       checkbox.title = 'Marquer comme prélevé du compte (ne compte plus dans le solde)';
-      checkbox.checked = realCheckbox?.checked ?? false;
+      checkbox.checked = getRealCheckbox()?.checked ?? false;
       checkbox.slot = 'prefix';
 
       checkbox.addEventListener('change', () => {
+        const realCheckbox = getRealCheckbox();
         if (realCheckbox) {
           realCheckbox.checked = checkbox.checked;
           realCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
@@ -75,6 +83,11 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
     deleteBtn.slot = 'actions';
     deleteBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      const outflowId = entry.outflowId ?? '';
+      if (outflowId) {
+        document.querySelector<HTMLElement>(`buddj-charge-item[outflow-id="${outflowId}"] buddj-icon-delete`)?.click();
+        return;
+      }
       entry.element.querySelector<HTMLElement>('buddj-icon-delete')?.click();
     });
 
@@ -114,6 +127,7 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
           icon: el.getAttribute('icon') ?? '💰',
           element: el as HTMLElement,
           isTemplateContext: isTemplateDetail,
+          outflowId: el.getAttribute('outflow-id') ?? '',
         });
       });
     });

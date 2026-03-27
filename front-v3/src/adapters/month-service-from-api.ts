@@ -1,4 +1,5 @@
 import type { MonthService } from '../application/month/month-service.js';
+import type { OutflowsCheckingPayload } from '../application/month/outflows-checking-payload.js';
 import { getReponseDataOrFail } from '../shared/get-reponse-data-or-fail.js';
 import {
   errorMessageFromUnknown,
@@ -29,6 +30,23 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
     },
     async putExpensesChecking(monthId, body) {
       const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/expenses/checking`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
+    async putOutflowsChecking({ monthId, body }: { monthId: string; body: OutflowsCheckingPayload }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/outflows/checking`;
       let response: Response;
       try {
         response = await fetch(url, {

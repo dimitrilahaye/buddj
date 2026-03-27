@@ -55,10 +55,15 @@ export class BuddjChargeItem extends HTMLElement {
     checkbox?.addEventListener('change', () => {
       if (checkbox.checked) this.setAttribute('taken', '');
       else this.removeAttribute('taken');
-      const toast = getToast();
-      const message = checkbox.checked ? 'La charge a bien été cochée' : 'La charge a bien été décochée';
-      toast?.show({ message });
-      this.dispatchEvent(new CustomEvent('buddj-charge-taken-change', { bubbles: true }));
+      this.dispatchEvent(
+        new CustomEvent('buddj-charge-taken-change', {
+          bubbles: true,
+          detail: {
+            outflowId: this.getAttribute('outflow-id') ?? '',
+            isChecked: checkbox.checked,
+          },
+        }),
+      );
     });
   }
 

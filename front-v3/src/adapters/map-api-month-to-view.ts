@@ -1,5 +1,5 @@
 import { splitLeadingEmoji } from '../shared/emoji-label.js';
-import type { Budget, BudgetGroupData, ChargeGroupData, ChargeItemData } from '../application/month/month-types.js';
+import type { Budget, BudgetGroupData, ChargeGroupData, ChargeItemData, OutflowData } from '../application/month/month-types.js';
 import type { MonthView } from '../application/month/month-view.js';
 
 const DEFAULT_ITEM_ICON = '💰';
@@ -12,6 +12,7 @@ type ApiWeeklyBudgetRow = {
 };
 
 type ApiOutflowRow = {
+  id: string;
   amount: number;
   label: string;
   isChecked: boolean;
@@ -118,9 +119,18 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
     });
   }
 
-  const toCharge = (o: ApiOutflowRow): ChargeItemData => {
+  const toOutflowData = (o: ApiOutflowRow): OutflowData => ({
+    id: o.id,
+    pendingFrom: o.pendingFrom,
+    label: o.label,
+    amount: Number(o.amount),
+    isChecked: !!o.isChecked,
+  });
+  const outflowsData = outflows.map(toOutflowData);
+  const toCharge = (o: OutflowData): ChargeItemData => {
     const parsed = splitLeadingEmoji({ label: o.label, defaultIcon: DEFAULT_ITEM_ICON });
     return {
+      id: o.id,
       icon: parsed.icon,
       label: parsed.text,
       amount: Number(o.amount),
@@ -128,8 +138,8 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
       previous: o.pendingFrom != null,
     };
   };
-  const previousOutflows = outflows.filter((o) => o.pendingFrom != null).map(toCharge);
-  const currentOutflows = outflows.filter((o) => o.pendingFrom == null).map(toCharge);
+  const previousOutflows = outflowsData.filter((o) => o.pendingFrom != null).map(toCharge);
+  const currentOutflows = outflowsData.filter((o) => o.pendingFrom == null).map(toCharge);
   const chargeGroups: ChargeGroupData[] = [];
   if (previousOutflows.length > 0) {
     chargeGroups.push({
@@ -156,5 +166,6 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
     projectedBalance: Number(payload.dashboard?.account?.forecastBalance ?? 0),
     budgetGroups,
     chargeGroups,
+    outflows: outflowsData,
   };
 }
