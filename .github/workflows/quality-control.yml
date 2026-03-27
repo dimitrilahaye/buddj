@@ -28,7 +28,7 @@ jobs:
     if: needs.changes.outputs.back == 'true'
     name: ⚙️ Back — Continuous Integration
     runs-on: ubuntu-latest
-    container: node:24.14.0-bookworm-slim
+    container: node:24.14.1-bookworm-slim
 
     services:
       postgres:
@@ -44,7 +44,7 @@ jobs:
     - name: 🟢 Back — Use Node
       uses: actions/setup-node@v6
       with:
-        node-version: "24.14.0"
+        node-version: "24.14.1"
 
     - name: 📦 Back — Install
       working-directory: ./back
@@ -96,7 +96,7 @@ jobs:
     - name: 🟢 Front — Use Node
       uses: actions/setup-node@v6
       with:
-        node-version: "24.14.0"
+        node-version: "24.14.1"
 
     - name: 📦 Front — Install
       working-directory: ./front-v3
