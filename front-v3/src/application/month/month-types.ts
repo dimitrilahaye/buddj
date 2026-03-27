@@ -36,7 +36,6 @@ export interface ChargeItemData {
 export interface ChargeGroupData {
   title?: string;
   previous?: boolean;
-  annual?: boolean;
   showAdd?: boolean;
   addLabel?: string;
   addTitle?: string;

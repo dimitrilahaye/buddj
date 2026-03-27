@@ -1,5 +1,5 @@
 import { splitLeadingEmoji } from '../shared/emoji-label.js';
-import type { Budget, BudgetGroupData } from '../application/month/month-types.js';
+import type { Budget, BudgetGroupData, ChargeGroupData, ChargeItemData } from '../application/month/month-types.js';
 import type { MonthView } from '../application/month/month-view.js';
 
 const DEFAULT_ITEM_ICON = '💰';
@@ -9,6 +9,13 @@ type ApiWeeklyBudgetRow = {
   name: string;
   pendingFrom: string | null;
   expenses: Array<{ id: string; amount: number; label: string; isChecked: boolean }>;
+};
+
+type ApiOutflowRow = {
+  amount: number;
+  label: string;
+  isChecked: boolean;
+  pendingFrom: string | null;
 };
 
 type ApiDashboardWeekRow = {
@@ -33,6 +40,7 @@ export type ApiMonthPayload = {
   account: {
     id: string;
     currentBalance: number;
+    outflows?: ApiOutflowRow[];
     weeklyBudgets: ApiWeeklyBudgetRow[];
   };
 };
@@ -85,6 +93,7 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
   const displayLabel = formatDisplayLabelFr({ isoDate });
   const dashWeeks = payload.dashboard?.weeks?.weeklyBudgets ?? [];
   const weekly = payload.account?.weeklyBudgets ?? [];
+  const outflows = payload.account?.outflows ?? [];
 
   const previousBudgets = weekly
     .filter((w) => w.pendingFrom != null)
@@ -109,6 +118,35 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
     });
   }
 
+  const toCharge = (o: ApiOutflowRow): ChargeItemData => {
+    const parsed = splitLeadingEmoji({ label: o.label, defaultIcon: DEFAULT_ITEM_ICON });
+    return {
+      icon: parsed.icon,
+      label: parsed.text,
+      amount: Number(o.amount),
+      taken: !!o.isChecked,
+      previous: o.pendingFrom != null,
+    };
+  };
+  const previousOutflows = outflows.filter((o) => o.pendingFrom != null).map(toCharge);
+  const currentOutflows = outflows.filter((o) => o.pendingFrom == null).map(toCharge);
+  const chargeGroups: ChargeGroupData[] = [];
+  if (previousOutflows.length > 0) {
+    chargeGroups.push({
+      previous: true,
+      charges: previousOutflows,
+    });
+  }
+  if (currentOutflows.length > 0) {
+    chargeGroups.push({
+      title: `Charges de ${displayLabel}`,
+      showAdd: true,
+      addLabel: 'Ajouter une charge',
+      addTitle: 'Ajouter une charge récurrente',
+      charges: currentOutflows,
+    });
+  }
+
   return {
     id: payload.id,
     accountId: payload.account?.id ?? '',
@@ -117,5 +155,6 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
     currentBalance: Number(payload.account?.currentBalance ?? 0),
     projectedBalance: Number(payload.dashboard?.account?.forecastBalance ?? 0),
     budgetGroups,
+    chargeGroups,
   };
 }

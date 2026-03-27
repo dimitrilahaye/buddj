@@ -7,45 +7,19 @@ import type { BuddjChargeSearchDrawerElement } from '../organisms/buddj-charge-s
 import { entryMatchesSearch } from '../../shared/search.js';
 import type { ChargeGroupData } from '../../application/month/month-types.js';
 import { escapeAttr } from '../../shared/escape.js';
-
-const CHARGE_GROUPS: ChargeGroupData[] = [
-  {
-    previous: true,
-    charges: [
-      { icon: '🏠', label: 'Loyer', amount: 650, previous: true },
-      { icon: '🛡️', label: "Assurance auto pour l'année passée", amount: 45, taken: true, previous: true },
-    ],
-  },
-  {
-    title: 'Charges annuelles',
-    annual: true,
-    charges: [
-      { icon: '🛡️', label: 'Assurance habitation', amount: 420 },
-      { icon: '📋', label: 'Contrôle chaudière', amount: 120, taken: true },
-    ],
-  },
-  {
-    title: "Charges d'Avril 2024",
-    showAdd: true,
-    addLabel: 'Ajouter une charge',
-    addTitle: 'Ajouter une charge récurrente',
-    charges: [
-      { icon: '🏠', label: 'Loyer', amount: 650, taken: true },
-      { icon: '⚡', label: 'Électricité', amount: 82 },
-      { icon: '🛡️', label: 'Assurance auto', amount: 45, taken: true },
-      { icon: '📶', label: 'Internet', amount: 29.99, taken: true },
-      { icon: '💪', label: 'Abonnement sport', amount: 39 },
-    ],
-  },
-];
-
-const HEADER_ADD_CHARGE = CHARGE_GROUPS.find((g) => g.showAdd);
-const HEADER_ADD_CHARGE_TITLE_ATTR = escapeAttr(
-  HEADER_ADD_CHARGE?.addTitle ?? 'Ajouter une charge récurrente'
-);
+import type { MonthStore } from '../../application/month/month-store.js';
+import type { MonthView } from '../../application/month/month-view.js';
+import { getCurrentMonth } from '../../application/month/month-state.js';
 
 export class BuddjScreenRecurring extends HTMLElement {
   static readonly tagName = 'buddj-screen-recurring';
+  private _monthStore?: MonthStore;
+  private _monthListenersAttached = false;
+  private _chargeGroups: ChargeGroupData[] = [];
+
+  init({ monthStore }: { monthStore: MonthStore }): void {
+    this._monthStore = monthStore;
+  }
 
   private _searchListener = (e: Event): void => {
     const ev = e as CustomEvent<{ query: string }>;
@@ -63,6 +37,22 @@ export class BuddjScreenRecurring extends HTMLElement {
 
   connectedCallback(): void {
     if (this.querySelector('.recurring-list')) return;
+    this.render();
+    this.attachListeners();
+    document.addEventListener('buddj-charge-search', this._searchListener);
+    this._attachMonthStoreListeners();
+  }
+
+  disconnectedCallback(): void {
+    document.removeEventListener('buddj-charge-search', this._searchListener);
+    this._detachMonthStoreListeners();
+  }
+
+  private render(): void {
+    const headerAddCharge = this._chargeGroups.find((g) => g.showAdd);
+    const headerAddChargeTitleAttr = escapeAttr(
+      headerAddCharge?.addTitle ?? 'Ajouter une charge récurrente'
+    );
     const main = document.createElement('main');
     main.id = 'recurring';
     main.className = 'screen screen--recurring';
@@ -73,8 +63,8 @@ export class BuddjScreenRecurring extends HTMLElement {
             <h1 class="title">Charges récurrentes</h1>
             <buddj-icon-search title="Rechercher par intitulé ou montant" aria-label="Ouvrir la recherche"></buddj-icon-search>
             ${
-              HEADER_ADD_CHARGE
-                ? `<buddj-btn-add label="" title="${HEADER_ADD_CHARGE_TITLE_ATTR}" data-header-add-charge></buddj-btn-add>`
+              headerAddCharge
+                ? `<buddj-btn-add label="" title="${headerAddChargeTitleAttr}" data-header-add-charge></buddj-btn-add>`
                 : ''
             }
           </div>
@@ -85,10 +75,9 @@ export class BuddjScreenRecurring extends HTMLElement {
       </section>
     `;
     const listSection = main.querySelector('.recurring-list')!;
-    for (const group of CHARGE_GROUPS) {
+    for (const group of this._chargeGroups) {
       const groupEl = document.createElement('buddj-charge-group');
       if (group.previous) groupEl.setAttribute('previous', '');
-      if (group.annual) groupEl.setAttribute('annual', '');
       if (group.title) groupEl.setAttribute('title', group.title);
       if (group.showAdd) {
         groupEl.setAttribute('show-add', '');
@@ -107,13 +96,7 @@ export class BuddjScreenRecurring extends HTMLElement {
       }
       listSection.appendChild(groupEl);
     }
-    this.appendChild(main);
-    this.attachListeners();
-    document.addEventListener('buddj-charge-search', this._searchListener);
-  }
-
-  disconnectedCallback(): void {
-    document.removeEventListener('buddj-charge-search', this._searchListener);
+    this.replaceChildren(main);
   }
 
   private attachListeners(): void {
@@ -131,6 +114,28 @@ export class BuddjScreenRecurring extends HTMLElement {
         drawer?.open();
       }
     });
+  }
+
+  private _onCurrentMonthChanged = (e: Event): void => {
+    const month = (e as CustomEvent<{ month: MonthView | null }>).detail?.month;
+    this._chargeGroups = month?.chargeGroups ?? [];
+    this.render();
+  };
+
+  private _attachMonthStoreListeners(): void {
+    if (!this._monthStore || this._monthListenersAttached) return;
+    this._monthListenersAttached = true;
+    this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
+    const month = getCurrentMonth({ state: this._monthStore.getState() });
+    this._chargeGroups = month?.chargeGroups ?? [];
+    this.render();
+    if (!month) this._monthStore.emitAction('loadUnarchivedMonths');
+  }
+
+  private _detachMonthStoreListeners(): void {
+    if (!this._monthStore || !this._monthListenersAttached) return;
+    this._monthStore.removeEventListener('currentMonthChanged', this._onCurrentMonthChanged);
+    this._monthListenersAttached = false;
   }
 }
 

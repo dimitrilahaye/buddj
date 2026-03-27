@@ -1,4 +1,4 @@
-import type { BudgetGroupData } from './month-types.js';
+import type { BudgetGroupData, ChargeGroupData } from './month-types.js';
 
 /**
  * Mois prêt pour l’UI (après mapping API → domaine).
@@ -13,4 +13,5 @@ export interface MonthView {
   currentBalance: number;
   projectedBalance: number;
   budgetGroups: BudgetGroupData[];
+  chargeGroups?: ChargeGroupData[];
 }

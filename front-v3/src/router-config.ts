@@ -112,7 +112,10 @@ export function createRoutes({
       name: 'outflows',
       pattern: '/outflows/:monthId',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-recurring');
+        const el = document.createElement('buddj-screen-recurring') as HTMLElement & {
+          init: (i: { monthStore: MonthStore }) => void;
+        };
+        el.init({ monthStore });
         ctx.outlet.replaceChildren(el);
         const main = document.getElementById('recurring');
         if (main) main.setAttribute('data-month-id', ctx.params.monthId ?? '');
