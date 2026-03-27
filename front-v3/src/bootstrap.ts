@@ -15,6 +15,7 @@ import { MonthStore } from './application/month/month-store.js';
 import { createCreateBudget } from './application/month/create-budget.js';
 import { createUpdateBudget } from './application/month/update-budget.js';
 import { createCreateExpense } from './application/month/create-expense.js';
+import { createCreateOutflow } from './application/month/create-outflow.js';
 import { createDeleteBudget } from './application/month/delete-budget.js';
 import { createDeleteExpense } from './application/month/delete-expense.js';
 import { createPutExpensesChecking } from './application/month/put-expenses-checking.js';
@@ -75,6 +76,7 @@ export function bootstrap(options: BootstrapOptions): void {
   const deleteBudget = createDeleteBudget({ monthService: options.monthService });
   const createExpense = createCreateExpense({ monthService: options.monthService });
   const createBudget = createCreateBudget({ monthService: options.monthService });
+  const createOutflow = createCreateOutflow({ monthService: options.monthService });
   const updateBudget = createUpdateBudget({ monthService: options.monthService });
   const transferFromWeeklyBudget = createTransferFromWeeklyBudget({ monthService: options.monthService });
   const transferFromAccount = createTransferFromAccount({ monthService: options.monthService });
@@ -85,6 +87,7 @@ export function bootstrap(options: BootstrapOptions): void {
     deleteBudget,
     createExpense,
     createBudget,
+    createOutflow,
     updateBudget,
     transferFromWeeklyBudget,
     transferFromAccount,

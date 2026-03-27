@@ -6,6 +6,7 @@ import {
 import { DEFAULT_MONTH_STATE, getCurrentMonth, type MonthState } from './month-state.js';
 import type { CreateBudgetUseCase } from './create-budget.js';
 import type { CreateExpenseUseCase } from './create-expense.js';
+import type { CreateOutflowUseCase } from './create-outflow.js';
 import type { DeleteBudgetUseCase } from './delete-budget.js';
 import type { DeleteExpenseUseCase } from './delete-expense.js';
 import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
@@ -20,6 +21,7 @@ export const LOADING_DELETE_EXPENSE_TEXT = 'Suppression de la dépense en cours'
 export const LOADING_DELETE_BUDGET_TEXT = 'Suppression du budget en cours';
 export const LOADING_CREATE_EXPENSE_TEXT = 'Ajout de la dépense en cours';
 export const LOADING_CREATE_BUDGET_TEXT = 'Ajout du budget en cours';
+export const LOADING_CREATE_OUTFLOW_TEXT = 'Ajout de la charge en cours';
 export const LOADING_UPDATE_BUDGET_TEXT = 'Mise à jour du budget en cours';
 export const LOADING_TRANSFER_BUDGET_TEXT = 'Transfert en cours';
 
@@ -52,6 +54,11 @@ export type CreateBudgetActionDetail = {
   initialBalance: number;
 };
 
+export type CreateOutflowActionDetail = {
+  label: string;
+  amount: number;
+};
+
 export type UpdateBudgetActionDetail = {
   budgetId: string;
   /** Nom API (ex. « 🔥 Semaine 123 »). */
@@ -79,6 +86,7 @@ export class MonthStore extends Store<MonthState> {
     deleteBudget,
     createExpense,
     createBudget,
+    createOutflow,
     updateBudget,
     transferFromWeeklyBudget,
     transferFromAccount,
@@ -89,6 +97,7 @@ export class MonthStore extends Store<MonthState> {
     deleteBudget: DeleteBudgetUseCase;
     createExpense: CreateExpenseUseCase;
     createBudget: CreateBudgetUseCase;
+    createOutflow: CreateOutflowUseCase;
     updateBudget: UpdateBudgetUseCase;
     transferFromWeeklyBudget: TransferFromWeeklyBudgetUseCase;
     transferFromAccount: TransferFromAccountUseCase;
@@ -100,6 +109,7 @@ export class MonthStore extends Store<MonthState> {
     this._deleteBudget = deleteBudget;
     this._createExpense = createExpense;
     this._createBudget = createBudget;
+    this._createOutflow = createOutflow;
     this._updateBudget = updateBudget;
     this._transferFromWeeklyBudget = transferFromWeeklyBudget;
     this._transferFromAccount = transferFromAccount;
@@ -126,6 +136,10 @@ export class MonthStore extends Store<MonthState> {
       const d = (e as CustomEvent<CreateBudgetActionDetail>).detail;
       if (d?.name?.trim() && d.initialBalance !== undefined && d.initialBalance > 0) void this.handleCreateBudget(d);
     });
+    this.addEventListener('createOutflow', (e: Event) => {
+      const d = (e as CustomEvent<CreateOutflowActionDetail>).detail;
+      if (d?.label?.trim() && d.amount !== undefined && d.amount > 0) void this.handleCreateOutflow(d);
+    });
     this.addEventListener('updateBudget', (e: Event) => {
       const d = (e as CustomEvent<UpdateBudgetActionDetail>).detail;
       if (d?.budgetId && d.name?.trim()) void this.handleUpdateBudget(d);
@@ -149,6 +163,7 @@ export class MonthStore extends Store<MonthState> {
   private _deleteBudget: DeleteBudgetUseCase;
   private _createExpense: CreateExpenseUseCase;
   private _createBudget: CreateBudgetUseCase;
+  private _createOutflow: CreateOutflowUseCase;
   private _updateBudget: UpdateBudgetUseCase;
   private _transferFromWeeklyBudget: TransferFromWeeklyBudgetUseCase;
   private _transferFromAccount: TransferFromAccountUseCase;
@@ -271,6 +286,27 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('budgetCreateFailed', { message });
+    }
+  }
+
+  private async handleCreateOutflow(detail: CreateOutflowActionDetail): Promise<void> {
+    const state = this.getState();
+    const month = getCurrentMonth({ state });
+    if (!month) return;
+    this.emitStateChange('outflowCreateLoading');
+    try {
+      const updated = await this._createOutflow({
+        monthId: month.id,
+        label: detail.label,
+        amount: detail.amount,
+      });
+      const months = state.months.map((m) => (m.id === updated.id ? updated : m));
+      this.setState({ months });
+      this.emitStateChange('outflowCreateLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('outflowCreateFailed', { message });
     }
   }
 
