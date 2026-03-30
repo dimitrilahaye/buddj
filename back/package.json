@@ -50,7 +50,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@tsconfig/node22": "^22.0.0",
+    "@tsconfig/node22": "^22.0.5",
     "@types/chai": "^4.3.20",
     "@types/chai-as-promised": "^8.0.2",
     "@types/cookie-session": "^2.0.49",
