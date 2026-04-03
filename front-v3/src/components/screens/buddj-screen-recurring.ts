@@ -124,6 +124,7 @@ export class BuddjScreenRecurring extends HTMLElement {
     const listSection = main.querySelector('.recurring-list')!;
     for (const group of this._chargeGroups) {
       const groupEl = document.createElement('buddj-charge-group');
+      groupEl.setAttribute('hide-recap', '');
       if (group.previous) groupEl.setAttribute('previous', '');
       if (group.title) groupEl.setAttribute('title', group.title);
       if (group.showAdd) {

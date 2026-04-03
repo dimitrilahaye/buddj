@@ -29,6 +29,7 @@ import { createPutOutflowsChecking } from './application/month/put-outflows-chec
 import { createTransferFromWeeklyBudget } from './application/month/transfer-from-weekly-budget.js';
 import { createTransferFromAccount } from './application/month/transfer-from-account.js';
 import { createArchiveMonth } from './application/month/archive-month.js';
+import { createCreateMonth } from './application/month/create-month.js';
 import type { MonthService } from './application/month/month-service.js';
 import { createLoadTemplates } from './application/template/load-templates.js';
 import { createUpdateTemplate } from './application/template/update-template.js';
@@ -140,8 +141,10 @@ export function bootstrap(options: BootstrapOptions): void {
   const loadArchivedMonths = createLoadArchivedMonths({ monthService: options.monthService });
   const unarchiveMonth = createUnarchiveMonth({ monthService: options.monthService });
   const deleteArchivedMonth = createDeleteArchivedMonth({ monthService: options.monthService });
+  const createMonth = createCreateMonth({ monthService: options.monthService });
   const monthStore = new MonthStore({
     loadUnarchivedMonths,
+    createMonth,
     archiveMonth,
     putExpensesChecking,
     putOutflowsChecking,
@@ -189,6 +192,8 @@ export function bootstrap(options: BootstrapOptions): void {
   // let requis : authStore a besoin de router dans onAuthenticatedRedirect, router dépend de authStore pour createRoutes
   // eslint-disable-next-line prefer-const
   let router: ReturnType<typeof createRouter>;
+  const navigateHolder: { navigate?: (path: string) => void } = {};
+
   const authStore = new AuthStore({
     checkUserIsAuthenticated: () => checkUserIsAuthenticated({ authService }),
     userSignIn: () => userSignIn({ authService }),
@@ -221,6 +226,8 @@ export function bootstrap(options: BootstrapOptions): void {
     archivedMonthStore,
     templatesStore,
     yearlyOutflowsStore,
+    templateService,
+    navigateToPath: (path: string) => navigateHolder.navigate?.(path),
     redirectToHome: () => {
       const target = `${window.location.pathname}${window.location.search}${window.location.hash}`;
       if (isSpaInternalPath(window.location.pathname)) {
@@ -236,6 +243,9 @@ export function bootstrap(options: BootstrapOptions): void {
     defaultMonthId: DEFAULT_MONTH_ID,
     defaultRoute: DEFAULT_ROUTE,
   });
+  navigateHolder.navigate = (path: string) => {
+    router.navigate(path);
+  };
 
   monthStore.addEventListener('routeMonthIdNotFound', () => {
     getToast()?.show({

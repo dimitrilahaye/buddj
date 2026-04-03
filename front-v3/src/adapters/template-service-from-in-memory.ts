@@ -1,3 +1,5 @@
+import type { DefaultNewMonthBundle } from '../application/new-month/default-new-month-bundle.js';
+import { emptyPendingDebits } from '../application/new-month/default-new-month-bundle.js';
 import type { TemplateService } from '../application/template/template-service.js';
 import type { TemplateView } from '../application/template/template-view.js';
 
@@ -10,18 +12,33 @@ function deepClone<T>(x: T): T {
  */
 export function createTemplateServiceFromInMemory({
   templates: initialTemplates,
+  defaultForNewMonth,
   delayMs = 0,
 }: {
   templates: TemplateView[];
+  /** Si absent : premier template `isDefault`, sinon premier de la liste, avec pending vides. */
+  defaultForNewMonth?: DefaultNewMonthBundle;
   delayMs?: number;
 }): TemplateService {
   const templates = deepClone(initialTemplates);
+  const defaultBundle: DefaultNewMonthBundle =
+    defaultForNewMonth ??
+    (() => {
+      const def = templates.find((t) => t.isDefault) ?? templates[0];
+      if (!def) return { template: null, pendingDebits: emptyPendingDebits() };
+      return { template: deepClone(def), pendingDebits: emptyPendingDebits() };
+    })();
 
   async function tick(): Promise<void> {
     if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
   }
 
   return {
+    async getDefaultForNewMonth() {
+      await tick();
+      return deepClone(defaultBundle);
+    },
+
     async getAllTemplates() {
       await tick();
       return deepClone(templates);

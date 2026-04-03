@@ -1,3 +1,4 @@
+import type { DefaultNewMonthBundle } from '../new-month/default-new-month-bundle.js';
 import type { TemplateView } from './template-view.js';
 
 export type UpdateTemplateInput = {
@@ -19,6 +20,7 @@ export type AddTemplateBudgetInput = {
 };
 
 export interface TemplateService {
+  getDefaultForNewMonth(): Promise<DefaultNewMonthBundle>;
   getAllTemplates(): Promise<TemplateView[]>;
   updateTemplate(input: UpdateTemplateInput): Promise<TemplateView>;
   addTemplateOutflow(input: AddTemplateOutflowInput): Promise<TemplateView>;

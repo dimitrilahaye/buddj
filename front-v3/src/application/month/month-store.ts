@@ -11,7 +11,9 @@ import type { DeleteBudgetUseCase } from './delete-budget.js';
 import type { DeleteExpenseUseCase } from './delete-expense.js';
 import type { DeleteOutflowUseCase } from './delete-outflow.js';
 import type { ArchiveMonthUseCase } from './archive-month.js';
+import type { CreateMonthUseCase } from './create-month.js';
 import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
+import type { CreateMonthApiBody } from '../new-month/default-new-month-bundle.js';
 import type { PutExpensesCheckingUseCase } from './put-expenses-checking.js';
 import type { PutOutflowsCheckingUseCase } from './put-outflows-checking.js';
 import type { UpdateBudgetUseCase } from './update-budget.js';
@@ -106,6 +108,10 @@ export type ArchiveMonthActionDetail = {
   monthId: string;
 };
 
+export type CreateMonthActionDetail = {
+  body: CreateMonthApiBody;
+};
+
 /** Réponse API désarchivage : liste complète des mois non archivés. */
 export type ApplyUnarchivedMonthsFromApiActionDetail = {
   months: MonthView[];
@@ -149,8 +155,10 @@ export class MonthStore extends Store<MonthState> {
     updateBudget,
     transferFromWeeklyBudget,
     transferFromAccount,
+    createMonth,
   }: {
     loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
+    createMonth: CreateMonthUseCase;
     putExpensesChecking: PutExpensesCheckingUseCase;
     putOutflowsChecking: PutOutflowsCheckingUseCase;
     deleteExpense: DeleteExpenseUseCase;
@@ -166,6 +174,7 @@ export class MonthStore extends Store<MonthState> {
   }) {
     super(DEFAULT_MONTH_STATE);
     this._loadUnarchivedMonths = loadUnarchivedMonths;
+    this._createMonth = createMonth;
     this._archiveMonth = archiveMonth;
     this._putExpensesChecking = putExpensesChecking;
     this._putOutflowsChecking = putOutflowsChecking;
@@ -245,9 +254,14 @@ export class MonthStore extends Store<MonthState> {
       const d = (e as CustomEvent<ApplyUnarchivedMonthsFromApiActionDetail>).detail;
       if (d?.months) this.handleApplyUnarchivedMonthsFromApi(d);
     });
+    this.addEventListener('createMonth', (e: Event) => {
+      const d = (e as CustomEvent<CreateMonthActionDetail>).detail;
+      if (d?.body) void this.handleCreateMonth(d);
+    });
   }
 
   private _loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
+  private _createMonth: CreateMonthUseCase;
   private _archiveMonth: ArchiveMonthUseCase;
   private _putExpensesChecking: PutExpensesCheckingUseCase;
   private _putOutflowsChecking: PutOutflowsCheckingUseCase;
@@ -598,6 +612,29 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('budgetTransferFailed', { message });
+    }
+  }
+
+  private async handleCreateMonth(detail: CreateMonthActionDetail): Promise<void> {
+    this.emitStateChange('createMonthLoading');
+    try {
+      const created = await this._createMonth({ body: detail.body });
+      const state = this.getState();
+      const others = state.months.filter((m) => m.id !== created.id);
+      const months = [...others, created].sort((a, b) => a.isoDate.localeCompare(b.isoDate));
+      const idx = months.findIndex((m) => m.id === created.id);
+      this.setState({
+        months,
+        currentIndex: idx >= 0 ? idx : state.currentIndex,
+        isLoadingMonths: false,
+        loadMonthsErrorMessage: null,
+      });
+      this.emitStateChange('createMonthLoaded');
+      this.emitStateChange('monthCreated', { monthId: created.id });
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('createMonthFailed', { message });
     }
   }
 

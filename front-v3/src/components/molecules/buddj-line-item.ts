@@ -92,6 +92,13 @@ export class BuddjLineItem extends HTMLElement {
       :host(:not([no-inner-padding])) .line-item-actions {
         padding-right: 0.5rem;
       }
+      /* Création de mois : ligne exclue du prévisionnel — aligné visuellement sur charge « prélevée » */
+      :host(.new-month-row--hidden) .line-item-label .buddj-text-ellipsis__inner {
+        color: var(--navy-soft);
+      }
+      :host(.new-month-row--hidden) .line-item-icon {
+        opacity: 0.75;
+      }
       .line-item-amount-wrap {
         display: flex;
         flex-direction: column;

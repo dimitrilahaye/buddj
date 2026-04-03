@@ -17,6 +17,8 @@ import type { ArchivedMonthStore } from './application/month/archived-month-stor
 import type { MonthStore } from './application/month/month-store.js';
 import type { TemplatesStore } from './application/template/templates-store.js';
 import type { YearlyOutflowsStore } from './application/yearly-outflows/yearly-outflows-store.js';
+import type { TemplateService } from './application/template/template-service.js';
+import type { BuddjScreenNewMonth } from './components/screens/buddj-screen-new-month.js';
 import type { BuddjScreenArchived } from './components/screens/buddj-screen-archived.js';
 import type { BuddjScreenTemplates } from './components/screens/buddj-screen-templates.js';
 import type { BuddjScreenTemplateDetail } from './components/screens/buddj-screen-template-detail.js';
@@ -55,6 +57,8 @@ export function createRoutes({
   archivedMonthStore,
   templatesStore,
   yearlyOutflowsStore,
+  templateService,
+  navigateToPath,
   redirectToHome,
 }: {
   authStore: AuthStore;
@@ -62,6 +66,8 @@ export function createRoutes({
   archivedMonthStore: ArchivedMonthStore;
   templatesStore: TemplatesStore;
   yearlyOutflowsStore: YearlyOutflowsStore;
+  templateService: TemplateService;
+  navigateToPath: (path: string) => void;
   redirectToHome: () => void;
 }): RouteDef[] {
   return [
@@ -78,7 +84,13 @@ export function createRoutes({
       name: 'new-month',
       pattern: '/new-month',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-new-month');
+        const el = document.createElement('buddj-screen-new-month') as BuddjScreenNewMonth;
+        el.init({
+          templateService,
+          monthStore,
+          yearlyOutflowsStore,
+          navigateToPath,
+        });
         ctx.outlet.replaceChildren(el);
       }),
     },

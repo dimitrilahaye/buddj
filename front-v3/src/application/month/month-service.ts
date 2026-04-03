@@ -1,9 +1,11 @@
+import type { CreateMonthApiBody } from '../new-month/default-new-month-bundle.js';
 import type { ExpensesCheckingPayload } from './expenses-checking-payload.js';
 import type { OutflowsCheckingPayload } from './outflows-checking-payload.js';
 import type { MonthView } from './month-view.js';
 
 export interface MonthService {
   getUnarchivedMonths(): Promise<MonthView[]>;
+  createMonth(input: { body: CreateMonthApiBody }): Promise<MonthView>;
   getArchivedMonths(): Promise<MonthView[]>;
   archiveMonth(input: { monthId: string }): Promise<MonthView>;
   unarchiveMonth(input: { monthId: string }): Promise<MonthView[]>;

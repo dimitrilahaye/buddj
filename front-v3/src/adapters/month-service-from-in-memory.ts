@@ -4,6 +4,7 @@ import { applyCheckingPayloadToMonthView } from '../application/month/expenses-c
 import { applyOutflowsCheckingPayloadToMonthView } from '../application/month/outflows-checking-payload.js';
 import type { MonthService } from '../application/month/month-service.js';
 import type { MonthView } from '../application/month/month-view.js';
+import type { CreateMonthApiBody } from '../application/new-month/default-new-month-bundle.js';
 import { removeBudgetFromMonthView } from '../application/month/remove-budget-from-month-view.js';
 import { updateBudgetInMonthView } from '../application/month/update-budget-in-month-view.js';
 import { removeExpenseFromMonthView } from '../application/month/remove-expense-from-month-view.js';
@@ -32,6 +33,7 @@ export function createMonthServiceFromInMemory({
   transferDelayMs,
   archiveMonthDelayMs,
   archiveMonthFailure,
+  createMonthDelayMs,
 }: {
   months: MonthView[];
   /** Mois déjà archivés (tests écran archivés). */
@@ -62,6 +64,8 @@ export function createMonthServiceFromInMemory({
   archiveMonthDelayMs?: number;
   /** Si défini, `archiveMonth` échoue avec ce message (tests). */
   archiveMonthFailure?: string;
+  /** Délai simulé pour `createMonth` (défaut : `delayMs`). */
+  createMonthDelayMs?: number;
 }): MonthService {
   const months = deepCloneMonths(initialMonths);
   const archivedMonths = deepCloneMonths(initialArchivedMonths ?? []);
@@ -76,8 +80,37 @@ export function createMonthServiceFromInMemory({
   const waitUpdateBudget = updateBudgetDelayMs ?? delayMs;
   const waitTransfer = transferDelayMs ?? delayMs;
   const waitArchiveMonth = archiveMonthDelayMs ?? delayMs;
+  const waitCreateMonth = createMonthDelayMs ?? delayMs;
   const archiveFailMessage = archiveMonthFailure;
   return {
+    async createMonth({ body }: { body: CreateMonthApiBody }) {
+      if (waitCreateMonth > 0) await new Promise((r) => setTimeout(r, waitCreateMonth));
+      const iso =
+        typeof body.month === 'string' && body.month.length >= 10
+          ? body.month
+          : `${String(body.month).slice(0, 7)}-01T00:00:00.000Z`;
+      const id = iso.slice(0, 7);
+      const d = new Date(iso);
+      const displayLabel =
+        new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(d);
+      const capitalized = displayLabel.charAt(0).toUpperCase() + displayLabel.slice(1);
+      const created: MonthView = {
+        id,
+        isoDate: iso,
+        displayLabel: capitalized,
+        currentBalance: body.startingBalance,
+        projectedBalance: body.startingBalance,
+        budgetGroups: [],
+        chargeGroups: [],
+        outflows: [],
+      };
+      const idx = months.findIndex((m) => m.id === id);
+      if (idx >= 0) months[idx] = created;
+      else months.push(created);
+      months.sort((a, b) => a.isoDate.localeCompare(b.isoDate));
+      return deepCloneMonths([created])[0]!;
+    },
+
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
       return deepCloneMonths(months);

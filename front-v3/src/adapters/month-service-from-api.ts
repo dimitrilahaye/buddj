@@ -1,5 +1,6 @@
 import type { MonthService } from '../application/month/month-service.js';
 import type { OutflowsCheckingPayload } from '../application/month/outflows-checking-payload.js';
+import type { CreateMonthApiBody } from '../application/new-month/default-new-month-bundle.js';
 import { getReponseDataOrFail } from '../shared/get-reponse-data-or-fail.js';
 import {
   errorMessageFromUnknown,
@@ -12,6 +13,29 @@ import { type ApiMonthPayload, mapApiMonthPayloadToView } from './map-api-month-
 export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): MonthService {
   const baseUrl = apiUrl.replace(/\/$/, '');
   return {
+    async createMonth({ body }: { body: CreateMonthApiBody }) {
+      const url = `${baseUrl}/months`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            month: body.month,
+            startingBalance: body.startingBalance,
+            outflows: body.outflows,
+            weeklyBudgets: body.weeklyBudgets,
+          }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, '/months');
+      return mapApiMonthPayloadToView(data);
+    },
+
     async getUnarchivedMonths() {
       const url = `${baseUrl}/months/unarchived`;
       let response: Response;

@@ -25,6 +25,7 @@ import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
 import type { MonthView } from '../../application/month/month-view.js';
 import type { BudgetGroupData } from '../../application/month/month-types.js';
+import { formatEuros } from '../../shared/goal.js';
 
 const LOADING_MONTHS_TEXT = 'Chargement des mois en cours';
 
@@ -86,6 +87,7 @@ export class BuddjScreenBudgets extends HTMLElement {
             <buddj-toggle-all target-selector=".budget-details" title-expand="Déplier tous les budgets" title-collapse="Replier tous les budgets"></buddj-toggle-all>
             <buddj-btn-add label="" title="Ajouter un budget" data-budget-header-add hidden></buddj-btn-add>
           </div>
+          <p class="budget-screen-recap" data-budget-screen-recap hidden aria-live="polite"></p>
         </header>
       </div>
       <section class="budget-list"></section>
@@ -294,6 +296,28 @@ export class BuddjScreenBudgets extends HTMLElement {
     drawer?.refresh();
   };
 
+  private _hideBudgetScreenRecap(): void {
+    const el = this.querySelector('[data-budget-screen-recap]') as HTMLElement | null;
+    if (!el) return;
+    el.textContent = '';
+    el.setAttribute('hidden', '');
+  }
+
+  private _updateBudgetScreenRecap(groups: BudgetGroupData[]): void {
+    const el = this.querySelector('[data-budget-screen-recap]') as HTMLElement | null;
+    if (!el) return;
+    let n = 0;
+    let sum = 0;
+    for (const g of groups) {
+      for (const b of g.budgets) {
+        n += 1;
+        sum += b.allocated;
+      }
+    }
+    el.textContent = `${n} budget${n > 1 ? 's' : ''} · ${formatEuros(sum)}`;
+    el.removeAttribute('hidden');
+  }
+
   /** Sans mois dans le store : pas de recherche ni de « déplier tout » dans le header. */
   private _syncBudgetHeaderToolbarVisibility(): void {
     const main = this.querySelector('#budgets');
@@ -315,6 +339,7 @@ export class BuddjScreenBudgets extends HTMLElement {
       if (headerAddBtn) headerAddBtn.setAttribute('hidden', '');
       listSection.replaceChildren();
       listSection.appendChild(document.createElement('buddj-months-empty-placeholder'));
+      this._hideBudgetScreenRecap();
       this._syncBudgetHeaderToolbarVisibility();
       return;
     }
@@ -338,6 +363,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     }
     for (const group of groups) {
       const groupEl = document.createElement('buddj-budget-group');
+      groupEl.setAttribute('hide-recap', '');
       groupEl.setAttribute('hide-inline-add', '');
       groupEl.setAttribute('title', group.title);
       if (group.previous) groupEl.setAttribute('previous', '');
@@ -365,6 +391,7 @@ export class BuddjScreenBudgets extends HTMLElement {
       if (!openKeys.has(openBudgetKey(card))) continue;
       card.querySelector('details.budget-details')?.setAttribute('open', '');
     }
+    this._updateBudgetScreenRecap(groups);
     this._syncBudgetHeaderToolbarVisibility();
   }
 

@@ -2,6 +2,7 @@ import type { TemplateService } from '../application/template/template-service.j
 import type { TemplateView } from '../application/template/template-view.js';
 import { getReponseDataOrFail } from '../shared/get-reponse-data-or-fail.js';
 import { errorMessageFromUnknown, handleHttpError, handleNotOkResponse } from '../shared/http-error.js';
+import { mapApiDefaultNewMonthPayloadToBundle } from './map-api-default-new-month.js';
 import { type ApiTemplatePayload, mapApiTemplatePayloadToView } from './map-api-template-to-view.js';
 
 export function createTemplateServiceFromApi({ apiUrl }: { apiUrl: string }): TemplateService {
@@ -14,6 +15,23 @@ export function createTemplateServiceFromApi({ apiUrl }: { apiUrl: string }): Te
   }
 
   return {
+    async getDefaultForNewMonth() {
+      const url = `${baseUrl}/months/template/default`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<unknown>(response, url);
+      return mapApiDefaultNewMonthPayloadToBundle(data);
+    },
+
     async getAllTemplates() {
       const url = `${baseUrl}/months/template`;
       let response: Response;

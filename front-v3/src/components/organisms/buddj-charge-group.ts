@@ -1,5 +1,6 @@
 /**
- * Groupe de charges pour un mois (récap + optionnellement bouton Ajouter une charge, liste).
+ * Groupe de charges pour un mois (récap optionnel + optionnellement bouton Ajouter une charge, liste).
+ * Attribut hide-recap : pas de div.charge-group-recap (ex. page Charges récurrentes).
  */
 import type { BuddjChargeAddDrawerElement } from './buddj-charge-add-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
@@ -14,6 +15,7 @@ export class BuddjChargeGroup extends HTMLElement {
     const showAdd = this.hasAttribute('show-add');
     const addLabel = this.getAttribute('add-label') ?? 'Ajouter une charge';
     const addTitle = this.getAttribute('add-title') ?? 'Ajouter une charge récurrente';
+    const hideRecap = this.hasAttribute('hide-recap');
     const recapCount = this.getAttribute('recap-count');
     const recapTotal = this.getAttribute('recap-total');
     const addAlignRight = this.hasAttribute('add-align') && this.getAttribute('add-align') === 'right';
@@ -29,10 +31,12 @@ export class BuddjChargeGroup extends HTMLElement {
       (n): n is Element => n.nodeType === Node.ELEMENT_NODE && (n as Element).tagName === 'BUDDJ-CHARGE-ITEM'
     ) as Element[];
     const sumAmounts = chargeItems.reduce((s, el) => s + (parseFloat(el.getAttribute('amount') ?? '0') || 0), 0);
-    const recapHtml =
-      recapCount != null && recapTotal != null
+    const recapHtml = hideRecap
+      ? ''
+      : recapCount != null && recapTotal != null
         ? `<div class="charge-group-recap"><span class="charge-group-recap-line">${escapeHtml(recapCount)} charge${parseInt(recapCount, 10) > 1 ? 's' : ''}</span><span class="charge-group-recap-line">${escapeHtml(recapTotal)}</span></div>`
         : `<div class="charge-group-recap"><span class="charge-group-recap-line">${chargeItems.length} charge${chargeItems.length > 1 ? 's' : ''}</span><span class="charge-group-recap-line">${escapeHtml(formatEuros(sumAmounts))}</span></div>`;
+    const hasRecap = recapHtml !== '';
     const searchHtml = showSearch
       ? `<buddj-icon-search class="template-section-search charge-group-search" title="Rechercher dans les charges" aria-label="Rechercher les charges"></buddj-icon-search>`
       : '';
@@ -48,11 +52,10 @@ export class BuddjChargeGroup extends HTMLElement {
       const actionsInner = `${addBtnHtml}${searchHtml}`;
       const hasActionsRow = actionsInner.trim() !== '';
       if (hasActionsRow) {
+        const titleBlock = hasRecap ? `<div class="charge-group-title-block">${recapHtml}</div>` : '';
         div.innerHTML = `
         <div class="charge-group-title-row">
-          <div class="charge-group-title-block">
-            ${recapHtml}
-          </div>
+          ${titleBlock}
           <div class="charge-group-actions">
             ${actionsInner}
           </div>
@@ -60,10 +63,14 @@ export class BuddjChargeGroup extends HTMLElement {
         <ul class="charge-list"></ul>
       `;
       } else {
-        div.innerHTML = `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`;
+        div.innerHTML = hasRecap
+          ? `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`
+          : `<ul class="charge-list"></ul>`;
       }
     } else {
-      div.innerHTML = `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`;
+      div.innerHTML = hasRecap
+        ? `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`
+        : `<ul class="charge-list"></ul>`;
     }
     const ul = div.querySelector('ul')!;
     const isChargeChecked = (el: Element) =>
