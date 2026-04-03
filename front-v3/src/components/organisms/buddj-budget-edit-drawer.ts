@@ -17,15 +17,23 @@ export class BuddjBudgetEditDrawer extends HTMLElement {
   private _label = '';
   private _emoji = DEFAULT_EMOJI;
   private _onValidate: BudgetEditDrawerOnValidate | null = null;
+  private _dialogTitle = 'Modifier le budget';
+  private _dialogAriaLabel = 'Modifier le budget';
 
   open(options: {
     initialLabel: string;
     initialEmoji?: string;
     onValidate: BudgetEditDrawerOnValidate;
+    /** Titre du panneau (défaut : « Modifier le budget »). */
+    title?: string;
+    /** `aria-label` du dialogue (défaut : égal à `title` ou au défaut). */
+    ariaLabel?: string;
   }): void {
     this._label = options.initialLabel;
     this._emoji = options.initialEmoji ?? DEFAULT_EMOJI;
     this._onValidate = options.onValidate;
+    this._dialogTitle = options.title ?? 'Modifier le budget';
+    this._dialogAriaLabel = options.ariaLabel ?? options.title ?? 'Modifier le budget';
     this.render();
     this.classList.add('budget-edit-drawer--open');
     this.attachListeners();
@@ -39,9 +47,9 @@ export class BuddjBudgetEditDrawer extends HTMLElement {
   private render(): void {
     this.innerHTML = `
       <div class="budget-edit-drawer-backdrop" data-budget-edit-backdrop></div>
-      <div class="budget-edit-drawer-panel" role="dialog" aria-modal="true" aria-label="Modifier le budget">
+      <div class="budget-edit-drawer-panel" role="dialog" aria-modal="true" aria-label="${escapeAttr(this._dialogAriaLabel)}">
         <div class="budget-edit-drawer-header">
-          <h2 class="budget-edit-drawer-title">Modifier le budget</h2>
+          <h2 class="budget-edit-drawer-title">${escapeHtml(this._dialogTitle)}</h2>
         </div>
         <div class="budget-edit-drawer-body">
           <div class="budget-edit-drawer-field">

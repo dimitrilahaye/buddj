@@ -15,7 +15,10 @@ import type { DefaultRoute, RouteContext, RouteDef } from './router.js';
 import type { AuthStore } from './application/auth/auth-store.js';
 import type { ArchivedMonthStore } from './application/month/archived-month-store.js';
 import type { MonthStore } from './application/month/month-store.js';
+import type { TemplatesStore } from './application/template/templates-store.js';
 import type { BuddjScreenArchived } from './components/screens/buddj-screen-archived.js';
+import type { BuddjScreenTemplates } from './components/screens/buddj-screen-templates.js';
+import type { BuddjScreenTemplateDetail } from './components/screens/buddj-screen-template-detail.js';
 import { BuddjScreenHome } from './components/screens/buddj-screen-home.js';
 import { BuddjScreenBudgets } from './components/screens/buddj-screen-budgets.js';
 
@@ -48,11 +51,13 @@ export function createRoutes({
   authStore,
   monthStore,
   archivedMonthStore,
+  templatesStore,
   redirectToHome,
 }: {
   authStore: AuthStore;
   monthStore: MonthStore;
   archivedMonthStore: ArchivedMonthStore;
+  templatesStore: TemplatesStore;
   redirectToHome: () => void;
 }): RouteDef[] {
   return [
@@ -102,9 +107,8 @@ export function createRoutes({
       name: 'template-detail',
       pattern: '/templates/:id',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-template-detail');
-        el.setAttribute('template-id', ctx.params.id ?? '');
-        el.setAttribute('is-default', 'false');
+        const el = document.createElement('buddj-screen-template-detail') as BuddjScreenTemplateDetail;
+        el.init({ templatesStore, templateId: ctx.params.id ?? '' });
         ctx.outlet.replaceChildren(el);
       }),
     },
@@ -112,7 +116,8 @@ export function createRoutes({
       name: 'templates',
       pattern: '/templates',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-templates');
+        const el = document.createElement('buddj-screen-templates') as BuddjScreenTemplates;
+        el.init({ templatesStore });
         ctx.outlet.replaceChildren(el);
       }),
     },

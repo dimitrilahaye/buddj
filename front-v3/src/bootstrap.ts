@@ -1,6 +1,7 @@
 /**
  * Bootstrap de l’app : config (vars d’env), auth, router, routes.
  * `monthService` est obligatoire (composition : `main.ts` injecte l’API, les tests un in-memory).
+ * `templateService` est optionnel : défaut = client API sur `config.apiUrl` (comme `authService`).
  */
 import type { AppConfig } from './config.js';
 import { buildConfigFromEnv } from './config.js';
@@ -29,6 +30,15 @@ import { createTransferFromWeeklyBudget } from './application/month/transfer-fro
 import { createTransferFromAccount } from './application/month/transfer-from-account.js';
 import { createArchiveMonth } from './application/month/archive-month.js';
 import type { MonthService } from './application/month/month-service.js';
+import { createLoadTemplates } from './application/template/load-templates.js';
+import { createUpdateTemplate } from './application/template/update-template.js';
+import { createAddTemplateOutflow } from './application/template/add-template-outflow.js';
+import { createDeleteTemplateOutflow } from './application/template/delete-template-outflow.js';
+import { createAddTemplateBudget } from './application/template/add-template-budget.js';
+import { createDeleteTemplateBudget } from './application/template/delete-template-budget.js';
+import { TemplatesStore } from './application/template/templates-store.js';
+import type { TemplateService } from './application/template/template-service.js';
+import { createTemplateServiceFromApi } from './adapters/template-service-from-api.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
@@ -98,11 +108,13 @@ export type BootstrapOptions = {
   config?: AppConfig;
   authService?: AuthService;
   monthService: MonthService;
+  templateService?: TemplateService;
 };
 
 export function bootstrap(options: BootstrapOptions): void {
   const config = options.config ?? buildConfigFromEnv();
   const authService = options.authService ?? createAuthServiceFromApi({ apiUrl: config.apiUrl });
+  const templateService = options.templateService ?? createTemplateServiceFromApi({ apiUrl: config.apiUrl });
   const loadUnarchivedMonths = createLoadUnarchivedMonths({ monthService: options.monthService });
   const putExpensesChecking = createPutExpensesChecking({ monthService: options.monthService });
   const putOutflowsChecking = createPutOutflowsChecking({ monthService: options.monthService });
@@ -140,6 +152,20 @@ export function bootstrap(options: BootstrapOptions): void {
     deleteArchivedMonth,
     monthStore,
   });
+  const loadTemplates = createLoadTemplates({ templateService });
+  const updateTemplate = createUpdateTemplate({ templateService });
+  const addTemplateOutflow = createAddTemplateOutflow({ templateService });
+  const deleteTemplateOutflow = createDeleteTemplateOutflow({ templateService });
+  const addTemplateBudget = createAddTemplateBudget({ templateService });
+  const deleteTemplateBudget = createDeleteTemplateBudget({ templateService });
+  const templatesStore = new TemplatesStore({
+    loadTemplates,
+    updateTemplate,
+    addTemplateOutflow,
+    deleteTemplateOutflow,
+    addTemplateBudget,
+    deleteTemplateBudget,
+  });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 
@@ -176,6 +202,7 @@ export function bootstrap(options: BootstrapOptions): void {
     authStore,
     monthStore,
     archivedMonthStore,
+    templatesStore,
     redirectToHome: () => {
       const target = `${window.location.pathname}${window.location.search}${window.location.hash}`;
       if (isSpaInternalPath(window.location.pathname)) {

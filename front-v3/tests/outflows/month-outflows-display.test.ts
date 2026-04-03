@@ -58,14 +58,19 @@ describe('outflows affiche les charges du mois courant', () => {
       expect(screen.getByRole('heading', { name: 'Charges récurrentes', level: 1 })).toBeTruthy();
     });
 
-    const previousGroupHeading = screen.getByRole('heading', { name: 'Charges des mois précédents', level: 3 });
-    const currentGroupHeading = screen.getByRole('heading', { name: 'Charges de Mars 2026', level: 3 });
     expect(screen.queryByRole('heading', { name: 'Charges annuelles', level: 3 })).toBeNull();
 
-    const previousGroup = previousGroupHeading.closest('buddj-charge-group') as HTMLElement;
-    const currentGroup = currentGroupHeading.closest('buddj-charge-group') as HTMLElement;
+    const chargeGroups = Array.from(document.querySelectorAll('buddj-charge-group'));
+    expect(chargeGroups).toHaveLength(2);
+    const previousGroup = chargeGroups.find((g) =>
+      Array.from(g.querySelectorAll('buddj-charge-item')).some((el) => el.hasAttribute('previous')),
+    );
+    const currentGroup = chargeGroups.find((g) => g !== previousGroup);
     expect(previousGroup).toBeTruthy();
     expect(currentGroup).toBeTruthy();
+    if (previousGroup == null || currentGroup == null) {
+      throw new Error('expected previous and current buddj-charge-group');
+    }
 
     const previousItems = Array.from(previousGroup.getElementsByTagName('buddj-charge-item'));
     const currentItems = Array.from(currentGroup.getElementsByTagName('buddj-charge-item'));

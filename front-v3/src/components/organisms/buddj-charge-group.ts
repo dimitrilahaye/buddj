@@ -1,8 +1,9 @@
 /**
- * Groupe de charges pour un mois (titre + optionnellement bouton Ajouter une charge, liste).
+ * Groupe de charges pour un mois (récap + optionnellement bouton Ajouter une charge, liste).
  */
 import type { BuddjChargeAddDrawerElement } from './buddj-charge-add-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { formatEuros } from '../../shared/goal.js';
 
 export class BuddjChargeGroup extends HTMLElement {
   static readonly tagName = 'buddj-charge-group';
@@ -10,7 +11,6 @@ export class BuddjChargeGroup extends HTMLElement {
   connectedCallback(): void {
     const previous = this.hasAttribute('previous');
     const annual = this.hasAttribute('annual');
-    const title = previous ? 'Charges des mois précédents' : (this.getAttribute('title') ?? 'Charges');
     const showAdd = this.hasAttribute('show-add');
     const addLabel = this.getAttribute('add-label') ?? 'Ajouter une charge';
     const addTitle = this.getAttribute('add-title') ?? 'Ajouter une charge récurrente';
@@ -25,10 +25,14 @@ export class BuddjChargeGroup extends HTMLElement {
     const children = Array.from(this.childNodes);
     const div = document.createElement('div');
     div.className = groupClass;
+    const chargeItems = children.filter(
+      (n): n is Element => n.nodeType === Node.ELEMENT_NODE && (n as Element).tagName === 'BUDDJ-CHARGE-ITEM'
+    ) as Element[];
+    const sumAmounts = chargeItems.reduce((s, el) => s + (parseFloat(el.getAttribute('amount') ?? '0') || 0), 0);
     const recapHtml =
       recapCount != null && recapTotal != null
         ? `<div class="charge-group-recap"><span class="charge-group-recap-line">${escapeHtml(recapCount)} charge${parseInt(recapCount, 10) > 1 ? 's' : ''}</span><span class="charge-group-recap-line">${escapeHtml(recapTotal)}</span></div>`
-        : '';
+        : `<div class="charge-group-recap"><span class="charge-group-recap-line">${chargeItems.length} charge${chargeItems.length > 1 ? 's' : ''}</span><span class="charge-group-recap-line">${escapeHtml(formatEuros(sumAmounts))}</span></div>`;
     const searchHtml = showSearch
       ? `<buddj-icon-search class="template-section-search charge-group-search" title="Rechercher dans les charges" aria-label="Rechercher les charges"></buddj-icon-search>`
       : '';
@@ -43,7 +47,6 @@ export class BuddjChargeGroup extends HTMLElement {
         div.innerHTML = `
         <div class="charge-group-title-row">
           <div class="charge-group-title-block">
-            <h3 class="charge-group-title">${escapeHtml(title)}</h3>
             ${recapHtml}
           </div>
           <div class="charge-group-actions">
@@ -53,15 +56,12 @@ export class BuddjChargeGroup extends HTMLElement {
         <ul class="charge-list"></ul>
       `;
       } else {
-        div.innerHTML = `<div class="charge-group-title-block"><h3 class="charge-group-title">${escapeHtml(title)}</h3>${recapHtml}</div><ul class="charge-list"></ul>`;
+        div.innerHTML = `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`;
       }
     } else {
-      div.innerHTML = `<div class="charge-group-title-block"><h3 class="charge-group-title">${escapeHtml(title)}</h3>${recapHtml}</div><ul class="charge-list"></ul>`;
+      div.innerHTML = `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`;
     }
     const ul = div.querySelector('ul')!;
-    const chargeItems = children.filter(
-      (n): n is Element => n.nodeType === Node.ELEMENT_NODE && (n as Element).tagName === 'BUDDJ-CHARGE-ITEM'
-    ) as Element[];
     const isChargeChecked = (el: Element) =>
       (el.querySelector('.charge-taken') as HTMLInputElement | null)?.checked ?? (el.hasAttribute('taken') && el.getAttribute('taken') !== 'false');
     chargeItems.sort((a, b) => {

@@ -531,20 +531,10 @@ buddj-icon-save {
   min-width: 0;
 }
 
-.charge-group-title {
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: var(--navy-soft);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
 .charge-group-recap {
   font-size: 0.8rem;
   color: var(--navy-soft);
-  margin-top: 0.25rem;
+  margin: 0;
   opacity: 0.9;
 }
 
@@ -589,12 +579,7 @@ buddj-icon-save {
   display: block;
 }
 
-.charge-group:not(:has(.charge-group-title-row)) > .charge-group-title,
-.charge-group:not(:has(.charge-group-title-row)) > .charge-group-title-block .charge-group-title {
-  margin-bottom: 0.5rem;
-}
-
-.charge-group--previous .charge-group-title {
+.charge-group--previous .charge-group-recap {
   color: var(--gold);
 }
 
@@ -605,7 +590,7 @@ buddj-icon-save {
   border-radius: var(--radius);
 }
 
-.charge-group--annual .charge-group-title {
+.charge-group--annual .charge-group-recap {
   color: var(--mint);
   font-size: 0.85rem;
 }
@@ -906,13 +891,12 @@ buddj-months-empty-placeholder {
 .budget-group-title-block {
   flex: 1;
   min-width: 0;
-  padding: 0.55rem 0;
 }
 
 .budget-group-recap {
   font-size: 0.8rem;
   color: var(--navy-soft);
-  margin-top: 0.25rem;
+  margin: 0;
   opacity: 0.9;
 }
 
@@ -957,21 +941,7 @@ buddj-months-empty-placeholder {
   display: block;
 }
 
-.budget-group > .budget-group-title {
-  margin-bottom: 0.5rem;
-}
-
-.budget-group-title {
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: var(--navy-soft);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.budget-group--previous .budget-group-title {
+.budget-group--previous .budget-group-recap {
   color: var(--gold);
 }
 
@@ -986,7 +956,7 @@ buddj-months-empty-placeholder {
   border-radius: var(--radius);
 }
 
-.budget-group--annual .budget-group-title {
+.budget-group--annual .budget-group-recap {
   color: var(--mint);
   font-size: 0.85rem;
 }
@@ -3716,6 +3686,8 @@ buddj-screen-template-detail {
   color: var(--navy);
 }
 
+/* Liste scrollable (classe du WC : templates-list-wrap) */
+.templates-list-wrap,
 .templates-list {
   flex: 1;
   min-height: 0;
@@ -3723,9 +3695,17 @@ buddj-screen-template-detail {
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 2rem 1.25rem;
+  padding: 1.25rem 1.25rem 2rem;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
+}
+
+main.screen--templates .templates-loading,
+main.screen--templates .templates-error {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 1rem 1.25rem 0;
+  box-sizing: border-box;
 }
 
 .template-list-item {
@@ -3773,6 +3753,28 @@ buddj-screen-template-detail {
   min-width: 0;
 }
 
+.template-detail-header-row--back-only {
+  justify-content: flex-start;
+}
+
+.template-detail-not-found {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1.25rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.template-detail-not-found-message {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
 .template-detail-back {
   color: var(--text);
   text-decoration: none;
@@ -3786,6 +3788,11 @@ buddj-screen-template-detail {
   color: var(--mint);
 }
 
+.template-detail-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
 .template-detail-header-row .new-month-title {
   flex: 1;
   min-width: 0;
@@ -3794,6 +3801,49 @@ buddj-screen-template-detail {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--navy);
+}
+
+.template-detail-title-edit {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  min-width: 0;
+}
+
+.template-detail-title-edit buddj-text-ellipsis {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.template-detail-title-edit .buddj-text-ellipsis__inner {
+  font: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.template-detail-title-edit:hover,
+.template-detail-title-edit:focus-visible {
+  color: var(--mint);
+  outline: none;
+}
+
+.template-detail-title-edit:hover .buddj-text-ellipsis__inner,
+.template-detail-title-edit:focus-visible .buddj-text-ellipsis__inner {
+  color: var(--mint);
 }
 
 .template-default-switch-wrap {

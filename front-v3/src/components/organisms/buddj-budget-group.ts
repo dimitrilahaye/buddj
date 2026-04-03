@@ -1,16 +1,16 @@
 /**
- * Groupe de budgets pour un mois (titre, optionnellement bouton Ajouter un budget, liste de cartes).
+ * Groupe de budgets pour un mois (récap, optionnellement bouton Ajouter un budget, liste de cartes).
  * Supporte buddj-budget-card et buddj-template-budget-card.
  * Attributs optionnels : recap-count, recap-total, show-search, add-align="right".
  */
 import type { BuddjBudgetAddDrawerElement } from './buddj-budget-add-drawer.js';
 import { escapeHtml } from '../../shared/escape.js';
+import { formatEuros } from '../../shared/goal.js';
 
 export class BuddjBudgetGroup extends HTMLElement {
   static readonly tagName = 'buddj-budget-group';
 
   connectedCallback(): void {
-    const title = this.getAttribute('title') ?? 'Budgets';
     const previous = this.hasAttribute('previous');
     const annual = this.hasAttribute('annual');
     const showAdd = this.hasAttribute('show-add');
@@ -27,10 +27,11 @@ export class BuddjBudgetGroup extends HTMLElement {
     if (annual) groupClass += ' budget-group--annual';
     if (addAlignRight) groupClass += ' budget-group--add-right';
     if (this.hasAttribute('template-mode')) groupClass += ' budget-group--template';
+    const sumAllocated = cards.reduce((s, c) => s + (parseFloat(c.getAttribute('allocated') ?? '0') || 0), 0);
     const recapHtml =
       recapCount != null && recapTotal != null
         ? `<div class="budget-group-recap"><span class="budget-group-recap-line">${escapeHtml(recapCount)} budget${parseInt(recapCount, 10) > 1 ? 's' : ''}</span><span class="budget-group-recap-line">${escapeHtml(recapTotal)}</span></div>`
-        : '';
+        : `<div class="budget-group-recap"><span class="budget-group-recap-line">${cards.length} budget${cards.length > 1 ? 's' : ''}</span><span class="budget-group-recap-line">${escapeHtml(formatEuros(sumAllocated))}</span></div>`;
     const searchHtml = showSearch
       ? `<buddj-icon-search class="template-section-search template-section-search--expenses budget-group-search" title="Rechercher un budget" aria-label="Rechercher un budget"></buddj-icon-search>`
       : '';
@@ -47,7 +48,6 @@ export class BuddjBudgetGroup extends HTMLElement {
         div.innerHTML = `
         <div class="budget-group-title-row">
           <div class="budget-group-title-block">
-            <h3 class="budget-group-title">${escapeHtml(title)}</h3>
             ${recapHtml}
           </div>
           <div class="budget-group-actions">
@@ -59,7 +59,6 @@ export class BuddjBudgetGroup extends HTMLElement {
       } else {
         div.innerHTML = `
         <div class="budget-group-title-block">
-          <h3 class="budget-group-title">${escapeHtml(title)}</h3>
           ${recapHtml}
         </div>
         <div class="budget-group-list"></div>
@@ -73,7 +72,6 @@ export class BuddjBudgetGroup extends HTMLElement {
     } else {
       div.innerHTML = `
         <div class="budget-group-title-block">
-          <h3 class="budget-group-title">${escapeHtml(title)}</h3>
           ${recapHtml}
         </div>
         <div class="budget-group-list"></div>

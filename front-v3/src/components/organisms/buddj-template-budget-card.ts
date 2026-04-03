@@ -3,8 +3,6 @@
  * Pas de dépenses, pas de remaining, pas de pending, pas de toggle.
  */
 import type { BuddjConfirmModalElement } from '../molecules/buddj-confirm-modal.js';
-import { getToast } from '../atoms/buddj-toast.js';
-
 export class BuddjTemplateBudgetCard extends HTMLElement {
   static readonly tagName = 'buddj-template-budget-card';
 
@@ -36,13 +34,18 @@ export class BuddjTemplateBudgetCard extends HTMLElement {
       if (!(e.target as Element).closest('buddj-icon-delete')) return;
       e.preventDefault();
       const name = this.getAttribute('name') ?? budgetName;
+      const budgetId = this.getAttribute('budget-id') ?? '';
       const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
       modal?.show({
         title: `Voulez-vous vraiment supprimer le budget "${name}" ?`,
         onConfirm: () => {
-          const toast = getToast();
-          toast?.show({ message: 'Le budget a bien été supprimé' });
-          this.dispatchEvent(new CustomEvent('buddj-budget-deleted', { bubbles: true }));
+          this.dispatchEvent(
+            new CustomEvent('buddj-template-budget-delete-confirmed', {
+              bubbles: true,
+              composed: true,
+              detail: { budgetId, name },
+            }),
+          );
         },
         onCancel: () => {},
       });

@@ -114,8 +114,10 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
         : '';
     const monthLabel = isTemplateDetail ? `Charges (${templateName})` : '';
     groups.forEach((group) => {
-      const titleEl = group.querySelector('.charge-group-title');
-      const month = isTemplateDetail ? monthLabel : (titleEl?.textContent?.trim() ?? '');
+      const host = group.parentElement;
+      const groupTitle =
+        host?.tagName === 'BUDDJ-CHARGE-GROUP' ? (host as HTMLElement).getAttribute('title')?.trim() ?? '' : '';
+      const month = isTemplateDetail ? monthLabel : groupTitle;
       const list = group.querySelector('ul.charge-list');
       if (!list) return;
       const items = list.querySelectorAll('buddj-charge-item');
