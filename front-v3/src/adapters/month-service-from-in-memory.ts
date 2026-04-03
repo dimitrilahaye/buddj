@@ -18,6 +18,7 @@ function deepCloneMonths(source: MonthView[]): MonthView[] {
  */
 export function createMonthServiceFromInMemory({
   months: initialMonths,
+  archivedMonths: initialArchivedMonths,
   delayMs = 0,
   putDelayMs,
   putOutflowsDelayMs,
@@ -33,6 +34,8 @@ export function createMonthServiceFromInMemory({
   archiveMonthFailure,
 }: {
   months: MonthView[];
+  /** Mois déjà archivés (tests écran archivés). */
+  archivedMonths?: MonthView[];
   /** Délai simulé pour `getUnarchivedMonths`. */
   delayMs?: number;
   /** Délai simulé pour `putExpensesChecking` (défaut : `delayMs`). */
@@ -61,6 +64,7 @@ export function createMonthServiceFromInMemory({
   archiveMonthFailure?: string;
 }): MonthService {
   const months = deepCloneMonths(initialMonths);
+  const archivedMonths = deepCloneMonths(initialArchivedMonths ?? []);
   const waitPut = putDelayMs ?? delayMs;
   const waitPutOutflows = putOutflowsDelayMs ?? delayMs;
   const waitDelete = deleteDelayMs ?? delayMs;
@@ -77,6 +81,10 @@ export function createMonthServiceFromInMemory({
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
       return deepCloneMonths(months);
+    },
+    async getArchivedMonths() {
+      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+      return deepCloneMonths(archivedMonths);
     },
     async putExpensesChecking(monthId, body) {
       if (waitPut > 0) await new Promise((r) => setTimeout(r, waitPut));
@@ -200,7 +208,24 @@ export function createMonthServiceFromInMemory({
       if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
       const archived = deepCloneMonths([months[idx]!])[0]!;
       months.splice(idx, 1);
+      archivedMonths.push(archived);
       return archived;
+    },
+    async unarchiveMonth({ monthId }) {
+      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+      const idx = archivedMonths.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois archivé introuvable : ${monthId}`);
+      const restored = deepCloneMonths([archivedMonths[idx]!])[0]!;
+      archivedMonths.splice(idx, 1);
+      months.push(restored);
+      return deepCloneMonths(months);
+    },
+    async deleteArchivedMonth({ monthId }) {
+      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+      const idx = archivedMonths.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois archivé introuvable : ${monthId}`);
+      archivedMonths.splice(idx, 1);
+      return deepCloneMonths(archivedMonths);
     },
   };
 }

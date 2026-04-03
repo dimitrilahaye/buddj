@@ -59,7 +59,12 @@ Le store concret enregistre dans son constructeur les listeners (ex. `this.addEv
 
 - Le **store enregistre lui-même** ses listeners d’actions (dans son constructeur ou une méthode d’init).
 - Il reçoit les **use-cases** au constructeur et branche chaque event d’action sur le use-case correspondant.
-- Le bootstrap crée : API → use-cases (avec `api` + `store`) → store (avec use-cases), puis injecte le store dans l’app.
+- Le bootstrap crée : **services** (ex. `MonthService`, `AuthService`) → **factories `create…`** qui closent le service → **use-cases** (fonctions typées) → **store** (le constructeur du store ne reçoit **jamais** un service brut, seulement des use-cases + éventuellement d’autres stores). Puis injection du store dans l’app (WC).
+
+### Ne pas injecter les services dans un store
+
+- **`MonthService`**, **`AuthService`**, etc. restent dans la **couche composition** (`bootstrap`, tests) : on appelle `createLoadUnarchivedMonths({ monthService })`, `createUnarchiveMonth({ monthService })`, etc., puis on passe **uniquement** les use-cases retournés au `MonthStore`, `ArchivedMonthStore`, etc.
+- Cela garde le store testable (mocks = fonctions use-case) et aligné sur le reste du module mois (`archive-month`, `put-expenses-checking`, …).
 
 ## Injection explicite du store dans les Web Components
 
@@ -101,4 +106,4 @@ Côté store, utiliser un **wrapper typé** `emitStateChange` pour émettre. Les
 ## Rappels
 
 - Les arguments des actions et des méthodes du store respectent la convention **arguments nommés** (objet unique).
-- Le use-case reçoit `{ api: IBuddjApi, store }` et met à jour le store après l’appel API ; il ne retourne pas l’état au store (le store est mis à jour depuis le use-case).
+- Les factories de use-cases reçoivent typiquement **`{ monthService }`** (ou équivalent) et retournent une fonction ; le store appelle cette fonction puis met à jour son état à partir du résultat (ou délègue à un autre store, ex. `applyUnarchivedMonthsFromApi`).

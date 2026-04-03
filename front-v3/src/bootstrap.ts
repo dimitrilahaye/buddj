@@ -11,6 +11,10 @@ import { userSignIn } from './application/auth/user-sign-in.js';
 import { userLogout } from './application/auth/user-logout.js';
 import { createAuthServiceFromApi } from './adapters/auth-service-from-api.js';
 import { createLoadUnarchivedMonths } from './application/month/load-unarchived-months.js';
+import { createLoadArchivedMonths } from './application/month/load-archived-months.js';
+import { createUnarchiveMonth } from './application/month/unarchive-month.js';
+import { createDeleteArchivedMonth } from './application/month/delete-archived-month.js';
+import { ArchivedMonthStore } from './application/month/archived-month-store.js';
 import { MonthStore } from './application/month/month-store.js';
 import { createCreateBudget } from './application/month/create-budget.js';
 import { createUpdateBudget } from './application/month/update-budget.js';
@@ -112,6 +116,9 @@ export function bootstrap(options: BootstrapOptions): void {
   const transferFromWeeklyBudget = createTransferFromWeeklyBudget({ monthService: options.monthService });
   const transferFromAccount = createTransferFromAccount({ monthService: options.monthService });
   const archiveMonth = createArchiveMonth({ monthService: options.monthService });
+  const loadArchivedMonths = createLoadArchivedMonths({ monthService: options.monthService });
+  const unarchiveMonth = createUnarchiveMonth({ monthService: options.monthService });
+  const deleteArchivedMonth = createDeleteArchivedMonth({ monthService: options.monthService });
   const monthStore = new MonthStore({
     loadUnarchivedMonths,
     archiveMonth,
@@ -126,6 +133,12 @@ export function bootstrap(options: BootstrapOptions): void {
     updateBudget,
     transferFromWeeklyBudget,
     transferFromAccount,
+  });
+  const archivedMonthStore = new ArchivedMonthStore({
+    loadArchivedMonths,
+    unarchiveMonth,
+    deleteArchivedMonth,
+    monthStore,
   });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
@@ -162,6 +175,7 @@ export function bootstrap(options: BootstrapOptions): void {
   const routes = createRoutes({
     authStore,
     monthStore,
+    archivedMonthStore,
     redirectToHome: () => {
       const target = `${window.location.pathname}${window.location.search}${window.location.hash}`;
       if (isSpaInternalPath(window.location.pathname)) {

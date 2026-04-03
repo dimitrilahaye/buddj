@@ -28,6 +28,22 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload[]>(response, '/months/unarchived');
       return data.map((row) => mapApiMonthPayloadToView(row));
     },
+    async getArchivedMonths() {
+      const url = `${baseUrl}/months/archived`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload[]>(response, '/months/archived');
+      return data.map((row) => mapApiMonthPayloadToView(row));
+    },
     async putExpensesChecking(monthId, body) {
       const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/expenses/checking`;
       let response: Response;
@@ -238,6 +254,39 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       if (!response.ok) await handleNotOkResponse(response);
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
+    },
+    async unarchiveMonth({ monthId }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/unarchive`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload[]>(response, url);
+      return data.map((row) => mapApiMonthPayloadToView(row));
+    },
+    async deleteArchivedMonth({ monthId }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload[]>(response, url);
+      return data.map((row) => mapApiMonthPayloadToView(row));
     },
   };
 }

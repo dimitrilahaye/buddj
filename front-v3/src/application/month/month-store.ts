@@ -106,6 +106,13 @@ export type ArchiveMonthActionDetail = {
   monthId: string;
 };
 
+/** Réponse API désarchivage : liste complète des mois non archivés. */
+export type ApplyUnarchivedMonthsFromApiActionDetail = {
+  months: MonthView[];
+  /** Mois à sélectionner dans le sélecteur (ex. celui qu’on vient de désarchiver). */
+  preferredMonthId?: string;
+};
+
 function computeMonthsAfterArchive(
   months: MonthView[],
   currentIndex: number,
@@ -234,6 +241,10 @@ export class MonthStore extends Store<MonthState> {
       const d = (e as CustomEvent<{ monthId: string }>).detail;
       if (d?.monthId) this.handleSyncCurrentMonthToRouteId(d.monthId);
     });
+    this.addEventListener('applyUnarchivedMonthsFromApi', (e: Event) => {
+      const d = (e as CustomEvent<ApplyUnarchivedMonthsFromApiActionDetail>).detail;
+      if (d?.months) this.handleApplyUnarchivedMonthsFromApi(d);
+    });
   }
 
   private _loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
@@ -314,6 +325,31 @@ export class MonthStore extends Store<MonthState> {
       this.emitStateChange('routeMonthIdNotFound', { monthId });
       this.emitCurrentMonthChanged();
     }
+  }
+
+  /** Met à jour la liste des mois actifs depuis la réponse API après désarchivage. */
+  private handleApplyUnarchivedMonthsFromApi(detail: ApplyUnarchivedMonthsFromApiActionDetail): void {
+    const { months, preferredMonthId } = detail;
+    let nextIndex = 0;
+    if (preferredMonthId) {
+      const idx = months.findIndex((m) => m.id === preferredMonthId);
+      if (idx >= 0) nextIndex = idx;
+    } else {
+      const prev = getCurrentMonth({ state: this.getState() })?.id;
+      if (prev) {
+        const idx = months.findIndex((m) => m.id === prev);
+        if (idx >= 0) nextIndex = idx;
+      }
+    }
+    this.setState({
+      months,
+      currentIndex: months.length === 0 ? 0 : Math.min(nextIndex, months.length - 1),
+      isLoadingMonths: false,
+      loadMonthsErrorMessage: null,
+      pendingRouteMonthId: null,
+    });
+    this.emitStateChange('unarchivedMonthsLoaded');
+    this.emitCurrentMonthChanged();
   }
 
   private handleGoToPreviousMonth(): void {

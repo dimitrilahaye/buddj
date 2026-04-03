@@ -5,15 +5,17 @@
 import './components/screens/buddj-screen-home.js';
 import './components/screens/buddj-screen-recurring.js';
 import './components/screens/buddj-screen-new-month.js';
-import './components/screens/buddj-screen-archived.js';
 import './components/screens/buddj-screen-savings.js';
 import './components/screens/buddj-screen-reimbursements.js';
 import './components/screens/buddj-screen-templates.js';
 import './components/screens/buddj-screen-template-detail.js';
 import './components/screens/buddj-screen-annual-outflows.js';
+import './components/screens/buddj-screen-archived.js';
 import type { DefaultRoute, RouteContext, RouteDef } from './router.js';
 import type { AuthStore } from './application/auth/auth-store.js';
+import type { ArchivedMonthStore } from './application/month/archived-month-store.js';
 import type { MonthStore } from './application/month/month-store.js';
+import type { BuddjScreenArchived } from './components/screens/buddj-screen-archived.js';
 import { BuddjScreenHome } from './components/screens/buddj-screen-home.js';
 import { BuddjScreenBudgets } from './components/screens/buddj-screen-budgets.js';
 
@@ -45,10 +47,12 @@ function wrapGuard(authStore: AuthStore, redirectToHome: () => void, handle: Rou
 export function createRoutes({
   authStore,
   monthStore,
+  archivedMonthStore,
   redirectToHome,
 }: {
   authStore: AuthStore;
   monthStore: MonthStore;
+  archivedMonthStore: ArchivedMonthStore;
   redirectToHome: () => void;
 }): RouteDef[] {
   return [
@@ -73,7 +77,8 @@ export function createRoutes({
       name: 'archived',
       pattern: '/archived',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-archived');
+        const el = document.createElement('buddj-screen-archived') as BuddjScreenArchived;
+        el.init({ archivedMonthStore });
         ctx.outlet.replaceChildren(el);
       }),
     },

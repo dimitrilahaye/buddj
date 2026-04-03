@@ -99,12 +99,12 @@ export class BuddjSummaryBar extends HTMLElement {
     this.toggleAttribute('hidden', months.length === 0);
   }
 
-  /** Aligne `buddj-nav` (liens Charges / Budgets) sur le mois courant du store sur les écrans budget & charges. */
+  /** Aligne `buddj-nav` (liens Charges / Budgets) sur le mois courant du store (toute route : ex. mois archivés après désarchivage). */
   private _syncBuddjNavMonthIdFromStore(): void {
-    const route = this._getCurrentRouteName?.() ?? '';
-    if (route !== 'budgets' && route !== 'budgets-month' && route !== 'outflows') return;
     const nav = document.querySelector('buddj-nav');
     if (!nav || !this._monthStore) return;
+    const { months } = this._monthStore.getState();
+    if (months.length === 0) return;
     const id = this._monthStore.getCurrentMonthIdForNav() || this._defaultMonthIdForNav;
     nav.setAttribute('month-id', id);
   }
