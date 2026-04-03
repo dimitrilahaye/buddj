@@ -33,10 +33,13 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  /* iOS / Safari : évite le zoom au double-tap sur les contrôles (touch-action non hérité → ciblage global). */
+  touch-action: manipulation;
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
