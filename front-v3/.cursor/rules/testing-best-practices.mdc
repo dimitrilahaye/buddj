@@ -12,7 +12,7 @@ On utilise **Testing Library** (`@testing-library/dom`) pour tester le front-v3.
 
 - Si l’UI respecte l’**accessibilité** (rôles, noms accessibles, labels), les tests ciblent le même « contrat » que les utilisateurs (dont ceux qui utilisent des lecteurs d’écran).
 - Les tests **résistent à la refacto** : changement de classes, de structure HTML ou de composants internes ne casse pas les tests tant que le rôle et le nom restent les mêmes.
-- Éviter `data-testid` / classes / id comme première option : ils couplent le test à l’implémentation.
+- Éviter classes / id comme première option : ils couplent le test à l’implémentation. Pas de `data-testid` (voir interdiction `*ByTestId` ci-dessous).
 
 ## Règles de sélection
 
@@ -43,11 +43,14 @@ getByRole('list', { name: 'Liste des mois archivés' });
 getByRole('listitem', { name: /janvier 2024/i });
 ```
 
+### Interdit
+
+- **`getByTestId`**, **`findByTestId`**, **`queryByTestId`** (et tout `*ByTestId`) : **interdit** dans les tests front-v3. Ne pas ajouter d’attributs `data-testid` pour les tests ; préférer rôle + nom accessible (ou améliorer l’a11y du composant).
+
 ### À éviter (sauf dernier recours)
 
 - **Sélecteurs CSS** : `.class`, `#id`, `[data-testid="…"]` — couplage fort à l’implémentation.
 - **Requêtes par tag** : `getByTagName`, structure du DOM (`querySelector`) — idem.
-- **`data-testid`** : acceptable seulement si aucun rôle/nom accessible ne peut identifier l’élément (et dans ce cas, documenter pourquoi et viser à améliorer l’a11y).
 
 ## Côté composants : permettre les tests par rôle
 
@@ -63,5 +66,5 @@ Si un élément n’est pas trouvable par rôle/name, c’est souvent un signal 
 ## Récap
 
 - **Testing Library** + **sélecteurs par rôle (et nom accessible)** uniquement.
-- **Pas de sélecteurs CSS** dans les tests ; si besoin, améliorer l’a11y du composant pour qu’il soit identifiable par rôle.
+- **Pas de `*ByTestId`** ; **pas de sélecteurs CSS** dans les tests ; si besoin, améliorer l’a11y du composant pour qu’il soit identifiable par rôle.
 - En respectant l’a11y, on obtient des tests **stables face à la refacto** et alignés avec l’usage réel de l’interface.

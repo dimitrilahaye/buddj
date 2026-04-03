@@ -1,68 +1,109 @@
 /**
- * Écran Sorties annuelles : pour chaque mois de l’année, charges et budgets configurés.
- * Header + sticky « Total par mois » (somme / 12) + liste scrollable des 12 mois.
- * Inspiré de l’UX du détail template (recap, charge-group, budget-group).
+ * Écran Sorties annuelles : YearlyOutflowsStore + GET/POST/DELETE /yearly-outflows.
  */
-import type { ChargeItemData } from '../../application/month/month-types.js';
+import type { YearlyOutflowsStore } from '../../application/yearly-outflows/yearly-outflows-store.js';
 import { formatEuros } from '../../shared/goal.js';
-import { escapeHtml } from '../../shared/escape.js';
+import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import {
+  monthBudgetsTotalEuros,
+  monthChargesTotalEuros,
+  yearlyAveragePerMonthEuros,
+} from '../../application/yearly-outflows/yearly-totals.js';
+import { getToast } from '../atoms/buddj-toast.js';
+import { splitLeadingEmoji } from '../../shared/emoji-label.js';
 
-const MONTH_NAMES = [
+/** Libellés des mois (FR) — réutilisés par les tests pour les requêtes par rôle / nom accessible. */
+export const ANNUAL_OUTFLOWS_MONTH_LABELS_FR = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
-];
+] as const;
 
-type BudgetItem = { name: string; icon: string; allocated: number };
-
-interface MonthData {
-  charges: ChargeItemData[];
-  budgets: BudgetItem[];
-}
-
-const MOCK_ANNUAL: MonthData[] = [
-  { charges: [{ icon: '🐕', label: 'Croquettes chat', amount: 45 }, { icon: '🛡️', label: 'Assurance annuelle', amount: 40 }], budgets: [{ name: 'Vacances', icon: '🏖️', allocated: 120 }] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [{ name: 'Vacances', icon: '🏖️', allocated: 350 }] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [{ name: 'Vacances', icon: '🏖️', allocated: 350 }] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [] },
-  { charges: [], budgets: [{ name: 'Noël', icon: '🎄', allocated: 250 }] },
-];
+const DEFAULT_ANNUAL_ICON = '💰';
 
 export class BuddjScreenAnnualOutflows extends HTMLElement {
   static readonly tagName = 'buddj-screen-annual-outflows';
 
-  private _months: MonthData[] = MOCK_ANNUAL.map((m) => ({
-    charges: m.charges.map((c) => ({ ...c })),
-    budgets: m.budgets.map((b) => ({ ...b })),
-  }));
+  private _store?: YearlyOutflowsStore;
+
+  init({ yearlyOutflowsStore }: { yearlyOutflowsStore: YearlyOutflowsStore }): void {
+    this._store = yearlyOutflowsStore;
+  }
 
   connectedCallback(): void {
     if (this.querySelector('#annual-outflows')) return;
-    this.render();
-    this.attachListeners();
+    const store = this._store;
+    if (!store) return;
+
+    this._renderShell();
+    store.addEventListener('yearlyOutflowsStateUpdated', this._onStore);
+    store.addEventListener('yearlyOutflowsLoadFailed', this._onMutationError);
+    store.addEventListener('yearlySavingAddFailed', this._onMutationError);
+    store.addEventListener('yearlySavingRemoveFailed', this._onMutationError);
+    store.addEventListener('yearlySavingAddLoaded', this._onSuccessAdd);
+    store.addEventListener('yearlySavingRemoveLoaded', this._onSuccessRemove);
+    document.addEventListener('buddj-annual-charge-add-submit', this._onAnnualChargeAddSubmit);
+    document.addEventListener('buddj-annual-budget-add-submit', this._onAnnualBudgetAddSubmit);
+    store.emitAction('loadYearlyOutflows');
+    this._syncFromStore();
   }
 
-  private getTotalAnnual(): number {
-    let sum = 0;
-    for (const m of this._months) {
-      sum += m.charges.reduce((s, c) => s + c.amount, 0);
-      sum += m.budgets.reduce((s, b) => s + b.allocated, 0);
-    }
-    return sum;
+  disconnectedCallback(): void {
+    this._store?.removeEventListener('yearlyOutflowsStateUpdated', this._onStore);
+    this._store?.removeEventListener('yearlyOutflowsLoadFailed', this._onMutationError);
+    this._store?.removeEventListener('yearlySavingAddFailed', this._onMutationError);
+    this._store?.removeEventListener('yearlySavingRemoveFailed', this._onMutationError);
+    this._store?.removeEventListener('yearlySavingAddLoaded', this._onSuccessAdd);
+    this._store?.removeEventListener('yearlySavingRemoveLoaded', this._onSuccessRemove);
+    document.removeEventListener('buddj-annual-charge-add-submit', this._onAnnualChargeAddSubmit);
+    document.removeEventListener('buddj-annual-budget-add-submit', this._onAnnualBudgetAddSubmit);
   }
 
-  private getTotalPerMonth(): number {
-    return Math.round((this.getTotalAnnual() / 12) * 100) / 100;
-  }
+  private _onMutationError = ((e: Event) => {
+    const d = (e as CustomEvent<{ message?: string }>).detail;
+    getToast()?.show({ message: d?.message ?? 'Une erreur est survenue', variant: 'error', durationMs: 3500 });
+  }) as EventListener;
 
-  private render(): void {
-    const totalPerMonth = this.getTotalPerMonth();
+  private _onSuccessAdd = ((): void => {
+    getToast()?.show({ message: 'Ajout enregistré' });
+  }) as EventListener;
+
+  private _onSuccessRemove = ((): void => {
+    getToast()?.show({ message: 'Suppression enregistrée' });
+  }) as EventListener;
+
+  private _onAnnualChargeAddSubmit = (e: Event): void => {
+    const store = this._store;
+    if (!store || !this.isConnected) return;
+    const d = (e as CustomEvent<{ month: number; label: string; amount: number; emoji: string }>).detail;
+    if (!d?.label?.trim() || d.amount <= 0 || d.month < 1 || d.month > 12) return;
+    const apiLabel = `${d.emoji ?? DEFAULT_ANNUAL_ICON} ${d.label.trim()}`.trim();
+    store.emitAction('addYearlySaving', {
+      kind: 'outflow',
+      month: d.month,
+      label: apiLabel,
+      amount: d.amount,
+    });
+  };
+
+  private _onAnnualBudgetAddSubmit = (e: Event): void => {
+    const store = this._store;
+    if (!store || !this.isConnected) return;
+    const d = (e as CustomEvent<{ month: number; name: string; amount: number; emoji: string }>).detail;
+    if (!d?.name?.trim() || d.amount <= 0 || d.month < 1 || d.month > 12) return;
+    const apiLabel = `${d.emoji ?? DEFAULT_ANNUAL_ICON} ${d.name.trim()}`.trim();
+    store.emitAction('addYearlySaving', {
+      kind: 'budget',
+      month: d.month,
+      label: apiLabel,
+      amount: d.amount,
+    });
+  };
+
+  private _onStore = (): void => {
+    this._syncFromStore();
+  };
+
+  private _renderShell(): void {
     const main = document.createElement('main');
     main.id = 'annual-outflows';
     main.className = 'screen screen--annual-outflows';
@@ -79,33 +120,106 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
         </header>
         <div class="new-month-projected-sticky" aria-live="polite">
           <span class="new-month-projected-label">Total par mois</span>
-          <span class="new-month-projected" data-annual-total-per-month>${escapeHtml(formatEuros(totalPerMonth))}</span>
+          <span class="new-month-projected" data-annual-total-per-month></span>
         </div>
       </div>
+      <p class="annual-outflows-loading" hidden>Chargement…</p>
+      <p class="annual-outflows-error" role="alert" hidden></p>
       <section class="annual-outflows-sections" aria-label="Mois de l’année"></section>
     `;
+    this.appendChild(main);
+    this.attachListeners();
+  }
 
-    const sectionsEl = main.querySelector('.annual-outflows-sections')!;
+  private attachListeners(): void {
+    this.addEventListener('click', (e) => {
+      const target = e.target as Element;
+      if (target.closest('.annual-outflows-search')) {
+        e.preventDefault();
+        const drawer = document.getElementById('annual-outflows-search-drawer') as HTMLElement & { open: () => void };
+        drawer?.open();
+        return;
+      }
+    });
+
+    this.addEventListener('buddj-charge-delete-confirmed', (e) => {
+      const d = (e as CustomEvent<{ outflowId: string }>).detail;
+      if (!d?.outflowId || !this._store) return;
+      this._store.emitAction('removeYearlySaving', { id: d.outflowId });
+    });
+
+    this.addEventListener('buddj-template-budget-delete-confirmed', (e) => {
+      const d = (e as CustomEvent<{ budgetId: string }>).detail;
+      if (!d?.budgetId || !this._store) return;
+      this._store.emitAction('removeYearlySaving', { id: d.budgetId });
+    });
+  }
+
+  private _syncFromStore(): void {
+    const store = this._store;
+    const main = this.querySelector('#annual-outflows');
+    if (!store || !main) return;
+
+    const { view, isLoading, loadErrorMessage } = store.getState();
+    const loadingEl = main.querySelector('.annual-outflows-loading');
+    const errEl = main.querySelector('.annual-outflows-error');
+    const sectionsEl = main.querySelector('.annual-outflows-sections');
+    const totalEl = main.querySelector('[data-annual-total-per-month]');
+
+    if (loadingEl instanceof HTMLElement) {
+      loadingEl.hidden = !isLoading;
+    }
+    if (errEl instanceof HTMLElement) {
+      const show = Boolean(loadErrorMessage) && !isLoading;
+      errEl.hidden = !show;
+      errEl.textContent = loadErrorMessage ?? '';
+    }
+
+    const avg = yearlyAveragePerMonthEuros({ view });
+    if (totalEl) totalEl.textContent = formatEuros(avg);
+
+    if (!sectionsEl) return;
+    if (isLoading && view.months.every((m) => m.outflows.length === 0 && m.budgets.length === 0)) {
+      sectionsEl.innerHTML = '';
+      return;
+    }
+    if (loadErrorMessage) {
+      sectionsEl.innerHTML = '';
+      return;
+    }
+
+    const openApiMonths = new Set<number>();
+    main.querySelectorAll('details.annual-outflows-month').forEach((node) => {
+      const el = node as HTMLDetailsElement;
+      if (el.open) {
+        const m = el.dataset.apiMonth;
+        if (m) openApiMonths.add(parseInt(m, 10));
+      }
+    });
+
+    sectionsEl.innerHTML = '';
     for (let i = 0; i < 12; i++) {
-      const monthName = MONTH_NAMES[i];
-      const data = this._months[i]!;
-      const chargesTotal = data.charges.reduce((s, c) => s + c.amount, 0);
-      const budgetsTotal = data.budgets.reduce((s, b) => s + b.allocated, 0);
-      const chargesRecap = `${data.charges.length} charge${data.charges.length !== 1 ? 's' : ''} — ${formatEuros(chargesTotal)}`;
+      const apiMonth = i + 1;
+      const monthName = ANNUAL_OUTFLOWS_MONTH_LABELS_FR[i]!;
+      const data = view.months[i]!;
+      const chargesTotal = monthChargesTotalEuros({ month: data });
+      const budgetsTotal = monthBudgetsTotalEuros({ month: data });
+      const chargesRecap = `${data.outflows.length} charge${data.outflows.length !== 1 ? 's' : ''} — ${formatEuros(chargesTotal)}`;
       const budgetsRecap = `${data.budgets.length} budget${data.budgets.length !== 1 ? 's' : ''} — ${formatEuros(budgetsTotal)}`;
 
       const details = document.createElement('details');
       details.className = 'annual-outflows-month';
       details.dataset.monthIndex = String(i);
+      details.dataset.apiMonth = String(apiMonth);
       details.innerHTML = `
         <summary class="annual-outflows-month-summary">
           <span class="annual-outflows-month-toggle" aria-hidden="true">▼</span>
           <div class="annual-outflows-month-summary-inner">
             <div class="annual-outflows-month-summary-row annual-outflows-month-summary-row--title">${escapeHtml(monthName)}</div>
             <div class="annual-outflows-month-summary-row annual-outflows-month-summary-row--recap">
-              <span class="annual-outflows-recap-charges">${escapeHtml(chargesRecap)}</span>
+              <span class="annual-outflows-recap-charges" role="status" aria-label="${escapeAttr(`Récapitulatif des charges pour ${monthName}`)}">${escapeHtml(chargesRecap)}</span>
               <span class="annual-outflows-recap-sep" aria-hidden="true"></span>
-              <span class="annual-outflows-recap-budgets">${escapeHtml(budgetsRecap)}</span>
+              <span class="annual-outflows-recap-budgets" role="status" aria-label="${escapeAttr(`Récapitulatif des budgets pour ${monthName}`)}">${escapeHtml(budgetsRecap)}</span>
             </div>
           </div>
         </summary>
@@ -119,16 +233,20 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
       const chargeGroup = document.createElement('buddj-charge-group');
       chargeGroup.setAttribute('title', 'Charges');
       chargeGroup.setAttribute('show-add', '');
+      chargeGroup.setAttribute('annual-month', String(apiMonth));
       chargeGroup.setAttribute('add-label', 'Ajouter une charge');
-      chargeGroup.setAttribute('add-title', 'Ajouter une charge');
+      chargeGroup.setAttribute('add-title', 'Ajouter une charge annuelle');
       chargeGroup.setAttribute('add-align', 'right');
-      for (const c of data.charges) {
+      chargeGroup.setAttribute('annual', '');
+      for (const c of data.outflows) {
+        const parsed = splitLeadingEmoji({ label: c.label, defaultIcon: DEFAULT_ANNUAL_ICON });
         const item = document.createElement('buddj-charge-item');
-        item.setAttribute('icon', c.icon);
-        item.setAttribute('label', c.label);
+        item.setAttribute('outflow-id', c.id);
+        item.setAttribute('icon', parsed.icon);
+        item.setAttribute('label', parsed.text || c.label);
         item.setAttribute('amount', String(c.amount));
-        if (c.taken) item.setAttribute('taken', '');
         item.setAttribute('no-label-toggle', '');
+        item.setAttribute('hide-taken', '');
         chargeGroup.appendChild(item);
       }
       chargesContainer.appendChild(chargeGroup);
@@ -137,44 +255,26 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
       const budgetGroup = document.createElement('buddj-budget-group');
       budgetGroup.setAttribute('title', 'Budgets');
       budgetGroup.setAttribute('show-add', '');
+      budgetGroup.setAttribute('annual-month', String(apiMonth));
       budgetGroup.setAttribute('add-align', 'right');
       budgetGroup.setAttribute('template-mode', '');
+      budgetGroup.setAttribute('annual', '');
       for (const b of data.budgets) {
+        const parsed = splitLeadingEmoji({ label: b.name, defaultIcon: DEFAULT_ANNUAL_ICON });
         const card = document.createElement('buddj-template-budget-card');
-        card.setAttribute('name', b.name);
-        card.setAttribute('icon', b.icon);
-        card.setAttribute('allocated', String(b.allocated));
+        card.setAttribute('budget-id', b.id);
+        card.setAttribute('name', parsed.text || b.name);
+        card.setAttribute('icon', parsed.icon);
+        card.setAttribute('allocated', String(b.initialBalance));
         budgetGroup.appendChild(card);
       }
       budgetsContainer.appendChild(budgetGroup);
 
+      if (openApiMonths.has(apiMonth)) {
+        details.open = true;
+      }
       sectionsEl.appendChild(details);
     }
-
-    this.innerHTML = '';
-    this.appendChild(main);
-  }
-
-  private attachListeners(): void {
-    this.addEventListener('click', (e) => {
-      const target = e.target as Element;
-      if (target.closest('.annual-outflows-search')) {
-        e.preventDefault();
-        const drawer = document.getElementById('annual-outflows-search-drawer') as HTMLElement & { open: () => void };
-        drawer?.open();
-        return;
-      }
-    });
-    this.addEventListener('buddj-budget-deleted', (e) => {
-      const card = (e.target as Element).closest('buddj-template-budget-card');
-      if (!card) return;
-      const monthBlock = card.closest('details.annual-outflows-month');
-      const idx = monthBlock ? parseInt(monthBlock.getAttribute('data-month-index') ?? '-1', 10) : -1;
-      if (idx < 0 || idx >= this._months.length) return;
-      const name = card.getAttribute('name') ?? '';
-      this._months[idx]!.budgets = this._months[idx]!.budgets.filter((b) => b.name !== name);
-      this.render();
-    });
   }
 }
 

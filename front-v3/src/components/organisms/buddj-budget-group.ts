@@ -36,6 +36,10 @@ export class BuddjBudgetGroup extends HTMLElement {
       ? `<buddj-icon-search class="template-section-search template-section-search--expenses budget-group-search" title="Rechercher un budget" aria-label="Rechercher un budget"></buddj-icon-search>`
       : '';
     const hideInlineAdd = this.hasAttribute('hide-inline-add');
+    const annualMonthAttr = this.getAttribute('annual-month');
+    const annualMonth =
+      annualMonthAttr != null && annualMonthAttr !== '' ? parseInt(annualMonthAttr, 10) : NaN;
+    const useAnnualDrawer = showAdd && Number.isFinite(annualMonth) && annualMonth >= 1 && annualMonth <= 12;
     const div = document.createElement('div');
     div.className = groupClass;
     if (showAdd) {
@@ -66,6 +70,13 @@ export class BuddjBudgetGroup extends HTMLElement {
       }
       const addBtn = div.querySelector('[data-budget-add-btn]');
       addBtn?.addEventListener('click', () => {
+        if (useAnnualDrawer) {
+          const drawer = document.getElementById('annual-budget-add-drawer') as HTMLElement & {
+            open: (o: { month: number }) => void;
+          };
+          drawer?.open({ month: annualMonth });
+          return;
+        }
         const drawer = document.getElementById('budget-add-drawer') as BuddjBudgetAddDrawerElement;
         drawer?.open();
       });

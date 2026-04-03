@@ -39,6 +39,12 @@ import { createDeleteTemplateBudget } from './application/template/delete-templa
 import { TemplatesStore } from './application/template/templates-store.js';
 import type { TemplateService } from './application/template/template-service.js';
 import { createTemplateServiceFromApi } from './adapters/template-service-from-api.js';
+import { createYearlyOutflowsServiceFromApi } from './adapters/yearly-outflows-service-from-api.js';
+import { createLoadYearlyOutflows } from './application/yearly-outflows/load-yearly-outflows.js';
+import { createAddYearlySaving } from './application/yearly-outflows/add-yearly-saving.js';
+import { createRemoveYearlySaving } from './application/yearly-outflows/remove-yearly-saving.js';
+import { YearlyOutflowsStore } from './application/yearly-outflows/yearly-outflows-store.js';
+import type { YearlyOutflowsService } from './application/yearly-outflows/yearly-outflows-service.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
@@ -109,12 +115,15 @@ export type BootstrapOptions = {
   authService?: AuthService;
   monthService: MonthService;
   templateService?: TemplateService;
+  yearlyOutflowsService?: YearlyOutflowsService;
 };
 
 export function bootstrap(options: BootstrapOptions): void {
   const config = options.config ?? buildConfigFromEnv();
   const authService = options.authService ?? createAuthServiceFromApi({ apiUrl: config.apiUrl });
   const templateService = options.templateService ?? createTemplateServiceFromApi({ apiUrl: config.apiUrl });
+  const yearlyOutflowsService =
+    options.yearlyOutflowsService ?? createYearlyOutflowsServiceFromApi({ apiUrl: config.apiUrl });
   const loadUnarchivedMonths = createLoadUnarchivedMonths({ monthService: options.monthService });
   const putExpensesChecking = createPutExpensesChecking({ monthService: options.monthService });
   const putOutflowsChecking = createPutOutflowsChecking({ monthService: options.monthService });
@@ -166,6 +175,14 @@ export function bootstrap(options: BootstrapOptions): void {
     addTemplateBudget,
     deleteTemplateBudget,
   });
+  const loadYearlyOutflows = createLoadYearlyOutflows({ yearlyOutflowsService });
+  const addYearlySaving = createAddYearlySaving({ yearlyOutflowsService });
+  const removeYearlySaving = createRemoveYearlySaving({ yearlyOutflowsService });
+  const yearlyOutflowsStore = new YearlyOutflowsStore({
+    loadYearlyOutflows,
+    addYearlySaving,
+    removeYearlySaving,
+  });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 
@@ -203,6 +220,7 @@ export function bootstrap(options: BootstrapOptions): void {
     monthStore,
     archivedMonthStore,
     templatesStore,
+    yearlyOutflowsStore,
     redirectToHome: () => {
       const target = `${window.location.pathname}${window.location.search}${window.location.hash}`;
       if (isSpaInternalPath(window.location.pathname)) {

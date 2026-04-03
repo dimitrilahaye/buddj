@@ -2013,11 +2013,13 @@ buddj-search-drawer.search-drawer--open .search-drawer-panel {
 }
 
 /* ========== Drawer ajout charge ========== */
-buddj-charge-add-drawer {
+buddj-charge-add-drawer,
+buddj-annual-charge-add-drawer {
   display: contents;
 }
 
-buddj-charge-add-drawer.charge-add-drawer--open {
+buddj-charge-add-drawer.charge-add-drawer--open,
+buddj-annual-charge-add-drawer.charge-add-drawer--open {
   display: block;
   position: fixed;
   inset: 0;
@@ -2026,7 +2028,9 @@ buddj-charge-add-drawer.charge-add-drawer--open {
 }
 
 buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-backdrop,
-buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-panel {
+buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-panel,
+buddj-annual-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-backdrop,
+buddj-annual-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-panel {
   pointer-events: auto;
 }
 
@@ -2043,7 +2047,8 @@ buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-panel {
   transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
-buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-backdrop {
+buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-backdrop,
+buddj-annual-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-backdrop {
   opacity: 1;
   visibility: visible;
 }
@@ -2065,7 +2070,8 @@ buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-backdrop {
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 
-buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-panel {
+buddj-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-panel,
+buddj-annual-charge-add-drawer.charge-add-drawer--open .charge-add-drawer-panel {
   transform: translateY(0);
 }
 
@@ -2432,11 +2438,13 @@ buddj-expense-add-drawer.expense-add-drawer--open .expense-add-drawer-panel {
 }
 
 /* ========== Drawer ajout budget ========== */
-buddj-budget-add-drawer {
+buddj-budget-add-drawer,
+buddj-annual-budget-add-drawer {
   display: contents;
 }
 
-buddj-budget-add-drawer.budget-add-drawer--open {
+buddj-budget-add-drawer.budget-add-drawer--open,
+buddj-annual-budget-add-drawer.budget-add-drawer--open {
   display: block;
   position: fixed;
   inset: 0;
@@ -2445,7 +2453,9 @@ buddj-budget-add-drawer.budget-add-drawer--open {
 }
 
 buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-backdrop,
-buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-panel {
+buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-panel,
+buddj-annual-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-backdrop,
+buddj-annual-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-panel {
   pointer-events: auto;
 }
 
@@ -2462,7 +2472,8 @@ buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-panel {
   transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
-buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-backdrop {
+buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-backdrop,
+buddj-annual-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-backdrop {
   opacity: 1;
   visibility: visible;
 }
@@ -2484,7 +2495,8 @@ buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-backdrop {
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 
-buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-panel {
+buddj-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-panel,
+buddj-annual-budget-add-drawer.budget-add-drawer--open .budget-add-drawer-panel {
   transform: translateY(0);
 }
 

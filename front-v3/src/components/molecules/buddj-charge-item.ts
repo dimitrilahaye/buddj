@@ -18,6 +18,7 @@ export class BuddjChargeItem extends HTMLElement {
     const taken = this.hasAttribute('taken') ? this.getAttribute('taken') !== 'false' : false;
     const previous = this.hasAttribute('previous');
     const noLabelToggle = this.hasAttribute('no-label-toggle');
+    const hideTaken = this.hasAttribute('hide-taken');
     const cbId = CHECKBOX_ID_PREFIX + Math.random().toString(36).slice(2, 11);
 
     this.classList.add('charge-item');
@@ -27,25 +28,27 @@ export class BuddjChargeItem extends HTMLElement {
     lineItem.setAttribute('icon', icon);
     lineItem.setAttribute('label', label);
     lineItem.setAttribute('amount', String(amountNum));
-    if (!noLabelToggle) lineItem.setAttribute('checkable-for', cbId);
-
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = cbId;
-    checkbox.className = 'charge-taken';
-    checkbox.title = 'Marquer comme prélevé du compte (ne compte plus dans le solde)';
-    checkbox.checked = taken;
-    checkbox.slot = 'prefix';
+    if (!noLabelToggle && !hideTaken) lineItem.setAttribute('checkable-for', cbId);
 
     const deleteBtn = document.createElement('buddj-icon-delete');
     deleteBtn.setAttribute('title', 'Supprimer');
     deleteBtn.slot = 'actions';
 
-    lineItem.appendChild(checkbox);
+    if (!hideTaken) {
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = cbId;
+      checkbox.className = 'charge-taken';
+      checkbox.title = 'Marquer comme prélevé du compte (ne compte plus dans le solde)';
+      checkbox.checked = taken;
+      checkbox.slot = 'prefix';
+      lineItem.appendChild(checkbox);
+    }
+
     lineItem.appendChild(deleteBtn);
     this.appendChild(lineItem);
 
-    this.attachToggleListener();
+    if (!hideTaken) this.attachToggleListener();
     this.attachDeleteListener(label);
   }
 

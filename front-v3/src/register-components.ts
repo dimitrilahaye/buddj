@@ -28,6 +28,8 @@ import './components/organisms/buddj-burger-panel.js';
 import './components/organisms/buddj-calculator-drawer.js';
 import './components/organisms/buddj-emoji-picker-drawer.js';
 import './components/organisms/buddj-charge-add-drawer.js';
+import './components/organisms/buddj-annual-charge-add-drawer.js';
+import './components/organisms/buddj-annual-budget-add-drawer.js';
 import './components/organisms/buddj-expense-add-drawer.js';
 import './components/organisms/buddj-budget-add-drawer.js';
 import './components/organisms/buddj-budget-edit-drawer.js';

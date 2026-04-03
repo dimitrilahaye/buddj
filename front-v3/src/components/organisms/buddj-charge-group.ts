@@ -37,6 +37,10 @@ export class BuddjChargeGroup extends HTMLElement {
       ? `<buddj-icon-search class="template-section-search charge-group-search" title="Rechercher dans les charges" aria-label="Rechercher les charges"></buddj-icon-search>`
       : '';
     const hideInlineAdd = this.hasAttribute('hide-inline-add');
+    const annualMonthAttr = this.getAttribute('annual-month');
+    const annualMonth =
+      annualMonthAttr != null && annualMonthAttr !== '' ? parseInt(annualMonthAttr, 10) : NaN;
+    const useAnnualDrawer = showAdd && Number.isFinite(annualMonth) && annualMonth >= 1 && annualMonth <= 12;
     if (showAdd) {
       const addBtnHtml = hideInlineAdd
         ? ''
@@ -86,6 +90,13 @@ export class BuddjChargeGroup extends HTMLElement {
     if (showAdd && !hideInlineAdd) {
       const addBtn = div.querySelector('buddj-btn-add');
       addBtn?.addEventListener('click', () => {
+        if (useAnnualDrawer) {
+          const drawer = document.getElementById('annual-charge-add-drawer') as HTMLElement & {
+            open: (o: { month: number }) => void;
+          };
+          drawer?.open({ month: annualMonth });
+          return;
+        }
         const drawer = document.getElementById('charge-add-drawer') as BuddjChargeAddDrawerElement;
         drawer?.open();
       });

@@ -16,9 +16,11 @@ import type { AuthStore } from './application/auth/auth-store.js';
 import type { ArchivedMonthStore } from './application/month/archived-month-store.js';
 import type { MonthStore } from './application/month/month-store.js';
 import type { TemplatesStore } from './application/template/templates-store.js';
+import type { YearlyOutflowsStore } from './application/yearly-outflows/yearly-outflows-store.js';
 import type { BuddjScreenArchived } from './components/screens/buddj-screen-archived.js';
 import type { BuddjScreenTemplates } from './components/screens/buddj-screen-templates.js';
 import type { BuddjScreenTemplateDetail } from './components/screens/buddj-screen-template-detail.js';
+import type { BuddjScreenAnnualOutflows } from './components/screens/buddj-screen-annual-outflows.js';
 import { BuddjScreenHome } from './components/screens/buddj-screen-home.js';
 import { BuddjScreenBudgets } from './components/screens/buddj-screen-budgets.js';
 
@@ -52,12 +54,14 @@ export function createRoutes({
   monthStore,
   archivedMonthStore,
   templatesStore,
+  yearlyOutflowsStore,
   redirectToHome,
 }: {
   authStore: AuthStore;
   monthStore: MonthStore;
   archivedMonthStore: ArchivedMonthStore;
   templatesStore: TemplatesStore;
+  yearlyOutflowsStore: YearlyOutflowsStore;
   redirectToHome: () => void;
 }): RouteDef[] {
   return [
@@ -125,7 +129,8 @@ export function createRoutes({
       name: 'annual-outflows',
       pattern: '/annual-outflows',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-annual-outflows');
+        const el = document.createElement('buddj-screen-annual-outflows') as BuddjScreenAnnualOutflows;
+        el.init({ yearlyOutflowsStore });
         ctx.outlet.replaceChildren(el);
       }),
     },
