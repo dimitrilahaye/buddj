@@ -10,6 +10,7 @@ export type BuddjNewMonthChargeSearchDrawerElement = HTMLElement & { open: () =>
 
 interface NewMonthChargeEntry extends SearchDrawerEntry {
   id: string;
+  element: HTMLElement;
 }
 
 function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
