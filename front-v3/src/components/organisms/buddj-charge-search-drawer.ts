@@ -57,7 +57,7 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
         if (outflowId) {
           return document.querySelector(`buddj-charge-item[outflow-id="${outflowId}"] .charge-taken`) as HTMLInputElement | null;
         }
-        return entry.element.querySelector<HTMLInputElement>('.charge-taken');
+        return entry.element?.querySelector<HTMLInputElement>('.charge-taken') ?? null;
       };
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -88,7 +88,7 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
         document.querySelector<HTMLElement>(`buddj-charge-item[outflow-id="${outflowId}"] buddj-icon-delete`)?.click();
         return;
       }
-      entry.element.querySelector<HTMLElement>('buddj-icon-delete')?.click();
+      entry.element?.querySelector<HTMLElement>('buddj-icon-delete')?.click();
     });
 
     lineItem.appendChild(deleteBtn);

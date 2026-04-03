@@ -1,5 +1,5 @@
 /**
- * Bouton icône « Recherche » (loupe). Utilisé pour ouvrir le drawer de recherche des charges.
+ * Bouton icône « Recherche » (loupe). Ex. barre récap (charges / budgets) ou groupes template.
  */
 import { escapeAttr } from '../../shared/escape.js';
 

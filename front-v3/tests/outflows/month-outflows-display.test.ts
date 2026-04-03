@@ -10,7 +10,9 @@ function shellDocument(): void {
   document.body.innerHTML = `
     <buddj-toast></buddj-toast>
     <buddj-confirm-modal id="delete-confirm-modal"></buddj-confirm-modal>
-    <buddj-charge-search-drawer id="charge-search-drawer"></buddj-charge-search-drawer>
+    <buddj-confirm-modal id="archive-month-confirm"></buddj-confirm-modal>
+    <buddj-month-search-drawer id="month-search-drawer"></buddj-month-search-drawer>
+    <buddj-summary-bar balance-value="0" date="" projected-balance="0"></buddj-summary-bar>
     <buddj-charge-add-drawer id="charge-add-drawer"></buddj-charge-add-drawer>
     <main id="screen-outlet" role="main"></main>
   `;

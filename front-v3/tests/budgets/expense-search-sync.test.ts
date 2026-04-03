@@ -19,7 +19,8 @@ function shellDocument(): void {
   document.body.innerHTML = `
     <buddj-toast></buddj-toast>
     <buddj-confirm-modal id="delete-confirm-modal"></buddj-confirm-modal>
-    <buddj-expense-search-drawer id="expense-search-drawer"></buddj-expense-search-drawer>
+    <buddj-confirm-modal id="archive-month-confirm"></buddj-confirm-modal>
+    <buddj-month-search-drawer id="month-search-drawer"></buddj-month-search-drawer>
     <buddj-summary-bar balance-value="0" date="" projected-balance="0"></buddj-summary-bar>
     <main id="screen-outlet" role="main"></main>
   `;
@@ -34,7 +35,7 @@ function budgetsScreenMain(): HTMLElement {
 }
 
 function expenseSearchDialog(): HTMLElement {
-  return screen.getByRole('dialog', { name: /Rechercher une dépense/i });
+  return screen.getByRole('dialog', { name: /^Rechercher$/ });
 }
 
 function kebabCheckboxInMain(): HTMLInputElement {
@@ -42,7 +43,7 @@ function kebabCheckboxInMain(): HTMLInputElement {
 }
 
 async function openExpenseSearchAndFilter(query: string): Promise<void> {
-  fireEvent.click(screen.getByRole('button', { name: 'Ouvrir la recherche' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Rechercher dans les charges ou les budgets' }));
   const input = screen.getByRole('searchbox', { name: /Rechercher par intitulé ou montant/i });
   fireEvent.input(input, { target: { value: query } });
   await waitFor(() => {

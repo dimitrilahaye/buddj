@@ -44,7 +44,7 @@ describe('placeholder « aucun mois » (web component)', () => {
     expect(outlet.querySelectorAll('buddj-months-empty-placeholder')).toHaveLength(1);
     expect(summaryBar?.hasAttribute('hidden')).toBe(true);
     const budgetsHeader = screen.getByRole('heading', { name: 'Mes budgets', level: 1 }).closest('header');
-    expect(budgetsHeader?.querySelector('buddj-icon-search')?.hasAttribute('hidden')).toBe(true);
+    expect(budgetsHeader?.querySelector('buddj-icon-search')).toBeNull();
     expect(budgetsHeader?.querySelector('buddj-toggle-all')?.hasAttribute('hidden')).toBe(true);
 
     const link = document.createElement('a');

@@ -11,7 +11,8 @@ export interface SearchDrawerEntry {
   label: string;
   amount: string;
   icon: string;
-  element: HTMLElement;
+  /** Référence DOM optionnelle (ex. collecte depuis l’écran monté). */
+  element?: HTMLElement;
   [key: string]: unknown;
 }
 
@@ -22,8 +23,12 @@ export interface SearchDrawerConfig {
   getEntries: () => SearchDrawerEntry[];
   getGroupKey: (entry: SearchDrawerEntry) => string;
   createMirrorRow: (entry: SearchDrawerEntry) => HTMLElement;
-  rowWrapperClass: string;
+  /** Classe sur la ligne (ex. charge-item / expense-item). */
+  rowWrapperClass?: string;
+  getRowWrapperClass?: (entry: SearchDrawerEntry) => string;
   eventName?: string;
+  /** Si défini, chaque event reçoit le même `detail.query` (ex. charges + dépenses). */
+  eventNames?: string[];
 }
 
 export type BuddjSearchDrawerElement = HTMLElement & {
@@ -59,11 +64,11 @@ export class BuddjSearchDrawer extends HTMLElement {
   }
 
   close(): void {
-    const eventName = this._config?.eventName;
+    const names = this._searchEventNames();
     this.classList.remove('search-drawer--open');
     this._query = '';
     this._config = null;
-    if (eventName) {
+    for (const eventName of names) {
       this.dispatchEvent(new CustomEvent(eventName, { detail: { query: '' }, bubbles: true }));
     }
   }
@@ -113,7 +118,10 @@ export class BuddjSearchDrawer extends HTMLElement {
         const wrap = document.createElement('li');
         wrap.className = 'search-drawer-item';
         const rowWrap = document.createElement('div');
-        rowWrap.className = `search-drawer-item-row ${config.rowWrapperClass}`;
+        const rowExtra = config.getRowWrapperClass
+          ? config.getRowWrapperClass(entry)
+          : (config.rowWrapperClass ?? '');
+        rowWrap.className = ['search-drawer-item-row', rowExtra].filter(Boolean).join(' ');
         rowWrap.appendChild(config.createMirrorRow(entry));
         wrap.appendChild(rowWrap);
         list.appendChild(wrap);
@@ -126,9 +134,17 @@ export class BuddjSearchDrawer extends HTMLElement {
     this.dispatchSearchEvent();
   }
 
+  private _searchEventNames(): string[] {
+    const c = this._config;
+    if (!c) return [];
+    if (c.eventNames?.length) return c.eventNames;
+    if (c.eventName) return [c.eventName];
+    return [];
+  }
+
   private dispatchSearchEvent(): void {
-    if (this._config?.eventName) {
-      this.dispatchEvent(new CustomEvent(this._config.eventName, { detail: { query: this._query }, bubbles: true }));
+    for (const eventName of this._searchEventNames()) {
+      this.dispatchEvent(new CustomEvent(eventName, { detail: { query: this._query }, bubbles: true }));
     }
   }
 

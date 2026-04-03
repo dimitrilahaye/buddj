@@ -64,6 +64,7 @@ export class BuddjSummaryBar extends HTMLElement {
     this.renderBalanceActions();
     this.attachBalanceListeners();
     this.attachDateListeners();
+    this.addEventListener('click', this._onMonthSearchClick);
     if (this._monthStore) {
       this._syncFromStoreState();
     }
@@ -90,6 +91,7 @@ export class BuddjSummaryBar extends HTMLElement {
     this._toggleVisibilityWhenNoMonthsInStore();
     this._updateNavButtonsDisabled();
     this._syncBuddjNavMonthIdFromStore();
+    this._updateMonthSearchVisibility();
   };
 
   /** Masque la barre récap lorsqu’il n’y a aucun mois dans le store. */
@@ -131,7 +133,31 @@ export class BuddjSummaryBar extends HTMLElement {
     this._toggleVisibilityWhenNoMonthsInStore();
     this._updateNavButtonsDisabled();
     this._syncBuddjNavMonthIdFromStore();
+    this._updateMonthSearchVisibility();
   }
+
+  /** À appeler après navigation (Charges / Budgets) pour afficher ou masquer la loupe. */
+  syncSearchFromRoute(): void {
+    this._updateMonthSearchVisibility();
+  }
+
+  private _updateMonthSearchVisibility(): void {
+    const el = this.querySelector('[data-summary-month-search]');
+    if (!el || !this._getCurrentRouteName || !this._monthStore) return;
+    const month = getCurrentMonth({ state: this._monthStore.getState() });
+    const route = this._getCurrentRouteName();
+    const show =
+      !!month &&
+      (route === 'outflows' || route === 'budgets-month' || route === 'budgets');
+    el.toggleAttribute('hidden', !show);
+  }
+
+  private _onMonthSearchClick = (e: Event): void => {
+    if (!(e.target as Element).closest('[data-summary-month-search]')) return;
+    e.preventDefault();
+    const drawer = document.getElementById('month-search-drawer') as HTMLElement & { open: () => void } | null;
+    drawer?.open();
+  };
 
   private _toggleMonthOptionsMenu(visible: boolean): void {
     const dropdown = this.querySelector('buddj-actions-dropdown');
@@ -201,6 +227,13 @@ export class BuddjSummaryBar extends HTMLElement {
               <button type="button" class="btn goal-btn-gear" slot="trigger" title="Options du mois" aria-label="Options du mois" aria-haspopup="true">⚙</button>
               <button type="button" slot="items" data-action="archive-month">Archiver ce mois</button>
             </buddj-actions-dropdown>
+            <buddj-icon-search
+              class="summary-bar-month-search"
+              data-summary-month-search
+              title="Rechercher dans les charges ou les budgets"
+              aria-label="Rechercher dans les charges ou les budgets"
+              hidden
+            ></buddj-icon-search>
           </div>
           <button type="button" class="btn btn--nav-month" title="Mois suivant" aria-label="Mois suivant">→</button>
         </div>

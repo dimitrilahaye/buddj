@@ -50,6 +50,7 @@ import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
 import type { BuddjSummaryBarElement } from './components/organisms/buddj-summary-bar.js';
+import type { BuddjMonthSearchDrawerElement } from './components/organisms/buddj-month-search-drawer.js';
 import { getCurrentMonth } from './application/month/month-state.js';
 import { getToast } from './components/atoms/buddj-toast.js';
 
@@ -274,6 +275,9 @@ export function bootstrap(options: BootstrapOptions): void {
     defaultMonthIdForNav: DEFAULT_MONTH_ID,
   });
 
+  const monthSearchDrawer = document.getElementById('month-search-drawer') as BuddjMonthSearchDrawerElement | null;
+  monthSearchDrawer?.init({ monthStore });
+
   function applyRoute(match: { name: string; params: Record<string, string> }): void {
     const isStandalone = STANDALONE_ROUTE_NAMES.has(match.name);
     getBodyClassToggles(match).forEach(({ class: cls, active }) => {
@@ -290,6 +294,7 @@ export function bootstrap(options: BootstrapOptions): void {
       const activeRouteNames = href ? BURGER_LINK_ACTIVE_BY_HREF[href] ?? [] : [];
       link.classList.toggle('burger-panel-link--active', activeRouteNames.includes(match.name));
     });
+    summaryBar?.syncSearchFromRoute();
   }
 
   const onSpaNavigationClick = (e: Event): void => {

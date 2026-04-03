@@ -2,7 +2,6 @@
  * Écran Mes budgets : charge les mois non archivés, barre récap + liste depuis MonthStore.
  */
 import type { BuddjBudgetAddDrawerElement } from '../organisms/buddj-budget-add-drawer.js';
-import type { BuddjExpenseSearchDrawerElement } from '../organisms/buddj-expense-search-drawer.js';
 import {
   LOADING_CREATE_BUDGET_TEXT,
   LOADING_CREATE_EXPENSE_TEXT,
@@ -83,7 +82,6 @@ export class BuddjScreenBudgets extends HTMLElement {
         <header class="screen-header">
           <div class="screen-header-row screen-header-row--title">
             <h1 class="title">Mes budgets</h1>
-            <buddj-icon-search title="Rechercher par intitulé ou montant" aria-label="Ouvrir la recherche"></buddj-icon-search>
             <buddj-toggle-all target-selector=".budget-details" title-expand="Déplier tous les budgets" title-collapse="Replier tous les budgets"></buddj-toggle-all>
             <buddj-btn-add label="" title="Ajouter un budget" data-budget-header-add hidden></buddj-btn-add>
           </div>
@@ -292,8 +290,8 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _onCurrentMonthChanged = (e: Event): void => {
     const ev = e as CustomEvent<{ month: MonthView | null }>;
     this._renderBudgetGroups(ev.detail?.month ?? null);
-    const drawer = document.getElementById('expense-search-drawer') as BuddjExpenseSearchDrawerElement | null;
-    drawer?.refresh();
+    const drawer = document.getElementById('month-search-drawer') as { refresh?: () => void } | null;
+    drawer?.refresh?.();
   };
 
   private _hideBudgetScreenRecap(): void {
@@ -318,13 +316,12 @@ export class BuddjScreenBudgets extends HTMLElement {
     el.removeAttribute('hidden');
   }
 
-  /** Sans mois dans le store : pas de recherche ni de « déplier tout » dans le header. */
+  /** Sans mois dans le store : pas de « déplier tout » dans le header. */
   private _syncBudgetHeaderToolbarVisibility(): void {
     const main = this.querySelector('#budgets');
     if (!main) return;
     const months = this._monthStore?.getState().months ?? [];
     const hideTools = months.length === 0;
-    main.querySelector('buddj-icon-search')?.toggleAttribute('hidden', hideTools);
     main.querySelector('buddj-toggle-all')?.toggleAttribute('hidden', hideTools);
   }
 
@@ -398,12 +395,6 @@ export class BuddjScreenBudgets extends HTMLElement {
   private attachListeners(): void {
     this.addEventListener('click', (e) => {
       const target = e.target as Element;
-      if (target.closest('buddj-icon-search')) {
-        e.preventDefault();
-        const drawer = document.getElementById('expense-search-drawer') as BuddjExpenseSearchDrawerElement;
-        drawer?.open();
-        return;
-      }
       const headerAdd = target.closest('[data-budget-header-add]');
       if (headerAdd && !headerAdd.hasAttribute('hidden')) {
         e.preventDefault();

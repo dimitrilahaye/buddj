@@ -17,13 +17,41 @@ export function normalizeForSearch(text: string): string {
 }
 
 /**
- * Normalise un montant pour la recherche : minuscules, sans espaces ni symbole €.
+ * Normalise un montant pour la recherche : minuscules, sans espaces ni symbole €, virgule décimale → point.
  */
 export function normalizeAmountForSearch(amount: string): string {
   return (amount ?? '')
     .toLowerCase()
     .replace(/\s/g, '')
-    .replace('€', '');
+    .replace('€', '')
+    .replace(',', '.');
+}
+
+/**
+ * Normalise la saisie utilisateur quand on la compare à un montant (symétrique à {@link normalizeAmountForSearch}).
+ */
+export function normalizeQueryForAmountMatch(query: string): string {
+  return (query ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s/g, '')
+    .replace('€', '')
+    .replace(',', '.');
+}
+
+/** Représentations textuelles d’un montant pour « contient » (ex. 10,5 ↔ 10.50). */
+function amountSearchVariants(amountStr: string): string[] {
+  const norm = normalizeAmountForSearch(amountStr);
+  const set = new Set<string>();
+  if (norm !== '') set.add(norm);
+  const n = parseFloat(norm);
+  if (Number.isFinite(n)) {
+    set.add(String(n));
+    const f2 = n.toFixed(2);
+    set.add(f2);
+    set.add(f2.replace('.', ','));
+  }
+  return [...set];
 }
 
 /**
@@ -47,7 +75,8 @@ export function entryMatchesSearch(
   const nQuery = normalizeForSearch(query);
   if (nQuery === '') return true;
   const labelMatch = textMatchesQuery(label, query);
-  const amountNorm = normalizeAmountForSearch(amount);
-  const amountMatch = amountNorm.includes(nQuery);
+  const qAmount = normalizeQueryForAmountMatch(query);
+  const amountMatch =
+    /\d/.test(qAmount) && amountSearchVariants(amount).some((v) => v.includes(qAmount));
   return labelMatch || amountMatch;
 }

@@ -1,10 +1,8 @@
 /**
- * Écran Charges récurrentes : header avec icône recherche + section avec titre, groupes de charges construits à partir d’un tableau de données.
- * Filtrage en temps réel par intitulé ou montant via le drawer de recherche.
+ * Écran Charges récurrentes : section avec titre, groupes de charges construits à partir d’un tableau de données.
+ * Filtrage en temps réel par intitulé ou montant via le drawer de recherche (barre récap).
  */
 import type { BuddjChargeAddDrawerElement } from '../organisms/buddj-charge-add-drawer.js';
-import type { BuddjChargeSearchDrawerElement } from '../organisms/buddj-charge-search-drawer.js';
-import type { BuddjSearchDrawerElement } from '../organisms/buddj-search-drawer.js';
 import { entryMatchesSearch } from '../../shared/search.js';
 import type { ChargeGroupData } from '../../application/month/month-types.js';
 import { escapeAttr } from '../../shared/escape.js';
@@ -108,7 +106,6 @@ export class BuddjScreenRecurring extends HTMLElement {
         <header class="screen-header">
           <div class="screen-header-row screen-header-row--title">
             <h1 class="title">Charges récurrentes</h1>
-            <buddj-icon-search title="Rechercher par intitulé ou montant" aria-label="Ouvrir la recherche"></buddj-icon-search>
             ${
               headerAddCharge
                 ? `<buddj-btn-add label="" title="${headerAddChargeTitleAttr}" data-header-add-charge></buddj-btn-add>`
@@ -152,12 +149,6 @@ export class BuddjScreenRecurring extends HTMLElement {
   private attachListeners(): void {
     this.addEventListener('click', (e) => {
       const target = e.target as Element;
-      if (target.closest('buddj-icon-search')) {
-        e.preventDefault();
-        const drawer = document.getElementById('charge-search-drawer') as BuddjChargeSearchDrawerElement;
-        drawer?.open();
-        return;
-      }
       if (target.closest('[data-header-add-charge]')) {
         e.preventDefault();
         const drawer = document.getElementById('charge-add-drawer') as BuddjChargeAddDrawerElement;
@@ -184,9 +175,8 @@ export class BuddjScreenRecurring extends HTMLElement {
     const month = (e as CustomEvent<{ month: MonthView | null }>).detail?.month;
     this._chargeGroups = month?.chargeGroups ?? [];
     this.render();
-    const searchDrawer = document.getElementById('charge-search-drawer') as BuddjChargeSearchDrawerElement | null;
-    const shell = searchDrawer?.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
-    shell?.refresh();
+    const monthDrawer = document.getElementById('month-search-drawer') as { refresh?: () => void } | null;
+    monthDrawer?.refresh?.();
   };
 
   private _onChargeDeleteConfirmed = (e: Event): void => {

@@ -36,7 +36,7 @@ import './components/organisms/buddj-budget-edit-drawer.js';
 import './components/organisms/buddj-transfer-drawer.js';
 import './components/organisms/buddj-search-drawer.js';
 import './components/organisms/buddj-charge-search-drawer.js';
-import './components/organisms/buddj-expense-search-drawer.js';
+import './components/organisms/buddj-month-search-drawer.js';
 import './components/organisms/buddj-budget-search-drawer.js';
 import './components/organisms/buddj-annual-outflows-search-drawer.js';
 import './components/organisms/buddj-new-month-charge-search-drawer.js';

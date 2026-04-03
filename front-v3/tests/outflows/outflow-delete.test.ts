@@ -11,7 +11,9 @@ function shellDocument(): void {
   document.body.innerHTML = `
     <buddj-toast></buddj-toast>
     <buddj-confirm-modal id="delete-confirm-modal"></buddj-confirm-modal>
-    <buddj-charge-search-drawer id="charge-search-drawer"></buddj-charge-search-drawer>
+    <buddj-confirm-modal id="archive-month-confirm"></buddj-confirm-modal>
+    <buddj-month-search-drawer id="month-search-drawer"></buddj-month-search-drawer>
+    <buddj-summary-bar balance-value="0" date="" projected-balance="0"></buddj-summary-bar>
     <buddj-charge-add-drawer id="charge-add-drawer"></buddj-charge-add-drawer>
     <main id="screen-outlet" role="main"></main>
   `;
@@ -73,8 +75,8 @@ describe('suppression charge récurrente', () => {
     });
     expect(Array.from(document.getElementsByTagName('buddj-charge-item')).some((el) => el.getAttribute('label') === 'Loyer 2')).toBe(false);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ouvrir la recherche' }));
-    const searchDrawer = document.getElementById('charge-search-drawer') as HTMLElement;
+    fireEvent.click(screen.getByRole('button', { name: 'Rechercher dans les charges ou les budgets' }));
+    const searchDrawer = document.getElementById('month-search-drawer') as HTMLElement;
     const searchInput = within(searchDrawer).getByRole('searchbox', { name: 'Rechercher par intitulé ou montant' });
     fireEvent.input(searchInput, { target: { value: 'Adobe' } });
     await waitFor(() => {

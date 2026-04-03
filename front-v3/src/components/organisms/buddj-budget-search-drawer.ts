@@ -50,7 +50,7 @@ export class BuddjBudgetSearchDrawer extends HTMLElement {
     deleteBtn.slot = 'actions';
     deleteBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      entry.element.querySelector<HTMLElement>('buddj-icon-delete')?.click();
+      entry.element?.querySelector<HTMLElement>('buddj-icon-delete')?.click();
     });
 
     lineItem.appendChild(deleteBtn);
