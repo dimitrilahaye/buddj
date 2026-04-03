@@ -1,5 +1,5 @@
 /**
- * Navigation principale : liens vers /outflows/:monthId et /budgets.
+ * Navigation principale : liens vers /outflows/:monthId et /budgets/:monthId (même mois courant).
  * Attribut month-id pour construire les hrefs ; l’état actif est géré via .nav-link--active.
  */
 export class BuddjNav extends HTMLElement {
@@ -34,6 +34,12 @@ export class BuddjNav extends HTMLElement {
   private _activeRoute = '';
   private _burgerOpen = false;
 
+  /** Nom de route interne (`budgets-month`) → premier segment d’URL utilisé par les liens (`budgets`). */
+  private _navKeyFromRouteName(routeName: string): string {
+    if (routeName === 'budgets-month') return 'budgets';
+    return routeName;
+  }
+
   private render(): void {
     const m = this.monthId;
     const burgerIcon = this._burgerOpen ? '×' : '☰';
@@ -42,14 +48,15 @@ export class BuddjNav extends HTMLElement {
       <nav class="nav-main">
         <div class="nav-main-links">
           <a href="/outflows/${m}" class="nav-link">Charges</a>
-          <a href="/budgets" class="nav-link">Budgets</a>
+          <a href="/budgets/${m}" class="nav-link">Budgets</a>
         </div>
         <button type="button" class="btn nav-burger" title="${burgerTitle}" aria-label="${burgerTitle}" aria-expanded="${this._burgerOpen}">${burgerIcon}</button>
       </nav>
     `;
+    const activeKey = this._navKeyFromRouteName(this._activeRoute);
     this.querySelectorAll('.nav-link').forEach((a) => {
       const route = (a.getAttribute('href') ?? '').replace(/^\/+/, '').split('/')[0] ?? '';
-      a.classList.toggle('nav-link--active', route === this._activeRoute);
+      a.classList.toggle('nav-link--active', route === activeKey);
     });
     this.attachBurgerListeners();
   }
@@ -67,9 +74,10 @@ export class BuddjNav extends HTMLElement {
 
   setActiveRoute(routeName: string): void {
     this._activeRoute = routeName;
+    const activeKey = this._navKeyFromRouteName(routeName);
     this.querySelectorAll('.nav-link').forEach((a) => {
       const route = (a.getAttribute('href') ?? '').replace(/^\/+/, '').split('/')[0] ?? '';
-      a.classList.toggle('nav-link--active', route === routeName);
+      a.classList.toggle('nav-link--active', route === activeKey);
     });
   }
 }

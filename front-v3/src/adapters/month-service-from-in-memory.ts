@@ -29,6 +29,8 @@ export function createMonthServiceFromInMemory({
   createBudgetDelayMs,
   updateBudgetDelayMs,
   transferDelayMs,
+  archiveMonthDelayMs,
+  archiveMonthFailure,
 }: {
   months: MonthView[];
   /** Délai simulé pour `getUnarchivedMonths`. */
@@ -53,6 +55,10 @@ export function createMonthServiceFromInMemory({
   updateBudgetDelayMs?: number;
   /** Délai simulé pour `transferFromWeeklyBudget` (défaut : `delayMs`). */
   transferDelayMs?: number;
+  /** Délai simulé pour `archiveMonth` (défaut : `delayMs`). */
+  archiveMonthDelayMs?: number;
+  /** Si défini, `archiveMonth` échoue avec ce message (tests). */
+  archiveMonthFailure?: string;
 }): MonthService {
   const months = deepCloneMonths(initialMonths);
   const waitPut = putDelayMs ?? delayMs;
@@ -65,6 +71,8 @@ export function createMonthServiceFromInMemory({
   const waitCreateBudget = createBudgetDelayMs ?? delayMs;
   const waitUpdateBudget = updateBudgetDelayMs ?? delayMs;
   const waitTransfer = transferDelayMs ?? delayMs;
+  const waitArchiveMonth = archiveMonthDelayMs ?? delayMs;
+  const archiveFailMessage = archiveMonthFailure;
   return {
     async getUnarchivedMonths() {
       if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
@@ -184,6 +192,15 @@ export function createMonthServiceFromInMemory({
       });
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
+    },
+    async archiveMonth({ monthId }) {
+      if (waitArchiveMonth > 0) await new Promise((r) => setTimeout(r, waitArchiveMonth));
+      if (archiveFailMessage) throw new Error(archiveFailMessage);
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const archived = deepCloneMonths([months[idx]!])[0]!;
+      months.splice(idx, 1);
+      return archived;
     },
   };
 }

@@ -4,6 +4,7 @@ import type { MonthView } from './month-view.js';
 
 export interface MonthService {
   getUnarchivedMonths(): Promise<MonthView[]>;
+  archiveMonth(input: { monthId: string }): Promise<MonthView>;
   putExpensesChecking(monthId: string, body: ExpensesCheckingPayload): Promise<MonthView>;
   putOutflowsChecking(input: { monthId: string; body: OutflowsCheckingPayload }): Promise<MonthView>;
   deleteExpense(input: {

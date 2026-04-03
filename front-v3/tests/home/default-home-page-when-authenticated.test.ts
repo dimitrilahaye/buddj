@@ -3,6 +3,7 @@ import { screen } from '@testing-library/dom';
 import { createAuthServiceFromInMemory } from '../../src/adapters/auth-service-from-in-memory.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { DEFAULT_MONTH_ID } from '../../src/router-config.js';
 import { monthServiceEmpty } from '../helpers/month-service-empty.js';
 
 describe("home quand l'utilisateur est authentifié", () => {
@@ -14,7 +15,7 @@ describe("home quand l'utilisateur est authentifié", () => {
 
     await new Promise((r) => setTimeout(r, 100));
 
-    expect(window.location.pathname).toBe('/budgets');
+    expect(window.location.pathname).toBe(`/budgets/${DEFAULT_MONTH_ID}`);
     expect(screen.queryByRole('status', { name: 'Connexion à Buddj! en cours' })).toBeNull();
   });
 });

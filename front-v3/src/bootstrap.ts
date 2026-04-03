@@ -23,11 +23,38 @@ import { createPutExpensesChecking } from './application/month/put-expenses-chec
 import { createPutOutflowsChecking } from './application/month/put-outflows-checking.js';
 import { createTransferFromWeeklyBudget } from './application/month/transfer-from-weekly-budget.js';
 import { createTransferFromAccount } from './application/month/transfer-from-account.js';
+import { createArchiveMonth } from './application/month/archive-month.js';
 import type { MonthService } from './application/month/month-service.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
 import type { BuddjSummaryBarElement } from './components/organisms/buddj-summary-bar.js';
+import { getCurrentMonth } from './application/month/month-state.js';
+import { getToast } from './components/atoms/buddj-toast.js';
+
+/** Référence du listener délégation SPA : retiré avant un second `bootstrap()` (tests). */
+let spaNavigationClickListener: ((e: Event) => void) | undefined;
+
+/** Route protégée demandée avant redirection vers `/` (garde auth) ; relue après vérif de session. */
+const POST_AUTH_REDIRECT_STORAGE_KEY = 'buddj-post-auth-redirect';
+
+function isSpaInternalPath(pathname: string): boolean {
+  if (
+    pathname === '/budgets' ||
+    pathname.startsWith('/budgets/') ||
+    pathname === '/new-month' ||
+    pathname === '/archived' ||
+    pathname === '/annual-outflows' ||
+    pathname === '/savings' ||
+    pathname === '/reimbursements' ||
+    pathname === '/templates'
+  ) {
+    return true;
+  }
+  if (pathname.startsWith('/outflows/')) return true;
+  if (pathname.startsWith('/templates/')) return true;
+  return false;
+}
 
 const STANDALONE_ROUTE_NAMES = new Set([
   'home',
@@ -44,7 +71,7 @@ function getBodyClassToggles(match: { name: string }): Array<{ class: string; ac
   return [
     { class: 'route-home', active: match.name === 'home' },
     { class: 'route-outflows', active: match.name === 'outflows' },
-    { class: 'route-budgets', active: match.name === 'budgets' },
+    { class: 'route-budgets', active: match.name === 'budgets' || match.name === 'budgets-month' },
     { class: 'route-templates', active: match.name === 'templates' || match.name === 'template-detail' },
     { class: 'route-annual-outflows', active: match.name === 'annual-outflows' },
     { class: 'route-new-month', active: match.name === 'new-month' },
@@ -84,8 +111,10 @@ export function bootstrap(options: BootstrapOptions): void {
   const updateBudget = createUpdateBudget({ monthService: options.monthService });
   const transferFromWeeklyBudget = createTransferFromWeeklyBudget({ monthService: options.monthService });
   const transferFromAccount = createTransferFromAccount({ monthService: options.monthService });
+  const archiveMonth = createArchiveMonth({ monthService: options.monthService });
   const monthStore = new MonthStore({
     loadUnarchivedMonths,
+    archiveMonth,
     putExpensesChecking,
     putOutflowsChecking,
     deleteExpense,
@@ -108,7 +137,22 @@ export function bootstrap(options: BootstrapOptions): void {
     checkUserIsAuthenticated: () => checkUserIsAuthenticated({ authService }),
     userSignIn: () => userSignIn({ authService }),
     userLogout: () => userLogout({ authService }),
-    onAuthenticatedRedirect: () => router.navigate('/budgets'),
+    onAuthenticatedRedirect: () => {
+      const saved = sessionStorage.getItem(POST_AUTH_REDIRECT_STORAGE_KEY);
+      sessionStorage.removeItem(POST_AUTH_REDIRECT_STORAGE_KEY);
+      if (saved) {
+        try {
+          const u = new URL(saved, window.location.origin);
+          if (u.origin === window.location.origin && isSpaInternalPath(u.pathname)) {
+            router.navigate(`${u.pathname}${u.search}${u.hash}`);
+            return;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+      router.navigate('/budgets');
+    },
     onLogoutSuccess: () => router.replace('/'),
   });
 
@@ -119,6 +163,10 @@ export function bootstrap(options: BootstrapOptions): void {
     authStore,
     monthStore,
     redirectToHome: () => {
+      const target = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      if (isSpaInternalPath(window.location.pathname)) {
+        sessionStorage.setItem(POST_AUTH_REDIRECT_STORAGE_KEY, target);
+      }
       // Désynchroniser pour que les listeners de la navigation en cours (route protégée) ne réappliquent pas leurs classes après applyRoute(home)
       setTimeout(() => router.replace('/'), 0);
     },
@@ -128,6 +176,26 @@ export function bootstrap(options: BootstrapOptions): void {
     routes,
     defaultMonthId: DEFAULT_MONTH_ID,
     defaultRoute: DEFAULT_ROUTE,
+  });
+
+  monthStore.addEventListener('routeMonthIdNotFound', () => {
+    getToast()?.show({
+      message: 'Ce mois n’est pas disponible dans la liste des mois non archivés.',
+      variant: 'error',
+      durationMs: 2500,
+    });
+  });
+
+  monthStore.addEventListener('currentMonthChanged', () => {
+    const m = getCurrentMonth({ state: monthStore.getState() });
+    if (!m) return;
+    const name = router.getCurrent().name;
+    const suffix = `${window.location.search}${window.location.hash}`;
+    if (name === 'outflows') {
+      window.history.replaceState(null, '', `/outflows/${m.id}${suffix}`);
+    } else if (name === 'budgets' || name === 'budgets-month') {
+      window.history.replaceState(null, '', `/budgets/${m.id}${suffix}`);
+    }
   });
 
   const summaryBar = document.querySelector('buddj-summary-bar') as BuddjSummaryBarElement | null;
@@ -155,14 +223,42 @@ export function bootstrap(options: BootstrapOptions): void {
     });
   }
 
-  document.addEventListener('click', (e) => {
-    const a = (e.target as Element).closest(
-      'a[href^="/outflows/"], a[href="/budgets"], a[href="/new-month"], a[href="/archived"], a[href="/annual-outflows"], a[href="/savings"], a[href="/reimbursements"], a[href="/templates"], a[href^="/templates/"]'
-    );
-    if (!a || (a as HTMLAnchorElement).target === '_blank') return;
+  const onSpaNavigationClick = (e: Event): void => {
+    const t = e.target as Node;
+    const start = t instanceof Element ? t : t.parentElement;
+    const raw = start?.closest('a');
+    if (!raw || !(raw instanceof HTMLAnchorElement) || raw.target === '_blank') return;
+    const hrefAttr = raw.getAttribute('href');
+    if (!hrefAttr || hrefAttr.startsWith('mailto:') || hrefAttr.startsWith('tel:')) return;
+
+    if (raw.closest('.global-header-logo')) {
+      e.preventDefault();
+      monthStore.emitAction('loadUnarchivedMonths');
+      return;
+    }
+
+    if (!hrefAttr.startsWith('/')) {
+      try {
+        const u = new URL(raw.href, window.location.origin);
+        if (u.origin !== window.location.origin) return;
+        if (!isSpaInternalPath(u.pathname)) return;
+        e.preventDefault();
+        router.navigate(`${u.pathname}${u.search}${u.hash}`);
+      } catch {
+        return;
+      }
+      return;
+    }
+    const pathOnly = hrefAttr.split(/[?#]/)[0] ?? '';
+    if (!pathOnly || !isSpaInternalPath(pathOnly)) return;
     e.preventDefault();
-    router.navigate((a as HTMLAnchorElement).getAttribute('href')!);
-  });
+    router.navigate(hrefAttr);
+  };
+  if (spaNavigationClickListener) {
+    document.removeEventListener('click', spaNavigationClickListener);
+  }
+  spaNavigationClickListener = onSpaNavigationClick;
+  document.addEventListener('click', spaNavigationClickListener);
 
   router.subscribe(applyRoute);
   router.init();

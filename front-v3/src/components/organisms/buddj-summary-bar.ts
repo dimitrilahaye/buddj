@@ -8,7 +8,10 @@ import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js'
 import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 import { escapeHtml } from '../../shared/escape.js';
 import type { MonthStore } from '../../application/month/month-store.js';
-import { LOADING_CURRENT_BALANCE_UPDATE_TEXT } from '../../application/month/month-store.js';
+import {
+  LOADING_ARCHIVE_MONTH_TEXT,
+  LOADING_CURRENT_BALANCE_UPDATE_TEXT,
+} from '../../application/month/month-store.js';
 import type { MonthView } from '../../application/month/month-view.js';
 import { getCurrentMonth } from '../../application/month/month-state.js';
 import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
@@ -44,6 +47,9 @@ export class BuddjSummaryBar extends HTMLElement {
     this._monthStore.addEventListener('currentBalanceUpdateLoading', this._onCurrentBalanceUpdateLoading);
     this._monthStore.addEventListener('currentBalanceUpdateLoaded', this._onCurrentBalanceUpdateLoaded);
     this._monthStore.addEventListener('currentBalanceUpdateFailed', this._onCurrentBalanceUpdateFailed);
+    this._monthStore.addEventListener('archiveMonthLoading', this._onArchiveMonthLoading);
+    this._monthStore.addEventListener('archiveMonthLoaded', this._onArchiveMonthLoaded);
+    this._monthStore.addEventListener('archiveMonthFailed', this._onArchiveMonthFailed);
     this.addEventListener('click', this._onNavMonthClick);
     if (!this._loadingModal) {
       this._loadingModal = document.createElement('buddj-loading-modal') as BuddjLoadingModal;
@@ -72,14 +78,31 @@ export class BuddjSummaryBar extends HTMLElement {
       this.setAttribute('account-id', m.accountId ?? '');
       this.renderBalanceActions();
       this.attachBalanceListeners();
+    } else {
+      this.setAttribute('date', '');
+      this.setAttribute('balance-value', '0');
+      this.setAttribute('projected-balance', '0');
+      this.removeAttribute('account-id');
+      this.renderBalanceActions();
+      this.attachBalanceListeners();
     }
+    this._toggleMonthOptionsMenu(!!m);
+    this._toggleVisibilityWhenNoMonthsInStore();
     this._updateNavButtonsDisabled();
     this._syncBuddjNavMonthIdFromStore();
   };
 
-  /** Sur la route budgets, aligne `buddj-nav` sur le mois courant du store (lien Charges). */
+  /** Masque la barre récap lorsqu’il n’y a aucun mois dans le store. */
+  private _toggleVisibilityWhenNoMonthsInStore(): void {
+    if (!this._monthStore) return;
+    const { months } = this._monthStore.getState();
+    this.toggleAttribute('hidden', months.length === 0);
+  }
+
+  /** Aligne `buddj-nav` (liens Charges / Budgets) sur le mois courant du store sur les écrans budget & charges. */
   private _syncBuddjNavMonthIdFromStore(): void {
-    if (this._getCurrentRouteName?.() !== 'budgets') return;
+    const route = this._getCurrentRouteName?.() ?? '';
+    if (route !== 'budgets' && route !== 'budgets-month' && route !== 'outflows') return;
     const nav = document.querySelector('buddj-nav');
     if (!nav || !this._monthStore) return;
     const id = this._monthStore.getCurrentMonthIdForNav() || this._defaultMonthIdForNav;
@@ -96,9 +119,23 @@ export class BuddjSummaryBar extends HTMLElement {
       this.setAttribute('account-id', m.accountId ?? '');
       this.renderBalanceActions();
       this.attachBalanceListeners();
+    } else {
+      this.setAttribute('date', '');
+      this.setAttribute('balance-value', '0');
+      this.setAttribute('projected-balance', '0');
+      this.removeAttribute('account-id');
+      this.renderBalanceActions();
+      this.attachBalanceListeners();
     }
+    this._toggleMonthOptionsMenu(!!m);
+    this._toggleVisibilityWhenNoMonthsInStore();
     this._updateNavButtonsDisabled();
     this._syncBuddjNavMonthIdFromStore();
+  }
+
+  private _toggleMonthOptionsMenu(visible: boolean): void {
+    const dropdown = this.querySelector('buddj-actions-dropdown');
+    dropdown?.toggleAttribute('hidden', !visible);
   }
 
   private _onNavMonthClick = (e: Event): void => {
@@ -193,8 +230,9 @@ export class BuddjSummaryBar extends HTMLElement {
           confirmLabel: 'Confirmer',
           onCancel: () => {},
           onConfirm: () => {
-            const toast = getToast();
-            toast?.show({ message: 'Le mois a bien été archivé' });
+            const monthId = this._monthStore ? getCurrentMonth({ state: this._monthStore.getState() })?.id : '';
+            if (!monthId) return;
+            this._monthStore?.emitAction('archiveMonth', { monthId });
           },
         });
       }
@@ -292,6 +330,21 @@ export class BuddjSummaryBar extends HTMLElement {
   private _onCurrentBalanceUpdateFailed = (e: Event): void => {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de la mise à jour du solde';
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
+  };
+
+  private _onArchiveMonthLoading = (): void => {
+    this._loadingModal?.show(LOADING_ARCHIVE_MONTH_TEXT);
+  };
+
+  private _onArchiveMonthLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'Le mois a bien été archivé' });
+  };
+
+  private _onArchiveMonthFailed = (e: Event): void => {
+    this._loadingModal?.hide();
+    const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de l’archivage du mois';
     getToast()?.show({ message: msg, variant: 'error', durationMs: 3000 });
   };
 }

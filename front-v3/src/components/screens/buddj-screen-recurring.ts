@@ -23,6 +23,8 @@ import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
 import { parseEurosToNumber } from '../../shared/goal.js';
 import { getToast } from '../atoms/buddj-toast.js';
 
+const LOADING_MONTHS_TEXT = 'Chargement des mois en cours';
+
 export class BuddjScreenRecurring extends HTMLElement {
   static readonly tagName = 'buddj-screen-recurring';
   private _monthStore?: MonthStore;
@@ -49,12 +51,11 @@ export class BuddjScreenRecurring extends HTMLElement {
   };
 
   connectedCallback(): void {
-    if (this.querySelector('.recurring-list')) return;
-    this.render();
+    if (this.querySelector('#recurring')) return;
+    this._attachMonthStoreListeners();
     this.attachListeners();
     document.addEventListener('buddj-charge-search', this._searchListener);
     document.addEventListener('buddj-charge-add-done', this._onChargeAddDone as EventListener);
-    this._attachMonthStoreListeners();
   }
 
   disconnectedCallback(): void {
@@ -65,7 +66,36 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._detachMonthStoreListeners();
   }
 
+  private _showEmptyMonthsPlaceholder(): boolean {
+    if (!this._monthStore) return false;
+    const s = this._monthStore.getState();
+    return !s.isLoadingMonths && s.months.length === 0;
+  }
+
+  private _renderEmptyMonthsPlaceholder(): void {
+    const main = document.createElement('main');
+    main.id = 'recurring';
+    main.className = 'screen screen--recurring';
+    main.innerHTML = `
+      <div class="screen-sticky-header-wrap">
+        <header class="screen-header">
+          <div class="screen-header-row screen-header-row--title">
+            <h1 class="title">Charges récurrentes</h1>
+          </div>
+        </header>
+      </div>
+      <section class="recurring-list"></section>
+    `;
+    main.querySelector('.recurring-list')!.appendChild(document.createElement('buddj-months-empty-placeholder'));
+    if (this._loadingModal) this.replaceChildren(main, this._loadingModal);
+    else this.replaceChildren(main);
+  }
+
   private render(): void {
+    if (this._showEmptyMonthsPlaceholder()) {
+      this._renderEmptyMonthsPlaceholder();
+      return;
+    }
     const headerAddCharge = this._chargeGroups.find((g) => g.showAdd);
     const headerAddChargeTitleAttr = escapeAttr(
       headerAddCharge?.addTitle ?? 'Ajouter une charge récurrente'
@@ -180,6 +210,9 @@ export class BuddjScreenRecurring extends HTMLElement {
     const loadingModal = document.createElement('buddj-loading-modal') as BuddjLoadingModal;
     this._loadingModal = loadingModal;
     this.appendChild(loadingModal);
+    this._monthStore.addEventListener('unarchivedMonthsLoading', this._onUnarchivedMonthsLoading);
+    this._monthStore.addEventListener('unarchivedMonthsLoaded', this._onUnarchivedMonthsLoaded);
+    this._monthStore.addEventListener('unarchivedMonthsLoadFailed', this._onUnarchivedMonthsLoaded);
     this._monthStore.addEventListener('currentMonthChanged', this._onCurrentMonthChanged);
     this._monthStore.addEventListener('outflowCreateLoading', this._onOutflowCreateLoading);
     this._monthStore.addEventListener('outflowCreateLoaded', this._onOutflowCreateLoaded);
@@ -190,14 +223,19 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._monthStore.addEventListener('outflowsCheckingLoading', this._onOutflowsCheckingLoading);
     this._monthStore.addEventListener('outflowsCheckingLoaded', this._onOutflowsCheckingLoaded);
     this._monthStore.addEventListener('outflowsCheckingFailed', this._onOutflowsCheckingFailed);
-    const month = getCurrentMonth({ state: this._monthStore.getState() });
-    this._chargeGroups = month?.chargeGroups ?? [];
+    const s = this._monthStore.getState();
+    if (s.months.length === 0 && !s.isLoadingMonths) {
+      this._monthStore.emitAction('loadUnarchivedMonths');
+    }
+    this._chargeGroups = getCurrentMonth({ state: this._monthStore.getState() })?.chargeGroups ?? [];
     this.render();
-    if (!month) this._monthStore.emitAction('loadUnarchivedMonths');
   }
 
   private _detachMonthStoreListeners(): void {
     if (!this._monthStore || !this._monthListenersAttached) return;
+    this._monthStore.removeEventListener('unarchivedMonthsLoading', this._onUnarchivedMonthsLoading);
+    this._monthStore.removeEventListener('unarchivedMonthsLoaded', this._onUnarchivedMonthsLoaded);
+    this._monthStore.removeEventListener('unarchivedMonthsLoadFailed', this._onUnarchivedMonthsLoaded);
     this._monthStore.removeEventListener('currentMonthChanged', this._onCurrentMonthChanged);
     this._monthStore.removeEventListener('outflowCreateLoading', this._onOutflowCreateLoading);
     this._monthStore.removeEventListener('outflowCreateLoaded', this._onOutflowCreateLoaded);
@@ -212,6 +250,14 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._loadingModal?.hide();
     this._loadingModal = undefined;
   }
+
+  private _onUnarchivedMonthsLoading = (): void => {
+    this._loadingModal?.show(LOADING_MONTHS_TEXT);
+  };
+
+  private _onUnarchivedMonthsLoaded = (): void => {
+    this._loadingModal?.hide();
+  };
 
   private _onOutflowCreateLoading = (): void => {
     this._loadingModal?.show(LOADING_CREATE_OUTFLOW_TEXT);

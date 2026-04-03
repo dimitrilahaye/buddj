@@ -5,6 +5,8 @@ export type MonthState = {
   currentIndex: number;
   isLoadingMonths: boolean;
   loadMonthsErrorMessage: string | null;
+  /** Id mois issu de l’URL à appliquer dès que les mois sont chargés (alignement route ↔ store). */
+  pendingRouteMonthId: string | null;
 };
 
 export const DEFAULT_MONTH_STATE: MonthState = {
@@ -12,6 +14,7 @@ export const DEFAULT_MONTH_STATE: MonthState = {
   currentIndex: 0,
   isLoadingMonths: false,
   loadMonthsErrorMessage: null,
+  pendingRouteMonthId: null,
 };
 
 export function getCurrentMonth({ state }: { state: MonthState }): MonthView | null {

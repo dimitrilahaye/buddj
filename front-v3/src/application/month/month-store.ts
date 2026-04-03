@@ -10,6 +10,7 @@ import type { CreateOutflowUseCase } from './create-outflow.js';
 import type { DeleteBudgetUseCase } from './delete-budget.js';
 import type { DeleteExpenseUseCase } from './delete-expense.js';
 import type { DeleteOutflowUseCase } from './delete-outflow.js';
+import type { ArchiveMonthUseCase } from './archive-month.js';
 import type { LoadUnarchivedMonthsUseCase } from './load-unarchived-months.js';
 import type { PutExpensesCheckingUseCase } from './put-expenses-checking.js';
 import type { PutOutflowsCheckingUseCase } from './put-outflows-checking.js';
@@ -33,6 +34,7 @@ export const LOADING_CREATE_BUDGET_TEXT = 'Ajout du budget en cours';
 export const LOADING_CREATE_OUTFLOW_TEXT = 'Ajout de la charge en cours';
 export const LOADING_UPDATE_BUDGET_TEXT = 'Mise à jour du budget en cours';
 export const LOADING_TRANSFER_BUDGET_TEXT = 'Transfert en cours';
+export const LOADING_ARCHIVE_MONTH_TEXT = 'Archivage du mois en cours';
 
 export type PutExpensesCheckingActionDetail = {
   weeklyBudgetId: string;
@@ -100,9 +102,35 @@ export type TransferFromAccountActionDetail = {
   amount: number;
 };
 
+export type ArchiveMonthActionDetail = {
+  monthId: string;
+};
+
+function computeMonthsAfterArchive(
+  months: MonthView[],
+  currentIndex: number,
+  archivedMonthId: string
+): { months: MonthView[]; currentIndex: number } {
+  const removedIndex = months.findIndex((m) => m.id === archivedMonthId);
+  if (removedIndex < 0) {
+    return { months: [...months], currentIndex };
+  }
+  const newMonths = months.filter((m) => m.id !== archivedMonthId);
+  let newIndex = currentIndex;
+  if (newMonths.length === 0) {
+    newIndex = 0;
+  } else if (removedIndex < currentIndex) {
+    newIndex = currentIndex - 1;
+  } else if (removedIndex === currentIndex) {
+    newIndex = Math.min(currentIndex, newMonths.length - 1);
+  }
+  return { months: newMonths, currentIndex: newIndex };
+}
+
 export class MonthStore extends Store<MonthState> {
   constructor({
     loadUnarchivedMonths,
+    archiveMonth,
     putExpensesChecking,
     putOutflowsChecking,
     deleteExpense,
@@ -127,9 +155,11 @@ export class MonthStore extends Store<MonthState> {
     updateBudget: UpdateBudgetUseCase;
     transferFromWeeklyBudget: TransferFromWeeklyBudgetUseCase;
     transferFromAccount: TransferFromAccountUseCase;
+    archiveMonth: ArchiveMonthUseCase;
   }) {
     super(DEFAULT_MONTH_STATE);
     this._loadUnarchivedMonths = loadUnarchivedMonths;
+    this._archiveMonth = archiveMonth;
     this._putExpensesChecking = putExpensesChecking;
     this._putOutflowsChecking = putOutflowsChecking;
     this._deleteExpense = deleteExpense;
@@ -195,9 +225,19 @@ export class MonthStore extends Store<MonthState> {
       if (!d?.fromAccountId || !d.toWeeklyBudgetId || d.amount === undefined || d.amount <= 0) return;
       void this.handleTransferFromAccount(d);
     });
+    this.addEventListener('archiveMonth', (e: Event) => {
+      const d = (e as CustomEvent<ArchiveMonthActionDetail>).detail;
+      if (!d?.monthId) return;
+      void this.handleArchiveMonth(d);
+    });
+    this.addEventListener('syncCurrentMonthToRouteId', (e: Event) => {
+      const d = (e as CustomEvent<{ monthId: string }>).detail;
+      if (d?.monthId) this.handleSyncCurrentMonthToRouteId(d.monthId);
+    });
   }
 
   private _loadUnarchivedMonths: LoadUnarchivedMonthsUseCase;
+  private _archiveMonth: ArchiveMonthUseCase;
   private _putExpensesChecking: PutExpensesCheckingUseCase;
   private _putOutflowsChecking: PutOutflowsCheckingUseCase;
   private _deleteExpense: DeleteExpenseUseCase;
@@ -211,22 +251,68 @@ export class MonthStore extends Store<MonthState> {
   private _transferFromAccount: TransferFromAccountUseCase;
 
   private async handleLoadUnarchivedMonths(): Promise<void> {
+    if (this.getState().isLoadingMonths) return;
     this.setState({ isLoadingMonths: true, loadMonthsErrorMessage: null });
     this.emitStateChange('unarchivedMonthsLoading');
     try {
       const months = await this._loadUnarchivedMonths();
+      const pending = this.getState().pendingRouteMonthId;
       this.setState({
         months,
         currentIndex: 0,
         isLoadingMonths: false,
         loadMonthsErrorMessage: null,
+        pendingRouteMonthId: null,
       });
       this.emitStateChange('unarchivedMonthsLoaded');
-      this.emitCurrentMonthChanged();
+      if (pending) {
+        this._applyRouteMonthIdSync(pending);
+      } else {
+        this.emitCurrentMonthChanged();
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this.setState({ isLoadingMonths: false, loadMonthsErrorMessage: message });
+      this.setState({ isLoadingMonths: false, loadMonthsErrorMessage: message, pendingRouteMonthId: null });
       this.emitStateChange('unarchivedMonthsLoadFailed', { message });
+    }
+  }
+
+  private handleSyncCurrentMonthToRouteId(monthId: string): void {
+    const id = monthId.trim();
+    if (!id) return;
+    const current = getCurrentMonth({ state: this.getState() });
+    if (
+      current?.id &&
+      (current.id === id || current.id.toLowerCase() === id.toLowerCase())
+    ) {
+      this.emitCurrentMonthChanged();
+      return;
+    }
+    const { isLoadingMonths, months } = this.getState();
+    if (isLoadingMonths) {
+      this.setState({ pendingRouteMonthId: id });
+      return;
+    }
+    if (months.length === 0) {
+      this.setState({ pendingRouteMonthId: id });
+      this.emitAction('loadUnarchivedMonths');
+      return;
+    }
+    this._applyRouteMonthIdSync(id);
+  }
+
+  /** Aligne `currentIndex` sur `monthId` ou émet `routeMonthIdNotFound`. */
+  private _applyRouteMonthIdSync(monthId: string): void {
+    const { months } = this.getState();
+    const idx = months.findIndex(
+      (m) => m.id === monthId || m.id.toLowerCase() === monthId.toLowerCase()
+    );
+    if (idx >= 0) {
+      this.setState({ currentIndex: idx });
+      this.emitCurrentMonthChanged();
+    } else {
+      this.emitStateChange('routeMonthIdNotFound', { monthId });
+      this.emitCurrentMonthChanged();
     }
   }
 
@@ -476,6 +562,23 @@ export class MonthStore extends Store<MonthState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('budgetTransferFailed', { message });
+    }
+  }
+
+  private async handleArchiveMonth(detail: ArchiveMonthActionDetail): Promise<void> {
+    const state = this.getState();
+    const month = getCurrentMonth({ state });
+    if (!month || month.id !== detail.monthId) return;
+    this.emitStateChange('archiveMonthLoading');
+    try {
+      await this._archiveMonth({ monthId: detail.monthId });
+      const next = computeMonthsAfterArchive(state.months, state.currentIndex, detail.monthId);
+      this.setState({ months: next.months, currentIndex: next.currentIndex });
+      this.emitStateChange('archiveMonthLoaded');
+      this.emitCurrentMonthChanged();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('archiveMonthFailed', { message });
     }
   }
 
