@@ -23,10 +23,16 @@ import {
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjLoadingModal } from '../molecules/buddj-loading-modal.js';
 import type { MonthView } from '../../application/month/month-view.js';
-import type { BudgetGroupData } from '../../application/month/month-types.js';
+import type { Budget, BudgetGroupData } from '../../application/month/month-types.js';
 import { formatEuros } from '../../shared/goal.js';
 
 const LOADING_MONTHS_TEXT = 'Chargement des mois en cours';
+
+/** Reste par budget : même formule que `buddj-budget-card` (alloué − somme des dépenses). */
+function budgetRemaining({ allocated, expenses }: Budget): number {
+  const sumExpenses = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  return Math.round((allocated - sumExpenses) * 100) / 100;
+}
 
 function openBudgetKey(card: Element): string {
   const wid = card.getAttribute('weekly-budget-id');
@@ -304,15 +310,13 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _updateBudgetScreenRecap(groups: BudgetGroupData[]): void {
     const el = this.querySelector('[data-budget-screen-recap]') as HTMLElement | null;
     if (!el) return;
-    let n = 0;
-    let sum = 0;
+    let sumRemaining = 0;
     for (const g of groups) {
       for (const b of g.budgets) {
-        n += 1;
-        sum += b.allocated;
+        sumRemaining += budgetRemaining(b);
       }
     }
-    el.textContent = `${n} budget${n > 1 ? 's' : ''} · ${formatEuros(sum)}`;
+    el.textContent = `${formatEuros(sumRemaining)} restants`;
     el.removeAttribute('hidden');
   }
 
