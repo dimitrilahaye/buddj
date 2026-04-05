@@ -244,7 +244,7 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
 
     const chargesContainer = main.querySelector('[data-charges-container]')!;
     const chargeGroup = document.createElement('buddj-charge-group');
-    chargeGroup.setAttribute('title', 'Charges récurrentes mensuelles');
+    chargeGroup.setAttribute('section-title', 'Charges récurrentes mensuelles');
     chargeGroup.setAttribute('show-add', '');
     chargeGroup.setAttribute('show-search', '');
     chargeGroup.setAttribute('add-label', 'Ajouter une charge');

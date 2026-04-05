@@ -1,6 +1,7 @@
 /**
  * Groupe de charges pour un mois (récap optionnel + optionnellement bouton Ajouter une charge, liste).
  * Attribut hide-recap : pas de div.charge-group-recap (ex. page Charges récurrentes).
+ * Attribut section-title : titre visible au-dessus du groupe (ex. « Charges des mois précédents »).
  */
 import type { BuddjChargeAddDrawerElement } from './buddj-charge-add-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
@@ -20,6 +21,11 @@ export class BuddjChargeGroup extends HTMLElement {
     const recapTotal = this.getAttribute('recap-total');
     const addAlignRight = this.hasAttribute('add-align') && this.getAttribute('add-align') === 'right';
     const showSearch = this.hasAttribute('show-search');
+    const sectionTitleRaw = this.getAttribute('section-title')?.trim() ?? '';
+    const sectionTitleHtml =
+      sectionTitleRaw !== ''
+        ? `<h2 class="charge-group-section-title">${escapeHtml(sectionTitleRaw)}</h2>`
+        : '';
     let groupClass = 'charge-group';
     if (previous) groupClass += ' charge-group--previous';
     if (annual) groupClass += ' charge-group--annual';
@@ -54,6 +60,7 @@ export class BuddjChargeGroup extends HTMLElement {
       if (hasActionsRow) {
         const titleBlock = hasRecap ? `<div class="charge-group-title-block">${recapHtml}</div>` : '';
         div.innerHTML = `
+        ${sectionTitleHtml}
         <div class="charge-group-title-row">
           ${titleBlock}
           <div class="charge-group-actions">
@@ -63,14 +70,14 @@ export class BuddjChargeGroup extends HTMLElement {
         <ul class="charge-list"></ul>
       `;
       } else {
-        div.innerHTML = hasRecap
-          ? `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`
-          : `<ul class="charge-list"></ul>`;
+        div.innerHTML =
+          sectionTitleHtml +
+          (hasRecap ? `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>` : `<ul class="charge-list"></ul>`);
       }
     } else {
-      div.innerHTML = hasRecap
-        ? `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>`
-        : `<ul class="charge-list"></ul>`;
+      div.innerHTML =
+        sectionTitleHtml +
+        (hasRecap ? `<div class="charge-group-title-block">${recapHtml}</div><ul class="charge-list"></ul>` : `<ul class="charge-list"></ul>`);
     }
     const ul = div.querySelector('ul')!;
     const isChargeChecked = (el: Element) =>

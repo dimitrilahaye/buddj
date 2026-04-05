@@ -144,6 +144,7 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
   if (previousOutflows.length > 0) {
     chargeGroups.push({
       previous: true,
+      title: 'Charges des mois précédents',
       charges: previousOutflows,
     });
   }

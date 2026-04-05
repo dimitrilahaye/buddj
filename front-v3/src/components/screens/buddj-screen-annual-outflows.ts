@@ -231,7 +231,7 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
 
       const chargesContainer = details.querySelector('[data-month-charges]')!;
       const chargeGroup = document.createElement('buddj-charge-group');
-      chargeGroup.setAttribute('title', 'Charges');
+      chargeGroup.setAttribute('section-title', 'Charges');
       chargeGroup.setAttribute('show-add', '');
       chargeGroup.setAttribute('annual-month', String(apiMonth));
       chargeGroup.setAttribute('add-label', 'Ajouter une charge');

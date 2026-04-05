@@ -60,6 +60,9 @@ describe('outflows affiche les charges du mois courant', () => {
       expect(screen.getByRole('heading', { name: 'Charges récurrentes', level: 1 })).toBeTruthy();
     });
 
+    expect(screen.getByRole('heading', { name: 'Charges des mois précédents', level: 2 })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Charges de Mars 2026', level: 2 })).toBeTruthy();
+
     expect(screen.queryByRole('heading', { name: 'Charges annuelles', level: 3 })).toBeNull();
 
     const chargeGroups = Array.from(document.querySelectorAll('buddj-charge-group'));
