@@ -167,7 +167,7 @@ export class BuddjBudgetCard extends HTMLElement {
         currentAmount: formatEuros(parseFloat(card.getAttribute('remaining') ?? '0') || 0),
       }))
       .filter((d) => d.id);
-    const afterChargesEl = document.querySelector('.summary-after .balance-value--highlight');
+      const afterChargesEl = document.querySelector('buddj-summary-bar .summary-balances-projected');
     const soldeFinMois = afterChargesEl?.textContent?.trim() ?? '0 €';
     const accountId =
       this.closest('buddj-screen-budgets')?.getAttribute('current-account-id') ??

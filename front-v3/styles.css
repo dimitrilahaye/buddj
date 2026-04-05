@@ -163,8 +163,8 @@ buddj-summary-bar[hidden] {
 .summary-bar {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
+  gap: 0.4rem;
+  padding: 0.45rem 1.25rem 0.5rem;
   max-width: 520px;
   margin: 0 auto;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -207,33 +207,52 @@ buddj-summary-bar[hidden] {
   color: var(--navy);
 }
 
-/* Solde, après charges, transfert (sous la date) */
+/* Ligne compacte : solde actuel (éditable) → solde prévisionnel (comme amount-totals des budgets) */
 .summary-details {
   display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 1rem 1.25rem;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
 }
 
-.summary-balance,
-.summary-after {
+.summary-amounts-inline {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  max-width: 100%;
+  min-width: 0;
 }
 
-.summary-balance {
-  flex: 1;
-  min-width: 0;
+.summary-amounts-sep {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .summary-balance-actions {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
+}
+
+.summary-bar .summary-balances-projected {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+}
+
+.summary-bar .balance-edit {
+  margin: 0;
+  padding: 0.15rem 0.35rem;
+}
+
+.summary-bar .balance-edit .balance-value {
+  font-size: 1.05rem;
 }
 
 /* Composants d’icônes réutilisables : ne pas casser le flex du parent */
@@ -296,19 +315,6 @@ buddj-icon-save {
   outline: 2px solid var(--mint);
   outline-offset: 2px;
 }
-
-.summary-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--navy-soft);
-}
-
-.summary-bar .balance-value--highlight {
-  font-size: 1.1rem;
-}
-
 
 .nav-link {
   font-family: var(--font-head);

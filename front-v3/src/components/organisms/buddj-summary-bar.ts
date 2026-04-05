@@ -1,5 +1,5 @@
 /**
- * Barre récap : date, navigation mois, solde (mode affichage / édition), après charges.
+ * Barre récap : date, navigation mois, ligne compacte « solde actuel → solde prévisionnel » (édition du solde actuel au clic).
  * Clic sur le menu ⋮ → Rechercher, Transférer, séparateur, Archiver (modal confirmation pour archivage).
  */
 import { getToast } from '../atoms/buddj-toast.js';
@@ -188,7 +188,7 @@ export class BuddjSummaryBar extends HTMLElement {
       const el = this.querySelector('.summary-date');
       if (el) el.textContent = val || this.date;
     } else if (name === 'projected-balance') {
-      const el = this.querySelector('.summary-after .balance-value--highlight');
+      const el = this.querySelector('.summary-balances-projected');
       if (el) el.textContent = formatEuros(parseEurosToNumber(val));
     }
   }
@@ -225,13 +225,10 @@ export class BuddjSummaryBar extends HTMLElement {
           <button type="button" class="btn btn--nav-month" title="Mois suivant" aria-label="Mois suivant">→</button>
         </div>
         <div class="summary-details">
-          <div class="summary-balance">
-            <span class="summary-label">Solde actuel</span>
+          <div class="summary-amounts-inline" role="group" aria-label="Soldes du mois">
             <div class="summary-balance-actions"></div>
-          </div>
-          <div class="summary-after">
-            <span class="summary-label">Solde prévisionnel</span>
-            <span class="balance-value balance-value--highlight">${escapeHtml(this.formatProjectedBalance())}</span>
+            <span class="summary-amounts-sep" aria-hidden="true">→</span>
+            <span class="balance-value balance-value--highlight summary-balances-projected" title="Solde prévisionnel">${escapeHtml(this.formatProjectedBalance())}</span>
           </div>
         </div>
       </aside>
