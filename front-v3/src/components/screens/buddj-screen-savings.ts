@@ -1,6 +1,6 @@
 /**
  * Écran Économies : objectifs d’épargne (ex. vacances 100€).
- * Liste de buddj-goal-card (style budget-card), total restant sticky, actions (ajout, max, engrenage, suppression).
+ * Liste de buddj-goal-card (style budget-card), total restant sticky, actions (ajout, max, menu ⋮, suppression).
  */
 import type { BuddjConfirmModalElement } from '../molecules/buddj-confirm-modal.js';
 import type { GoalDrawerOnValidate } from '../organisms/buddj-goal-add-drawer.js';

@@ -75,7 +75,12 @@ describe('suppression charge récurrente', () => {
     });
     expect(Array.from(document.getElementsByTagName('buddj-charge-item')).some((el) => el.getAttribute('label') === 'Loyer 2')).toBe(false);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Rechercher dans les charges ou les budgets' }));
+    const recap = screen.getByRole('complementary', { name: 'Résumé du mois' });
+    fireEvent.click(within(recap).getByRole('button', { name: 'Options du mois' }));
+    await waitFor(() => {
+      expect(within(recap).getByRole('button', { name: 'Rechercher dans les charges ou les budgets' })).toBeTruthy();
+    });
+    fireEvent.click(within(recap).getByRole('button', { name: 'Rechercher dans les charges ou les budgets' }));
     const searchDrawer = document.getElementById('month-search-drawer') as HTMLElement;
     const searchInput = within(searchDrawer).getByRole('searchbox', { name: 'Rechercher par intitulé ou montant' });
     fireEvent.input(searchInput, { target: { value: 'Adobe' } });

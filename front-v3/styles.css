@@ -236,10 +236,6 @@ buddj-summary-bar[hidden] {
   min-width: 0;
 }
 
-.summary-balance-actions buddj-icon-transfer {
-  margin-left: auto;
-}
-
 /* Composants d’icônes réutilisables : ne pas casser le flex du parent */
 buddj-icon-edit,
 buddj-icon-delete,
@@ -1275,51 +1271,6 @@ buddj-expense-item:has(.expense-taken:checked) buddj-line-item::part(main) {
   font-weight: 700;
   font-size: 1rem;
   color: var(--navy);
-}
-
-.summary-bar-month-search[hidden] {
-  display: none !important;
-}
-
-.summary-date-wrap .summary-bar-month-search {
-  flex-shrink: 0;
-}
-
-/* Loupe récap : même gabarit / bordure / fond que l’engrenage (⚙) à côté */
-.summary-date-wrap .summary-bar-month-search .btn--search {
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  line-height: 1;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: transparent;
-  color: var(--navy-soft);
-  border-radius: var(--radius);
-  box-sizing: border-box;
-  opacity: 1;
-}
-
-.summary-date-wrap .summary-bar-month-search .btn--search:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--navy);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
-}
-
-.summary-date-wrap .summary-bar-month-search .buddj-icon-search__svg {
-  width: 1.05rem;
-  height: 1.05rem;
-  display: block;
-  color: inherit;
-}
-
-.summary-date-wrap .summary-bar-month-search .buddj-icon-search__svg svg {
-  width: 100%;
-  height: 100%;
-  display: block;
 }
 
 /* ========== Modal de confirmation ========== */
@@ -4387,27 +4338,29 @@ buddj-screen-reimbursements .goal-section {
   box-sizing: border-box;
 }
 
-.summary-date-wrap .goal-btn-gear,
-.goal-card .goal-card-actions .goal-btn-gear,
-.budget-card-actions .goal-btn-gear,
-buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .goal-btn-gear {
+.summary-date-wrap .btn-menu-dots,
+.goal-card .goal-card-actions .btn-menu-dots,
+.budget-card-actions .btn-menu-dots,
+buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots {
   width: 2rem;
   height: 2rem;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.15rem;
+  line-height: 1;
+  font-weight: 700;
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: transparent;
   color: var(--navy-soft);
   border-radius: var(--radius);
 }
 
-.summary-date-wrap .goal-btn-gear:hover,
-.goal-card .goal-card-actions .goal-btn-gear:hover,
-.budget-card-actions .goal-btn-gear:hover,
-buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .goal-btn-gear:hover {
+.summary-date-wrap .btn-menu-dots:hover,
+.goal-card .goal-card-actions .btn-menu-dots:hover,
+.budget-card-actions .btn-menu-dots:hover,
+buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots:hover {
   background: rgba(255, 255, 255, 0.06);
   color: var(--navy);
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
@@ -4484,14 +4437,16 @@ buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .goal-btn-
   cursor: not-allowed;
 }
 
-.goal-btn-gear {
-  font-size: 1rem;
+.btn-menu-dots {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 700;
   color: var(--navy-soft);
   cursor: pointer;
   border-radius: var(--radius);
 }
 
-.goal-gear-wrap {
+.goal-menu-wrap {
   position: relative;
 }
 

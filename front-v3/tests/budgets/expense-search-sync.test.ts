@@ -43,7 +43,12 @@ function kebabCheckboxInMain(): HTMLInputElement {
 }
 
 async function openExpenseSearchAndFilter(query: string): Promise<void> {
-  fireEvent.click(screen.getByRole('button', { name: 'Rechercher dans les charges ou les budgets' }));
+  const recap = screen.getByRole('complementary', { name: 'Résumé du mois' });
+  fireEvent.click(within(recap).getByRole('button', { name: 'Options du mois' }));
+  await waitFor(() => {
+    expect(within(recap).getByRole('button', { name: 'Rechercher dans les charges ou les budgets' })).toBeTruthy();
+  });
+  fireEvent.click(within(recap).getByRole('button', { name: 'Rechercher dans les charges ou les budgets' }));
   const input = screen.getByRole('searchbox', { name: /Rechercher par intitulé ou montant/i });
   fireEvent.input(input, { target: { value: query } });
   await waitFor(() => {

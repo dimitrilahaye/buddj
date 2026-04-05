@@ -44,10 +44,11 @@ export class BuddjBudgetCard extends HTMLElement {
             <h2 class="budget-name"><span class="budget-icon" aria-hidden="true">${escapeHtml(icon)}</span> <span class="budget-name-text">${escapeHtml(name)}</span></h2>
             <div class="budget-card-actions">
               <buddj-icon-add title="Ajouter une dépense dans ce budget" aria-label="Ajouter une dépense dans ce budget"></buddj-icon-add>
-              <buddj-icon-transfer variant="out" title="Transférer vers un autre budget ou le solde après charges"></buddj-icon-transfer>
-              <buddj-actions-dropdown position="right" class="budget-card-gear-wrap">
-                <button type="button" class="btn goal-btn-gear" slot="trigger" title="Options du budget" aria-label="Options du budget">⚙</button>
+              <buddj-actions-dropdown position="right" class="budget-card-menu-wrap">
+                <button type="button" class="btn btn-menu-dots" slot="trigger" title="Options du budget" aria-label="Options du budget">⋮</button>
                 <button type="button" slot="items" data-action="edit">Modifier</button>
+                <button type="button" slot="items" data-action="transfer">Transférer</button>
+                <hr slot="items" class="dropdown-menu-separator" aria-hidden="true" />
                 <button type="button" slot="items" data-action="delete" data-variant="danger">Supprimer</button>
               </buddj-actions-dropdown>
             </div>
@@ -67,7 +68,6 @@ export class BuddjBudgetCard extends HTMLElement {
     this.setAttribute('remaining', remaining);
     this.attachDropdownListener();
     this.attachAddExpenseListener();
-    this.attachTransferListener();
     this.attachTakenChangeListener(details, isExpenseChecked);
   }
 
@@ -77,6 +77,7 @@ export class BuddjBudgetCard extends HTMLElement {
       const actionId = ev.detail?.actionId;
       if (actionId === 'edit') this.openEditDrawer();
       else if (actionId === 'delete') this.openDeleteConfirm();
+      else if (actionId === 'transfer') this.openTransferDrawer();
     });
   }
 
@@ -154,67 +155,62 @@ export class BuddjBudgetCard extends HTMLElement {
     });
   }
 
-  private attachTransferListener(): void {
-    const transferBtn = this.querySelector('buddj-icon-transfer[variant="out"]');
-    transferBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const maxAmount = formatEuros(parseFloat(this.getAttribute('remaining') ?? '0') || 0);
-      const allCards = Array.from(document.querySelectorAll('#budgets buddj-budget-card'));
-      const otherBudgets = allCards
-        .filter((card) => card !== this)
-        .map((card) => ({
-          id: card.getAttribute('weekly-budget-id') ?? '',
-          label: card.getAttribute('name') ?? 'Budget',
-          icon: card.getAttribute('icon') ?? '💰',
-          currentAmount: formatEuros(parseFloat(card.getAttribute('remaining') ?? '0') || 0),
-        }))
-        .filter((d) => d.id);
-      const afterChargesEl = document.querySelector('.summary-after .balance-value--highlight');
-      const soldeFinMois = afterChargesEl?.textContent?.trim() ?? '0 €';
-      const accountId =
-        this.closest('buddj-screen-budgets')?.getAttribute('current-account-id') ??
-        document.querySelector('#budgets')?.getAttribute('data-account-id') ??
-        '';
-      const destinations = [
-        ...otherBudgets,
-        { id: accountId, label: 'Solde fin de mois' as string, currentAmount: soldeFinMois },
-      ];
-      const sourceBudgetId = this.getAttribute('weekly-budget-id') ?? '';
-      if (!sourceBudgetId || !accountId) return;
-      const drawer = document.getElementById('transfer-drawer') as HTMLElement & {
-        open: (o: {
-          source: 'outflows' | 'budget';
-          maxAmount: string;
-          maxLabel: string;
-          destinations: { id: string; label: string; icon?: string; currentAmount: string }[];
-          onTransfer: (amount: string, destinationId: string) => void;
-        }) => void;
-      };
-      drawer?.open({
-        source: 'budget',
-        maxAmount,
-        maxLabel: '',
-        destinations,
-        onTransfer: (amount: string, destinationId: string) => {
-          if (!destinationId) return;
-          const destinationType = otherBudgets.some((b) => b.id === destinationId) ? 'weekly-budget' : 'account';
-          const amountNum = parseEurosToNumber(amount);
-          if (amountNum <= 0) return;
-          this.dispatchEvent(
-            new CustomEvent('buddj-budget-transfer-confirmed', {
-              bubbles: true,
-              composed: true,
-              detail: {
-                fromWeeklyBudgetId: sourceBudgetId,
-                destinationId,
-                destinationType,
-                amount: amountNum,
-              },
-            }),
-          );
-        },
-      });
+  private openTransferDrawer(): void {
+    const maxAmount = formatEuros(parseFloat(this.getAttribute('remaining') ?? '0') || 0);
+    const allCards = Array.from(document.querySelectorAll('#budgets buddj-budget-card'));
+    const otherBudgets = allCards
+      .filter((card) => card !== this)
+      .map((card) => ({
+        id: card.getAttribute('weekly-budget-id') ?? '',
+        label: card.getAttribute('name') ?? 'Budget',
+        icon: card.getAttribute('icon') ?? '💰',
+        currentAmount: formatEuros(parseFloat(card.getAttribute('remaining') ?? '0') || 0),
+      }))
+      .filter((d) => d.id);
+    const afterChargesEl = document.querySelector('.summary-after .balance-value--highlight');
+    const soldeFinMois = afterChargesEl?.textContent?.trim() ?? '0 €';
+    const accountId =
+      this.closest('buddj-screen-budgets')?.getAttribute('current-account-id') ??
+      document.querySelector('#budgets')?.getAttribute('data-account-id') ??
+      '';
+    const destinations = [
+      ...otherBudgets,
+      { id: accountId, label: 'Solde fin de mois' as string, currentAmount: soldeFinMois },
+    ];
+    const sourceBudgetId = this.getAttribute('weekly-budget-id') ?? '';
+    if (!sourceBudgetId || !accountId) return;
+    const drawer = document.getElementById('transfer-drawer') as HTMLElement & {
+      open: (o: {
+        source: 'outflows' | 'budget';
+        maxAmount: string;
+        maxLabel: string;
+        destinations: { id: string; label: string; icon?: string; currentAmount: string }[];
+        onTransfer: (amount: string, destinationId: string) => void;
+      }) => void;
+    };
+    drawer?.open({
+      source: 'budget',
+      maxAmount,
+      maxLabel: '',
+      destinations,
+      onTransfer: (amount: string, destinationId: string) => {
+        if (!destinationId) return;
+        const destinationType = otherBudgets.some((b) => b.id === destinationId) ? 'weekly-budget' : 'account';
+        const amountNum = parseEurosToNumber(amount);
+        if (amountNum <= 0) return;
+        this.dispatchEvent(
+          new CustomEvent('buddj-budget-transfer-confirmed', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              fromWeeklyBudgetId: sourceBudgetId,
+              destinationId,
+              destinationType,
+              amount: amountNum,
+            },
+          }),
+        );
+      },
     });
   }
 

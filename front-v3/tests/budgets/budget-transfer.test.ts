@@ -75,7 +75,11 @@ describe('transfert budget -> budget/account', () => {
 
     const sourceCard = screen.getByRole('heading', { name: 'Semaine 123', level: 2 }).closest('buddj-budget-card') as HTMLElement;
     fireEvent.click(screen.getByRole('heading', { name: 'Semaine 123', level: 2 }));
-    fireEvent.click(within(sourceCard).getByRole('button', { name: 'Transférer vers un autre budget ou le solde après charges' }));
+    fireEvent.click(within(sourceCard).getByRole('button', { name: 'Options du budget' }));
+    await waitFor(() => {
+      expect(within(sourceCard).getByRole('button', { name: 'Transférer' })).toBeTruthy();
+    });
+    fireEvent.click(within(sourceCard).getByRole('button', { name: 'Transférer' }));
 
     let transferDrawer: HTMLElement;
     await waitFor(() => {

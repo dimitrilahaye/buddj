@@ -90,6 +90,16 @@ export class BuddjActionsDropdown extends HTMLElement {
         ::slotted([slot="items"][data-variant="danger"]:hover:not(:disabled)) {
           background: rgba(229, 83, 75, 0.12);
         }
+        ::slotted(hr.dropdown-menu-separator) {
+          display: block;
+          width: calc(100% - 1.5rem);
+          margin: 0.35rem auto;
+          padding: 0;
+          border: none;
+          border-top: 1px solid rgba(255, 255, 255, 0.12);
+          height: 0;
+          pointer-events: none;
+        }
       </style>
       <div class="dropdown-trigger">
         <slot name="trigger"></slot>
@@ -107,7 +117,8 @@ export class BuddjActionsDropdown extends HTMLElement {
       e.stopPropagation();
       this.toggle();
     });
-    root.addEventListener('click', (e) => this.onPanelClick(e));
+    /* Clics sur les items slottés remontent au host, pas au shadow root : écouter `this`. */
+    this.addEventListener('click', (e) => this.onPanelClick(e));
     document.addEventListener('click', this._boundCloseOnOutside);
   }
 
@@ -177,6 +188,7 @@ export class BuddjActionsDropdown extends HTMLElement {
     const actionId = (target as Element).getAttribute('data-action');
     if (!actionId) return;
     e.preventDefault();
+    e.stopPropagation();
     this.close();
     const targetId = this.getAttribute('target-id') ?? this.getAttribute('data-target-id') ?? '';
     this.dispatchEvent(

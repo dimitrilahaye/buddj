@@ -41,11 +41,12 @@ export class BuddjGoalCard extends HTMLElement {
             <div class="budget-card-actions goal-card-actions">
               <buddj-icon-add data-action="add" data-id="${escapeAttr(id)}" title="Ajouter une somme" aria-label="Ajouter une somme" ${isCompleteBool ? ' disabled' : ''}></buddj-icon-add>
               <button type="button" class="btn goal-btn-max" data-action="add-remaining" data-id="${escapeAttr(id)}" title="Ajouter la somme restante" ${isCompleteBool ? ' disabled' : ''}>Max</button>
-              <buddj-actions-dropdown target-id="${escapeAttr(id)}" position="right" class="goal-gear-wrap">
-                <button type="button" class="btn goal-btn-gear" slot="trigger" title="Options">⚙</button>
+              <buddj-actions-dropdown target-id="${escapeAttr(id)}" position="right" class="goal-menu-wrap">
+                <button type="button" class="btn btn-menu-dots" slot="trigger" title="Options">⋮</button>
                 <button type="button" slot="items" data-action="back" ${backDisabled ? ' disabled' : ''}>Retour arrière</button>
                 <button type="button" slot="items" data-action="forward" ${forwardDisabled ? ' disabled' : ''}>Retour avant</button>
                 <button type="button" slot="items" data-action="update">Mettre à jour</button>
+                <hr slot="items" class="dropdown-menu-separator" aria-hidden="true" />
                 <button type="button" slot="items" data-action="${isCompleteBool ? 'delete-victory' : 'delete'}" data-variant="${isCompleteBool ? 'victory' : 'danger'}">${isCompleteBool ? 'Supprimer (victoire)' : 'Supprimer'}</button>
               </buddj-actions-dropdown>
             </div>

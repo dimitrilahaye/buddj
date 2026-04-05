@@ -1,7 +1,6 @@
 /**
- * Barre récap : date, navigation mois, solde (mode affichage / édition), après charges, transfert.
- * Clic sur le crayon → mode édition (input + icône sauvegarde). Clic sur sauvegarde → valide et revient en affichage.
- * Clic sur l’engrenage à côté de la date → dropdown (Archiver ce mois). Archiver → modal de confirmation puis toast succès.
+ * Barre récap : date, navigation mois, solde (mode affichage / édition), après charges.
+ * Clic sur le menu ⋮ → Rechercher, Transférer, séparateur, Archiver (modal confirmation pour archivage).
  */
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
@@ -63,8 +62,7 @@ export class BuddjSummaryBar extends HTMLElement {
     this.innerHTML = this.renderFull();
     this.renderBalanceActions();
     this.attachBalanceListeners();
-    this.attachDateListeners();
-    this.addEventListener('click', this._onMonthSearchClick);
+    this.attachSummaryDropdownListeners();
     if (this._monthStore) {
       this._syncFromStoreState();
     }
@@ -142,22 +140,15 @@ export class BuddjSummaryBar extends HTMLElement {
   }
 
   private _updateMonthSearchVisibility(): void {
-    const el = this.querySelector('[data-summary-month-search]');
-    if (!el || !this._getCurrentRouteName || !this._monthStore) return;
+    const btn = this.querySelector('.summary-month-actions-dropdown [data-action="summary-search"]');
+    if (!btn || !this._getCurrentRouteName || !this._monthStore) return;
     const month = getCurrentMonth({ state: this._monthStore.getState() });
     const route = this._getCurrentRouteName();
     const show =
       !!month &&
       (route === 'outflows' || route === 'budgets-month' || route === 'budgets');
-    el.toggleAttribute('hidden', !show);
+    btn.toggleAttribute('hidden', !show);
   }
-
-  private _onMonthSearchClick = (e: Event): void => {
-    if (!(e.target as Element).closest('[data-summary-month-search]')) return;
-    e.preventDefault();
-    const drawer = document.getElementById('month-search-drawer') as HTMLElement & { open: () => void } | null;
-    drawer?.open();
-  };
 
   private _toggleMonthOptionsMenu(visible: boolean): void {
     const dropdown = this.querySelector('buddj-actions-dropdown');
@@ -223,17 +214,13 @@ export class BuddjSummaryBar extends HTMLElement {
           <button type="button" class="btn btn--nav-month" title="Mois précédent" aria-label="Mois précédent">←</button>
           <div class="summary-date-wrap">
             <span class="summary-date">${escapeHtml(this.date)}</span>
-            <buddj-actions-dropdown position="center">
-              <button type="button" class="btn goal-btn-gear" slot="trigger" title="Options du mois" aria-label="Options du mois" aria-haspopup="true">⚙</button>
-              <button type="button" slot="items" data-action="archive-month">Archiver ce mois</button>
+            <buddj-actions-dropdown position="center" class="summary-month-actions-dropdown">
+              <button type="button" class="btn btn-menu-dots" slot="trigger" title="Options du mois" aria-label="Options du mois" aria-haspopup="true">⋮</button>
+              <button type="button" slot="items" data-action="summary-search" title="Rechercher dans les charges ou les budgets" aria-label="Rechercher dans les charges ou les budgets" hidden>Rechercher</button>
+              <button type="button" slot="items" data-action="summary-transfer" title="Transférer une partie ou tout le reste vers un budget">Transférer</button>
+              <hr slot="items" class="dropdown-menu-separator" aria-hidden="true" />
+              <button type="button" slot="items" data-action="archive-month" data-variant="danger">Archiver</button>
             </buddj-actions-dropdown>
-            <buddj-icon-search
-              class="summary-bar-month-search"
-              data-summary-month-search
-              title="Rechercher dans les charges ou les budgets"
-              aria-label="Rechercher dans les charges ou les budgets"
-              hidden
-            ></buddj-icon-search>
           </div>
           <button type="button" class="btn btn--nav-month" title="Mois suivant" aria-label="Mois suivant">→</button>
         </div>
@@ -251,23 +238,34 @@ export class BuddjSummaryBar extends HTMLElement {
     `;
   }
 
-  private attachDateListeners(): void {
+  private attachSummaryDropdownListeners(): void {
     this.addEventListener('buddj-dropdown-action', (e: Event) => {
       const ev = e as CustomEvent<{ actionId: string; targetId: string }>;
-      if (ev.detail?.actionId !== 'archive-month') return;
-      const confirmModal = document.getElementById('archive-month-confirm') as HTMLElement & { show: (o: unknown) => void };
-      if (confirmModal?.show) {
-        confirmModal.show({
-          title: 'Voulez-vous vraiment archiver ce mois ?',
-          cancelLabel: 'Annuler',
-          confirmLabel: 'Confirmer',
-          onCancel: () => {},
-          onConfirm: () => {
-            const monthId = this._monthStore ? getCurrentMonth({ state: this._monthStore.getState() })?.id : '';
-            if (!monthId) return;
-            this._monthStore?.emitAction('archiveMonth', { monthId });
-          },
-        });
+      const actionId = ev.detail?.actionId;
+      if (actionId === 'summary-search') {
+        const drawer = document.getElementById('month-search-drawer') as HTMLElement & { open: () => void } | null;
+        drawer?.open();
+        return;
+      }
+      if (actionId === 'summary-transfer') {
+        this._openAccountTransferDrawer();
+        return;
+      }
+      if (actionId === 'archive-month') {
+        const confirmModal = document.getElementById('archive-month-confirm') as HTMLElement & { show: (o: unknown) => void };
+        if (confirmModal?.show) {
+          confirmModal.show({
+            title: 'Voulez-vous vraiment archiver ce mois ?',
+            cancelLabel: 'Annuler',
+            confirmLabel: 'Confirmer',
+            onCancel: () => {},
+            onConfirm: () => {
+              const monthId = this._monthStore ? getCurrentMonth({ state: this._monthStore.getState() })?.id : '';
+              if (!monthId) return;
+              this._monthStore?.emitAction('archiveMonth', { monthId });
+            },
+          });
+        }
       }
     });
   }
@@ -280,7 +278,6 @@ export class BuddjSummaryBar extends HTMLElement {
       <button type="button" class="balance-edit" title="Cliquer pour modifier le solde actuel">
         <span class="balance-value">${escapeHtml(this.formatBalanceValue())}</span>
       </button>
-      <buddj-icon-transfer title="Transférer une partie ou tout le reste vers un budget"></buddj-icon-transfer>
     `;
   }
 
@@ -305,49 +302,48 @@ export class BuddjSummaryBar extends HTMLElement {
 
     editBtn?.addEventListener('click', openDrawer);
     balanceEditBtn?.addEventListener('click', openDrawer);
+  }
 
-    const transferBtn = container.querySelector('buddj-icon-transfer');
-    transferBtn?.addEventListener('click', () => {
-      const maxAmount = this.formatProjectedBalance();
-      const sourceAccountId = this.getAttribute('account-id') ?? '';
-      if (!sourceAccountId) return;
-      const budgetCards = document.querySelectorAll('#budgets buddj-budget-card');
-      const destinations = Array.from(budgetCards).map((card) => ({
-        id: card.getAttribute('weekly-budget-id') ?? '',
-        label: card.getAttribute('name') ?? 'Budget',
-        icon: card.getAttribute('icon') ?? '💰',
-        currentAmount: card.getAttribute('remaining') ?? '0 €',
-      })).filter((d) => d.id);
-      const drawer = document.getElementById('transfer-drawer') as HTMLElement & {
-        open: (o: {
-          source: 'outflows' | 'budget';
-          maxAmount: string;
-          maxLabel: string;
-          destinations: { id: string; label: string; icon?: string; currentAmount: string }[];
-          onTransfer: (amount: string, destinationId: string) => void;
-        }) => void;
-      };
-      drawer?.open({
-        source: 'outflows',
-        maxAmount,
-        maxLabel: 'Solde prévisionnel',
-        destinations,
-        onTransfer: (amount: string, destinationId: string) => {
-          const parsedAmount = parseEurosToNumber(amount);
-          if (!destinationId || parsedAmount <= 0) return;
-          this.dispatchEvent(
-            new CustomEvent('buddj-account-transfer-confirmed', {
-              bubbles: true,
-              composed: true,
-              detail: {
-                fromAccountId: sourceAccountId,
-                toWeeklyBudgetId: destinationId,
-                amount: parsedAmount,
-              },
-            }),
-          );
-        },
-      });
+  private _openAccountTransferDrawer(): void {
+    const maxAmount = this.formatProjectedBalance();
+    const sourceAccountId = this.getAttribute('account-id') ?? '';
+    if (!sourceAccountId) return;
+    const budgetCards = document.querySelectorAll('#budgets buddj-budget-card');
+    const destinations = Array.from(budgetCards).map((card) => ({
+      id: card.getAttribute('weekly-budget-id') ?? '',
+      label: card.getAttribute('name') ?? 'Budget',
+      icon: card.getAttribute('icon') ?? '💰',
+      currentAmount: card.getAttribute('remaining') ?? '0 €',
+    })).filter((d) => d.id);
+    const drawer = document.getElementById('transfer-drawer') as HTMLElement & {
+      open: (o: {
+        source: 'outflows' | 'budget';
+        maxAmount: string;
+        maxLabel: string;
+        destinations: { id: string; label: string; icon?: string; currentAmount: string }[];
+        onTransfer: (amount: string, destinationId: string) => void;
+      }) => void;
+    };
+    drawer?.open({
+      source: 'outflows',
+      maxAmount,
+      maxLabel: 'Solde prévisionnel',
+      destinations,
+      onTransfer: (amount: string, destinationId: string) => {
+        const parsedAmount = parseEurosToNumber(amount);
+        if (!destinationId || parsedAmount <= 0) return;
+        this.dispatchEvent(
+          new CustomEvent('buddj-account-transfer-confirmed', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              fromAccountId: sourceAccountId,
+              toWeeklyBudgetId: destinationId,
+              amount: parsedAmount,
+            },
+          }),
+        );
+      },
     });
   }
 

@@ -404,8 +404,9 @@ export class BuddjScreenNewMonth extends HTMLElement {
           <input type="checkbox" slot="prefix" id="nm-ch-${escapeAttr(c.id)}" class="new-month-sr-checkbox" data-new-month-include="charge" data-template-row-id="${escapeAttr(c.id)}" ${c.includedInProjected ? 'checked' : ''} aria-label="Inclure dans le solde prévisionnel" />
           <div class="new-month-line-actions" slot="actions">
             <buddj-actions-dropdown position="right" target-id="${escapeAttr(c.id)}" data-dropdown-role="template-charge">
-              <button type="button" class="btn goal-btn-gear" slot="trigger" title="Actions sur la charge" aria-label="Actions sur la charge">⚙</button>
+              <button type="button" class="btn btn-menu-dots" slot="trigger" title="Actions sur la charge" aria-label="Actions sur la charge">⋮</button>
               <button type="button" slot="items" data-action="edit">Modifier</button>
+              <hr slot="items" class="dropdown-menu-separator" aria-hidden="true" />
               <button type="button" slot="items" data-action="delete" data-variant="danger">Supprimer</button>
             </buddj-actions-dropdown>
           </div>
@@ -422,8 +423,9 @@ export class BuddjScreenNewMonth extends HTMLElement {
           <input type="checkbox" slot="prefix" id="nm-bu-${escapeAttr(b.id)}" class="new-month-sr-checkbox" data-new-month-include="budget" data-template-row-id="${escapeAttr(b.id)}" ${b.includedInProjected ? 'checked' : ''} aria-label="Inclure dans le solde prévisionnel" />
           <div class="new-month-line-actions" slot="actions">
             <buddj-actions-dropdown position="right" target-id="${escapeAttr(b.id)}" data-dropdown-role="template-budget">
-              <button type="button" class="btn goal-btn-gear" slot="trigger" title="Actions sur le budget" aria-label="Actions sur le budget">⚙</button>
+              <button type="button" class="btn btn-menu-dots" slot="trigger" title="Actions sur le budget" aria-label="Actions sur le budget">⋮</button>
               <button type="button" slot="items" data-action="edit">Modifier</button>
+              <hr slot="items" class="dropdown-menu-separator" aria-hidden="true" />
               <button type="button" slot="items" data-action="delete" data-variant="danger">Supprimer</button>
             </buddj-actions-dropdown>
           </div>

@@ -72,7 +72,12 @@ describe('transfert account -> budget', () => {
       expect(screen.getByRole('heading', { name: 'Mes budgets', level: 1 })).toBeTruthy();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Transférer une partie ou tout le reste vers un budget' }));
+    const recap = screen.getByRole('complementary', { name: 'Résumé du mois' });
+    fireEvent.click(within(recap).getByRole('button', { name: 'Options du mois' }));
+    await waitFor(() => {
+      expect(within(recap).getByRole('button', { name: 'Transférer' })).toBeTruthy();
+    });
+    fireEvent.click(within(recap).getByRole('button', { name: 'Transférer' }));
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Transférer' })).toBeTruthy();
     });
@@ -115,7 +120,6 @@ describe('transfert account -> budget', () => {
     const destinationCardAfter = screen.getByRole('heading', { name: 'Semaine 3', level: 2 }).closest('buddj-budget-card') as HTMLElement;
     expect(destinationCardAfter.getAttribute('remaining')).toBe('0');
 
-    const summary = screen.getByRole('complementary', { name: 'Résumé du mois' });
-    expect(within(summary).getByText(formatEuros(130.3))).toBeTruthy();
+    expect(within(recap).getByText(formatEuros(130.3))).toBeTruthy();
   });
 });
