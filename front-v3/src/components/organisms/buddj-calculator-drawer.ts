@@ -1,7 +1,7 @@
 /**
  * Drawer calculette réutilisable (solde, montant charge, montant budget, etc.).
  * API : open({ initialValue, title?, onValidate, onCancel })
- * Rangée opérations + / − / = (1/4, 1/4, 2/4), puis icônes Effacer / Recharger / Suppr (idem).
+ * Barre Effacer / Recharger / Suppr (¼, ¼, ½), puis pavé type calculette : chiffres + colonne + − = (= sur 2 lignes).
  * Pied : Annuler | Valider.
  */
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
@@ -59,11 +59,6 @@ export class BuddjCalculatorDrawer extends HTMLElement {
           <h2 class="calculator-drawer-title">${escapeHtml(this._title)}</h2>
         </div>
         <div class="calculator-drawer-display" aria-live="polite">${escapeHtml(display)} €</div>
-        <div class="calculator-drawer-ops" role="group" aria-label="Opérations">
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op" data-action="plus" aria-label="Ajouter">+</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op" data-action="minus" aria-label="Soustraire">−</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op calculator-drawer-btn--equals-op" data-action="equals" aria-label="Égal">=</button>
-        </div>
         <div class="calculator-drawer-fn-row" role="group" aria-label="Correction">
           <button type="button" class="calculator-drawer-btn calculator-drawer-btn--fn calculator-drawer-btn--fn-icon" data-action="clear" aria-label="Effacer" title="Tout effacer, remettre à zéro">
             <svg class="calculator-drawer-fn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -75,18 +70,21 @@ export class BuddjCalculatorDrawer extends HTMLElement {
             <svg class="calculator-drawer-fn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M18 9l-6 6"/><path d="M12 9l6 6"/></svg>
           </button>
         </div>
-        <div class="calculator-drawer-numpad">
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="7">7</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="8">8</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="9">9</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="4">4</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="5">5</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="6">6</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="1">1</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="2">2</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="3">3</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-num--zero-wide" data-digit="0">0</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit=",">,</button>
+        <div class="calculator-drawer-calc-grid" role="group" aria-label="Pavé numérique">
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n7" data-digit="7">7</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n8" data-digit="8">8</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n9" data-digit="9">9</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op calculator-drawer-calc-plus" data-action="plus" aria-label="Ajouter">+</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n4" data-digit="4">4</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n5" data-digit="5">5</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n6" data-digit="6">6</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op calculator-drawer-calc-minus" data-action="minus" aria-label="Soustraire">−</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n1" data-digit="1">1</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n2" data-digit="2">2</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-n3" data-digit="3">3</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op calculator-drawer-btn--equals-tall calculator-drawer-calc-eq" data-action="equals" aria-label="Égal">=</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-z0" data-digit="0">0</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-calc-comma" data-digit=",">,</button>
         </div>
         <div class="calculator-drawer-footer">
           <button type="button" class="btn calculator-drawer-cancel">Annuler</button>

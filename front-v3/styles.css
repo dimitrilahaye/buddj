@@ -1628,30 +1628,88 @@ buddj-calculator-drawer.calculator-drawer--open .calculator-drawer-panel {
   min-height: 2.5rem;
 }
 
-.calculator-drawer-ops {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.calculator-drawer-btn--equals-op {
-  background: rgba(129, 178, 154, 0.25);
-  color: var(--mint);
-  font-weight: 700;
-  font-size: 1.25rem;
-}
-
-.calculator-drawer-btn--equals-op:hover {
-  background: rgba(129, 178, 154, 0.4);
-  color: var(--navy);
-}
-
 .calculator-drawer-fn-row {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;
   gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+/* Options en haut (Effacer, Recharger, Suppr) : style barre d’outils, distinct du pavé */
+.calculator-drawer-fn-row .calculator-drawer-btn--fn {
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--navy-soft);
+}
+
+.calculator-drawer-fn-row .calculator-drawer-btn--fn:hover {
+  background: rgba(0, 0, 0, 0.22);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: var(--navy);
+}
+
+/* Pavé 4×4 : chiffres + colonne opérateurs, = sur 2 lignes (type calculette) */
+.calculator-drawer-calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(2.75rem, auto));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.55rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  grid-template-areas:
+    'n7 n8 n9 pl'
+    'n4 n5 n6 mi'
+    'n1 n2 n3 eq'
+    'z0 z0 cm eq';
+}
+
+.calculator-drawer-calc-n7 { grid-area: n7; }
+.calculator-drawer-calc-n8 { grid-area: n8; }
+.calculator-drawer-calc-n9 { grid-area: n9; }
+.calculator-drawer-calc-n4 { grid-area: n4; }
+.calculator-drawer-calc-n5 { grid-area: n5; }
+.calculator-drawer-calc-n6 { grid-area: n6; }
+.calculator-drawer-calc-n1 { grid-area: n1; }
+.calculator-drawer-calc-n2 { grid-area: n2; }
+.calculator-drawer-calc-n3 { grid-area: n3; }
+.calculator-drawer-calc-z0 { grid-area: z0; }
+.calculator-drawer-calc-comma { grid-area: cm; }
+.calculator-drawer-calc-plus { grid-area: pl; }
+.calculator-drawer-calc-minus { grid-area: mi; }
+.calculator-drawer-calc-eq { grid-area: eq; }
+
+/* Chiffres et virgule : touches « clavier », plus lisibles que la barre d’options */
+.calculator-drawer-calc-grid .calculator-drawer-btn--num {
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--navy);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.calculator-drawer-calc-grid .calculator-drawer-btn--num:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--navy);
+}
+
+.calculator-drawer-btn--equals-tall {
+  background: rgba(129, 178, 154, 0.25);
+  color: var(--mint);
+  font-weight: 700;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.calculator-drawer-btn--equals-tall:hover {
+  background: rgba(129, 178, 154, 0.4);
+  color: var(--navy);
 }
 
 .calculator-drawer-btn--fn-icon {
@@ -1666,17 +1724,6 @@ buddj-calculator-drawer.calculator-drawer--open .calculator-drawer-panel {
   width: 1.4rem;
   height: 1.4rem;
   flex-shrink: 0;
-}
-
-.calculator-drawer-numpad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.calculator-drawer-num--zero-wide {
-  grid-column: span 2;
 }
 
 .calculator-drawer-btn {
