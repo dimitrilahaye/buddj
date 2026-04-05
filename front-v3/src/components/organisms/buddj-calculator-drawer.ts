@@ -23,6 +23,8 @@ export class BuddjCalculatorDrawer extends HTMLElement {
   private _title = 'Solde actuel';
   private _initialRaw = '0';
   private _display = '0';
+  /** Aligné sur `open({ startWithInitialValue })` : détermine ce que « Recharger » doit réafficher. */
+  private _startWithInitialValue = false;
   private _leftOperand: number | null = null;
   private _operation: 'add' | 'subtract' | null = null;
   private _onValidate: ((value: string) => void) | null = null;
@@ -31,7 +33,11 @@ export class BuddjCalculatorDrawer extends HTMLElement {
   open(options: CalculatorDrawerOpenOptions): void {
     this._title = options.title ?? 'Solde actuel';
     this._initialRaw = parseRaw(options.initialValue);
-    this._display = options.startWithInitialValue ? formatDisplay(parseRaw(options.initialValue)) : '0';
+    this._startWithInitialValue = !!options.startWithInitialValue;
+    this._display = entryDisplayFromOpen({
+      startWithInitialValue: this._startWithInitialValue,
+      initialRaw: this._initialRaw,
+    });
     this._leftOperand = null;
     this._operation = null;
     this._onValidate = options.onValidate;
@@ -221,9 +227,12 @@ export class BuddjCalculatorDrawer extends HTMLElement {
   }
 
   private doReload(): void {
-    this._display = formatDisplay(this._initialRaw);
     this._leftOperand = null;
     this._operation = null;
+    this._display = entryDisplayFromOpen({
+      startWithInitialValue: this._startWithInitialValue,
+      initialRaw: this._initialRaw,
+    });
     this.updateDisplay();
   }
 
@@ -261,6 +270,19 @@ function formatDisplay(raw: string): string {
   const n = parseFloat(raw);
   if (Number.isNaN(n)) return '0';
   return n.toFixed(2).replace('.', ',');
+}
+
+/**
+ * État interne affichable pour la saisie : éviter `0,00` / `X,YY` seuls, sinon `appendDigit` bloque (2 décimales déjà présentes).
+ */
+function entryDisplayFromOpen(options: {
+  startWithInitialValue: boolean;
+  initialRaw: string;
+}): string {
+  if (!options.startWithInitialValue) return '0';
+  const n = parseFloat(options.initialRaw);
+  if (Number.isNaN(n) || n === 0) return '0';
+  return formatDisplay(options.initialRaw);
 }
 
 customElements.define(BuddjCalculatorDrawer.tagName, BuddjCalculatorDrawer);
