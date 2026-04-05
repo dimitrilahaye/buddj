@@ -1,7 +1,11 @@
 import type { MonthView } from './month-view.js';
 
 export type MonthState = {
-  months: MonthView[];
+  /**
+   * `null` tant que la liste des mois non archivés n’a pas encore été chargée une première fois (succès ou échec).
+   * Après le premier chargement : toujours un tableau (éventuellement vide).
+   */
+  months: MonthView[] | null;
   currentIndex: number;
   isLoadingMonths: boolean;
   loadMonthsErrorMessage: string | null;
@@ -10,7 +14,7 @@ export type MonthState = {
 };
 
 export const DEFAULT_MONTH_STATE: MonthState = {
-  months: [],
+  months: null,
   currentIndex: 0,
   isLoadingMonths: false,
   loadMonthsErrorMessage: null,
@@ -19,6 +23,8 @@ export const DEFAULT_MONTH_STATE: MonthState = {
 
 export function getCurrentMonth({ state }: { state: MonthState }): MonthView | null {
   const { months, currentIndex } = state;
-  if (months.length === 0 || currentIndex < 0 || currentIndex >= months.length) return null;
+  if (months === null || months.length === 0 || currentIndex < 0 || currentIndex >= months.length) {
+    return null;
+  }
   return months[currentIndex] ?? null;
 }

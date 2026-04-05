@@ -109,7 +109,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     if (this._monthStore && !this._monthListenersAttached) {
       this._attachMonthStoreListeners();
       const s = this._monthStore.getState();
-      if (s.months.length === 0 && !s.isLoadingMonths) {
+      if ((s.months === null || s.months.length === 0) && !s.isLoadingMonths) {
         this._monthStore.emitAction('loadUnarchivedMonths');
       }
     }
@@ -324,8 +324,8 @@ export class BuddjScreenBudgets extends HTMLElement {
   private _syncBudgetHeaderToolbarVisibility(): void {
     const main = this.querySelector('#budgets');
     if (!main) return;
-    const months = this._monthStore?.getState().months ?? [];
-    const hideTools = months.length === 0;
+    const months = this._monthStore?.getState().months;
+    const hideTools = months == null || months.length === 0;
     main.querySelector('buddj-toggle-all')?.toggleAttribute('hidden', hideTools);
   }
 
@@ -333,7 +333,12 @@ export class BuddjScreenBudgets extends HTMLElement {
     const listSection = this.querySelector('.budget-list');
     if (!listSection) return;
     const storeState = this._monthStore?.getState();
-    if (storeState && !storeState.isLoadingMonths && storeState.months.length === 0) {
+    if (
+      storeState &&
+      storeState.months !== null &&
+      !storeState.isLoadingMonths &&
+      storeState.months.length === 0
+    ) {
       this.removeAttribute('current-account-id');
       this.querySelector('#budgets')?.removeAttribute('data-account-id');
       const headerAddBtn = this.querySelector('[data-budget-header-add]');

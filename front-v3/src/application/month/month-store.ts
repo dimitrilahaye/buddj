@@ -20,6 +20,7 @@ import type { UpdateBudgetUseCase } from './update-budget.js';
 import type { TransferFromWeeklyBudgetUseCase } from './transfer-from-weekly-budget.js';
 import type { TransferFromAccountUseCase } from './transfer-from-account.js';
 import type { MonthView } from './month-view.js';
+import { DEFAULT_ROUTE_MONTH_PLACEHOLDER_ID } from '../../default-route-month-placeholder.js';
 import {
   applyOutflowToggleToMonthView,
   buildOutflowsCheckingPayload,
@@ -297,7 +298,12 @@ export class MonthStore extends Store<MonthState> {
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this.setState({ isLoadingMonths: false, loadMonthsErrorMessage: message, pendingRouteMonthId: null });
+      this.setState({
+        isLoadingMonths: false,
+        loadMonthsErrorMessage: message,
+        pendingRouteMonthId: null,
+        months: [],
+      });
       this.emitStateChange('unarchivedMonthsLoadFailed', { message });
     }
   }
@@ -314,6 +320,13 @@ export class MonthStore extends Store<MonthState> {
       return;
     }
     const { isLoadingMonths, months } = this.getState();
+    if (months === null) {
+      this.setState({ pendingRouteMonthId: id });
+      if (!isLoadingMonths) {
+        this.emitAction('loadUnarchivedMonths');
+      }
+      return;
+    }
     if (isLoadingMonths) {
       this.setState({ pendingRouteMonthId: id });
       return;
@@ -329,16 +342,32 @@ export class MonthStore extends Store<MonthState> {
   /** Aligne `currentIndex` sur `monthId` ou émet `routeMonthIdNotFound`. */
   private _applyRouteMonthIdSync(monthId: string): void {
     const { months } = this.getState();
+    if (months === null) {
+      this.setState({ pendingRouteMonthId: monthId });
+      if (!this.getState().isLoadingMonths) {
+        this.emitAction('loadUnarchivedMonths');
+      }
+      return;
+    }
     const idx = months.findIndex(
       (m) => m.id === monthId || m.id.toLowerCase() === monthId.toLowerCase()
     );
     if (idx >= 0) {
       this.setState({ currentIndex: idx });
       this.emitCurrentMonthChanged();
-    } else {
-      this.emitStateChange('routeMonthIdNotFound', { monthId });
-      this.emitCurrentMonthChanged();
+      return;
     }
+    /** Route `/budgets` sans id : URL temporaire avec id placeholder absent de l’API — pas d’erreur, premier mois. */
+    const isPlaceholder =
+      monthId === DEFAULT_ROUTE_MONTH_PLACEHOLDER_ID ||
+      monthId.toLowerCase() === DEFAULT_ROUTE_MONTH_PLACEHOLDER_ID.toLowerCase();
+    if (isPlaceholder && months.length > 0) {
+      this.setState({ currentIndex: 0 });
+      this.emitCurrentMonthChanged();
+      return;
+    }
+    this.emitStateChange('routeMonthIdNotFound', { monthId });
+    this.emitCurrentMonthChanged();
   }
 
   /** Met à jour la liste des mois actifs depuis la réponse API après désarchivage. */
@@ -368,7 +397,7 @@ export class MonthStore extends Store<MonthState> {
 
   private handleGoToPreviousMonth(): void {
     const { months, currentIndex } = this.getState();
-    if (months.length === 0) return;
+    if (months === null || months.length === 0) return;
     const next = Math.max(0, currentIndex - 1);
     if (next === currentIndex) return;
     this.setState({ currentIndex: next });
@@ -377,7 +406,7 @@ export class MonthStore extends Store<MonthState> {
 
   private handleGoToNextMonth(): void {
     const { months, currentIndex } = this.getState();
-    if (months.length === 0) return;
+    if (months === null || months.length === 0) return;
     const next = Math.min(months.length - 1, currentIndex + 1);
     if (next === currentIndex) return;
     this.setState({ currentIndex: next });
@@ -386,6 +415,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handlePutExpensesChecking(detail: PutExpensesCheckingActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     const toggled = applyExpenseToggleToMonthView(month, detail);
@@ -405,6 +435,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handlePutOutflowsChecking(detail: PutOutflowsCheckingActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     const toggled = applyOutflowToggleToMonthView(month, detail);
@@ -424,6 +455,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleUpdateCurrentBalance(detail: UpdateCurrentBalanceActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     const body = {
@@ -451,6 +483,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleDeleteExpense(detail: DeleteExpenseActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('expenseDeleteLoading');
@@ -472,6 +505,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleDeleteOutflow(detail: DeleteOutflowActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('outflowDeleteLoading');
@@ -492,6 +526,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleCreateExpense(detail: CreateExpenseActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('expenseCreateLoading');
@@ -514,6 +549,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleCreateBudget(detail: CreateBudgetActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('budgetCreateLoading');
@@ -535,6 +571,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleCreateOutflow(detail: CreateOutflowActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('outflowCreateLoading');
@@ -556,6 +593,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleUpdateBudget(detail: UpdateBudgetActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('budgetUpdateLoading');
@@ -577,6 +615,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleDeleteBudget(detail: DeleteBudgetActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('budgetDeleteLoading');
@@ -594,6 +633,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleTransferFromWeeklyBudget(detail: TransferFromWeeklyBudgetActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('budgetTransferLoading');
@@ -620,7 +660,7 @@ export class MonthStore extends Store<MonthState> {
     try {
       const created = await this._createMonth({ body: detail.body });
       const state = this.getState();
-      const others = state.months.filter((m) => m.id !== created.id);
+      const others = (state.months ?? []).filter((m) => m.id !== created.id);
       const months = [...others, created].sort((a, b) => a.isoDate.localeCompare(b.isoDate));
       const idx = months.findIndex((m) => m.id === created.id);
       this.setState({
@@ -640,6 +680,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleArchiveMonth(detail: ArchiveMonthActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month || month.id !== detail.monthId) return;
     this.emitStateChange('archiveMonthLoading');
@@ -657,6 +698,7 @@ export class MonthStore extends Store<MonthState> {
 
   private async handleTransferFromAccount(detail: TransferFromAccountActionDetail): Promise<void> {
     const state = this.getState();
+    if (state.months === null) return;
     const month = getCurrentMonth({ state });
     if (!month) return;
     this.emitStateChange('budgetTransferLoading');

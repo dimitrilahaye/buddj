@@ -25,8 +25,9 @@ import type { BuddjScreenTemplateDetail } from './components/screens/buddj-scree
 import type { BuddjScreenAnnualOutflows } from './components/screens/buddj-screen-annual-outflows.js';
 import { BuddjScreenHome } from './components/screens/buddj-screen-home.js';
 import { BuddjScreenBudgets } from './components/screens/buddj-screen-budgets.js';
+import { DEFAULT_ROUTE_MONTH_PLACEHOLDER_ID } from './default-route-month-placeholder.js';
 
-export const DEFAULT_MONTH_ID = '2024-04';
+export const DEFAULT_MONTH_ID = DEFAULT_ROUTE_MONTH_PLACEHOLDER_ID;
 
 export const DEFAULT_ROUTE: DefaultRoute = { name: 'home', path: '/' };
 

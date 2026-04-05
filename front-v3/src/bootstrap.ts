@@ -249,6 +249,7 @@ export function bootstrap(options: BootstrapOptions): void {
   };
 
   monthStore.addEventListener('routeMonthIdNotFound', () => {
+    if (monthStore.getState().months === null) return;
     getToast()?.show({
       message: 'Ce mois n’est pas disponible dans la liste des mois non archivés.',
       variant: 'error',

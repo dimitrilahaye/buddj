@@ -96,7 +96,7 @@ export class BuddjSummaryBar extends HTMLElement {
   private _toggleVisibilityWhenNoMonthsInStore(): void {
     if (!this._monthStore) return;
     const { months } = this._monthStore.getState();
-    this.toggleAttribute('hidden', months.length === 0);
+    this.toggleAttribute('hidden', months === null || months.length === 0);
   }
 
   /** Aligne `buddj-nav` (liens Charges / Budgets) sur le mois courant du store (toute route : ex. mois archivés après désarchivage). */
@@ -104,7 +104,7 @@ export class BuddjSummaryBar extends HTMLElement {
     const nav = document.querySelector('buddj-nav');
     if (!nav || !this._monthStore) return;
     const { months } = this._monthStore.getState();
-    if (months.length === 0) return;
+    if (months === null || months.length === 0) return;
     const id = this._monthStore.getCurrentMonthIdForNav() || this._defaultMonthIdForNav;
     nav.setAttribute('month-id', id);
   }
@@ -173,9 +173,10 @@ export class BuddjSummaryBar extends HTMLElement {
     const buttons = row.querySelectorAll('.btn--nav-month');
     const prev = buttons[0] as HTMLButtonElement | undefined;
     const next = buttons[1] as HTMLButtonElement | undefined;
-    const empty = months.length === 0;
+    const len = months?.length ?? 0;
+    const empty = months === null || len === 0;
     if (prev) prev.disabled = empty || currentIndex <= 0;
-    if (next) next.disabled = empty || currentIndex >= months.length - 1;
+    if (next) next.disabled = empty || currentIndex >= len - 1;
   }
 
   attributeChangedCallback(name: string, _old: string | null, newValue: string | null): void {

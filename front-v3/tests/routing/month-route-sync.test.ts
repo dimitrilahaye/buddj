@@ -72,6 +72,56 @@ describe('alignement mois ↔ URL (budgets / outflows)', () => {
     expect(window.location.pathname).toBe(`/budgets/${idA}`);
   });
 
+  it('avec /budgets sans id et API lente, aucun toast « mois indisponible » (id placeholder vs liste UUID)', async () => {
+    shell();
+    const idA = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+    const months: MonthView[] = [minimalMonth(idA, 'Mars 2026')];
+    window.history.replaceState(null, '', '/budgets');
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months, delayMs: 120 }),
+    });
+
+    const errToast = () =>
+      screen.queryByRole('alert', {
+        name: 'Ce mois n’est pas disponible dans la liste des mois non archivés.',
+      });
+    expect(errToast()).toBeNull();
+
+    await waitFor(() => {
+      expect(screen.getByText('Mars 2026')).toBeTruthy();
+    });
+    expect(errToast()).toBeNull();
+    expect(window.location.pathname).toBe(`/budgets/${idA}`);
+  });
+
+  it('avec /budgets/:id inconnu et API lente, aucun toast avant la fin du chargement', async () => {
+    shell();
+    const idA = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+    const months: MonthView[] = [minimalMonth(idA, 'Mars 2026')];
+    window.history.replaceState(null, '', '/budgets/99999999-9999-9999-9999-999999999999');
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months, delayMs: 120 }),
+    });
+
+    const errToast = () =>
+      screen.queryByRole('alert', {
+        name: 'Ce mois n’est pas disponible dans la liste des mois non archivés.',
+      });
+    expect(errToast()).toBeNull();
+
+    await waitFor(() => {
+      expect(screen.getByText('Mars 2026')).toBeTruthy();
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByRole('alert', { name: 'Ce mois n’est pas disponible dans la liste des mois non archivés.' }),
+      ).toBeTruthy();
+    });
+    expect(window.location.pathname).toBe(`/budgets/${idA}`);
+  });
+
   it('avec /budgets/:id inconnu, toast d’erreur et URL corrigée sur le mois affiché', async () => {
     shell();
     const idA = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';

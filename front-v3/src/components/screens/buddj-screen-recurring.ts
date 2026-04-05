@@ -67,7 +67,7 @@ export class BuddjScreenRecurring extends HTMLElement {
   private _showEmptyMonthsPlaceholder(): boolean {
     if (!this._monthStore) return false;
     const s = this._monthStore.getState();
-    return !s.isLoadingMonths && s.months.length === 0;
+    return s.months !== null && !s.isLoadingMonths && s.months.length === 0;
   }
 
   private _renderEmptyMonthsPlaceholder(): void {
@@ -213,7 +213,7 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._monthStore.addEventListener('outflowsCheckingLoaded', this._onOutflowsCheckingLoaded);
     this._monthStore.addEventListener('outflowsCheckingFailed', this._onOutflowsCheckingFailed);
     const s = this._monthStore.getState();
-    if (s.months.length === 0 && !s.isLoadingMonths) {
+    if ((s.months === null || s.months.length === 0) && !s.isLoadingMonths) {
       this._monthStore.emitAction('loadUnarchivedMonths');
     }
     this._chargeGroups = getCurrentMonth({ state: this._monthStore.getState() })?.chargeGroups ?? [];
