@@ -29,6 +29,37 @@ describe('écran mois archivés (API in-memory)', () => {
     window.history.replaceState(null, '', '/');
   });
 
+  it('liste des mois archivés : date (libellé) uniquement, sans montant ni solde', async () => {
+    shellDocument();
+    const archId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+    window.history.replaceState(null, '', '/archived');
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({
+        months: [],
+        archivedMonths: [
+          minimalMonth({
+            id: archId,
+            displayLabel: 'Mars 2026',
+            currentBalance: 1234.56,
+            projectedBalance: 888.88,
+          }),
+        ],
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole('listitem', { name: 'Mars 2026' })).toBeTruthy();
+    });
+
+    const row = screen.getByRole('listitem', { name: 'Mars 2026' });
+    expect(within(row).queryByText(/€/)).toBeNull();
+    const line = row.querySelector('buddj-line-item');
+    expect(line?.getAttribute('label')).toBe('Mars 2026');
+    expect(line?.hasAttribute('hide-amount')).toBe(true);
+  });
+
   it('charge la liste et permet de désarchiver un mois', async () => {
     shellDocument();
     const archId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';

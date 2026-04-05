@@ -165,7 +165,7 @@ export class BuddjScreenArchived extends HTMLElement {
           const disabledAttr = busy ? ' disabled' : '';
           return `
       <li class="archived-row" data-id="${escapeAttr(m.id)}" data-label="${escapeAttr(m.displayLabel)}" aria-label="${escapeAttr(m.displayLabel)}">
-        <buddj-line-item class="archived-line-item" icon="📁" label="${escapeAttr(m.displayLabel)}" amount="" no-inner-padding>
+        <buddj-line-item class="archived-line-item" icon="📁" label="${escapeAttr(m.displayLabel)}" hide-amount no-inner-padding>
           <div class="archived-row-actions" slot="actions">
             <button type="button" class="btn archived-btn-unarchive"${disabledAttr}>Désarchiver</button>
             <buddj-icon-delete title="Supprimer définitivement ce mois"></buddj-icon-delete>
