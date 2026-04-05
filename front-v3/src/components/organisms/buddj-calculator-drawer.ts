@@ -1,7 +1,8 @@
 /**
  * Drawer calculette réutilisable (solde, montant charge, montant budget, etc.).
  * API : open({ initialValue, title?, onValidate, onCancel })
- * title par défaut : "Solde actuel". + / − en mode opération, = pour le résultat.
+ * Rangée opérations + / − / = (1/4, 1/4, 2/4), puis icônes Effacer / Recharger / Suppr (idem).
+ * Pied : Annuler | Valider.
  */
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 
@@ -58,12 +59,21 @@ export class BuddjCalculatorDrawer extends HTMLElement {
           <h2 class="calculator-drawer-title">${escapeHtml(this._title)}</h2>
         </div>
         <div class="calculator-drawer-display" aria-live="polite">${escapeHtml(display)} €</div>
-        <div class="calculator-drawer-actions">
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op" data-action="minus">−</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op" data-action="plus">+</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--fn" data-action="suppr">Suppr</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--fn" data-action="clear">C</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--fn" data-action="reload">Reload</button>
+        <div class="calculator-drawer-ops" role="group" aria-label="Opérations">
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op" data-action="plus" aria-label="Ajouter">+</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op" data-action="minus" aria-label="Soustraire">−</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--op calculator-drawer-btn--equals-op" data-action="equals" aria-label="Égal">=</button>
+        </div>
+        <div class="calculator-drawer-fn-row" role="group" aria-label="Correction">
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--fn calculator-drawer-btn--fn-icon" data-action="clear" aria-label="Effacer" title="Tout effacer, remettre à zéro">
+            <svg class="calculator-drawer-fn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--fn calculator-drawer-btn--fn-icon" data-action="reload" aria-label="Recharger" title="Recharger la valeur affichée à l’ouverture">
+            <svg class="calculator-drawer-fn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--fn calculator-drawer-btn--fn-icon" data-action="suppr" aria-label="Suppr" title="Supprimer le dernier caractère">
+            <svg class="calculator-drawer-fn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M18 9l-6 6"/><path d="M12 9l6 6"/></svg>
+          </button>
         </div>
         <div class="calculator-drawer-numpad">
           <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="7">7</button>
@@ -75,9 +85,8 @@ export class BuddjCalculatorDrawer extends HTMLElement {
           <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="1">1</button>
           <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="2">2</button>
           <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="3">3</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit="0">0</button>
+          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num calculator-drawer-num--zero-wide" data-digit="0">0</button>
           <button type="button" class="calculator-drawer-btn calculator-drawer-btn--num" data-digit=",">,</button>
-          <button type="button" class="calculator-drawer-btn calculator-drawer-btn--equals" data-action="equals">=</button>
         </div>
         <div class="calculator-drawer-footer">
           <button type="button" class="btn calculator-drawer-cancel">Annuler</button>

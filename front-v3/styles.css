@@ -901,6 +901,18 @@ buddj-months-empty-placeholder {
 }
 
 /* Groupe de budgets (mois précédent / mois en cours) */
+.budget-group-section-title {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--navy-soft);
+}
+
+.budget-group--previous .budget-group-section-title {
+  color: var(--gold);
+}
+
 .budget-group {
   margin-bottom: 1.25rem;
 }
@@ -1616,11 +1628,44 @@ buddj-calculator-drawer.calculator-drawer--open .calculator-drawer-panel {
   min-height: 2.5rem;
 }
 
-.calculator-drawer-actions {
+.calculator-drawer-ops {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.calculator-drawer-btn--equals-op {
+  background: rgba(129, 178, 154, 0.25);
+  color: var(--mint);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.calculator-drawer-btn--equals-op:hover {
+  background: rgba(129, 178, 154, 0.4);
+  color: var(--navy);
+}
+
+.calculator-drawer-fn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
+}
+
+.calculator-drawer-btn--fn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  padding: 0.65rem;
+}
+
+.calculator-drawer-fn-svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  flex-shrink: 0;
 }
 
 .calculator-drawer-numpad {
@@ -1628,6 +1673,10 @@ buddj-calculator-drawer.calculator-drawer--open .calculator-drawer-panel {
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   margin-bottom: 1rem;
+}
+
+.calculator-drawer-num--zero-wide {
+  grid-column: span 2;
 }
 
 .calculator-drawer-btn {
@@ -1668,17 +1717,6 @@ buddj-calculator-drawer.calculator-drawer--open .calculator-drawer-panel {
   color: var(--navy);
 }
 
-.calculator-drawer-btn--equals {
-  background: rgba(129, 178, 154, 0.25);
-  color: var(--mint);
-  font-weight: 700;
-}
-
-.calculator-drawer-btn--equals:hover {
-  background: rgba(129, 178, 154, 0.4);
-  color: var(--navy);
-}
-
 .calculator-drawer-footer {
   display: flex;
   gap: 0.75rem;
@@ -1688,6 +1726,7 @@ buddj-calculator-drawer.calculator-drawer--open .calculator-drawer-panel {
 
 .calculator-drawer-cancel {
   flex: 1;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.08);
   color: var(--navy-soft);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1699,7 +1738,8 @@ buddj-calculator-drawer.calculator-drawer--open .calculator-drawer-panel {
 }
 
 .calculator-drawer-validate {
-  flex: 1;
+  flex: 2;
+  min-width: 0;
   background: linear-gradient(135deg, var(--mint), #6a9d82);
   color: var(--white);
   border: none;

@@ -253,7 +253,7 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
 
       const budgetsContainer = details.querySelector('[data-month-budgets]')!;
       const budgetGroup = document.createElement('buddj-budget-group');
-      budgetGroup.setAttribute('title', 'Budgets');
+      budgetGroup.setAttribute('section-title', 'Budgets');
       budgetGroup.setAttribute('show-add', '');
       budgetGroup.setAttribute('annual-month', String(apiMonth));
       budgetGroup.setAttribute('add-align', 'right');

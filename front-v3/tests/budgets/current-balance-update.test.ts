@@ -59,7 +59,7 @@ describe('modification du solde actuel', () => {
       expect(calc).toBeTruthy();
     });
     calc = screen.getByRole('dialog', { name: 'Solde actuel' }) as HTMLElement;
-    fireEvent.click(within(calc).getByRole('button', { name: 'C' }));
+    fireEvent.click(within(calc).getByRole('button', { name: 'Effacer' }));
     for (const digit of ['3', '5', '0', '0'] as const) {
       fireEvent.click(within(calc).getByRole('button', { name: digit }));
     }

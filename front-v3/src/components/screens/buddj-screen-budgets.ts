@@ -366,7 +366,7 @@ export class BuddjScreenBudgets extends HTMLElement {
       const groupEl = document.createElement('buddj-budget-group');
       groupEl.setAttribute('hide-recap', '');
       groupEl.setAttribute('hide-inline-add', '');
-      groupEl.setAttribute('title', group.title);
+      if (group.title) groupEl.setAttribute('section-title', group.title);
       if (group.previous) groupEl.setAttribute('previous', '');
       if (group.showAdd) groupEl.setAttribute('show-add', '');
       for (const budget of group.budgets) {

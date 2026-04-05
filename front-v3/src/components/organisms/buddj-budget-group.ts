@@ -2,6 +2,7 @@
  * Groupe de budgets pour un mois (récap optionnel, bouton Ajouter, liste de cartes).
  * Supporte buddj-budget-card et buddj-template-budget-card.
  * Attributs optionnels : hide-recap, recap-count, recap-total, show-search, add-align="right".
+ * Attribut section-title : titre visible au-dessus du groupe (ex. « Budgets des mois précédents »).
  */
 import type { BuddjBudgetAddDrawerElement } from './buddj-budget-add-drawer.js';
 import { escapeHtml } from '../../shared/escape.js';
@@ -19,6 +20,11 @@ export class BuddjBudgetGroup extends HTMLElement {
     const recapTotal = this.getAttribute('recap-total');
     const addAlignRight = this.hasAttribute('add-align') && this.getAttribute('add-align') === 'right';
     const showSearch = this.hasAttribute('show-search');
+    const sectionTitleRaw = this.getAttribute('section-title')?.trim() ?? '';
+    const sectionTitleHtml =
+      sectionTitleRaw !== ''
+        ? `<h2 class="budget-group-section-title">${escapeHtml(sectionTitleRaw)}</h2>`
+        : '';
     const cards = Array.from(this.querySelectorAll('buddj-budget-card, buddj-template-budget-card'));
     cards.sort((a, b) =>
       (a.getAttribute('name') ?? '').localeCompare(b.getAttribute('name') ?? '', undefined, { sensitivity: 'base' })
@@ -54,6 +60,7 @@ export class BuddjBudgetGroup extends HTMLElement {
       if (hasActionsRow) {
         const titleBlock = hasRecap ? `<div class="budget-group-title-block">${recapHtml}</div>` : '';
         div.innerHTML = `
+        ${sectionTitleHtml}
         <div class="budget-group-title-row">
           ${titleBlock}
           <div class="budget-group-actions">
@@ -63,14 +70,16 @@ export class BuddjBudgetGroup extends HTMLElement {
         <div class="budget-group-list"></div>
       `;
       } else {
-        div.innerHTML = hasRecap
-          ? `
+        div.innerHTML =
+          sectionTitleHtml +
+          (hasRecap
+            ? `
         <div class="budget-group-title-block">
           ${recapHtml}
         </div>
         <div class="budget-group-list"></div>
       `
-          : `<div class="budget-group-list"></div>`;
+            : `<div class="budget-group-list"></div>`);
       }
       const addBtn = div.querySelector('[data-budget-add-btn]');
       addBtn?.addEventListener('click', () => {
@@ -85,14 +94,16 @@ export class BuddjBudgetGroup extends HTMLElement {
         drawer?.open();
       });
     } else {
-      div.innerHTML = hasRecap
-        ? `
+      div.innerHTML =
+        sectionTitleHtml +
+        (hasRecap
+          ? `
         <div class="budget-group-title-block">
           ${recapHtml}
         </div>
         <div class="budget-group-list"></div>
       `
-        : `<div class="budget-group-list"></div>`;
+          : `<div class="budget-group-list"></div>`);
     }
     const list = div.querySelector('.budget-group-list')!;
     for (const card of cards) {

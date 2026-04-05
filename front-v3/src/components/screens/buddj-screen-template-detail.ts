@@ -266,7 +266,7 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
 
     const budgetsContainer = main.querySelector('[data-budgets-container]')!;
     const budgetGroup = document.createElement('buddj-budget-group');
-    budgetGroup.setAttribute('title', 'Budgets mensuels');
+    budgetGroup.setAttribute('section-title', 'Budgets mensuels');
     budgetGroup.setAttribute('show-add', '');
     budgetGroup.setAttribute('show-search', '');
     budgetGroup.setAttribute('recap-count', String(template.budgets.length));

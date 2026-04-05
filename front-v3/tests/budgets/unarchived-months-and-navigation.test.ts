@@ -141,6 +141,8 @@ describe('mois non archivés (page budgets)', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Mes budgets', level: 1 })).toBeTruthy();
     });
+    expect(screen.getByRole('heading', { name: 'Budgets des mois précédents', level: 2 })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Budgets de Mars 2026', level: 2 })).toBeTruthy();
     expect(screen.getAllByRole('checkbox')).toHaveLength(4);
     expect((screen.getByRole('checkbox', { name: /Dépense reportée/ }) as HTMLInputElement).checked).toBe(true);
     expect((screen.getByRole('checkbox', { name: /À faire/ }) as HTMLInputElement).checked).toBe(false);
