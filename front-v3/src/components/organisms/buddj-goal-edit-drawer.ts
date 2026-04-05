@@ -7,7 +7,7 @@ import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js'
 import type { GoalDrawerOnValidate } from './buddj-goal-add-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 
-const DEFAULT_EMOJI = '💰';
+const FALLBACK_EMOJI = '💰';
 
 export class BuddjGoalEditDrawer extends HTMLElement {
   static readonly tagName = 'buddj-goal-edit-drawer';
@@ -15,7 +15,7 @@ export class BuddjGoalEditDrawer extends HTMLElement {
   private _title = 'Mettre à jour';
   private _label = '';
   private _total = '0,00 €';
-  private _emoji = DEFAULT_EMOJI;
+  private _emoji = FALLBACK_EMOJI;
   private _onValidate: GoalDrawerOnValidate | null = null;
 
   open(options: {
@@ -28,7 +28,7 @@ export class BuddjGoalEditDrawer extends HTMLElement {
     this._title = options.title ?? 'Mettre à jour';
     this._label = options.initialLabel;
     this._total = options.initialTotal;
-    this._emoji = options.initialEmoji ?? DEFAULT_EMOJI;
+    this._emoji = options.initialEmoji?.trim() || FALLBACK_EMOJI;
     this._onValidate = options.onValidate;
     this.render();
     this.classList.add('goal-edit-drawer--open');

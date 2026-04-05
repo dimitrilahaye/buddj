@@ -1,12 +1,12 @@
 /**
- * Drawer d’ajout d’un objectif (économie ou remboursement) : emoji (défaut 💰), intitulé, somme totale.
+ * Drawer d’ajout d’un objectif (économie ou remboursement) : emoji (défaut via `defaultEmoji`, sinon 💰), intitulé, somme totale.
  */
 import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 
-const DEFAULT_EMOJI = '💰';
+const FALLBACK_EMOJI = '💰';
 
 /** Callback de validation du drawer objectif (add/edit) : label, totalStr, emoji */
 export type GoalDrawerOnValidate = (label: string, totalStr: string, emoji: string) => void;
@@ -17,14 +17,14 @@ export class BuddjGoalAddDrawer extends HTMLElement {
   private _title = 'Ajouter un objectif';
   private _label = '';
   private _total = '0,00 €';
-  private _emoji = DEFAULT_EMOJI;
+  private _emoji = FALLBACK_EMOJI;
   private _onValidate: GoalDrawerOnValidate | null = null;
 
-  open(options: { title: string; onValidate: GoalDrawerOnValidate }): void {
+  open(options: { title: string; defaultEmoji?: string; onValidate: GoalDrawerOnValidate }): void {
     this._title = options.title;
     this._label = '';
     this._total = '0,00 €';
-    this._emoji = DEFAULT_EMOJI;
+    this._emoji = options.defaultEmoji?.trim() || FALLBACK_EMOJI;
     this._onValidate = options.onValidate;
     this.render();
     this.classList.add('goal-add-drawer--open');

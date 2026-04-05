@@ -12,7 +12,7 @@ export interface EmojiPickerDrawerOpenOptions {
 export type BuddjEmojiPickerDrawerElement = HTMLElement & { open: (o: EmojiPickerDrawerOpenOptions) => void };
 
 const EMOJI_PICKER_SECTIONS: { title: string; emojis: string[] }[] = [
-  { title: 'Argent & finances', emojis: ['💰', '💳', '💵', '💴', '💶', '💸', '🏦', '📈', '📉', '🧾'] },
+  { title: 'Argent & finances', emojis: ['💰', '🐖', '💳', '💵', '💴', '💶', '💸', '🏦', '📈', '📉', '🧾'] },
   { title: 'Logement', emojis: ['🏠', '🏡', '🏢', '🏬', '🔑', '🛏️'] },
   { title: 'Transport', emojis: ['🚗', '🚕', '🚎', '🚌', '🚅', '🚄', '✈️', '🚲', '🛵', '⛽', '🅿️'] },
   { title: 'Énergie & utilitaires', emojis: ['⚡', '💧', '🔥', '📱', '💻', '🌐', '🌍'] },

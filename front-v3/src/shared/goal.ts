@@ -2,6 +2,13 @@
  * Modèle partagé pour les objectifs (économies / remboursements).
  * totalGoal = somme à atteindre ; additions = historique des ajouts ; currentIndex = position dans l’historique (back/forward).
  */
+
+/** Emoji proposé par défaut à l’ajout d’une économie (objectif d’épargne). */
+export const DEFAULT_GOAL_EMOJI_SAVINGS = '🐖';
+
+/** Emoji proposé par défaut à l’ajout d’un remboursement. */
+export const DEFAULT_GOAL_EMOJI_REIMBURSEMENT = '💸';
+
 export interface GoalItem {
   id: string;
   label: string;

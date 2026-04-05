@@ -8,7 +8,14 @@ import type { BuddjGoalAmountDrawerElement } from '../organisms/buddj-goal-amoun
 import { getToast } from '../atoms/buddj-toast.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import type { GoalItem } from '../../shared/goal.js';
-import { canGoBack, canGoForward, formatEuros, getRemaining, parseEurosToNumber } from '../../shared/goal.js';
+import {
+  canGoBack,
+  canGoForward,
+  DEFAULT_GOAL_EMOJI_REIMBURSEMENT,
+  formatEuros,
+  getRemaining,
+  parseEurosToNumber,
+} from '../../shared/goal.js';
 
 const MOCK_ITEMS: GoalItem[] = [
   { id: 'r1', label: 'Concert ACDC', icon: '🎸', totalGoal: 200, additions: [50], currentIndex: 0 },
@@ -157,10 +164,11 @@ export class BuddjScreenReimbursements extends HTMLElement {
 
   private openAddDrawer(): void {
     const drawer = document.getElementById('goal-add-drawer') as HTMLElement & {
-      open: (o: { title: string; onValidate: GoalDrawerOnValidate }) => void;
+      open: (o: { title: string; defaultEmoji?: string; onValidate: GoalDrawerOnValidate }) => void;
     };
     drawer?.open({
       title: 'Ajouter un remboursement',
+      defaultEmoji: DEFAULT_GOAL_EMOJI_REIMBURSEMENT,
       onValidate: (label: string, totalStr: string, emoji: string) => {
         const totalGoal = Math.max(0, parseEurosToNumber(totalStr));
         const newItem: GoalItem = {
@@ -189,7 +197,7 @@ export class BuddjScreenReimbursements extends HTMLElement {
       title: 'Mettre à jour le remboursement',
       initialLabel: item.label,
       initialTotal: formatEuros(parseFloat(String(item.totalGoal)) || 0),
-      initialEmoji: item.icon,
+      initialEmoji: item.icon?.trim() ? item.icon : DEFAULT_GOAL_EMOJI_REIMBURSEMENT,
       onValidate: (label: string, totalStr: string, emoji: string) => {
         item.label = label;
         item.icon = emoji;
