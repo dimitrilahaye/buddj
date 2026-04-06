@@ -31,7 +31,7 @@ export class BuddjGoalCard extends HTMLElement {
     const isCompleteBool = remainingNum <= 0;
 
     this.innerHTML = `
-      <div class="budget-details goal-card" data-id="${escapeAttr(id)}">
+      <div class="budget-details goal-card${isCompleteBool ? ' goal-card--completed' : ''}" data-id="${escapeAttr(id)}">
         <div class="budget-card-header">
           <div class="budget-card-title-row">
             <h2 class="budget-name">

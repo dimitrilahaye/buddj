@@ -23,6 +23,10 @@ import type { BuddjScreenArchived } from './components/screens/buddj-screen-arch
 import type { BuddjScreenTemplates } from './components/screens/buddj-screen-templates.js';
 import type { BuddjScreenTemplateDetail } from './components/screens/buddj-screen-template-detail.js';
 import type { BuddjScreenAnnualOutflows } from './components/screens/buddj-screen-annual-outflows.js';
+import type { SavingsStore } from './application/project/savings-store.js';
+import type { ReimbursementsStore } from './application/project/reimbursements-store.js';
+import type { BuddjScreenSavings } from './components/screens/buddj-screen-savings.js';
+import type { BuddjScreenReimbursements } from './components/screens/buddj-screen-reimbursements.js';
 import { BuddjScreenHome } from './components/screens/buddj-screen-home.js';
 import { BuddjScreenBudgets } from './components/screens/buddj-screen-budgets.js';
 import { DEFAULT_ROUTE_MONTH_PLACEHOLDER_ID } from './default-route-month-placeholder.js';
@@ -58,6 +62,8 @@ export function createRoutes({
   archivedMonthStore,
   templatesStore,
   yearlyOutflowsStore,
+  savingsStore,
+  reimbursementsStore,
   templateService,
   navigateToPath,
   redirectToHome,
@@ -67,6 +73,8 @@ export function createRoutes({
   archivedMonthStore: ArchivedMonthStore;
   templatesStore: TemplatesStore;
   yearlyOutflowsStore: YearlyOutflowsStore;
+  savingsStore: SavingsStore;
+  reimbursementsStore: ReimbursementsStore;
   templateService: TemplateService;
   navigateToPath: (path: string) => void;
   redirectToHome: () => void;
@@ -108,7 +116,8 @@ export function createRoutes({
       name: 'savings',
       pattern: '/savings',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-savings');
+        const el = document.createElement('buddj-screen-savings') as BuddjScreenSavings;
+        el.init({ savingsStore });
         ctx.outlet.replaceChildren(el);
       }),
     },
@@ -116,7 +125,8 @@ export function createRoutes({
       name: 'reimbursements',
       pattern: '/reimbursements',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
-        const el = document.createElement('buddj-screen-reimbursements');
+        const el = document.createElement('buddj-screen-reimbursements') as BuddjScreenReimbursements;
+        el.init({ reimbursementsStore });
         ctx.outlet.replaceChildren(el);
       }),
     },

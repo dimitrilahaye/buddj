@@ -46,6 +46,17 @@ import { createAddYearlySaving } from './application/yearly-outflows/add-yearly-
 import { createRemoveYearlySaving } from './application/yearly-outflows/remove-yearly-saving.js';
 import { YearlyOutflowsStore } from './application/yearly-outflows/yearly-outflows-store.js';
 import type { YearlyOutflowsService } from './application/yearly-outflows/yearly-outflows-service.js';
+import type { ProjectService } from './application/project/project-service.js';
+import { createProjectServiceFromApi } from './adapters/project-service-from-api.js';
+import { createLoadProjectsByCategory } from './application/project/load-projects-by-category.js';
+import { createCreateProject } from './application/project/create-project.js';
+import { createUpdateProject } from './application/project/update-project.js';
+import { createAddAmountToProject } from './application/project/add-amount-to-project.js';
+import { createRollbackProject } from './application/project/rollback-project.js';
+import { createReApplyProject } from './application/project/re-apply-project.js';
+import { createDeleteProject } from './application/project/delete-project.js';
+import { SavingsStore } from './application/project/savings-store.js';
+import { ReimbursementsStore } from './application/project/reimbursements-store.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
@@ -118,6 +129,7 @@ export type BootstrapOptions = {
   monthService: MonthService;
   templateService?: TemplateService;
   yearlyOutflowsService?: YearlyOutflowsService;
+  projectService?: ProjectService;
 };
 
 export function bootstrap(options: BootstrapOptions): void {
@@ -126,6 +138,7 @@ export function bootstrap(options: BootstrapOptions): void {
   const templateService = options.templateService ?? createTemplateServiceFromApi({ apiUrl: config.apiUrl });
   const yearlyOutflowsService =
     options.yearlyOutflowsService ?? createYearlyOutflowsServiceFromApi({ apiUrl: config.apiUrl });
+  const projectService = options.projectService ?? createProjectServiceFromApi({ apiUrl: config.apiUrl });
   const loadUnarchivedMonths = createLoadUnarchivedMonths({ monthService: options.monthService });
   const putExpensesChecking = createPutExpensesChecking({ monthService: options.monthService });
   const putOutflowsChecking = createPutOutflowsChecking({ monthService: options.monthService });
@@ -187,6 +200,31 @@ export function bootstrap(options: BootstrapOptions): void {
     addYearlySaving,
     removeYearlySaving,
   });
+  const loadProjectsByCategory = createLoadProjectsByCategory({ projectService });
+  const createProject = createCreateProject({ projectService });
+  const updateProject = createUpdateProject({ projectService });
+  const addAmountToProject = createAddAmountToProject({ projectService });
+  const rollbackProject = createRollbackProject({ projectService });
+  const reApplyProject = createReApplyProject({ projectService });
+  const deleteProject = createDeleteProject({ projectService });
+  const savingsStore = new SavingsStore({
+    loadProjectsByCategory,
+    createProject,
+    updateProject,
+    addAmountToProject,
+    rollbackProject,
+    reApplyProject,
+    deleteProject,
+  });
+  const reimbursementsStore = new ReimbursementsStore({
+    loadProjectsByCategory,
+    createProject,
+    updateProject,
+    addAmountToProject,
+    rollbackProject,
+    reApplyProject,
+    deleteProject,
+  });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 
@@ -227,6 +265,8 @@ export function bootstrap(options: BootstrapOptions): void {
     archivedMonthStore,
     templatesStore,
     yearlyOutflowsStore,
+    savingsStore,
+    reimbursementsStore,
     templateService,
     navigateToPath: (path: string) => navigateHolder.navigate?.(path),
     redirectToHome: () => {

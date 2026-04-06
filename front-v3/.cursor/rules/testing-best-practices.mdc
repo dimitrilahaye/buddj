@@ -67,9 +67,21 @@ Si un élément n’est pas trouvable par rôle/name, c’est souvent un signal 
 
 Lorsqu’on corrige un **bug** de comportement dans le front-v3, on **ajoute ou met à jour un test automatisé** qui couvre le scénario et **valide le comportement attendu**. Cela limite les régressions et documente le contrat fonctionnel.
 
+## Nouvelles features
+
+**Pas une feature sans tests.**
+
+Toute nouvelle feature (UI, store, use-case, adapter, routing) doit être livrée avec des tests automatisés dans la même PR :
+
+- au minimum un test de comportement nominal ;
+- et, dès que pertinent, un test d’échec (erreur API, validation, edge case).
+
+Une feature sans test est considérée incomplète.
+
 ## Récap
 
 - **Testing Library** + **sélecteurs par rôle (et nom accessible)** uniquement.
 - **Pas de `*ByTestId`** ; **pas de sélecteurs CSS** dans les tests ; si besoin, améliorer l’a11y du composant pour qu’il soit identifiable par rôle.
 - En respectant l’a11y, on obtient des tests **stables face à la refacto** et alignés avec l’usage réel de l’interface.
 - **Bugfix** : toujours viser un **test** qui verrouille le bon comportement (voir section « Corrections de bugs » ci-dessus).
+- **Feature** : pas de livraison sans tests (voir section « Nouvelles features » ci-dessus).

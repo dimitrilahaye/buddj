@@ -4398,6 +4398,20 @@ buddj-screen-reimbursements .goal-section {
   overflow: visible;
 }
 
+.goal-card.goal-card--completed {
+  border-color: rgba(129, 178, 154, 0.55);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--mint) 16%, var(--bg-card)),
+    color-mix(in srgb, var(--mint) 8%, var(--bg-card))
+  );
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--mint-glow) 70%, transparent);
+}
+
+.goal-card.goal-card--completed .budget-name-text {
+  color: var(--mint);
+}
+
 .goal-card .goal-card-actions {
   display: flex;
   align-items: center;
