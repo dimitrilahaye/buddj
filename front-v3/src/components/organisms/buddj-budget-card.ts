@@ -176,7 +176,7 @@ export class BuddjBudgetCard extends HTMLElement {
     const destinations = [
       ...otherBudgets,
       { id: accountId, label: 'Solde fin de mois' as string, currentAmount: soldeFinMois },
-    ];
+    ].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
     const sourceBudgetId = this.getAttribute('weekly-budget-id') ?? '';
     if (!sourceBudgetId || !accountId) return;
     const drawer = document.getElementById('transfer-drawer') as HTMLElement & {

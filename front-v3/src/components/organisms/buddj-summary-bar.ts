@@ -306,13 +306,28 @@ export class BuddjSummaryBar extends HTMLElement {
     const maxAmount = this.formatProjectedBalance();
     const sourceAccountId = this.getAttribute('account-id') ?? '';
     if (!sourceAccountId) return;
-    const budgetCards = document.querySelectorAll('#budgets buddj-budget-card');
-    const destinations = Array.from(budgetCards).map((card) => ({
-      id: card.getAttribute('weekly-budget-id') ?? '',
-      label: card.getAttribute('name') ?? 'Budget',
-      icon: card.getAttribute('icon') ?? '💰',
-      currentAmount: card.getAttribute('remaining') ?? '0 €',
-    })).filter((d) => d.id);
+    const month = this._monthStore ? getCurrentMonth({ state: this._monthStore.getState() }) : null;
+    const destinations =
+      month?.budgetGroups
+        ?.flatMap((group) => group.budgets)
+        .map((budget) => {
+          const expensesTotal = budget.expenses.reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0);
+          const remaining = budget.allocated - expensesTotal;
+          return {
+            id: budget.weeklyBudgetId,
+            label: budget.name || 'Budget',
+            icon: budget.icon || '💰',
+            currentAmount: formatEuros(remaining),
+          };
+        })
+        .filter(
+          (
+            destination
+          ): destination is { id: string; label: string; icon: string; currentAmount: string } =>
+            Boolean(destination.id)
+        )
+        .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })) ?? [];
+    if (destinations.length === 0) return;
     const drawer = document.getElementById('transfer-drawer') as HTMLElement & {
       open: (o: {
         source: 'outflows' | 'budget';
