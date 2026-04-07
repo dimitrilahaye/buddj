@@ -14,6 +14,7 @@ import {
   type CreateOutflowActionDetail,
   type DeleteOutflowActionDetail,
   type PutOutflowsCheckingActionDetail,
+  type TransferFromAccountActionDetail,
 } from '../../application/month/month-store.js';
 import type { MonthView } from '../../application/month/month-view.js';
 import { getCurrentMonth } from '../../application/month/month-state.js';
@@ -54,11 +55,13 @@ export class BuddjScreenRecurring extends HTMLElement {
     this.attachListeners();
     document.addEventListener('buddj-charge-search', this._searchListener);
     document.addEventListener('buddj-charge-add-done', this._onChargeAddDone as EventListener);
+    document.addEventListener('buddj-account-transfer-confirmed', this._onAccountTransferSubmit as EventListener);
   }
 
   disconnectedCallback(): void {
     document.removeEventListener('buddj-charge-search', this._searchListener);
     document.removeEventListener('buddj-charge-add-done', this._onChargeAddDone as EventListener);
+    document.removeEventListener('buddj-account-transfer-confirmed', this._onAccountTransferSubmit as EventListener);
     this.removeEventListener('buddj-charge-taken-change', this._onChargeTakenChange as EventListener);
     this.removeEventListener('buddj-charge-delete-confirmed', this._onChargeDeleteConfirmed as EventListener);
     this._detachMonthStoreListeners();
@@ -167,6 +170,14 @@ export class BuddjScreenRecurring extends HTMLElement {
     const apiLabel = `${emoji} ${rawLabel}`.trim();
     const payload: CreateOutflowActionDetail = { label: apiLabel, amount };
     this._monthStore.emitAction('createOutflow', payload);
+  };
+
+  private _onAccountTransferSubmit = (e: Event): void => {
+    if (!this._monthStore) return;
+    const ev = e as CustomEvent<TransferFromAccountActionDetail>;
+    const { fromAccountId, toWeeklyBudgetId, amount } = ev.detail ?? {};
+    if (!fromAccountId || !toWeeklyBudgetId || amount === undefined || amount <= 0) return;
+    this._monthStore.emitAction('transferFromAccount', { fromAccountId, toWeeklyBudgetId, amount });
   };
 
   private _onCurrentMonthChanged = (e: Event): void => {
