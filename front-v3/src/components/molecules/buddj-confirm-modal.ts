@@ -6,6 +6,7 @@ import { escapeHtml } from '../../shared/escape.js';
 
 export interface ConfirmModalShowOptions {
   title: string;
+  description?: string;
   cancelLabel?: string;
   confirmLabel?: string;
   onConfirm: () => void;
@@ -19,6 +20,7 @@ export class BuddjConfirmModal extends HTMLElement {
 
   private _options: {
     title: string;
+    description: string;
     cancelLabel: string;
     confirmLabel: string;
     onConfirm: () => void;
@@ -32,6 +34,7 @@ export class BuddjConfirmModal extends HTMLElement {
   show(options: ConfirmModalShowOptions): void {
     this._options = {
       title: options.title,
+      description: options.description ?? '',
       cancelLabel: options.cancelLabel ?? 'Annuler',
       confirmLabel: options.confirmLabel ?? 'Confirmer',
       onConfirm: options.onConfirm,
@@ -52,11 +55,15 @@ export class BuddjConfirmModal extends HTMLElement {
       this.innerHTML = '';
       return;
     }
-    const { title, cancelLabel, confirmLabel } = this._options;
+    const { title, description, cancelLabel, confirmLabel } = this._options;
+    const descriptionHtml = description
+      ? `<p class="confirm-modal-description">${escapeHtml(description)}</p>`
+      : '';
     this.innerHTML = `
       <div class="confirm-modal-backdrop" data-confirm-modal-backdrop aria-hidden="true"></div>
       <div class="confirm-modal-box" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
         <p id="confirm-modal-title" class="confirm-modal-title">${escapeHtml(title)}</p>
+        ${descriptionHtml}
         <div class="confirm-modal-actions">
           <button type="button" class="btn confirm-modal-btn confirm-modal-btn--cancel">${escapeHtml(cancelLabel)}</button>
           <button type="button" class="btn confirm-modal-btn confirm-modal-btn--confirm">${escapeHtml(confirmLabel)}</button>

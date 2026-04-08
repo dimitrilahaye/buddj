@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { screen, waitFor, fireEvent } from '@testing-library/dom';
+import { screen, waitFor, fireEvent, within } from '@testing-library/dom';
 import { createAuthServiceFromInMemory } from '../../src/adapters/auth-service-from-in-memory.js';
 import { createMonthServiceFromInMemory } from '../../src/adapters/month-service-from-in-memory.js';
 import { createTemplateServiceFromInMemory } from '../../src/adapters/template-service-from-in-memory.js';
@@ -316,6 +316,8 @@ describe('écran création de mois', () => {
     await waitFor(() => screen.getByRole('button', { name: 'Créer le mois' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Créer le mois' }));
+    await waitFor(() => screen.getByRole('button', { name: 'Confirmer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmer' }));
 
     await waitFor(() => {
       expect(window.location.pathname.startsWith('/budgets/')).toBe(true);
@@ -511,6 +513,107 @@ describe('écran création de mois', () => {
     ) as HTMLButtonElement;
     expect(pendingBudgetsBtn).toBeTruthy();
     fireEvent.click(pendingBudgetsBtn);
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200, 5);
+    });
+  });
+
+  it('supprime en masse annuels et reports après confirmation et met à jour le prévisionnel', async () => {
+    shellDocument();
+    const yearlyView = createEmptyYearlyOutflowsView();
+    yearlyView.months[5] = {
+      outflows: [{ id: 'y1', month: 6, label: 'Taxe', amount: 100 }],
+      budgets: [{ id: 'yb1', month: 6, name: 'Vacances', initialBalance: 300 }],
+    };
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 2000 })],
+        defaultForNewMonth: {
+          template: seedTemplate({ startingBalance: 2000 }),
+          pendingDebits: {
+            outflows: [{ id: 'po1', label: 'Retard', amount: 70, pendingFrom: '2026-05-01T00:00:00.000Z' }],
+            budgets: [
+              {
+                id: 'pb1',
+                name: '🎯 Santé',
+                initialBalance: 100,
+                currentBalance: 30,
+                pendingFrom: '2026-05-01T00:00:00.000Z',
+                expenses: [{ amount: 20, label: 'Pharmacie', date: '2026-05-15T00:00:00.000Z' }],
+              },
+            ],
+          },
+        },
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: yearlyView,
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 100 - 300 - 70 - 50, 5);
+    });
+
+    const yearlyChargesSection = getStepSection({
+      heading: '3. Charges et budgets annuels',
+    }).querySelector('.new-month-section--rappel-annuel') as HTMLElement;
+    expect(yearlyChargesSection).toBeTruthy();
+    const yearlyChargesDeleteAllBtn = within(yearlyChargesSection).getByRole('button', {
+      name: 'Supprimer toutes les charges annuelles',
+      hidden: true,
+    }) as HTMLButtonElement;
+    fireEvent.click(yearlyChargesDeleteAllBtn);
+    await waitFor(() => screen.getByRole('button', { name: 'Confirmer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmer' }));
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 300 - 70 - 50, 5);
+    });
+
+    const yearlyBudgetSections = getStepSection({
+      heading: '3. Charges et budgets annuels',
+    }).querySelectorAll('.new-month-section--rappel-annuel');
+    const yearlyBudgetsSection = yearlyBudgetSections[1] as HTMLElement;
+    expect(yearlyBudgetsSection).toBeTruthy();
+    const yearlyBudgetsDeleteAllBtn = within(yearlyBudgetsSection).getByRole('button', {
+      name: 'Supprimer tous les budgets annuels',
+      hidden: true,
+    }) as HTMLButtonElement;
+    fireEvent.click(yearlyBudgetsDeleteAllBtn);
+    await waitFor(() => screen.getByRole('button', { name: 'Confirmer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmer' }));
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 70 - 50, 5);
+    });
+
+    const pendingSections = getStepSection({
+      heading: '4. Charges et budgets des mois précédents',
+    }).querySelectorAll('.new-month-section--rappel');
+    const pendingChargesSection = pendingSections[0] as HTMLElement;
+    expect(pendingChargesSection).toBeTruthy();
+    const pendingChargesDeleteAllBtn = within(pendingChargesSection).getByRole('button', {
+      name: 'Supprimer toutes les charges des mois précédents',
+      hidden: true,
+    }) as HTMLButtonElement;
+    fireEvent.click(pendingChargesDeleteAllBtn);
+    await waitFor(() => screen.getByRole('button', { name: 'Confirmer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmer' }));
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 50, 5);
+    });
+
+    const pendingBudgetsSection = pendingSections[1] as HTMLElement;
+    expect(pendingBudgetsSection).toBeTruthy();
+    const pendingBudgetsDeleteAllBtn = within(pendingBudgetsSection).getByRole('button', {
+      name: 'Supprimer tous les budgets des mois précédents',
+      hidden: true,
+    }) as HTMLButtonElement;
+    fireEvent.click(pendingBudgetsDeleteAllBtn);
+    await waitFor(() => screen.getByRole('button', { name: 'Confirmer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmer' }));
     await waitFor(() => {
       expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200, 5);
     });

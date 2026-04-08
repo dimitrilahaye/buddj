@@ -38,6 +38,11 @@ function formatAmount(n: number): string {
   return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
 
+function formatMonthYear({ month, year }: { month: number; year: number }): string {
+  const date = new Date(Date.UTC(year, month, 1));
+  return new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
+}
+
 function labelForApi(icon: string, label: string): string {
   const t = label.trim();
   if (!t) return icon;
@@ -127,6 +132,13 @@ export class BuddjScreenNewMonth extends HTMLElement {
     return included
       ? 'Exclure du calcul du solde prévisionnel'
       : 'Inclure dans le calcul du solde prévisionnel';
+  }
+
+  private getDeleteAllRappelLabel({ section }: { section: 'annuel-charges' | 'annuel-budgets' | 'charges' | 'budgets' }): string {
+    if (section === 'annuel-charges') return 'Supprimer toutes les charges annuelles';
+    if (section === 'annuel-budgets') return 'Supprimer tous les budgets annuels';
+    if (section === 'charges') return 'Supprimer toutes les charges des mois précédents';
+    return 'Supprimer tous les budgets des mois précédents';
   }
   private _pendingScrollStep: number | null = null;
   private _noDefaultTemplate = false;
@@ -575,19 +587,25 @@ export class BuddjScreenNewMonth extends HTMLElement {
           <section class="${stepClass(3)}"${showStep(3)} data-new-month-step="3">
             <h2 class="new-month-section-title" data-new-month-step-title="3">3. Charges et budgets annuels</h2>
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-annuel">
-              <div class="new-month-section-head">
+              <div class="new-month-section-head new-month-section-head--rappel-title">
                 <h3 class="new-month-section-title">Charges annuelles</h3>
+              </div>
+              <div class="new-month-rappel-controls">
+                <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalYearlyCharges))}</p>
                 <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelYearlyChargesIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="annuel-charges" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyChargesIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyChargesIncluded })}</button>
-            </div>
-              <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalYearlyCharges))}</p>
+                <button type="button" class="btn new-month-btn-rappel-delete-all" data-rappel-delete-all="annuel-charges" title="${this.getDeleteAllRappelLabel({ section: 'annuel-charges' })}" aria-label="${this.getDeleteAllRappelLabel({ section: 'annuel-charges' })}" ${this._yearlyOutflows.length === 0 ? 'disabled' : ''}>Supprimer tout</button>
+              </div>
               <ul class="new-month-list">${this._yearlyOutflows.map((r) => rappelLineItemRow('yearly-o', r)).join('') || '<li class="new-month-list-empty">Aucune charge annuelle trouvée pour ce mois</li>'}</ul>
             </section>
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-annuel">
-              <div class="new-month-section-head">
+              <div class="new-month-section-head new-month-section-head--rappel-title">
                 <h3 class="new-month-section-title">Budgets annuels</h3>
-                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelYearlyBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="annuel-budgets" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyBudgetsIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyBudgetsIncluded })}</button>
               </div>
-              <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalYearlyBudgets))}</p>
+              <div class="new-month-rappel-controls">
+                <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalYearlyBudgets))}</p>
+                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelYearlyBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="annuel-budgets" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyBudgetsIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyBudgetsIncluded })}</button>
+                <button type="button" class="btn new-month-btn-rappel-delete-all" data-rappel-delete-all="annuel-budgets" title="${this.getDeleteAllRappelLabel({ section: 'annuel-budgets' })}" aria-label="${this.getDeleteAllRappelLabel({ section: 'annuel-budgets' })}" ${this._yearlyBudgets.length === 0 ? 'disabled' : ''}>Supprimer tout</button>
+              </div>
               <ul class="new-month-list">${this._yearlyBudgets.map((r) => rappelLineItemRow('yearly-b', r)).join('') || '<li class="new-month-list-empty">Aucun budget annuel trouvé pour ce mois</li>'}</ul>
             </section>
             <div class="new-month-step-actions"${this._activeStep === 3 ? '' : ' hidden'}>
@@ -599,19 +617,25 @@ export class BuddjScreenNewMonth extends HTMLElement {
           <section class="${stepClass(4)}"${showStep(4)} data-new-month-step="4">
             <h2 class="new-month-section-title" data-new-month-step-title="4">4. Charges et budgets des mois précédents</h2>
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-charges">
-              <div class="new-month-section-head">
+              <div class="new-month-section-head new-month-section-head--rappel-title">
                 <h3 class="new-month-section-title">Charges des mois précédents</h3>
-                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelChargesIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="charges" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelChargesIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelChargesIncluded })}</button>
               </div>
-              <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalChargesPending))}</p>
+              <div class="new-month-rappel-controls">
+                <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalChargesPending))}</p>
+                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelChargesIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="charges" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelChargesIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelChargesIncluded })}</button>
+                <button type="button" class="btn new-month-btn-rappel-delete-all" data-rappel-delete-all="charges" title="${this.getDeleteAllRappelLabel({ section: 'charges' })}" aria-label="${this.getDeleteAllRappelLabel({ section: 'charges' })}" ${this._pendingCharges.length === 0 ? 'disabled' : ''}>Supprimer tout</button>
+              </div>
               <ul class="new-month-list new-month-list--rappel">${rappelChargesList || '<li class="new-month-list-empty">Aucune charge reportée des mois précédents</li>'}</ul>
             </section>
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-budgets">
-              <div class="new-month-section-head">
+              <div class="new-month-section-head new-month-section-head--rappel-title">
                 <h3 class="new-month-section-title">Budgets des mois précédents</h3>
-                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="budgets" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}</button>
               </div>
-              <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalBudgetsPending))}</p>
+              <div class="new-month-rappel-controls">
+                <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalBudgetsPending))}</p>
+                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="budgets" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}</button>
+                <button type="button" class="btn new-month-btn-rappel-delete-all" data-rappel-delete-all="budgets" title="${this.getDeleteAllRappelLabel({ section: 'budgets' })}" aria-label="${this.getDeleteAllRappelLabel({ section: 'budgets' })}" ${this._pendingBudgets.length === 0 ? 'disabled' : ''}>Supprimer tout</button>
+              </div>
               <ul class="new-month-list new-month-list--rappel">${rappelBudgetsList || '<li class="new-month-list-empty">Aucun budget reporté des mois précédents</li>'}</ul>
             </section>
             <div class="new-month-step-actions"${this._activeStep === 4 ? '' : ' hidden'}>
@@ -766,6 +790,18 @@ export class BuddjScreenNewMonth extends HTMLElement {
         return;
       }
       const deleteIcon = target.closest('buddj-icon-delete');
+      const deleteAllBtn = target.closest<HTMLButtonElement>('button[data-rappel-delete-all]');
+      const deleteAllSection = deleteAllBtn?.dataset.rappelDeleteAll;
+      if (
+        deleteAllSection === 'annuel-charges' ||
+        deleteAllSection === 'annuel-budgets' ||
+        deleteAllSection === 'charges' ||
+        deleteAllSection === 'budgets'
+      ) {
+        e.preventDefault();
+        this.deleteAllRappelSection({ section: deleteAllSection });
+        return;
+      }
       if (deleteIcon?.closest('[data-yearly-delete]')) {
         const line = deleteIcon.closest('buddj-line-item[data-yearly-id]');
         const yid = line?.getAttribute('data-yearly-id');
@@ -801,7 +837,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
     });
 
     this.querySelector('.new-month-reset')?.addEventListener('click', () => this.resetForm());
-    this.querySelector('.new-month-cta')?.addEventListener('click', () => this.submitForm());
+    this.querySelector('.new-month-cta')?.addEventListener('click', () => this.confirmSubmitForm());
     this.querySelectorAll<HTMLButtonElement>('[data-new-month-step-next]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const step = Number(btn.getAttribute('data-new-month-step-next') ?? '1');
@@ -1072,11 +1108,67 @@ export class BuddjScreenNewMonth extends HTMLElement {
     this._updateProjectedOnly();
   }
 
+  private deleteAllRappelSection({ section }: { section: 'annuel-charges' | 'annuel-budgets' | 'charges' | 'budgets' }): void {
+    const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
+    const isYearlyCharges = section === 'annuel-charges';
+    const isYearlyBudgets = section === 'annuel-budgets';
+    const isPendingCharges = section === 'charges';
+    const count = isYearlyCharges
+      ? this._yearlyOutflows.length
+      : isYearlyBudgets
+        ? this._yearlyBudgets.length
+        : isPendingCharges
+          ? this._pendingCharges.length
+          : this._pendingBudgets.length;
+    if (count === 0) return;
+    const title = isYearlyCharges
+      ? `Voulez-vous vraiment supprimer les ${count} charges annuelles de ce mois ?`
+      : isYearlyBudgets
+        ? `Voulez-vous vraiment supprimer les ${count} budgets annuels de ce mois ?`
+        : isPendingCharges
+          ? `Voulez-vous vraiment supprimer les ${count} charges des mois précédents ?`
+          : `Voulez-vous vraiment supprimer les ${count} budgets des mois précédents ?`;
+    modal?.show({
+      title,
+      onConfirm: () => {
+        if (isYearlyCharges) this._yearlyOutflows = [];
+        else if (isYearlyBudgets) this._yearlyBudgets = [];
+        else if (isPendingCharges) this._pendingCharges = [];
+        else this._pendingBudgets = [];
+        const message = isYearlyCharges
+          ? 'Toutes les charges annuelles ont été retirées pour ce mois'
+          : isYearlyBudgets
+            ? 'Tous les budgets annuels ont été retirés pour ce mois'
+            : isPendingCharges
+              ? 'Toutes les charges des mois précédents ont été supprimées'
+              : 'Tous les budgets des mois précédents ont été supprimés';
+        getToast()?.show({ message });
+        this.render();
+        this.attachListeners();
+        this._updateProjectedOnly();
+      },
+      onCancel: () => {},
+    });
+  }
+
   private resetForm(): void {
     this._unsubYearly?.();
     this._unsubYearly = null;
     this._teardownMonthStoreListeners();
     this.open();
+  }
+
+  private confirmSubmitForm(): void {
+    if (!this._validateBeforeSubmit()) return;
+    const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
+    const monthLabel = formatMonthYear({ month: this._month, year: this._year });
+    const projected = formatAmount(this.getProjectedBalance());
+    modal?.show({
+      title: `Confirmez-vous la création du mois de ${monthLabel} ?`,
+      description: `Solde prévisionnel : ${projected}`,
+      onConfirm: () => this.submitForm(),
+      onCancel: () => {},
+    });
   }
 
   private submitForm(): void {
