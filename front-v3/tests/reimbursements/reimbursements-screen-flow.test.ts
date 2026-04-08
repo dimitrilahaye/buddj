@@ -358,4 +358,38 @@ describe('écran remboursements', () => {
     fireEvent.click(amountBtn);
     expect(screen.getByRole('dialog', { name: 'Injecter un montant' })).toBeTruthy();
   });
+
+  it('affiche le montant restant avec suffixe "restants" dans la liste du drawer injection', async () => {
+    const store = createReimbursementsStore({
+      loadProjectsByCategory: async () => [
+        createProjectView({ id: 'r-rem', name: '💸 Projet', target: 200, totalAmount: 150 }),
+      ],
+    });
+    const host = document.getElementById('host')!;
+    const el = document.createElement(BuddjScreenReimbursements.tagName) as InstanceType<typeof BuddjScreenReimbursements>;
+    el.init({ reimbursementsStore: store, monthStore: createMonthStoreMock({ projectedBalance: 100 }) });
+    host.appendChild(el);
+
+    await screen.findByRole('button', { name: /Injecter un montant/i });
+    await waitFor(() => {
+      expect(document.querySelector('buddj-goal-card[data-id="r-rem"]')).toBeTruthy();
+    });
+
+    const privateEl = el as unknown as {
+      _isInjectionDrawerOpen: boolean;
+      _injectionRemainingAmount: number;
+      _injectionTemporaryAmount: number;
+      openInjectionDrawer: () => void;
+    };
+    privateEl._isInjectionDrawerOpen = true;
+    privateEl._injectionRemainingAmount = 100;
+    privateEl._injectionTemporaryAmount = 100;
+    privateEl.openInjectionDrawer();
+
+    await waitFor(() => {
+      const suffix = screen.getByText('restants');
+      const amountRow = suffix.closest('.goal-injection-project-amount');
+      expect(amountRow?.textContent).toContain('50,00 €');
+    });
+  });
 });

@@ -4863,6 +4863,14 @@ buddj-goal-injection-drawer.goal-injection-drawer--open .goal-injection-drawer-p
 
 .goal-injection-project-amount {
   justify-self: end;
+  gap: 0.25rem;
+}
+
+.goal-injection-project-remaining-suffix {
+  color: var(--navy-soft);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.82rem;
 }
 
 .goal-injection-empty {

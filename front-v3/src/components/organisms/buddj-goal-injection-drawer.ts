@@ -51,9 +51,8 @@ export class BuddjGoalInjectionDrawer extends HTMLElement {
           <span class="goal-injection-project-icon" aria-hidden="true">${escapeHtml(project.icon)}</span>
           <span class="goal-injection-project-name">${escapeHtml(project.name)}</span>
           <span class="goal-injection-project-amount amount-totals">
-            <span class="amount-allocated">${escapeHtml(formatEuros(project.allocated))}</span>
-            <span class="amount-sep" aria-hidden="true">→</span>
             <span class="amount-remaining">${escapeHtml(formatEuros(project.remaining))}</span>
+            <span class="goal-injection-project-remaining-suffix">restants</span>
           </span>
         </button>
       `
