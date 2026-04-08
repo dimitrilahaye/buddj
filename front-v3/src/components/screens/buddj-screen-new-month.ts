@@ -122,6 +122,12 @@ export class BuddjScreenNewMonth extends HTMLElement {
   private _rappelBudgetsIncluded = true;
   private _visibleStep = 1;
   private _activeStep = 1;
+
+  private getProjectedBalanceToggleLabel({ included }: { included: boolean }): string {
+    return included
+      ? 'Exclure du calcul du solde prévisionnel'
+      : 'Inclure dans le calcul du solde prévisionnel';
+  }
   private _pendingScrollStep: number | null = null;
   private _noDefaultTemplate = false;
   private _loadError: string | null = null;
@@ -571,7 +577,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-annuel">
               <div class="new-month-section-head">
                 <h3 class="new-month-section-title">Charges annuelles</h3>
-                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelYearlyChargesIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="annuel-charges" title="${this._rappelYearlyChargesIncluded ? 'Exclure du solde' : 'Inclure'}">${this._rappelYearlyChargesIncluded ? 'Inclus' : 'Exclus'}</button>
+                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelYearlyChargesIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="annuel-charges" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyChargesIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyChargesIncluded })}</button>
             </div>
               <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalYearlyCharges))}</p>
               <ul class="new-month-list">${this._yearlyOutflows.map((r) => rappelLineItemRow('yearly-o', r)).join('') || '<li class="new-month-list-empty">Aucune charge annuelle trouvée pour ce mois</li>'}</ul>
@@ -579,7 +585,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-annuel">
               <div class="new-month-section-head">
                 <h3 class="new-month-section-title">Budgets annuels</h3>
-                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelYearlyBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="annuel-budgets" title="${this._rappelYearlyBudgetsIncluded ? 'Exclure du solde' : 'Inclure'}">${this._rappelYearlyBudgetsIncluded ? 'Inclus' : 'Exclus'}</button>
+                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelYearlyBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="annuel-budgets" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyBudgetsIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelYearlyBudgetsIncluded })}</button>
               </div>
               <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalYearlyBudgets))}</p>
               <ul class="new-month-list">${this._yearlyBudgets.map((r) => rappelLineItemRow('yearly-b', r)).join('') || '<li class="new-month-list-empty">Aucun budget annuel trouvé pour ce mois</li>'}</ul>
@@ -595,7 +601,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-charges">
               <div class="new-month-section-head">
                 <h3 class="new-month-section-title">Charges des mois précédents</h3>
-                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelChargesIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="charges" title="${this._rappelChargesIncluded ? 'Exclure du solde' : 'Inclure'}">${this._rappelChargesIncluded ? 'Inclus' : 'Exclus'}</button>
+                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelChargesIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="charges" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelChargesIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelChargesIncluded })}</button>
               </div>
               <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalChargesPending))}</p>
               <ul class="new-month-list new-month-list--rappel">${rappelChargesList || '<li class="new-month-list-empty">Aucune charge reportée des mois précédents</li>'}</ul>
@@ -603,7 +609,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
             <section class="new-month-section new-month-section--rappel new-month-section--rappel-budgets">
               <div class="new-month-section-head">
                 <h3 class="new-month-section-title">Budgets des mois précédents</h3>
-                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="budgets" title="${this._rappelBudgetsIncluded ? 'Exclure du solde' : 'Inclure'}">${this._rappelBudgetsIncluded ? 'Inclus' : 'Exclus'}</button>
+                <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="budgets" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}</button>
               </div>
               <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalBudgetsPending))}</p>
               <ul class="new-month-list new-month-list--rappel">${rappelBudgetsList || '<li class="new-month-list-empty">Aucun budget reporté des mois précédents</li>'}</ul>

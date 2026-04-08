@@ -13,6 +13,12 @@ interface NewMonthChargeEntry extends SearchDrawerEntry {
   element: HTMLElement;
 }
 
+function getProjectedBalanceToggleLabel({ included }: { included: boolean }): string {
+  return included
+    ? 'Exclure du calcul du solde prévisionnel'
+    : 'Inclure dans le calcul du solde prévisionnel';
+}
+
 function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
   return el.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
 }
@@ -73,8 +79,8 @@ export class BuddjNewMonthChargeSearchDrawer extends HTMLElement {
     const includeToggle = document.createElement('button');
     includeToggle.type = 'button';
     includeToggle.className = `btn new-month-btn-include-toggle new-month-btn-rappel-toggle ${isIncluded ? 'new-month-btn-rappel-toggle--on' : ''}`;
-    includeToggle.textContent = isIncluded ? 'Inclus' : 'Exclus';
-    includeToggle.title = isIncluded ? 'Exclure du solde prévisionnel' : 'Inclure dans le solde prévisionnel';
+    includeToggle.textContent = getProjectedBalanceToggleLabel({ included: isIncluded });
+    includeToggle.title = getProjectedBalanceToggleLabel({ included: isIncluded });
     includeToggle.addEventListener('click', (e) => {
       e.preventDefault();
       const realBtn = realRow.querySelector<HTMLButtonElement>('.new-month-btn-include-toggle');
@@ -82,8 +88,8 @@ export class BuddjNewMonthChargeSearchDrawer extends HTMLElement {
       const wasIncluded = includeToggle.classList.contains('new-month-btn-rappel-toggle--on');
       const nowIncluded = !wasIncluded;
       includeToggle.classList.toggle('new-month-btn-rappel-toggle--on', nowIncluded);
-      includeToggle.textContent = nowIncluded ? 'Inclus' : 'Exclus';
-      includeToggle.title = nowIncluded ? 'Exclure du solde prévisionnel' : 'Inclure dans le solde prévisionnel';
+      includeToggle.textContent = getProjectedBalanceToggleLabel({ included: nowIncluded });
+      includeToggle.title = getProjectedBalanceToggleLabel({ included: nowIncluded });
       lineItem.classList.toggle('new-month-row--hidden', !nowIncluded);
     });
 
