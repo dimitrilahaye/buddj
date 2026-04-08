@@ -57,6 +57,21 @@ function getStepSection({
   return section;
 }
 
+/** Sous-bloc (h3) dans une étape du formulaire « nouveau mois », ex. charges / budgets reportés. */
+function getNewMonthSubsectionByTitle({
+  stepSection,
+  title,
+}: {
+  stepSection: HTMLElement;
+  title: string;
+}): HTMLElement {
+  const h3 = within(stepSection).getByRole('heading', { name: title, level: 3, hidden: true });
+  const subsection = h3.closest('section');
+  expect(subsection).not.toBeNull();
+  if (!subsection) throw new Error(`Sous-section introuvable pour « ${title} »`);
+  return subsection as HTMLElement;
+}
+
 describe('écran création de mois', () => {
   beforeEach(() => {
     window.history.replaceState(null, '', '/new-month');
@@ -589,11 +604,13 @@ describe('écran création de mois', () => {
       expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 70 - 50, 5);
     });
 
-    const pendingSections = getStepSection({
+    const step4 = getStepSection({
       heading: '4. Charges et budgets des mois précédents',
-    }).querySelectorAll('.new-month-section--rappel');
-    const pendingChargesSection = pendingSections[0] as HTMLElement;
-    expect(pendingChargesSection).toBeTruthy();
+    });
+    const pendingChargesSection = getNewMonthSubsectionByTitle({
+      stepSection: step4,
+      title: 'Charges des mois précédents',
+    });
     const pendingChargesDeleteAllBtn = within(pendingChargesSection).getByRole('button', {
       name: 'Supprimer toutes les charges des mois précédents',
       hidden: true,
@@ -605,17 +622,76 @@ describe('écran création de mois', () => {
       expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 50, 5);
     });
 
-    const pendingBudgetsSection = pendingSections[1] as HTMLElement;
-    expect(pendingBudgetsSection).toBeTruthy();
+    const pendingBudgetsSection = getNewMonthSubsectionByTitle({
+      stepSection: step4,
+      title: 'Budgets des mois précédents',
+    });
     const pendingBudgetsDeleteAllBtn = within(pendingBudgetsSection).getByRole('button', {
+      name: 'Aucun budget supprimable : chaque budget a encore des dépenses en attente',
+      hidden: true,
+    }) as HTMLButtonElement;
+    expect(pendingBudgetsDeleteAllBtn.disabled).toBe(true);
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 50, 5);
+    });
+  });
+
+  it('Supprimer tout sur les budgets reportés ne retire que ceux sans dépenses en attente', async () => {
+    shellDocument();
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 2000 })],
+        defaultForNewMonth: {
+          template: seedTemplate({ startingBalance: 2000 }),
+          pendingDebits: {
+            outflows: [],
+            budgets: [
+              {
+                id: 'pb1',
+                name: 'Avec attente',
+                initialBalance: 100,
+                currentBalance: 30,
+                pendingFrom: '2026-05-01T00:00:00.000Z',
+                expenses: [{ amount: 20, label: 'X', date: '2026-05-15T00:00:00.000Z' }],
+              },
+              {
+                id: 'pb2',
+                name: 'Sans attente',
+                initialBalance: 40,
+                currentBalance: 40,
+                pendingFrom: '2026-05-01T00:00:00.000Z',
+                expenses: [],
+              },
+            ],
+          },
+        },
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: createEmptyYearlyOutflowsView(),
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => readProjectedEuros());
+    const step4 = getStepSection({ heading: '4. Charges et budgets des mois précédents' });
+    const pendingBudgetsSection = getNewMonthSubsectionByTitle({
+      stepSection: step4,
+      title: 'Budgets des mois précédents',
+    });
+    const deleteAllBtn = within(pendingBudgetsSection).getByRole('button', {
       name: 'Supprimer tous les budgets des mois précédents',
       hidden: true,
     }) as HTMLButtonElement;
-    fireEvent.click(pendingBudgetsDeleteAllBtn);
+    expect(deleteAllBtn.disabled).toBe(false);
+    fireEvent.click(deleteAllBtn);
     await waitFor(() => screen.getByRole('button', { name: 'Confirmer' }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirmer' }));
     await waitFor(() => {
-      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200, 5);
+      expect(screen.getByText('Avec attente')).toBeTruthy();
+      expect(screen.queryByText('Sans attente')).toBeNull();
     });
   });
 

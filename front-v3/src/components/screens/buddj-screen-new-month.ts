@@ -140,6 +140,11 @@ export class BuddjScreenNewMonth extends HTMLElement {
     if (section === 'charges') return 'Supprimer toutes les charges des mois précédents';
     return 'Supprimer tous les budgets des mois précédents';
   }
+
+  /** Budgets reportés qu’on peut retirer de la création du mois (sans dépenses encore en attente sur le budget source). */
+  private getDeletablePendingBudgets(): PendingBudgetRow[] {
+    return this._pendingBudgets.filter((b) => b.expenses.length === 0);
+  }
   private _pendingScrollStep: number | null = null;
   private _noDefaultTemplate = false;
   private _loadError: string | null = null;
@@ -507,12 +512,19 @@ export class BuddjScreenNewMonth extends HTMLElement {
         const labelBlock = pendingHtml
           ? `<div class="new-month-row-label-wrap"><span class="new-month-row-label">${escapeHtml(r.label)}</span>${pendingHtml}</div>`
           : `<span class="new-month-row-label">${escapeHtml(r.label)}</span>`;
+        const hasPendingExpenses = r.expenses.length > 0;
+        const deleteTitle = hasPendingExpenses
+          ? 'Impossible de supprimer : ce budget a encore des dépenses en attente'
+          : 'Supprimer';
+        const deleteIcon = hasPendingExpenses
+          ? `<buddj-icon-delete disabled title="${escapeAttr(deleteTitle)}" aria-label="${escapeAttr(deleteTitle)}"></buddj-icon-delete>`
+          : `<buddj-icon-delete title="Supprimer" aria-label="Supprimer"></buddj-icon-delete>`;
         return `<li class="new-month-list__row new-month-row new-month-row--rappel" data-pending-budget-id="${escapeAttr(r.id)}">
         <span class="new-month-row-icon" aria-hidden="true">${escapeHtml(r.icon)}</span>
         ${labelBlock}
         <span class="new-month-row-amount">${escapeHtml(formatAmount(r.currentBalance))}</span>
         <div class="new-month-line-actions">
-          <buddj-icon-delete title="Supprimer" aria-label="Supprimer"></buddj-icon-delete>
+          ${deleteIcon}
         </div>
       </li>`;
       })
@@ -523,6 +535,13 @@ export class BuddjScreenNewMonth extends HTMLElement {
       const exp = r.expenses.reduce((a, e) => a + e.amount, 0);
       return s + r.currentBalance + exp;
     }, 0);
+    const deletablePendingBudgets = this.getDeletablePendingBudgets();
+    const pendingBudgetsDeleteAllDisabled =
+      this._pendingBudgets.length === 0 || deletablePendingBudgets.length === 0;
+    const pendingBudgetsDeleteAllTitle =
+      pendingBudgetsDeleteAllDisabled && this._pendingBudgets.some((b) => b.expenses.length > 0)
+        ? 'Aucun budget supprimable : chaque budget a encore des dépenses en attente'
+        : this.getDeleteAllRappelLabel({ section: 'budgets' });
 
     const ctaDisabled = this._submitting ? ' disabled' : '';
 
@@ -634,7 +653,7 @@ export class BuddjScreenNewMonth extends HTMLElement {
               <div class="new-month-rappel-controls">
                 <p class="new-month-rappel-total">Total : ${escapeHtml(formatAmount(totalBudgetsPending))}</p>
                 <button type="button" class="btn new-month-btn-rappel-toggle ${this._rappelBudgetsIncluded ? 'new-month-btn-rappel-toggle--on' : ''}" data-rappel-section="budgets" title="${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}">${this.getProjectedBalanceToggleLabel({ included: this._rappelBudgetsIncluded })}</button>
-                <button type="button" class="btn new-month-btn-rappel-delete-all" data-rappel-delete-all="budgets" title="${this.getDeleteAllRappelLabel({ section: 'budgets' })}" aria-label="${this.getDeleteAllRappelLabel({ section: 'budgets' })}" ${this._pendingBudgets.length === 0 ? 'disabled' : ''}>Supprimer tout</button>
+                <button type="button" class="btn new-month-btn-rappel-delete-all" data-rappel-delete-all="budgets" title="${escapeAttr(pendingBudgetsDeleteAllTitle)}" aria-label="${escapeAttr(pendingBudgetsDeleteAllTitle)}" ${pendingBudgetsDeleteAllDisabled ? 'disabled' : ''}>Supprimer tout</button>
               </div>
               <ul class="new-month-list new-month-list--rappel">${rappelBudgetsList || '<li class="new-month-list-empty">Aucun budget reporté des mois précédents</li>'}</ul>
             </section>
@@ -1084,6 +1103,14 @@ export class BuddjScreenNewMonth extends HTMLElement {
   private deletePendingBudget(id: string): void {
     const b = this._pendingBudgets.find((x) => x.id === id);
     if (!b) return;
+    if (b.expenses.length > 0) {
+      getToast()?.show({
+        message: 'Impossible de supprimer ce budget : il contient encore des dépenses en attente.',
+        variant: 'error',
+        durationMs: 3000,
+      });
+      return;
+    }
     const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
     modal?.show({
       title: `Voulez-vous vraiment supprimer le budget « ${b.label} » ?`,
@@ -1113,36 +1140,58 @@ export class BuddjScreenNewMonth extends HTMLElement {
     const isYearlyCharges = section === 'annuel-charges';
     const isYearlyBudgets = section === 'annuel-budgets';
     const isPendingCharges = section === 'charges';
+    const isPendingBudgets = section === 'budgets';
+    const deletablePendingBudgets = isPendingBudgets ? this.getDeletablePendingBudgets() : [];
     const count = isYearlyCharges
       ? this._yearlyOutflows.length
       : isYearlyBudgets
         ? this._yearlyBudgets.length
         : isPendingCharges
           ? this._pendingCharges.length
-          : this._pendingBudgets.length;
-    if (count === 0) return;
+          : deletablePendingBudgets.length;
+    if (count === 0) {
+      if (isPendingBudgets && this._pendingBudgets.length > 0) {
+        getToast()?.show({
+          message:
+            'Aucun budget ne peut être supprimé : chaque budget a encore des dépenses en attente.',
+          variant: 'error',
+          durationMs: 3000,
+        });
+      }
+      return;
+    }
     const title = isYearlyCharges
       ? `Voulez-vous vraiment supprimer les ${count} charges annuelles de ce mois ?`
       : isYearlyBudgets
         ? `Voulez-vous vraiment supprimer les ${count} budgets annuels de ce mois ?`
         : isPendingCharges
           ? `Voulez-vous vraiment supprimer les ${count} charges des mois précédents ?`
-          : `Voulez-vous vraiment supprimer les ${count} budgets des mois précédents ?`;
+          : `Voulez-vous vraiment supprimer les ${count} budget(s) des mois précédents sans dépenses en attente ?`;
     modal?.show({
       title,
       onConfirm: () => {
-        if (isYearlyCharges) this._yearlyOutflows = [];
-        else if (isYearlyBudgets) this._yearlyBudgets = [];
-        else if (isPendingCharges) this._pendingCharges = [];
-        else this._pendingBudgets = [];
-        const message = isYearlyCharges
-          ? 'Toutes les charges annuelles ont été retirées pour ce mois'
-          : isYearlyBudgets
-            ? 'Tous les budgets annuels ont été retirés pour ce mois'
-            : isPendingCharges
-              ? 'Toutes les charges des mois précédents ont été supprimées'
-              : 'Tous les budgets des mois précédents ont été supprimés';
-        getToast()?.show({ message });
+        if (isYearlyCharges) {
+          this._yearlyOutflows = [];
+          getToast()?.show({ message: 'Toutes les charges annuelles ont été retirées pour ce mois' });
+        } else if (isYearlyBudgets) {
+          this._yearlyBudgets = [];
+          getToast()?.show({ message: 'Tous les budgets annuels ont été retirés pour ce mois' });
+        } else if (isPendingCharges) {
+          this._pendingCharges = [];
+          getToast()?.show({ message: 'Toutes les charges des mois précédents ont été supprimées' });
+        } else if (isPendingBudgets) {
+          const kept = this._pendingBudgets.filter((b) => b.expenses.length > 0);
+          const removed = this._pendingBudgets.length - kept.length;
+          const blocked = kept.length;
+          this._pendingBudgets = kept;
+          if (blocked > 0 && removed > 0) {
+            getToast()?.show({
+              message: `${removed} budget(s) sans dépenses en attente supprimé(s). ${blocked} budget(s) avec dépenses en attente conservé(s).`, durationMs: 3000
+            });
+          } else {
+            getToast()?.show({ message: 'Tous les budgets des mois précédents ont été supprimés' });
+          }
+        }
         this.render();
         this.attachListeners();
         this._updateProjectedOnly();

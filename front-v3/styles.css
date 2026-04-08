@@ -770,6 +770,20 @@ buddj-screen-new-month .new-month-row-amount {
   box-shadow: 0 2px 8px var(--coral-glow);
 }
 
+.btn--delete.btn--delete--disabled,
+.btn--delete:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.btn--delete.btn--delete--disabled:hover,
+.btn--delete:disabled:hover {
+  background: transparent;
+  border-color: rgba(224, 122, 95, 0.4);
+}
+
 .btn--icon {
   padding: 0.2rem 0.45rem;
   font-size: 1rem;
