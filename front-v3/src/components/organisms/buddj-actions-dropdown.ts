@@ -104,7 +104,7 @@ export class BuddjActionsDropdown extends HTMLElement {
       <div class="dropdown-trigger">
         <slot name="trigger"></slot>
       </div>
-      <div class="dropdown-panel" role="menu" aria-hidden="true" aria-label="Actions">
+      <div class="dropdown-panel" part="panel" role="menu" aria-hidden="true" aria-label="Actions">
         <slot name="items"></slot>
       </div>
     `;

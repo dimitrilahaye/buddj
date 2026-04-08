@@ -117,7 +117,7 @@ export function createRoutes({
       pattern: '/savings',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-savings') as BuddjScreenSavings;
-        el.init({ savingsStore });
+        el.init({ savingsStore, monthStore });
         ctx.outlet.replaceChildren(el);
       }),
     },
@@ -126,7 +126,7 @@ export function createRoutes({
       pattern: '/reimbursements',
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-reimbursements') as BuddjScreenReimbursements;
-        el.init({ reimbursementsStore });
+        el.init({ reimbursementsStore, monthStore });
         ctx.outlet.replaceChildren(el);
       }),
     },

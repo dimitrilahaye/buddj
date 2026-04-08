@@ -1348,6 +1348,7 @@ buddj-confirm-modal.confirm-modal--open {
   color: var(--navy);
   margin: 0 0 1.25rem 0;
   line-height: 1.4;
+  white-space: pre-line;
 }
 
 .confirm-modal-actions {
@@ -1555,7 +1556,7 @@ buddj-calculator-drawer.calculator-drawer--open {
   display: block;
   position: fixed;
   inset: 0;
-  z-index: 103;
+  z-index: 122;
   pointer-events: none;
 }
 
@@ -4389,7 +4390,37 @@ buddj-screen-reimbursements .goal-section {
   display: flex;
   justify-content: flex-end;
   flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
   padding: 0.7rem 0 0.1rem;
+}
+
+.goal-injection-dropdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: rgba(129, 178, 154, 0.08);
+  border: 1px solid rgba(129, 178, 154, 0.25);
+  margin: 0;
+  border-radius: var(--radius);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.goal-section-header buddj-actions-dropdown[data-goal-injection-menu]::part(panel) {
+  padding: 0.25rem;
+}
+
+.goal-injection-dropdown-title {
+  font-weight: 700;
+  color: var(--mint);
+}
+
+.goal-injection-dropdown-text {
+  font-size: 0.8rem;
+  line-height: 1.25;
+  color: var(--navy-soft);
+  white-space: normal;
 }
 
 /* Carte objectif (économie / remboursement) : même rendu que budget-card, sans toggle ni liste */
@@ -4460,7 +4491,8 @@ buddj-screen-reimbursements .goal-section {
 .summary-date-wrap .btn-menu-dots,
 .goal-card .goal-card-actions .btn-menu-dots,
 .budget-card-actions .btn-menu-dots,
-buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots {
+buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots,
+.goal-section-header buddj-actions-dropdown .btn-menu-dots {
   width: 2rem;
   height: 2rem;
   padding: 0;
@@ -4479,7 +4511,8 @@ buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-
 .summary-date-wrap .btn-menu-dots:hover,
 .goal-card .goal-card-actions .btn-menu-dots:hover,
 .budget-card-actions .btn-menu-dots:hover,
-buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots:hover {
+buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots:hover,
+.goal-section-header buddj-actions-dropdown .btn-menu-dots:hover {
   background: rgba(255, 255, 255, 0.06);
   color: var(--navy);
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
@@ -4636,10 +4669,48 @@ buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-
   color: var(--navy-soft);
 }
 
+buddj-injection-reminder {
+  display: block;
+  margin: 0.35rem 0 0.7rem;
+}
+
+.injection-reminder-card {
+  position: relative;
+  padding: 0.85rem 1rem;
+  background: rgba(129, 178, 154, 0.08);
+  border: 1px solid rgba(129, 178, 154, 0.25);
+  border-radius: var(--radius);
+}
+
+.injection-reminder-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  border: none;
+  background: transparent;
+  color: var(--navy-soft);
+  cursor: pointer;
+}
+
+.injection-reminder-title {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mint);
+}
+
+.injection-reminder-text {
+  margin: 0.35rem 0 0;
+  color: var(--navy);
+  font-size: 0.9rem;
+}
+
 /* Goal amount drawer (ajout somme / somme restante) + edit + add */
 buddj-goal-amount-drawer,
 buddj-goal-edit-drawer,
-buddj-goal-add-drawer {
+buddj-goal-add-drawer,
+buddj-goal-injection-drawer {
   display: none;
   position: fixed;
   inset: 0;
@@ -4649,8 +4720,13 @@ buddj-goal-add-drawer {
 
 buddj-goal-amount-drawer.goal-amount-drawer--open,
 buddj-goal-edit-drawer.goal-edit-drawer--open,
-buddj-goal-add-drawer.goal-add-drawer--open {
+buddj-goal-add-drawer.goal-add-drawer--open,
+buddj-goal-injection-drawer.goal-injection-drawer--open {
   display: block;
+}
+
+buddj-goal-amount-drawer.goal-amount-drawer--open {
+  z-index: 121;
 }
 
 buddj-goal-amount-drawer.goal-amount-drawer--open .goal-amount-drawer-backdrop,
@@ -4658,13 +4734,16 @@ buddj-goal-amount-drawer.goal-amount-drawer--open .goal-amount-drawer-panel,
 buddj-goal-edit-drawer.goal-edit-drawer--open .goal-edit-drawer-backdrop,
 buddj-goal-edit-drawer.goal-edit-drawer--open .goal-edit-drawer-panel,
 buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-backdrop,
-buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-panel {
+buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-panel,
+buddj-goal-injection-drawer.goal-injection-drawer--open .goal-injection-drawer-backdrop,
+buddj-goal-injection-drawer.goal-injection-drawer--open .goal-injection-drawer-panel {
   pointer-events: auto;
 }
 
 .goal-amount-drawer-backdrop,
 .goal-edit-drawer-backdrop,
-.goal-add-drawer-backdrop {
+.goal-add-drawer-backdrop,
+.goal-injection-drawer-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
@@ -4673,7 +4752,8 @@ buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-panel {
 
 .goal-amount-drawer-panel,
 .goal-edit-drawer-panel,
-.goal-add-drawer-panel {
+.goal-add-drawer-panel,
+.goal-injection-drawer-panel {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -4686,7 +4766,8 @@ buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-panel {
 
 .goal-amount-drawer-title,
 .goal-edit-drawer-title,
-.goal-add-drawer-title {
+.goal-add-drawer-title,
+.goal-injection-drawer-title {
   font-family: var(--font-head);
   font-weight: 600;
   font-size: 1.1rem;
@@ -4696,7 +4777,8 @@ buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-panel {
 
 .goal-amount-drawer-body,
 .goal-edit-drawer-body,
-.goal-add-drawer-body {
+.goal-add-drawer-body,
+.goal-injection-drawer-body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -4709,6 +4791,71 @@ buddj-goal-add-drawer.goal-add-drawer--open .goal-add-drawer-panel {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.goal-injection-drawer-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.goal-injection-drawer-close {
+  border: none;
+  background: transparent;
+  color: var(--navy-soft);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.goal-injection-drawer-amount {
+  border: none;
+  background: transparent;
+  color: var(--mint);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.goal-injection-drawer-balance-hint {
+  color: var(--navy-soft);
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.goal-injection-project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.goal-injection-project {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius);
+  color: var(--navy);
+  cursor: pointer;
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  display: grid;
+  grid-template-columns: 1.5rem 1fr auto;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.goal-injection-project-name {
+  font-weight: 600;
+}
+
+.goal-injection-project-amount {
+  justify-self: end;
+}
+
+.goal-injection-empty {
+  margin: 0;
+  color: var(--navy-soft);
 }
 
 .goal-add-drawer-label-row {
