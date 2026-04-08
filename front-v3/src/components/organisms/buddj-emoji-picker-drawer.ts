@@ -16,7 +16,7 @@ const EMOJI_PICKER_SECTIONS: { title: string; emojis: string[] }[] = [
   { title: 'Logement', emojis: ['🏠', '🏡', '🏢', '🏬', '🔑', '🛏️'] },
   { title: 'Transport', emojis: ['🚗', '🚕', '🚎', '🚌', '🚅', '🚄', '✈️', '🚲', '🛵', '⛽', '🅿️'] },
   { title: 'Énergie & utilitaires', emojis: ['⚡', '💧', '🔥', '📱', '💻', '🌐', '🌍'] },
-  { title: 'Alimentation', emojis: ['🍎', '🍽️', '☕', '🍔', '🍕', '🥖', '🥗', '🍻', '🍫'] },
+  { title: 'Alimentation', emojis: ['🍎', '🍽️', '☕', '🍔', '🍕', '🥐', '🥖', '🥗', '🍻', '🍫'] },
   { title: 'Shopping & loisirs', emojis: ['🛒', '🛍️', '🎬', '🍿', '🥤', '🎫', '🎟️', '🎮', '📺', '🎵', '📷', '🎁', '🎯', '🎪'] },
   { title: 'Santé', emojis: ['🏥', '💊', '🩺', '🦷', '🧴'] },
   { title: 'Éducation', emojis: ['📚', '✏️', '📖', '🎓', '📝'] },
