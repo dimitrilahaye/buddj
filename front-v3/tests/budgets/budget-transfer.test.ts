@@ -77,9 +77,9 @@ describe('transfert budget -> budget/account', () => {
     fireEvent.click(screen.getByRole('heading', { name: 'Semaine 123', level: 2 }));
     fireEvent.click(within(sourceCard).getByRole('button', { name: 'Options du budget' }));
     await waitFor(() => {
-      expect(within(sourceCard).getByRole('button', { name: 'Transférer' })).toBeTruthy();
+      expect(within(sourceCard).getByRole('button', { name: /Transférer un montant/i })).toBeTruthy();
     });
-    fireEvent.click(within(sourceCard).getByRole('button', { name: 'Transférer' }));
+    fireEvent.click(within(sourceCard).getByRole('button', { name: /Transférer un montant/i }));
 
     let transferDrawer: HTMLElement;
     await waitFor(() => {

@@ -47,7 +47,10 @@ export class BuddjBudgetCard extends HTMLElement {
               <buddj-actions-dropdown position="right" class="budget-card-menu-wrap">
                 <button type="button" class="btn btn-menu-dots" slot="trigger" title="Options du budget" aria-label="Options du budget">⋮</button>
                 <button type="button" slot="items" data-action="edit">Modifier</button>
-                <button type="button" slot="items" data-action="transfer">Transférer</button>
+                <button type="button" slot="items" data-action="transfer" class="goal-injection-dropdown-item">
+                  <span class="goal-injection-dropdown-title">Transférer un montant</span>
+                  <span class="goal-injection-dropdown-text">Vous souhaitez ré-équilibrer vos comptes ? Alors transférez tout ou partie du reste de ce budget vers un autre de vos budgets ou vers votre solde prévisionnel.</span>
+                </button>
                 <hr slot="items" class="dropdown-menu-separator" aria-hidden="true" />
                 <button type="button" slot="items" data-action="delete" data-variant="danger">Supprimer</button>
               </buddj-actions-dropdown>

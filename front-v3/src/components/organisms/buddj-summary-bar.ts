@@ -218,7 +218,16 @@ export class BuddjSummaryBar extends HTMLElement {
             <buddj-actions-dropdown position="center" class="summary-month-actions-dropdown">
               <button type="button" class="btn btn-menu-dots" slot="trigger" title="Options du mois" aria-label="Options du mois" aria-haspopup="true">⋮</button>
               <button type="button" slot="items" data-action="summary-search" title="Rechercher dans les charges ou les budgets" aria-label="Rechercher dans les charges ou les budgets" hidden>Rechercher</button>
-              <button type="button" slot="items" data-action="summary-transfer" title="Transférer une partie ou tout le reste vers un budget">Transférer</button>
+              <button
+                type="button"
+                slot="items"
+                data-action="summary-transfer"
+                title="Transférer une partie ou tout le reste vers un budget"
+                class="goal-injection-dropdown-item"
+              >
+                <span class="goal-injection-dropdown-title">Transférer un montant</span>
+                <span class="goal-injection-dropdown-text">Vous souhaitez ré-équilibrer vos comptes ? Alors transférez tout ou partie de votre solde prévisionnel vers un de vos budgets.</span>
+              </button>
               <hr slot="items" class="dropdown-menu-separator" aria-hidden="true" />
               <button type="button" slot="items" data-action="archive-month" data-variant="danger">Archiver</button>
             </buddj-actions-dropdown>

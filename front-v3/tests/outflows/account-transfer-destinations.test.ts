@@ -81,9 +81,9 @@ describe('transfert depuis solde sur page Charges', () => {
     const recap = screen.getByRole('complementary', { name: 'Résumé du mois' });
     fireEvent.click(within(recap).getByRole('button', { name: 'Options du mois' }));
     await waitFor(() => {
-      expect(within(recap).getByRole('button', { name: 'Transférer' })).toBeTruthy();
+      expect(within(recap).getByRole('button', { name: /Transférer un montant/i })).toBeTruthy();
     });
-    fireEvent.click(within(recap).getByRole('button', { name: 'Transférer' }));
+    fireEvent.click(within(recap).getByRole('button', { name: /Transférer un montant/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Transférer' })).toBeTruthy();
@@ -152,9 +152,9 @@ describe('transfert depuis solde sur page Charges', () => {
     const recap = screen.getByRole('complementary', { name: 'Résumé du mois' });
     fireEvent.click(within(recap).getByRole('button', { name: 'Options du mois' }));
     await waitFor(() => {
-      expect(within(recap).getByRole('button', { name: 'Transférer' })).toBeTruthy();
+      expect(within(recap).getByRole('button', { name: /Transférer un montant/i })).toBeTruthy();
     });
-    fireEvent.click(within(recap).getByRole('button', { name: 'Transférer' }));
+    fireEvent.click(within(recap).getByRole('button', { name: /Transférer un montant/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Transférer' })).toBeTruthy();

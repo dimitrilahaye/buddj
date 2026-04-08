@@ -4497,6 +4497,11 @@ buddj-screen-reimbursements .goal-section {
   padding: 0.25rem;
 }
 
+.summary-month-actions-dropdown::part(panel),
+.budget-card-menu-wrap::part(panel) {
+  padding: 0.25rem;
+}
+
 .goal-injection-dropdown-title {
   font-weight: 700;
   color: var(--mint);
