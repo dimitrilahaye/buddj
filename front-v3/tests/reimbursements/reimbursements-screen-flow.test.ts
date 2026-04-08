@@ -86,6 +86,7 @@ describe('écran remboursements', () => {
     document.body.innerHTML = `
       <buddj-toast></buddj-toast>
       <buddj-confirm-modal id="delete-confirm-modal"></buddj-confirm-modal>
+      <buddj-calculator-drawer id="calculator-drawer"></buddj-calculator-drawer>
       <buddj-goal-add-drawer id="goal-add-drawer"></buddj-goal-add-drawer>
       <buddj-goal-edit-drawer id="goal-edit-drawer"></buddj-goal-edit-drawer>
       <buddj-goal-amount-drawer id="goal-amount-drawer"></buddj-goal-amount-drawer>
@@ -230,6 +231,24 @@ describe('écran remboursements', () => {
 
     const injectBtn = (await screen.findByRole('button', { name: /Injecter un montant/i })) as HTMLButtonElement;
     expect(injectBtn.disabled).toBe(true);
+    expect(screen.queryByLabelText('Transfert disponible')).toBeNull();
+  });
+
+  it('affiche le badge vert sur le dropdown quand le solde prévisionnel est positif', async () => {
+    const store = createReimbursementsStore({
+      loadProjectsByCategory: async () => [
+        createProjectView({ id: 'r-badge', name: '💸 Projet', target: 80, totalAmount: 10 }),
+      ],
+    });
+    const host = document.getElementById('host')!;
+    const el = document.createElement(BuddjScreenReimbursements.tagName) as InstanceType<typeof BuddjScreenReimbursements>;
+    el.init({ reimbursementsStore: store, monthStore: createMonthStoreMock({ projectedBalance: 42 }) });
+    host.appendChild(el);
+
+    await screen.findByRole('button', { name: /Injecter un montant/i });
+    await waitFor(() => {
+      expect(screen.getByLabelText('Transfert disponible')).toBeTruthy();
+    });
   });
 
   it('injecte le min(sp_clone, montant_temp, remaining) après confirmation', async () => {
@@ -306,5 +325,37 @@ describe('écran remboursements', () => {
     await waitFor(() => {
       expect(screen.getByText(/\(sur 100,00 €\)/i)).toBeTruthy();
     });
+  });
+
+  it('ouvre directement la calculatrice quand on clique le montant du drawer injection', async () => {
+    const store = createReimbursementsStore({
+      loadProjectsByCategory: async () => [
+        createProjectView({ id: 'r-calc', name: '💸 Projet', target: 300, totalAmount: 20 }),
+      ],
+    });
+    const host = document.getElementById('host')!;
+    const el = document.createElement(BuddjScreenReimbursements.tagName) as InstanceType<typeof BuddjScreenReimbursements>;
+    el.init({ reimbursementsStore: store, monthStore: createMonthStoreMock({ projectedBalance: 100 }) });
+    host.appendChild(el);
+
+    await screen.findByRole('button', { name: /Injecter un montant/i });
+    await waitFor(() => {
+      expect(document.querySelector('buddj-goal-card[data-id="r-calc"]')).toBeTruthy();
+    });
+
+    const privateEl = el as unknown as {
+      _isInjectionDrawerOpen: boolean;
+      _injectionRemainingAmount: number;
+      _injectionTemporaryAmount: number;
+      openInjectionDrawer: () => void;
+    };
+    privateEl._isInjectionDrawerOpen = true;
+    privateEl._injectionRemainingAmount = 100;
+    privateEl._injectionTemporaryAmount = 60;
+    privateEl.openInjectionDrawer();
+
+    const amountBtn = screen.getByRole('button', { name: 'Modifier le montant à injecter' }) as HTMLButtonElement;
+    fireEvent.click(amountBtn);
+    expect(screen.getByRole('dialog', { name: 'Injecter un montant' })).toBeTruthy();
   });
 });

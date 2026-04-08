@@ -65,7 +65,7 @@ export class BuddjGoalInjectionDrawer extends HTMLElement {
       <div class="goal-injection-drawer-panel" role="dialog" aria-modal="true" aria-label="${escapeAttr(this._options.title)}">
         <div class="goal-injection-drawer-header">
           <h2 class="goal-injection-drawer-title">
-            Injecter <button type="button" class="goal-injection-drawer-amount" data-goal-injection-amount>${escapeHtml(
+            Injecter <button type="button" class="goal-injection-drawer-amount" data-goal-injection-amount aria-label="Modifier le montant à injecter">${escapeHtml(
               formatEuros(this._options.selectedAmount)
             )}</button>${showBalanceHint ? ` <span class="goal-injection-drawer-balance-hint">(sur ${escapeHtml(formatEuros(this._options.balanceAmount))})</span>` : ''} ${escapeHtml(
               this._options.title

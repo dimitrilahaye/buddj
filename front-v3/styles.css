@@ -4407,6 +4407,17 @@ buddj-screen-reimbursements .goal-section {
   box-sizing: border-box;
 }
 
+.goal-injection-available-badge {
+  position: absolute;
+  top: 0.2rem;
+  right: -0.1rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 8px var(--mint-glow);
+}
+
 .goal-section-header buddj-actions-dropdown[data-goal-injection-menu]::part(panel) {
   padding: 0.25rem;
 }
@@ -4506,6 +4517,7 @@ buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-
   background: transparent;
   color: var(--navy-soft);
   border-radius: var(--radius);
+  position: relative;
 }
 
 .summary-date-wrap .btn-menu-dots:hover,

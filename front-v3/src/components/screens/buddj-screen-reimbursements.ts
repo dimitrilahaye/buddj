@@ -182,6 +182,7 @@ export class BuddjScreenReimbursements extends HTMLElement {
 
     const projectedBalance = this.getProjectedBalance();
     const canInject = projectedBalance > 0 && this.getInjectableProjects({ projects }).length > 0;
+    const showInjectionBadge = projectedBalance > 0;
     const reminderHtml =
       this._reminderTransferredTotal > 0
         ? `<buddj-injection-reminder data-injection-reminder data-total="${this._reminderTransferredTotal}" data-target-label="vos remboursements"></buddj-injection-reminder>`
@@ -205,7 +206,14 @@ export class BuddjScreenReimbursements extends HTMLElement {
         <div class="goal-section-header">
           <buddj-btn-add label="Ajouter un remboursement" title="Ajouter un remboursement" data-goal-add-btn></buddj-btn-add>
           <buddj-actions-dropdown data-goal-injection-menu position="right">
-            <button slot="trigger" type="button" class="btn-menu-dots" title="Actions">⋮</button>
+            <button slot="trigger" type="button" class="btn-menu-dots" title="Actions">
+              ⋮
+              ${
+                showInjectionBadge
+                  ? '<span class="goal-injection-available-badge" aria-label="Transfert disponible" title="Transfert disponible"></span>'
+                  : ''
+              }
+            </button>
             <button
               slot="items"
               type="button"
