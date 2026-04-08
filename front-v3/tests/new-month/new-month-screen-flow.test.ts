@@ -23,13 +23,17 @@ function shellDocument(): void {
   `;
 }
 
-function seedTemplate(): TemplateView {
+function seedTemplate({
+  startingBalance = 2000,
+}: {
+  startingBalance?: number;
+} = {}): TemplateView {
   return {
     id: TEMPLATE_ID,
     name: 'Défaut',
     isDefault: true,
     month: '2026-06-01T00:00:00.000Z',
-    startingBalance: 2000,
+    startingBalance,
     outflows: [{ id: 'o1', label: '🔥 Loyer', amount: 500, isChecked: false, pendingFrom: null }],
     budgets: [{ id: 'wb1', name: '🎯 Courses', initialBalance: 200, pendingFrom: null }],
   };
@@ -39,6 +43,18 @@ function readProjectedEuros(): number {
   const el = document.querySelector('[data-new-month-projected]');
   expect(el).toBeTruthy();
   return parseEurosToNumber(el!.textContent ?? '');
+}
+
+function getStepSection({
+  heading,
+}: {
+  heading: string;
+}): HTMLElement {
+  const title = screen.getByRole('heading', { name: heading, level: 2, hidden: true });
+  const section = title.closest('section') as HTMLElement | null;
+  expect(section).not.toBeNull();
+  if (!section) throw new Error(`Section introuvable pour "${heading}"`);
+  return section;
 }
 
 describe('écran création de mois', () => {
@@ -304,5 +320,279 @@ describe('écran création de mois', () => {
     await waitFor(() => {
       expect(window.location.pathname.startsWith('/budgets/')).toBe(true);
     });
+  });
+
+  it('bloque le passage à l’étape 2 si le solde initial est à 0 € (toast + étape 2 cachée)', async () => {
+    shellDocument();
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 0 })],
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: createEmptyYearlyOutflowsView(),
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => screen.getByRole('button', { name: 'Suivant' }));
+    const step2Title = screen.getByRole('heading', {
+      name: '2. Charges et budgets template',
+      level: 2,
+      hidden: true,
+    });
+    const step2 = step2Title.closest('section') as HTMLElement | null;
+    expect(step2).not.toBeNull();
+    if (!step2) throw new Error('La step 2 est introuvable');
+    expect(step2.hidden).toBe(true);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }));
+
+    await waitFor(() => {
+      const toast = screen.getByRole('status', {
+        name: /solde initial supérieur à 0 €/i,
+      });
+      expect(toast).toBeTruthy();
+    });
+    expect(step2.hidden).toBe(true);
+  });
+
+  it('autorise le passage à l’étape 2 si le solde initial est supérieur à 0 €', async () => {
+    shellDocument();
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 2000 })],
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: createEmptyYearlyOutflowsView(),
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => screen.getByRole('button', { name: 'Suivant' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }));
+
+    await waitFor(() => {
+      const step2Title = screen.getByRole('heading', {
+        name: '2. Charges et budgets template',
+        level: 2,
+        hidden: true,
+      });
+      const step2 = step2Title.closest('section') as HTMLElement | null;
+      expect(step2).not.toBeNull();
+      if (!step2) throw new Error('La step 2 est introuvable');
+      expect(step2.hidden).toBe(false);
+    });
+  });
+
+  it('affiche les placeholders pour annuels et mois précédents quand les données sont vides', async () => {
+    shellDocument();
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 2000 })],
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: createEmptyYearlyOutflowsView(),
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => screen.getByRole('button', { name: 'Suivant' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }));
+    await waitFor(() => {
+      expect(
+        getStepSection({
+          heading: '2. Charges et budgets template',
+        }).hidden
+      ).toBe(false);
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }));
+    await waitFor(() => {
+      expect(
+        getStepSection({
+          heading: '3. Charges et budgets annuels',
+        }).hidden
+      ).toBe(false);
+    });
+
+    expect(screen.getByText(/Aucune charge annuelle trouvée pour ce mois/i)).toBeTruthy();
+    expect(screen.getByText(/Aucun budget annuel trouvé pour ce mois/i)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }));
+    await waitFor(() => {
+      expect(
+        getStepSection({
+          heading: '4. Charges et budgets des mois précédents',
+        }).hidden
+      ).toBe(false);
+    });
+
+    expect(screen.getByText(/Aucune charge reportée des mois précédents/i)).toBeTruthy();
+    expect(screen.getByText(/Aucun budget reporté des mois précédents/i)).toBeTruthy();
+  });
+
+  it('toggle Inclus/Exclus annuel et mois précédents met à jour le prévisionnel', async () => {
+    shellDocument();
+    const yearlyView = createEmptyYearlyOutflowsView();
+    yearlyView.months[5] = {
+      outflows: [{ id: 'y1', month: 6, label: 'Taxe', amount: 100 }],
+      budgets: [{ id: 'yb1', month: 6, name: 'Vacances', initialBalance: 300 }],
+    };
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 2000 })],
+        defaultForNewMonth: {
+          template: seedTemplate({ startingBalance: 2000 }),
+          pendingDebits: {
+            outflows: [{ id: 'po1', label: 'Retard', amount: 70, pendingFrom: '2026-05-01T00:00:00.000Z' }],
+            budgets: [
+              {
+                id: 'pb1',
+                name: '🎯 Santé',
+                initialBalance: 100,
+                currentBalance: 30,
+                pendingFrom: '2026-05-01T00:00:00.000Z',
+                expenses: [{ amount: 20, label: 'Pharmacie', date: '2026-05-15T00:00:00.000Z' }],
+              },
+            ],
+          },
+        },
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: yearlyView,
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 100 - 300 - 70 - 50, 5);
+    });
+
+    const yearlyChargesBtn = document.querySelector(
+      'button[data-rappel-section="annuel-charges"]'
+    ) as HTMLButtonElement;
+    expect(yearlyChargesBtn).toBeTruthy();
+    fireEvent.click(yearlyChargesBtn);
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 300 - 70 - 50, 5);
+    });
+
+    const yearlyBudgetsBtn = document.querySelector(
+      'button[data-rappel-section="annuel-budgets"]'
+    ) as HTMLButtonElement;
+    expect(yearlyBudgetsBtn).toBeTruthy();
+    fireEvent.click(yearlyBudgetsBtn);
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 70 - 50, 5);
+    });
+
+    const pendingChargesBtn = document.querySelector(
+      'button[data-rappel-section="charges"]'
+    ) as HTMLButtonElement;
+    expect(pendingChargesBtn).toBeTruthy();
+    fireEvent.click(pendingChargesBtn);
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200 - 50, 5);
+    });
+
+    const pendingBudgetsBtn = document.querySelector(
+      'button[data-rappel-section="budgets"]'
+    ) as HTMLButtonElement;
+    expect(pendingBudgetsBtn).toBeTruthy();
+    fireEvent.click(pendingBudgetsBtn);
+    await waitFor(() => {
+      expect(readProjectedEuros()).toBeCloseTo(2000 - 500 - 200, 5);
+    });
+  });
+
+  it('les boutons du stepper sont disabled/enabled selon les étapes dévoilées et permettent la navigation', async () => {
+    shellDocument();
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 2000 })],
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: createEmptyYearlyOutflowsView(),
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => screen.getByLabelText('Étape 1'));
+    const step1Btn = screen.getByLabelText('Étape 1') as HTMLButtonElement;
+    const step2Btn = screen.getByLabelText('Étape 2') as HTMLButtonElement;
+    const step3Btn = screen.getByLabelText('Étape 3') as HTMLButtonElement;
+    expect(step1Btn.disabled).toBe(false);
+    expect(step2Btn.disabled).toBe(true);
+    expect(step3Btn.disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }));
+    await waitFor(() => {
+      const refreshedStep2 = screen.getByLabelText('Étape 2') as HTMLButtonElement;
+      expect(refreshedStep2.disabled).toBe(false);
+    });
+
+    const refreshedStep1 = screen.getByLabelText('Étape 1');
+    fireEvent.click(refreshedStep1);
+    await waitFor(() => {
+      const step1Section = getStepSection({
+        heading: '1. Mois et solde initial',
+      });
+      expect(step1Section.className).toContain('new-month-step--active');
+    });
+  });
+
+  it('clic sur une pastille d’étape déclenche un scroll vers le h2 ciblé', async () => {
+    shellDocument();
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [], delayMs: 0 }),
+      templateService: createTemplateServiceFromInMemory({
+        templates: [seedTemplate({ startingBalance: 2000 })],
+        delayMs: 0,
+      }),
+      yearlyOutflowsService: createYearlyOutflowsServiceFromInMemory({
+        initial: createEmptyYearlyOutflowsView(),
+        delayMs: 0,
+      }),
+    });
+
+    await waitFor(() => screen.getByRole('button', { name: 'Suivant' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }));
+    await waitFor(() => {
+      expect((screen.getByLabelText('Étape 2') as HTMLButtonElement).disabled).toBe(false);
+    });
+
+    let scrollCalled = false;
+    const originalScrollTo = HTMLElement.prototype.scrollTo;
+    HTMLElement.prototype.scrollTo = () => {
+      scrollCalled = true;
+    };
+    const previousRaf = window.requestAnimationFrame;
+    window.requestAnimationFrame = ((cb: FrameRequestCallback) => {
+      cb(0);
+      return 1;
+    }) as typeof window.requestAnimationFrame;
+
+    fireEvent.click(screen.getByLabelText('Étape 1'));
+
+    await waitFor(() => {
+      expect(scrollCalled).toBe(true);
+    });
+    HTMLElement.prototype.scrollTo = originalScrollTo;
+    window.requestAnimationFrame = previousRaf;
   });
 });

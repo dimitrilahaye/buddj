@@ -5170,16 +5170,115 @@ buddj-screen-savings  .new-month-body,
 buddj-screen-reimbursements .new-month-body {
   flex: 1;
   overflow-y: auto;
-  padding: 1.25rem;
+  padding: 0 1.25rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+buddj-screen-new-month .new-month-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  margin: -1.25rem -1.25rem 0;
+  padding: 0.5rem 1.25rem 0.55rem;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+buddj-screen-new-month .new-month-stepper-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--navy-soft);
+  border-radius: 999px;
+  width: 2.05rem;
+  height: 2.05rem;
+  padding: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+  justify-self: center;
+  cursor: default;
+  opacity: 0.9;
+}
+
+buddj-screen-new-month .new-month-stepper-btn:disabled {
+  pointer-events: none;
+  opacity: 0.35;
+  color: rgba(166, 192, 230, 0.45);
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(166, 192, 230, 0.2);
+  box-shadow: none;
+  filter: saturate(0.6);
+  cursor: not-allowed;
+}
+
+buddj-screen-new-month .new-month-stepper-btn--active {
+  border-color: rgba(129, 178, 154, 0.6);
+  color: var(--navy);
+  background: rgba(129, 178, 154, 0.18);
+}
+
+buddj-screen-new-month .new-month-step {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+buddj-screen-new-month .new-month-step--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+buddj-screen-new-month .new-month-step-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 0.8rem;
+}
+
+buddj-screen-new-month .new-month-step-nav-btn {
+  min-width: 7.5rem;
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(166, 192, 230, 0.38);
+  box-shadow: 0 4px 12px rgba(8, 12, 22, 0.22);
+}
+
+buddj-screen-new-month .new-month-step-nav-btn:hover {
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(166, 192, 230, 0.5);
+}
+
+buddj-screen-new-month .new-month-step-nav-btn:focus-visible {
+  outline: 2px solid rgba(166, 192, 230, 0.85);
+  outline-offset: 2px;
+}
+
+buddj-screen-new-month .new-month-step-nav-btn--next {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 24px rgba(255, 123, 95, 0.28);
+  transform: translateY(0);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+buddj-screen-new-month .new-month-step-nav-btn--next:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 14px 28px rgba(255, 123, 95, 0.34);
+}
+
+buddj-screen-new-month .new-month-section--rappel + .new-month-section--rappel {
+  margin-top: 0.55rem;
 }
 
 buddj-screen-new-month .new-month-section {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding: 0.5rem 0;
 }
 
 /* Blocs rappels : délimitation et différenciation */
@@ -5251,11 +5350,26 @@ buddj-screen-new-month .new-month-details-body {
 }
 
 buddj-screen-new-month .new-month-section-title {
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   font-family: var(--font-head);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   color: var(--navy);
+}
+
+buddj-screen-new-month .new-month-step > .new-month-section-title {
+  font-size: 1.18rem;
+  padding: 0.15rem 0 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+buddj-screen-new-month h3.new-month-section-title {
+  font-size: 0.98rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  border-bottom: 0;
+  padding: 0;
 }
 
 buddj-screen-new-month .new-month-section-head {
@@ -5409,6 +5523,13 @@ buddj-screen-new-month .new-month-hint {
   margin: 0;
   font-size: 0.85rem;
   color: var(--navy-soft);
+}
+
+buddj-screen-new-month .new-month-list-empty {
+  margin: 0;
+  padding: 0.45rem 0.1rem;
+  color: var(--navy-soft);
+  font-size: 0.86rem;
 }
 
 buddj-screen-new-month .new-month-rappel-total {
