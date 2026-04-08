@@ -1,3 +1,5 @@
+import { splitLeadingEmoji } from '../../shared/emoji-label.js';
+
 export type ProjectCategory = 'saving' | 'refund';
 
 export interface ProjectView {
@@ -12,5 +14,9 @@ export interface ProjectView {
 }
 
 export function sortProjectsByName({ projects }: { projects: ProjectView[] }): ProjectView[] {
-  return [...projects].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  return [...projects].sort((a, b) => {
+    const labelA = splitLeadingEmoji({ label: a.name, defaultIcon: '' }).text || a.name;
+    const labelB = splitLeadingEmoji({ label: b.name, defaultIcon: '' }).text || b.name;
+    return labelA.localeCompare(labelB, undefined, { sensitivity: 'base' });
+  });
 }
