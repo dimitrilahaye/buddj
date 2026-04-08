@@ -6,6 +6,7 @@ import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { attachInputClear } from '../../shared/input-clear.js';
 import { parseEurosToNumber } from '../../shared/goal.js';
 
 const DEFAULT_BUDGET_EMOJI = '💰';
@@ -61,7 +62,10 @@ export class BuddjBudgetAddDrawer extends HTMLElement {
             <span class="budget-add-drawer-label">Libellé</span>
             <div class="budget-add-drawer-label-row">
               <button type="button" class="budget-add-emoji-btn" data-budget-add-emoji aria-label="Choisir un emoji">${escapeHtml(this._emoji)}</button>
-              <input type="text" class="budget-add-drawer-input" data-budget-add-label placeholder="Ex. Vacances" value="${escapeAttr(this._label)}" aria-label="Libellé du budget">
+              <div class="buddj-input-clear-wrap">
+                <input type="text" class="budget-add-drawer-input" data-budget-add-label placeholder="Ex. Vacances" value="${escapeAttr(this._label)}" aria-label="Libellé du budget">
+                <button type="button" class="buddj-input-clear-btn" data-buddj-input-clear aria-label="Effacer le libellé" hidden><span aria-hidden="true">×</span></button>
+              </div>
             </div>
           </div>
           <label class="budget-add-drawer-field">
@@ -90,6 +94,9 @@ export class BuddjBudgetAddDrawer extends HTMLElement {
     };
     labelInput?.addEventListener('focus', clearLabelError);
     labelInput?.addEventListener('input', clearLabelError);
+
+    const labelClearWrap = this.querySelector('[data-budget-add-label]')?.closest('.buddj-input-clear-wrap');
+    if (labelClearWrap instanceof HTMLElement) attachInputClear({ root: labelClearWrap });
 
     const amountBtn = this.querySelector('[data-budget-add-amount]');
     amountBtn?.addEventListener('click', () => this.openCalculator());

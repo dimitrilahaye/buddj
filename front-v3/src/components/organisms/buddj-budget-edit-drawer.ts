@@ -5,6 +5,7 @@
 import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { attachInputClear } from '../../shared/input-clear.js';
 
 const DEFAULT_EMOJI = '💰';
 
@@ -56,7 +57,10 @@ export class BuddjBudgetEditDrawer extends HTMLElement {
             <span class="budget-edit-drawer-label">Libellé</span>
             <div class="budget-edit-drawer-label-row">
               <button type="button" class="budget-edit-emoji-btn" data-budget-edit-emoji aria-label="Choisir un emoji">${escapeHtml(this._emoji)}</button>
-              <input type="text" class="budget-edit-drawer-input" data-budget-edit-label placeholder="Ex. Vacances" value="${escapeAttr(this._label)}" aria-label="Libellé du budget">
+              <div class="buddj-input-clear-wrap">
+                <input type="text" class="budget-edit-drawer-input" data-budget-edit-label placeholder="Ex. Vacances" value="${escapeAttr(this._label)}" aria-label="Libellé du budget">
+                <button type="button" class="buddj-input-clear-btn" data-buddj-input-clear aria-label="Effacer le libellé" hidden><span aria-hidden="true">×</span></button>
+              </div>
             </div>
           </div>
         </div>
@@ -81,6 +85,9 @@ export class BuddjBudgetEditDrawer extends HTMLElement {
     };
     labelInput?.addEventListener('focus', clearLabelError);
     labelInput?.addEventListener('input', clearLabelError);
+
+    const labelClearWrap = this.querySelector('[data-budget-edit-label]')?.closest('.buddj-input-clear-wrap');
+    if (labelClearWrap instanceof HTMLElement) attachInputClear({ root: labelClearWrap });
 
     const cancelBtn = this.querySelector('.budget-edit-drawer-cancel');
     cancelBtn?.addEventListener('click', () => this.close());

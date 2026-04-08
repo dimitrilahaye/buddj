@@ -5,6 +5,7 @@ import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { attachInputClear } from '../../shared/input-clear.js';
 
 const FALLBACK_EMOJI = '💰';
 
@@ -47,7 +48,10 @@ export class BuddjGoalAddDrawer extends HTMLElement {
             <span class="goal-add-drawer-label">Intitulé</span>
             <div class="goal-add-drawer-label-row">
               <button type="button" class="goal-add-emoji-btn" data-goal-add-emoji aria-label="Choisir un emoji">${escapeHtml(this._emoji)}</button>
-              <input type="text" class="goal-add-drawer-input" data-goal-add-label placeholder="Ex. Vacances" value="${escapeAttr(this._label)}" aria-label="Intitulé">
+              <div class="buddj-input-clear-wrap">
+                <input type="text" class="goal-add-drawer-input" data-goal-add-label placeholder="Ex. Vacances" value="${escapeAttr(this._label)}" aria-label="Intitulé">
+                <button type="button" class="buddj-input-clear-btn" data-buddj-input-clear aria-label="${escapeAttr("Effacer l'intitulé")}" hidden><span aria-hidden="true">×</span></button>
+              </div>
             </div>
           </div>
           <label class="goal-add-drawer-field">
@@ -76,6 +80,9 @@ export class BuddjGoalAddDrawer extends HTMLElement {
     };
     labelInput?.addEventListener('focus', clearError);
     labelInput?.addEventListener('input', clearError);
+
+    const labelClearWrap = this.querySelector('[data-goal-add-label]')?.closest('.buddj-input-clear-wrap');
+    if (labelClearWrap instanceof HTMLElement) attachInputClear({ root: labelClearWrap });
   }
 
   private openEmojiPicker(): void {

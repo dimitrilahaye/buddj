@@ -5,6 +5,7 @@ import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { attachInputClear } from '../../shared/input-clear.js';
 import { parseEurosToNumber } from '../../shared/goal.js';
 
 const DEFAULT_EMOJI = '💰';
@@ -60,7 +61,10 @@ export class BuddjAnnualChargeAddDrawer extends HTMLElement {
             <span class="charge-add-drawer-label">Libellé</span>
             <div class="charge-add-drawer-label-row">
               <button type="button" class="charge-add-emoji-btn" data-annual-charge-emoji aria-label="Choisir un emoji">${escapeHtml(this._emoji)}</button>
-              <input type="text" class="charge-add-drawer-input" data-annual-charge-label placeholder="Ex. Assurance habitation" value="${escapeAttr(this._label)}" aria-label="Libellé de la charge">
+              <div class="buddj-input-clear-wrap">
+                <input type="text" class="charge-add-drawer-input" data-annual-charge-label placeholder="Ex. Assurance habitation" value="${escapeAttr(this._label)}" aria-label="Libellé de la charge">
+                <button type="button" class="buddj-input-clear-btn" data-buddj-input-clear aria-label="Effacer le libellé" hidden><span aria-hidden="true">×</span></button>
+              </div>
             </div>
           </div>
           <label class="charge-add-drawer-field">
@@ -87,6 +91,9 @@ export class BuddjAnnualChargeAddDrawer extends HTMLElement {
     };
     labelInput?.addEventListener('focus', clearLabelError);
     labelInput?.addEventListener('input', clearLabelError);
+
+    const labelClearWrap = this.querySelector('[data-annual-charge-label]')?.closest('.buddj-input-clear-wrap');
+    if (labelClearWrap instanceof HTMLElement) attachInputClear({ root: labelClearWrap });
 
     this.querySelector('[data-annual-charge-amount]')?.addEventListener('click', () => this.openCalculator());
 

@@ -2126,6 +2126,60 @@ buddj-search-drawer.search-drawer--open .search-drawer-panel {
   gap: 0.35rem;
 }
 
+/* Champ texte + bouton effacer (remplace le clear natif des type=search, cohérent iOS) */
+.buddj-input-clear-wrap {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: stretch;
+}
+
+.buddj-input-clear-wrap--block {
+  flex: none;
+  width: 100%;
+}
+
+.buddj-input-clear-wrap > input {
+  padding-right: 2.5rem;
+}
+
+.buddj-input-clear-btn {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--navy-soft);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.buddj-input-clear-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--navy);
+}
+
+.buddj-input-clear-btn:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
+
+.buddj-input-clear-btn[hidden] {
+  display: none !important;
+}
+
 .search-drawer-label {
   font-size: 0.75rem;
   font-weight: 600;

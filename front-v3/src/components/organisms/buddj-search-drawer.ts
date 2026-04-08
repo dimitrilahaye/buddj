@@ -5,6 +5,7 @@
  * La logique métier (collecte, création des lignes miroir) est fournie via la config.
  */
 import { escapeAttr } from '../../shared/escape.js';
+import { attachInputClear } from '../../shared/input-clear.js';
 import { entryMatchesSearch } from '../../shared/search.js';
 
 export interface SearchDrawerEntry {
@@ -163,7 +164,10 @@ export class BuddjSearchDrawer extends HTMLElement {
           <div class="search-drawer-results" ${DATA_RESULTS}></div>
           <label class="search-drawer-field">
             <span class="search-drawer-label">${escapeAttr(inputLabel)}</span>
-            <input type="search" class="search-drawer-input" ${DATA_INPUT} placeholder="${escapeAttr(config.placeholder)}" value="${escapeAttr(this._query)}" aria-label="Rechercher par intitulé ou montant" autocomplete="off">
+            <div class="buddj-input-clear-wrap buddj-input-clear-wrap--block">
+              <input type="text" role="searchbox" class="search-drawer-input" ${DATA_INPUT} placeholder="${escapeAttr(config.placeholder)}" value="${escapeAttr(this._query)}" aria-label="Rechercher par intitulé ou montant" autocomplete="off" enterkeyhint="search">
+              <button type="button" class="buddj-input-clear-btn" data-buddj-input-clear aria-label="Effacer la recherche" hidden><span aria-hidden="true">×</span></button>
+            </div>
           </label>
         </div>
       </div>
@@ -179,6 +183,9 @@ export class BuddjSearchDrawer extends HTMLElement {
       this._query = input.value ?? '';
       this.updateResults();
     });
+
+    const clearWrap = this.querySelector('.buddj-input-clear-wrap');
+    if (clearWrap instanceof HTMLElement) attachInputClear({ root: clearWrap });
   }
 }
 

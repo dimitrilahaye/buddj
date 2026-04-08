@@ -6,6 +6,7 @@ import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import type { GoalDrawerOnValidate } from './buddj-goal-add-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { attachInputClear } from '../../shared/input-clear.js';
 
 const FALLBACK_EMOJI = '💰';
 
@@ -51,7 +52,10 @@ export class BuddjGoalEditDrawer extends HTMLElement {
             <span class="goal-edit-drawer-label">Intitulé</span>
             <div class="goal-edit-drawer-label-row">
               <button type="button" class="goal-edit-emoji-btn" data-goal-edit-emoji aria-label="Choisir un emoji">${escapeHtml(this._emoji)}</button>
-              <input type="text" class="goal-edit-drawer-input" data-goal-edit-label value="${escapeAttr(this._label)}" placeholder="Ex. Vacances">
+              <div class="buddj-input-clear-wrap">
+                <input type="text" class="goal-edit-drawer-input" data-goal-edit-label value="${escapeAttr(this._label)}" placeholder="Ex. Vacances" aria-label="Intitulé">
+                <button type="button" class="buddj-input-clear-btn" data-buddj-input-clear aria-label="${escapeAttr("Effacer l'intitulé")}" hidden><span aria-hidden="true">×</span></button>
+              </div>
             </div>
           </div>
           <label class="goal-edit-drawer-field">
@@ -73,6 +77,9 @@ export class BuddjGoalEditDrawer extends HTMLElement {
     this.querySelector('.goal-edit-drawer-validate')?.addEventListener('click', () => this.doValidate());
     this.querySelector('[data-goal-edit-amount]')?.addEventListener('click', () => this.openCalculator());
     this.querySelector('[data-goal-edit-emoji]')?.addEventListener('click', () => this.openEmojiPicker());
+
+    const labelClearWrap = this.querySelector('[data-goal-edit-label]')?.closest('.buddj-input-clear-wrap');
+    if (labelClearWrap instanceof HTMLElement) attachInputClear({ root: labelClearWrap });
   }
 
   private openEmojiPicker(): void {

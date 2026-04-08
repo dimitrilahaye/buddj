@@ -6,6 +6,7 @@ import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.
 import { getToast } from '../atoms/buddj-toast.js';
 import type { BuddjCalculatorDrawerElement } from './buddj-calculator-drawer.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { attachInputClear } from '../../shared/input-clear.js';
 import { parseEurosToNumber } from '../../shared/goal.js';
 
 const DEFAULT_EXPENSE_EMOJI = '🛒';
@@ -50,7 +51,10 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
             <span class="expense-add-drawer-label">Libellé</span>
             <div class="expense-add-drawer-label-row">
               <button type="button" class="expense-add-emoji-btn" data-expense-add-emoji aria-label="Choisir un emoji">${escapeHtml(this._emoji)}</button>
-              <input type="text" class="expense-add-drawer-input" data-expense-add-label placeholder="Ex. Billet train" value="${escapeAttr(this._label)}" aria-label="Libellé de la dépense">
+              <div class="buddj-input-clear-wrap">
+                <input type="text" class="expense-add-drawer-input" data-expense-add-label placeholder="Ex. Billet train" value="${escapeAttr(this._label)}" aria-label="Libellé de la dépense">
+                <button type="button" class="buddj-input-clear-btn" data-buddj-input-clear aria-label="Effacer le libellé" hidden><span aria-hidden="true">×</span></button>
+              </div>
             </div>
           </div>
           <label class="expense-add-drawer-field">
@@ -79,6 +83,9 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
     };
     labelInput?.addEventListener('focus', clearLabelError);
     labelInput?.addEventListener('input', clearLabelError);
+
+    const labelClearWrap = this.querySelector('[data-expense-add-label]')?.closest('.buddj-input-clear-wrap');
+    if (labelClearWrap instanceof HTMLElement) attachInputClear({ root: labelClearWrap });
 
     const amountBtn = this.querySelector('[data-expense-add-amount]');
     amountBtn?.addEventListener('click', () => this.openCalculator());
