@@ -5,7 +5,13 @@
  */
 import type { BuddjConfirmModalElement } from './buddj-confirm-modal.js';
 
+import {
+  PROJECTED_SIMULATION_INCLUDE_ATTR,
+  PROJECTED_SIMULATION_ROW_ID_ATTR,
+} from '../../shared/projected-simulation.js';
+
 const CHECKBOX_ID_PREFIX = 'buddj-charge-cb-';
+const SIMULATION_CHECKBOX_ID_PREFIX = 'buddj-charge-sim-cb-';
 
 export class BuddjChargeItem extends HTMLElement {
   static readonly tagName = 'buddj-charge-item';
@@ -17,9 +23,12 @@ export class BuddjChargeItem extends HTMLElement {
     const amountNum = parseFloat(this.getAttribute('amount') ?? '0') || 0;
     const taken = this.hasAttribute('taken') ? this.getAttribute('taken') !== 'false' : false;
     const previous = this.hasAttribute('previous');
+    const projectedSimulation = this.hasAttribute('projected-simulation');
     const noLabelToggle = this.hasAttribute('no-label-toggle');
     const hideTaken = this.hasAttribute('hide-taken');
-    const cbId = CHECKBOX_ID_PREFIX + Math.random().toString(36).slice(2, 11);
+    const cbId = projectedSimulation
+      ? SIMULATION_CHECKBOX_ID_PREFIX + Math.random().toString(36).slice(2, 11)
+      : CHECKBOX_ID_PREFIX + Math.random().toString(36).slice(2, 11);
 
     this.classList.add('charge-item');
     if (previous) this.classList.add('charge-item--previous');
@@ -28,13 +37,31 @@ export class BuddjChargeItem extends HTMLElement {
     lineItem.setAttribute('icon', icon);
     lineItem.setAttribute('label', label);
     lineItem.setAttribute('amount', String(amountNum));
-    if (!noLabelToggle && !hideTaken) lineItem.setAttribute('checkable-for', cbId);
+    if (projectedSimulation) {
+      lineItem.setAttribute('checkable-for', cbId);
+    } else if (!noLabelToggle && !hideTaken) {
+      lineItem.setAttribute('checkable-for', cbId);
+    }
 
     const deleteBtn = document.createElement('buddj-icon-delete');
     deleteBtn.setAttribute('title', 'Supprimer');
     deleteBtn.slot = 'actions';
 
-    if (!hideTaken) {
+    if (projectedSimulation) {
+      const rowId = this.getAttribute('outflow-id') ?? '';
+      const included = this.getAttribute('simulation-included') !== 'false';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = cbId;
+      checkbox.className = 'charge-taken';
+      checkbox.setAttribute(PROJECTED_SIMULATION_INCLUDE_ATTR, 'charge');
+      checkbox.setAttribute(PROJECTED_SIMULATION_ROW_ID_ATTR, rowId);
+      checkbox.title = 'Exclure du total projeté';
+      checkbox.setAttribute('aria-label', 'Exclure du total projeté');
+      checkbox.checked = !included;
+      checkbox.slot = 'prefix';
+      lineItem.appendChild(checkbox);
+    } else if (!hideTaken) {
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.id = cbId;
@@ -48,8 +75,31 @@ export class BuddjChargeItem extends HTMLElement {
     lineItem.appendChild(deleteBtn);
     this.appendChild(lineItem);
 
-    if (!hideTaken) this.attachToggleListener();
+    if (projectedSimulation) this.attachProjectedSimulationListener();
+    else if (!hideTaken) this.attachToggleListener();
     this.attachDeleteListener(label);
+  }
+
+  private attachProjectedSimulationListener(): void {
+    const checkbox = this.querySelector<HTMLInputElement>(
+      `input[${PROJECTED_SIMULATION_INCLUDE_ATTR}="charge"]`,
+    );
+    checkbox?.addEventListener('change', () => {
+      const included = !checkbox.checked;
+      if (included) this.setAttribute('simulation-included', '');
+      else this.setAttribute('simulation-included', 'false');
+      this.dispatchEvent(
+        new CustomEvent('buddj-projected-simulation-change', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            kind: 'charge' as const,
+            rowId: this.getAttribute('outflow-id') ?? '',
+            included,
+          },
+        }),
+      );
+    });
   }
 
   private attachToggleListener(): void {

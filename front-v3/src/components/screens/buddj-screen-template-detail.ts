@@ -9,6 +9,12 @@ import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { splitLeadingEmoji } from '../../shared/emoji-label.js';
 import { entryMatchesSearch } from '../../shared/search.js';
+import {
+  isProjectedSimulationActive,
+  projectedSimulationKey,
+  PROJECTED_SIMULATION_RESET_ICON_SVG,
+  type ProjectedSimulationKind,
+} from '../../shared/projected-simulation.js';
 
 const DEFAULT_TEMPLATE_EMOJI = '📆';
 
@@ -29,6 +35,11 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
   private _templateId = '';
   /** Conservé entre re-renders (ex. après suppression d’un budget) pour ne pas revenir sur Charges. */
   private _activeDetailTab: 'charges' | 'budgets' = 'charges';
+  /** Simulation locale : inclusion des lignes dans le total affiché (non persistée). */
+  private _simulationIncluded = new Map<string, boolean>();
+  /** Vrai dès la première inclusion/exclusion manuelle, jusqu’au clic sur Terminer la simulation. */
+  private _projectedSimulationSession = false;
+  private _simulationListenersAttached = false;
   private _chargeSearchListener = (e: Event): void => {
     const ev = e as CustomEvent<{ query: string }>;
     const query = (ev.detail?.query ?? '').trim();
@@ -193,9 +204,11 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
       return;
     }
 
+    this._syncSimulationKeysFromTemplate({ template });
     const chargesTotal = template.outflows.reduce((s, o) => s + o.amount, 0);
     const budgetsTotal = template.budgets.reduce((s, b) => s + b.initialBalance, 0);
-    const total = chargesTotal + budgetsTotal;
+    const total = this._getSimulatedTotal({ template });
+    const simulating = this._isProjectedSimulationUiActive();
     const busy = store.getState().busyTemplateId === this._templateId;
     const tabCharges = this._activeDetailTab === 'charges';
     const tabBudgets = this._activeDetailTab === 'budgets';
@@ -223,9 +236,12 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
             </label>
           </div>
         </header>
-        <div class="new-month-projected-sticky" aria-live="polite">
+        <div class="new-month-projected-sticky${simulating ? ' new-month-projected-sticky--simulating' : ''}" aria-live="polite">
           <span class="new-month-projected-label">Total charges et budgets</span>
-          <span class="new-month-projected" data-new-month-projected>${escapeHtml(formatEuros(total))}</span>
+          <div class="new-month-projected-sticky-end">
+            <span class="new-month-projected${simulating ? ' new-month-projected--simulating' : ''}" data-new-month-projected>${escapeHtml(formatEuros(total))}</span>
+            <button type="button" class="btn projected-simulation-end" data-end-projected-simulation ${simulating ? '' : 'hidden'} aria-label="Terminer la simulation" title="Terminer la simulation">${PROJECTED_SIMULATION_RESET_ICON_SVG}</button>
+          </div>
         </div>
         <div class="template-detail-tabs" role="tablist" aria-label="Charges ou budgets">
           <button type="button" class="template-detail-tab${tabCharges ? ' template-detail-tab--active' : ''}" role="tab" data-tab="charges" aria-selected="${tabCharges ? 'true' : 'false'}">Charges</button>
@@ -259,7 +275,11 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
       item.setAttribute('icon', c.icon);
       item.setAttribute('label', c.label);
       item.setAttribute('amount', String(c.amount));
-      item.setAttribute('no-label-toggle', '');
+      item.setAttribute('projected-simulation', '');
+      item.setAttribute(
+        'simulation-included',
+        this._isSimulationIncluded({ kind: 'charge', id: o.id }) ? '' : 'false',
+      );
       chargeGroup.appendChild(item);
     }
     chargesContainer.appendChild(chargeGroup);
@@ -280,12 +300,120 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
       card.setAttribute('name', parsed.text || b.name);
       card.setAttribute('icon', parsed.icon);
       card.setAttribute('allocated', String(b.initialBalance));
+      card.setAttribute('projected-simulation', '');
+      card.setAttribute(
+        'simulation-included',
+        this._isSimulationIncluded({ kind: 'budget', id: b.id }) ? '' : 'false',
+      );
       budgetGroup.appendChild(card);
     }
     budgetsContainer.appendChild(budgetGroup);
 
     this.innerHTML = '';
     this.appendChild(main);
+    this._attachSimulationListeners();
+  }
+
+  private _syncSimulationKeysFromTemplate({ template }: { template: TemplateView }): void {
+    const validKeys = new Set<string>();
+    for (const o of template.outflows) {
+      const key = projectedSimulationKey({ kind: 'charge', id: o.id });
+      validKeys.add(key);
+      if (!this._simulationIncluded.has(key)) this._simulationIncluded.set(key, true);
+    }
+    for (const b of template.budgets) {
+      const key = projectedSimulationKey({ kind: 'budget', id: b.id });
+      validKeys.add(key);
+      if (!this._simulationIncluded.has(key)) this._simulationIncluded.set(key, true);
+    }
+    for (const key of [...this._simulationIncluded.keys()]) {
+      if (!validKeys.has(key)) this._simulationIncluded.delete(key);
+    }
+  }
+
+  private _isSimulationIncluded({
+    kind,
+    id,
+  }: {
+    kind: ProjectedSimulationKind;
+    id: string;
+  }): boolean {
+    return this._simulationIncluded.get(projectedSimulationKey({ kind, id })) !== false;
+  }
+
+  private _isSimulationActive(): boolean {
+    return isProjectedSimulationActive({ inclusionByKey: this._simulationIncluded });
+  }
+
+  private _isProjectedSimulationUiActive(): boolean {
+    return this._projectedSimulationSession;
+  }
+
+  private _getSimulatedTotal({ template }: { template: TemplateView }): number {
+    let sum = 0;
+    for (const o of template.outflows) {
+      if (this._isSimulationIncluded({ kind: 'charge', id: o.id })) sum += o.amount;
+    }
+    for (const b of template.budgets) {
+      if (this._isSimulationIncluded({ kind: 'budget', id: b.id })) sum += b.initialBalance;
+    }
+    return sum;
+  }
+
+  private _updateProjectedSimulationUi(): void {
+    const template = this._currentTemplate();
+    if (!template) return;
+    const simulating = this._isProjectedSimulationUiActive();
+    const total = this._getSimulatedTotal({ template });
+    const sticky = this.querySelector('.new-month-projected-sticky');
+    sticky?.classList.toggle('new-month-projected-sticky--simulating', simulating);
+    const projected = this.querySelector('[data-new-month-projected]');
+    projected?.classList.toggle('new-month-projected--simulating', simulating);
+    if (projected) projected.textContent = formatEuros(total);
+    const endBtn = this.querySelector('[data-end-projected-simulation]');
+    if (endBtn instanceof HTMLElement) endBtn.hidden = !simulating;
+  }
+
+  private _endProjectedSimulation(): void {
+    this._projectedSimulationSession = false;
+    for (const key of this._simulationIncluded.keys()) {
+      this._simulationIncluded.set(key, true);
+    }
+    this.querySelectorAll('buddj-charge-item[projected-simulation]').forEach((item) => {
+      item.setAttribute('simulation-included', '');
+      const cb = item.querySelector<HTMLInputElement>('input[data-projected-simulation-include="charge"]');
+      if (cb) cb.checked = false;
+    });
+    this.querySelectorAll('buddj-template-budget-card[projected-simulation]').forEach((card) => {
+      card.setAttribute('simulation-included', '');
+      const cb = card.querySelector<HTMLInputElement>('input[data-projected-simulation-include="budget"]');
+      if (cb) cb.checked = false;
+    });
+    this._updateProjectedSimulationUi();
+  }
+
+  private _attachSimulationListeners(): void {
+    if (this._simulationListenersAttached) return;
+    this._simulationListenersAttached = true;
+
+    this.addEventListener('change', (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLInputElement) || target.type !== 'checkbox') return;
+      const kind = target.getAttribute('data-projected-simulation-include');
+      const rowId = target.getAttribute('data-projected-simulation-row-id');
+      if (kind !== 'charge' && kind !== 'budget') return;
+      if (!rowId) return;
+      this._projectedSimulationSession = true;
+      this._simulationIncluded.set(projectedSimulationKey({ kind, id: rowId }), !target.checked);
+      this._updateProjectedSimulationUi();
+    });
+
+    this.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('[data-end-projected-simulation]')) {
+        e.preventDefault();
+        this._endProjectedSimulation();
+      }
+    });
   }
 
   private attachListeners(): void {

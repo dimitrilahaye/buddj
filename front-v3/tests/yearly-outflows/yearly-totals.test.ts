@@ -5,6 +5,7 @@ import {
   monthChargesTotalEuros,
   sumYearlyOutflowsAnnualTotalEuros,
   yearlyAveragePerMonthEuros,
+  yearlyAveragePerMonthEurosFiltered,
 } from '../../src/application/yearly-outflows/yearly-totals.js';
 
 function viewWith(
@@ -56,5 +57,18 @@ describe('yearly-totals', () => {
     ]);
     expect(monthBudgetsTotalEuros({ month: view2.months[5]! })).toBe(60);
     expect(yearlyAveragePerMonthEuros({ view: view2 })).toBe(10);
+  });
+
+  it('yearlyAveragePerMonthEurosFiltered ignore les lignes exclues', () => {
+    const view = viewWith([
+      { monthIndex: 0, chargeAmount: 120 },
+      { monthIndex: 0, budgetBalance: 60 },
+    ]);
+    expect(
+      yearlyAveragePerMonthEurosFiltered({
+        view,
+        isIncluded: ({ kind, id }) => !(kind === 'charge' && id === 'o-0'),
+      }),
+    ).toBe(5);
   });
 });

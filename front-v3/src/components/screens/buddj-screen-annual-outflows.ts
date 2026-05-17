@@ -2,13 +2,21 @@
  * Écran Sorties annuelles : YearlyOutflowsStore + GET/POST/DELETE /yearly-outflows.
  */
 import type { YearlyOutflowsStore } from '../../application/yearly-outflows/yearly-outflows-store.js';
+import type { YearlyOutflowsView } from '../../application/yearly-outflows/yearly-outflows-view.js';
 import { formatEuros } from '../../shared/goal.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import {
   monthBudgetsTotalEuros,
   monthChargesTotalEuros,
   yearlyAveragePerMonthEuros,
+  yearlyAveragePerMonthEurosFiltered,
 } from '../../application/yearly-outflows/yearly-totals.js';
+import {
+  isProjectedSimulationActive,
+  projectedSimulationKey,
+  PROJECTED_SIMULATION_RESET_ICON_SVG,
+  type ProjectedSimulationKind,
+} from '../../shared/projected-simulation.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { splitLeadingEmoji } from '../../shared/emoji-label.js';
 
@@ -24,6 +32,9 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
   static readonly tagName = 'buddj-screen-annual-outflows';
 
   private _store?: YearlyOutflowsStore;
+  private _simulationIncluded = new Map<string, boolean>();
+  private _projectedSimulationSession = false;
+  private _simulationListenersAttached = false;
 
   init({ yearlyOutflowsStore }: { yearlyOutflowsStore: YearlyOutflowsStore }): void {
     this._store = yearlyOutflowsStore;
@@ -118,9 +129,12 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
             </div>
           </div>
         </header>
-        <div class="new-month-projected-sticky" aria-live="polite">
+        <div class="new-month-projected-sticky" data-annual-projected-sticky aria-live="polite">
           <span class="new-month-projected-label">Total par mois</span>
-          <span class="new-month-projected" data-annual-total-per-month></span>
+          <div class="new-month-projected-sticky-end">
+            <span class="new-month-projected" data-annual-total-per-month></span>
+            <button type="button" class="btn projected-simulation-end" data-end-projected-simulation hidden aria-label="Terminer la simulation" title="Terminer la simulation">${PROJECTED_SIMULATION_RESET_ICON_SVG}</button>
+          </div>
         </div>
       </div>
       <p class="annual-outflows-loading" hidden>Chargement…</p>
@@ -129,6 +143,112 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
     `;
     this.appendChild(main);
     this.attachListeners();
+    this._attachSimulationListeners();
+  }
+
+  private _syncSimulationKeysFromView({ view }: { view: YearlyOutflowsView }): void {
+    const validKeys = new Set<string>();
+    for (const month of view.months) {
+      for (const o of month.outflows) {
+        const key = projectedSimulationKey({ kind: 'charge', id: o.id });
+        validKeys.add(key);
+        if (!this._simulationIncluded.has(key)) this._simulationIncluded.set(key, true);
+      }
+      for (const b of month.budgets) {
+        const key = projectedSimulationKey({ kind: 'budget', id: b.id });
+        validKeys.add(key);
+        if (!this._simulationIncluded.has(key)) this._simulationIncluded.set(key, true);
+      }
+    }
+    for (const key of [...this._simulationIncluded.keys()]) {
+      if (!validKeys.has(key)) this._simulationIncluded.delete(key);
+    }
+  }
+
+  private _isSimulationIncluded({
+    kind,
+    id,
+  }: {
+    kind: ProjectedSimulationKind;
+    id: string;
+  }): boolean {
+    return this._simulationIncluded.get(projectedSimulationKey({ kind, id })) !== false;
+  }
+
+  private _isSimulationActive(): boolean {
+    return isProjectedSimulationActive({ inclusionByKey: this._simulationIncluded });
+  }
+
+  private _isProjectedSimulationUiActive(): boolean {
+    return this._projectedSimulationSession;
+  }
+
+  private _getSimulatedAveragePerMonth({ view }: { view: YearlyOutflowsView }): number {
+    if (!this._projectedSimulationSession) {
+      return yearlyAveragePerMonthEuros({ view });
+    }
+    return yearlyAveragePerMonthEurosFiltered({
+      view,
+      isIncluded: ({ kind, id }) => this._isSimulationIncluded({ kind, id }),
+    });
+  }
+
+  private _updateProjectedSimulationUi(): void {
+    const store = this._store;
+    const main = this.querySelector('#annual-outflows');
+    if (!store || !main) return;
+    const { view } = store.getState();
+    const simulating = this._isProjectedSimulationUiActive();
+    const avg = this._getSimulatedAveragePerMonth({ view });
+    const sticky = main.querySelector('[data-annual-projected-sticky]');
+    sticky?.classList.toggle('new-month-projected-sticky--simulating', simulating);
+    const projected = main.querySelector('[data-annual-total-per-month]');
+    projected?.classList.toggle('new-month-projected--simulating', simulating);
+    if (projected) projected.textContent = formatEuros(avg);
+    const endBtn = main.querySelector('[data-end-projected-simulation]');
+    if (endBtn instanceof HTMLElement) endBtn.hidden = !simulating;
+  }
+
+  private _endProjectedSimulation(): void {
+    this._projectedSimulationSession = false;
+    for (const key of this._simulationIncluded.keys()) {
+      this._simulationIncluded.set(key, true);
+    }
+    this.querySelectorAll('buddj-charge-item[projected-simulation]').forEach((item) => {
+      item.setAttribute('simulation-included', '');
+      const cb = item.querySelector<HTMLInputElement>('input[data-projected-simulation-include="charge"]');
+      if (cb) cb.checked = false;
+    });
+    this.querySelectorAll('buddj-template-budget-card[projected-simulation]').forEach((card) => {
+      card.setAttribute('simulation-included', '');
+      const cb = card.querySelector<HTMLInputElement>('input[data-projected-simulation-include="budget"]');
+      if (cb) cb.checked = false;
+    });
+    this._updateProjectedSimulationUi();
+  }
+
+  private _attachSimulationListeners(): void {
+    if (this._simulationListenersAttached) return;
+    this._simulationListenersAttached = true;
+
+    this.addEventListener('change', (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLInputElement) || target.type !== 'checkbox') return;
+      const kind = target.getAttribute('data-projected-simulation-include');
+      const rowId = target.getAttribute('data-projected-simulation-row-id');
+      if (kind !== 'charge' && kind !== 'budget') return;
+      if (!rowId) return;
+      this._projectedSimulationSession = true;
+      this._simulationIncluded.set(projectedSimulationKey({ kind, id: rowId }), !target.checked);
+      this._updateProjectedSimulationUi();
+    });
+
+    this.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('[data-end-projected-simulation]')) {
+        e.preventDefault();
+        this._endProjectedSimulation();
+      }
+    });
   }
 
   private attachListeners(): void {
@@ -164,8 +284,6 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
     const loadingEl = main.querySelector('.annual-outflows-loading');
     const errEl = main.querySelector('.annual-outflows-error');
     const sectionsEl = main.querySelector('.annual-outflows-sections');
-    const totalEl = main.querySelector('[data-annual-total-per-month]');
-
     if (loadingEl instanceof HTMLElement) {
       loadingEl.hidden = !isLoading;
     }
@@ -175,8 +293,8 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
       errEl.textContent = loadErrorMessage ?? '';
     }
 
-    const avg = yearlyAveragePerMonthEuros({ view });
-    if (totalEl) totalEl.textContent = formatEuros(avg);
+    this._syncSimulationKeysFromView({ view });
+    this._updateProjectedSimulationUi();
 
     if (!sectionsEl) return;
     if (isLoading && view.months.every((m) => m.outflows.length === 0 && m.budgets.length === 0)) {
@@ -245,7 +363,11 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
         item.setAttribute('icon', parsed.icon);
         item.setAttribute('label', parsed.text || c.label);
         item.setAttribute('amount', String(c.amount));
-        item.setAttribute('no-label-toggle', '');
+        item.setAttribute('projected-simulation', '');
+        item.setAttribute(
+          'simulation-included',
+          this._isSimulationIncluded({ kind: 'charge', id: c.id }) ? '' : 'false',
+        );
         item.setAttribute('hide-taken', '');
         chargeGroup.appendChild(item);
       }
@@ -266,6 +388,11 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
         card.setAttribute('name', parsed.text || b.name);
         card.setAttribute('icon', parsed.icon);
         card.setAttribute('allocated', String(b.initialBalance));
+        card.setAttribute('projected-simulation', '');
+        card.setAttribute(
+          'simulation-included',
+          this._isSimulationIncluded({ kind: 'budget', id: b.id }) ? '' : 'false',
+        );
         budgetGroup.appendChild(card);
       }
       budgetsContainer.appendChild(budgetGroup);

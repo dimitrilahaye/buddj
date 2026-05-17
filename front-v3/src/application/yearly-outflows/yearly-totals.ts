@@ -16,6 +16,26 @@ export function yearlyAveragePerMonthEuros({ view }: { view: YearlyOutflowsView 
   return Math.round((total / 12) * 100) / 100;
 }
 
+/** Moyenne mensuelle en ne comptant que les lignes marquées incluses (simulation). */
+export function yearlyAveragePerMonthEurosFiltered({
+  view,
+  isIncluded,
+}: {
+  view: YearlyOutflowsView;
+  isIncluded: ({ kind, id }: { kind: 'charge' | 'budget'; id: string }) => boolean;
+}): number {
+  let sum = 0;
+  for (const month of view.months) {
+    for (const outflow of month.outflows) {
+      if (isIncluded({ kind: 'charge', id: outflow.id })) sum += outflow.amount;
+    }
+    for (const budget of month.budgets) {
+      if (isIncluded({ kind: 'budget', id: budget.id })) sum += budget.initialBalance;
+    }
+  }
+  return Math.round((sum / 12) * 100) / 100;
+}
+
 export function monthChargesTotalEuros({ month }: { month: YearlyOutflowsView['months'][number] }): number {
   return month.outflows.reduce((s, o) => s + o.amount, 0);
 }
