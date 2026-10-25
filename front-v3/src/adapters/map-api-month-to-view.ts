@@ -111,13 +111,12 @@ export function mapApiMonthPayloadToView(payload: ApiMonthPayload): MonthView {
       budgets: previousBudgets,
     });
   }
-  if (currentBudgets.length > 0) {
-    budgetGroups.push({
-      title: `Budgets de ${displayLabel}`,
-      showAdd: true,
-      budgets: currentBudgets,
-    });
-  }
+  // Toujours présent (même vide) : porte showAdd, donc le bouton d'ajout du header.
+  budgetGroups.push({
+    title: `Budgets de ${displayLabel}`,
+    showAdd: true,
+    budgets: currentBudgets,
+  });
 
   const toOutflowData = (o: ApiOutflowRow): OutflowData => ({
     id: o.id,

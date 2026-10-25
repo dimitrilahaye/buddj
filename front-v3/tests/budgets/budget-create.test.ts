@@ -4,6 +4,7 @@ import { createAuthServiceFromInMemory } from '../../src/adapters/auth-service-f
 import { createMonthServiceFromInMemory } from '../../src/adapters/month-service-from-in-memory.js';
 import { LOADING_CREATE_BUDGET_TEXT } from '../../src/application/month/month-store.js';
 import type { MonthView } from '../../src/application/month/month-view.js';
+import { mapApiMonthPayloadToView, type ApiMonthPayload } from '../../src/adapters/map-api-month-to-view.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
 
@@ -90,6 +91,62 @@ describe('création budget → POST (in-memory)', () => {
     });
 
     expect(screen.getByRole('heading', { name: 'Semaine 1', level: 2 })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Test', level: 2 })).toBeTruthy();
+  });
+
+  it('mois sans aucun budget : le bouton « Ajouter un budget » est visible et la création fonctionne', async () => {
+    shellDocument();
+    const dto: ApiMonthPayload = {
+      id: '52bd55a5-9fb6-4f49-a56e-9a965985cf2e',
+      date: '2026-03-01T00:00:00.000Z',
+      dashboard: {
+        account: { currentBalance: 4000, forecastBalance: 500 },
+        weeks: { weeklyBudgets: [] },
+      },
+      account: {
+        id: 'a66640a1-ab8e-472e-bdf9-5ba8207a8f2b',
+        currentBalance: 4000,
+        outflows: [],
+        weeklyBudgets: [],
+      },
+    };
+    const month = mapApiMonthPayloadToView(dto);
+    bootstrap({
+      authService: createAuthServiceFromInMemory(true),
+      monthService: createMonthServiceFromInMemory({ months: [month], createBudgetDelayMs: 120 }),
+    });
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Mes budgets', level: 1 })).toBeTruthy();
+    });
+
+    const budgetsMain = screen.getByRole('heading', { name: 'Mes budgets', level: 1 }).closest('main') as HTMLElement;
+    await waitFor(() => {
+      expect(within(budgetsMain).getByRole('button', { name: 'Ajouter un budget' })).toBeTruthy();
+    });
+    fireEvent.click(within(budgetsMain).getByRole('button', { name: 'Ajouter un budget' }));
+
+    const budgetDrawer = await screen.findByRole('dialog', { name: 'Ajouter un budget' });
+
+    fireEvent.input(within(budgetDrawer).getByRole('textbox', { name: 'Libellé du budget' }), {
+      target: { value: 'Test' },
+    });
+
+    fireEvent.click(within(budgetDrawer).getByRole('button', { name: 'Montant (ouvrir la calculatrice)' }));
+    const calc = await screen.findByRole('dialog', { name: 'Montant' });
+    for (const digit of ['1', '2', '3', '0'] as const) {
+      fireEvent.click(within(calc).getByRole('button', { name: digit }));
+    }
+    fireEvent.click(within(calc).getByRole('button', { name: 'Valider' }));
+
+    fireEvent.click(within(budgetDrawer).getByRole('button', { name: 'Valider' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('status', { name: LOADING_CREATE_BUDGET_TEXT })).toBeTruthy();
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole('status', { name: LOADING_CREATE_BUDGET_TEXT })).toBeNull();
+    });
+
     expect(screen.getByRole('heading', { name: 'Test', level: 2 })).toBeTruthy();
   });
 });
