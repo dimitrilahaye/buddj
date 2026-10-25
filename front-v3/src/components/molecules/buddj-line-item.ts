@@ -115,6 +115,9 @@ export class BuddjLineItem extends HTMLElement {
         text-align: right;
         color: var(--coral);
       }
+      :host(.new-month-row--hidden) buddj-amount .amount-value {
+        color: var(--navy-soft);
+      }
       .line-item-amount-simple {
         display: flex;
         flex-direction: column;
