@@ -5819,10 +5819,6 @@ buddj-line-item.new-month-row--hidden::part(main) {
   color: var(--navy-soft);
 }
 
-buddj-line-item.new-month-row--hidden::part(main) .buddj-amount .amount-value {
-  color: var(--navy-soft) !important;
-}
-
 buddj-screen-new-month .new-month-row-icon {
   font-size: 1.25rem;
   flex-shrink: 0;
