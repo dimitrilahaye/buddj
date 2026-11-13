@@ -21,6 +21,10 @@ import type {
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
 import { formatBucketLabel } from '../../shared/spending-bucket-label.js';
+import {
+  cumulativeSpending,
+  hourlyCumulativeSpending,
+} from '../../application/spending-tracker/spending-tracker-cumulative.js';
 import '../organisms/buddj-spending-tracker-chart.js';
 import type {
   BuddjSpendingTrackerChart,
@@ -338,11 +342,18 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     isRefreshing: boolean;
   }): void {
     const chart = main.querySelector(BUDDJ_CHART_TAG) as BuddjSpendingTrackerChart;
-    // Un seul point ne fait pas une courbe : la plage d'un jour garde résumé et détail.
-    const hasCurve = view !== null && view.total > 0 && view.buckets.length > 1;
+    const hasCurve = view !== null && view.total > 0;
     chart.hidden = !hasCurve;
     if (!hasCurve || !view) return;
-    chart.render({ view, kinds, selectedStart: this._selectedStart, isRefreshing });
+    // Une plage d'un seul jour se lit heure par heure.
+    const [singleDay] = view.granularity === 'day' && view.buckets.length === 1 ? view.buckets : [];
+    chart.render({
+      points: singleDay ? hourlyCumulativeSpending({ bucket: singleDay }) : cumulativeSpending({ view }),
+      step: singleDay ? 'hour' : view.granularity,
+      kinds,
+      selectedKey: this._selectedStart,
+      isRefreshing,
+    });
   }
 
   private _renderBars({ main, view }: { main: HTMLElement; view: SpendingTrackerView | null }): void {
