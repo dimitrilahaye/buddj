@@ -27,7 +27,7 @@
     "tf": "tsx src/tests/integration/run-with-testcontainer.ts mocha --timeout 7000"
   },
   "engines": {
-    "node": "^24.22.1"
+    "node": "^24.22.3"
   },
   "type": "module",
   "keywords": [],
