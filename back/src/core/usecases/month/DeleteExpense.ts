@@ -1,9 +1,13 @@
+import EventPublisher from "../../ports/providers/EventPublisher.js";
 import MonthRepository from "../../ports/repositories/MonthRepository.js";
 import DeleteExpenseCommand from "../../commands/DeleteExpenseCommand.js";
 import { MonthNotFoundError } from "../../errors/MonthErrors.js";
 
 export default class DeleteExpense {
-  constructor(public readonly monthRepository: MonthRepository) {}
+  constructor(
+    public readonly monthRepository: MonthRepository,
+    public readonly eventPublisher: EventPublisher
+  ) {}
 
   async execute(command: DeleteExpenseCommand) {
     const month = await this.monthRepository.getById(command.monthId);
@@ -20,6 +24,10 @@ export default class DeleteExpense {
       month,
       command.weeklyId
     );
+
+    this.eventPublisher.publish("expenseDeleted", {
+      expenseId: command.expenseId,
+    });
 
     return month;
   }

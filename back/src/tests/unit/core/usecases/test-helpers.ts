@@ -4,6 +4,10 @@ const idProviderStub = {
   get: sinon.stub(),
 };
 
+const eventPublisherStub = {
+  publish: sinon.stub(),
+};
+
 const projectRepositoryStub = {
   getAllByCategory: sinon.stub(),
   getById: sinon.stub(),
@@ -65,6 +69,7 @@ const yearlyOutflowRepositoryStub = {
 };
 
 function resetStubs() {
+  eventPublisherStub.publish.reset();
   monthRepositoryStub.addExpenseToWeeklyBudget.reset();
   monthRepositoryStub.addOutflow.reset();
   monthRepositoryStub.addBudget.reset();
@@ -116,5 +121,6 @@ export {
   monthlyBudgetTemplateRepositoryStub,
   idProviderStub,
   projectRepositoryStub,
+  eventPublisherStub,
   resetStubs,
 };

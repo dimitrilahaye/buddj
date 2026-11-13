@@ -1,3 +1,4 @@
+import EventPublisher from "../../ports/providers/EventPublisher.js";
 import AccountOutflowFactory from "../../factories/AccountOutflowFactory.js";
 import MonthRepository from "../../ports/repositories/MonthRepository.js";
 import AddOutflowCommand from "../../commands/AddOutflowCommand.js";
@@ -6,7 +7,8 @@ import { MonthNotFoundError } from "../../errors/MonthErrors.js";
 export default class AddOutflow {
   constructor(
     public readonly accountOutflowFactory: AccountOutflowFactory,
-    public readonly monthRepository: MonthRepository
+    public readonly monthRepository: MonthRepository,
+    public readonly eventPublisher: EventPublisher
   ) {}
 
   async execute(command: AddOutflowCommand) {
@@ -23,6 +25,13 @@ export default class AddOutflow {
     month.addOutflow(outflow);
 
     await this.monthRepository.addOutflow(month, outflow);
+
+    this.eventPublisher.publish("outflowAdded", {
+      outflowId: outflow.id,
+      label: outflow.label,
+      amount: outflow.amount,
+      occurredAt: new Date(),
+    });
 
     return month;
   }
