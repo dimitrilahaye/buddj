@@ -4,28 +4,44 @@
  *
  * Interaction : le réticule suit le pointeur et s'aligne sur la période la plus proche,
  * l'infobulle donne les cumuls ; flèches gauche/droite au clavier ; clic ou Entrée
- * émet `spending-bucket-select` ({ start }) pour afficher le détail de la période.
+ * émet `spending-bucket-select` ({ start }) pour afficher le détail de la période
+ * (sauf en pas horaire, où le détail de la journée est déjà affiché).
  */
 import {
-  cumulativeSpending,
   niceAxisTicks,
   type CumulativePoint,
+  type CumulativeStep,
 } from '../../application/spending-tracker/spending-tracker-cumulative.js';
-import type {
-  SpendingKindsFilter,
-  SpendingTrackerView,
-} from '../../application/spending-tracker/spending-tracker-types.js';
+import type { SpendingKindsFilter } from '../../application/spending-tracker/spending-tracker-types.js';
 import { formatEuros } from '../../shared/goal.js';
 import { formatBucketAxisLabel, formatBucketLabel } from '../../shared/spending-bucket-label.js';
 
 export type SpendingBucketSelect = { start: string };
 
 export type SpendingTrackerChartData = {
-  /** Vue déjà filtrée par type */
-  view: SpendingTrackerView;
+  /** Points cumulés, déjà filtrés par type */
+  points: CumulativePoint[];
+  step: CumulativeStep;
   kinds: SpendingKindsFilter;
-  selectedStart: string | null;
+  selectedKey: string | null;
   isRefreshing: boolean;
+};
+
+function pointLabel({ key, step }: { key: string; step: CumulativeStep }): string {
+  if (step === 'hour') return `${key} h – ${Number(key) + 1} h`;
+  return formatBucketLabel({ start: key, granularity: step });
+}
+
+function pointAxisLabel({ key, step }: { key: string; step: CumulativeStep }): string {
+  if (step === 'hour') return `${key} h`;
+  return formatBucketAxisLabel({ start: key, granularity: step });
+}
+
+const BUCKET_TOTAL_LABELS: Record<CumulativeStep, string> = {
+  hour: 'cette heure-là',
+  day: 'ce jour',
+  week: 'cette semaine-là',
+  month: 'ce mois-là',
 };
 
 const HEIGHT = 200;
@@ -90,7 +106,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
 
   render(data: SpendingTrackerChartData): void {
     this._data = data;
-    this._points = cumulativeSpending({ view: data.view });
+    this._points = data.points;
     if (this._activeIndex !== null && this._activeIndex >= this._points.length) this._activeIndex = null;
     this._draw();
   }
@@ -116,7 +132,8 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     this._lastWidth = plot.clientWidth;
     const points = this._points;
     const series = this._series();
-    const { granularity } = data.view;
+    const { step } = data;
+    const selectable = step !== 'hour';
 
     plot.classList.toggle('spending-chart-plot--refreshing', data.isRefreshing);
     this._renderLegend(series);
@@ -126,7 +143,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     plot.setAttribute(
       'aria-label',
       last
-        ? `Cumul de ${formatEuros(total)} au ${formatBucketLabel({ start: last.start, granularity })}. Flèches gauche et droite pour parcourir, Entrée pour le détail.`
+        ? `Cumul de ${formatEuros(total)} ${step === 'hour' ? `à ${last.key} h` : `au ${pointLabel({ key: last.key, step })}`}. Flèches gauche et droite pour parcourir${selectable ? ', Entrée pour le détail' : ''}.`
         : 'Aucune donnée'
     );
 
@@ -168,7 +185,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
       for (const i of indexes) {
         const anchor = points.length === 1 ? 'middle' : i === 0 ? 'start' : i === points.length - 1 ? 'end' : 'middle';
         const label = add('text', { class: 'spending-chart-tick', x: x(i), y: HEIGHT - 6, 'text-anchor': anchor });
-        label.textContent = formatBucketAxisLabel({ start: points[i]!.start, granularity });
+        label.textContent = pointAxisLabel({ key: points[i]!.key, step });
       }
     }
 
@@ -188,7 +205,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     }
 
     // Période sélectionnée (détail affiché)
-    const selectedIndex = points.findIndex((p) => p.start === data.selectedStart);
+    const selectedIndex = points.findIndex((p) => p.key === data.selectedKey);
     if (selectedIndex >= 0) {
       add('line', {
         class: 'spending-chart-selected',
@@ -257,12 +274,12 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
           label,
           kind,
         ]),
-      [formatEuros(p.bucketTotal), data.view.granularity === 'day' ? 'ce jour' : 'sur la période', null],
+      [formatEuros(p.bucketTotal), BUCKET_TOTAL_LABELS[data.step], null],
     ];
     tooltip.replaceChildren();
     const title = document.createElement('p');
     title.className = 'spending-chart-tooltip-title';
-    title.textContent = formatBucketLabel({ start: p.start, granularity: data.view.granularity });
+    title.textContent = pointLabel({ key: p.key, step: data.step });
     tooltip.appendChild(title);
     for (const [value, label, kind] of rows) {
       const row = document.createElement('p');
@@ -304,9 +321,10 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
 
   private _select(index: number | null): void {
     const p = index === null ? undefined : this._points[index];
-    if (!p) return;
+    // En pas horaire, le détail de la journée est déjà affiché.
+    if (!p || this._data?.step === 'hour') return;
     this.dispatchEvent(
-      new CustomEvent<SpendingBucketSelect>('spending-bucket-select', { detail: { start: p.start }, bubbles: true })
+      new CustomEvent<SpendingBucketSelect>('spending-bucket-select', { detail: { start: p.key }, bubbles: true })
     );
   }
 

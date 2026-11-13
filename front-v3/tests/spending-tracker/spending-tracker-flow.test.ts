@@ -214,14 +214,27 @@ describe('écran suivi des dépenses', () => {
     expect(within(chart).queryByText('Dépenses')).toBeNull();
   });
 
-  it('masque la courbe sur une plage d’un seul jour', async () => {
+  it('trace la journée heure par heure jusqu’à l’heure actuelle', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
     fireEvent.click(screen.getByRole('radio', { name: "Aujourd'hui" }));
 
     await waitFor(() => expect(totalText()).toContain('16,50 €'));
-    expect(screen.queryByRole('figure')).toBeNull();
+    const plot = screen.getByRole('group', { name: /^Cumul de 16,50 € à 18 h\./ });
+    expect(plot.getAttribute('aria-label')).not.toContain('Entrée');
+    const bars = screen.getByRole('list', { name: 'Dépenses par jour' });
+    expect(within(bars).getAllByRole('listitem')).toHaveLength(1);
+
+    // La boulangerie est à 07:30 UTC, heure locale selon le fuseau de la machine.
+    const hour = new Date('2026-11-13T07:30:00.000Z').getHours();
+    // Le premier appui se place sur 18 h, chaque suivant recule d'une heure.
+    for (let i = 0; i <= 18 - hour; i++) fireEvent.keyDown(plot, { key: 'ArrowLeft' });
+
+    const readout = screen.getByRole('status', { name: 'Valeurs de la période survolée' });
+    expect(readout.textContent).toContain(`${hour} h – ${hour + 1} h`);
+    expect(readout.textContent).toContain('4,50 € cumulés');
+    expect(readout.textContent).toContain('4,50 € cette heure-là');
   });
 
   it('indique une période sans dépense et explique comment le suivi se remplit', async () => {

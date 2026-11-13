@@ -1,8 +1,12 @@
-import type { SpendingTrackerView } from './spending-tracker-types.js';
+import type { SpendingBucket, SpendingGranularity, SpendingTrackerView } from './spending-tracker-types.js';
+import { todayIso } from './spending-tracker-range.js';
+
+/** Pas de la courbe : les buckets de l'API, ou l'heure pour une plage d'un seul jour. */
+export type CumulativeStep = SpendingGranularity | 'hour';
 
 export type CumulativePoint = {
-  /** Premier jour du bucket (YYYY-MM-DD) */
-  start: string;
+  /** Premier jour du bucket (YYYY-MM-DD), ou l'heure (« 0 » à « 23 ») en pas horaire */
+  key: string;
   /** Montant dépensé dans ce bucket seul */
   bucketTotal: number;
   /** Cumuls depuis le début de la période, fin de bucket incluse */
@@ -23,8 +27,41 @@ export function cumulativeSpending({ view }: { view: SpendingTrackerView }): Cum
     expenses = roundCents(expenses + bucket.expensesTotal);
     outflows = roundCents(outflows + bucket.outflowsTotal);
     return {
-      start: bucket.start,
+      key: bucket.start,
       bucketTotal: bucket.total,
+      expenses,
+      outflows,
+      total: roundCents(expenses + outflows),
+    };
+  });
+}
+
+/**
+ * Cumul heure par heure d'une journée, à partir de l'horodatage des entrées (heure locale).
+ * La journée en cours s'arrête à l'heure actuelle, une journée passée va jusqu'à 23 h.
+ */
+export function hourlyCumulativeSpending({
+  bucket,
+  now = new Date(),
+}: {
+  bucket: SpendingBucket;
+  now?: Date;
+}): CumulativePoint[] {
+  const lastHour = bucket.start === todayIso({ now }) ? now.getHours() : 23;
+  const perHour = Array.from({ length: lastHour + 1 }, () => ({ expenses: 0, outflows: 0 }));
+  for (const entry of bucket.entries) {
+    const hour = Math.min(new Date(entry.occurredAt).getHours(), lastHour);
+    if (entry.kind === 'expense') perHour[hour]!.expenses += entry.amount;
+    else perHour[hour]!.outflows += entry.amount;
+  }
+  let expenses = 0;
+  let outflows = 0;
+  return perHour.map((hour, index) => {
+    expenses = roundCents(expenses + hour.expenses);
+    outflows = roundCents(outflows + hour.outflows);
+    return {
+      key: String(index),
+      bucketTotal: roundCents(hour.expenses + hour.outflows),
       expenses,
       outflows,
       total: roundCents(expenses + outflows),
