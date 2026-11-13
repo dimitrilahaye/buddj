@@ -11,6 +11,7 @@ import './components/screens/buddj-screen-templates.js';
 import './components/screens/buddj-screen-template-detail.js';
 import './components/screens/buddj-screen-annual-outflows.js';
 import './components/screens/buddj-screen-archived.js';
+import './components/screens/buddj-screen-spending-tracker.js';
 import type { DefaultRoute, RouteContext, RouteDef } from './router.js';
 import type { AuthStore } from './application/auth/auth-store.js';
 import type { ArchivedMonthStore } from './application/month/archived-month-store.js';
@@ -20,6 +21,8 @@ import type { YearlyOutflowsStore } from './application/yearly-outflows/yearly-o
 import type { TemplateService } from './application/template/template-service.js';
 import type { BuddjScreenNewMonth } from './components/screens/buddj-screen-new-month.js';
 import type { BuddjScreenArchived } from './components/screens/buddj-screen-archived.js';
+import type { BuddjScreenSpendingTracker } from './components/screens/buddj-screen-spending-tracker.js';
+import type { SpendingTrackerStore } from './application/spending-tracker/spending-tracker-store.js';
 import type { BuddjScreenTemplates } from './components/screens/buddj-screen-templates.js';
 import type { BuddjScreenTemplateDetail } from './components/screens/buddj-screen-template-detail.js';
 import type { BuddjScreenAnnualOutflows } from './components/screens/buddj-screen-annual-outflows.js';
@@ -64,6 +67,7 @@ export function createRoutes({
   yearlyOutflowsStore,
   savingsStore,
   reimbursementsStore,
+  spendingTrackerStore,
   templateService,
   navigateToPath,
   redirectToHome,
@@ -75,6 +79,7 @@ export function createRoutes({
   yearlyOutflowsStore: YearlyOutflowsStore;
   savingsStore: SavingsStore;
   reimbursementsStore: ReimbursementsStore;
+  spendingTrackerStore: SpendingTrackerStore;
   templateService: TemplateService;
   navigateToPath: (path: string) => void;
   redirectToHome: () => void;
@@ -88,6 +93,15 @@ export function createRoutes({
         el.init({ store: authStore });
         ctx.outlet.replaceChildren(el);
       },
+    },
+    {
+      name: 'spending-tracker',
+      pattern: '/spending-tracker',
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
+        const el = document.createElement('buddj-screen-spending-tracker') as BuddjScreenSpendingTracker;
+        el.init({ spendingTrackerStore });
+        ctx.outlet.replaceChildren(el);
+      }),
     },
     {
       name: 'new-month',

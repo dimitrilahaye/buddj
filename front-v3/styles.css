@@ -3497,6 +3497,7 @@ body.route-home .global-header {
 
 body.route-new-month .global-header buddj-summary-bar,
 body.route-archived .global-header buddj-summary-bar,
+body.route-spending-tracker .global-header buddj-summary-bar,
 body.route-savings .global-header buddj-summary-bar,
 body.route-reimbursements .global-header buddj-summary-bar,
 body.route-templates .global-header buddj-summary-bar,
@@ -3509,6 +3510,7 @@ body.route-home,
 body.route-savings,
 body.route-reimbursements,
 body.route-archived,
+body.route-spending-tracker,
 body.route-templates,
 body.route-annual-outflows {
   display: flex;
@@ -3523,6 +3525,7 @@ body.route-home #screen-outlet,
 body.route-savings #screen-outlet,
 body.route-reimbursements #screen-outlet,
 body.route-archived #screen-outlet,
+body.route-spending-tracker #screen-outlet,
 body.route-templates #screen-outlet,
 body.route-annual-outflows #screen-outlet {
   flex: 1;
@@ -3533,6 +3536,7 @@ body.route-home buddj-screen-home,
 body.route-savings buddj-screen-savings,
 body.route-reimbursements buddj-screen-reimbursements,
 body.route-archived buddj-screen-archived,
+body.route-spending-tracker buddj-screen-spending-tracker,
 body.route-templates buddj-screen-templates,
 body.route-templates buddj-screen-template-detail,
 body.route-annual-outflows buddj-screen-annual-outflows {
@@ -3551,6 +3555,7 @@ body.route-home buddj-screen-home main.screen,
 body.route-savings buddj-screen-savings main.screen,
 body.route-reimbursements buddj-screen-reimbursements main.screen,
 body.route-archived buddj-screen-archived main.screen,
+body.route-spending-tracker buddj-screen-spending-tracker main.screen,
 body.route-templates buddj-screen-templates main.screen,
 body.route-templates buddj-screen-template-detail main.screen,
 body.route-annual-outflows buddj-screen-annual-outflows main.screen {
@@ -3832,6 +3837,335 @@ body.route-budgets .budget-list {
 
 body.route-budgets .budget-list {
   padding-top: 0.5rem;
+}
+
+/* ========== Écran Suivi des dépenses ========== */
+buddj-screen-spending-tracker {
+  display: none;
+}
+
+.spending-tracker-sticky-wrap {
+  flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
+  background: var(--bg);
+}
+
+.spending-tracker-sticky-wrap .screen-header {
+  margin-bottom: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+}
+
+.spending-tracker-sticky-wrap .screen-header .title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.spending-tracker-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 1.25rem 2rem;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+}
+
+.spending-tracker-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.spending-tracker-fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.spending-tracker-legend {
+  width: 100%;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--navy-soft);
+}
+
+.spending-tracker-chip {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.spending-tracker-chip input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.spending-tracker-chip span {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card);
+  color: var(--navy-soft);
+  font-size: 0.875rem;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.spending-tracker-chip input:checked + span {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: var(--bg);
+  box-shadow: 0 0 12px var(--mint-glow);
+}
+
+.spending-tracker-chip input:focus-visible + span {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.spending-tracker-chip input:disabled,
+.spending-tracker-chip input:disabled + span {
+  cursor: not-allowed;
+}
+
+.spending-tracker-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.spending-tracker-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--navy-soft);
+}
+
+.spending-tracker-date input {
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card);
+  color: var(--navy);
+  font: inherit;
+  font-size: 0.9rem;
+  color-scheme: dark;
+}
+
+.spending-tracker-date input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.spending-tracker-range-error,
+.spending-tracker-error {
+  margin: 0;
+  color: var(--coral);
+  font-size: 0.85rem;
+}
+
+.spending-tracker-loading,
+.spending-tracker-empty {
+  color: var(--navy-soft);
+  text-align: center;
+}
+
+.spending-tracker-summary {
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+.spending-tracker-total {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--coral);
+}
+
+.spending-tracker-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--navy-soft);
+}
+
+.spending-tracker-split-item::before {
+  content: '';
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-right: 0.35rem;
+  border-radius: 2px;
+}
+
+.spending-tracker-split-item--expense::before,
+.spending-tracker-bar-fill--expense {
+  background: var(--coral);
+}
+
+.spending-tracker-split-item--outflow::before,
+.spending-tracker-bar-fill--outflow {
+  background: var(--accent-purple);
+}
+
+.spending-tracker-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spending-tracker-bar {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr 5.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--navy);
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.spending-tracker-bar:hover:not(:disabled),
+.spending-tracker-bar--selected {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.spending-tracker-bar--selected {
+  box-shadow: 0 0 12px var(--coral-glow);
+}
+
+.spending-tracker-bar:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.spending-tracker-bar:disabled {
+  cursor: default;
+  color: var(--navy-soft);
+}
+
+.spending-tracker-bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spending-tracker-bar-track {
+  display: flex;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.spending-tracker-bar-fill {
+  height: 100%;
+}
+
+.spending-tracker-bar-amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-tracker-detail {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.spending-tracker-detail-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-head);
+  font-size: 1rem;
+  color: var(--navy);
+}
+
+.spending-tracker-detail-title::first-letter {
+  text-transform: uppercase;
+}
+
+.spending-tracker-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spending-tracker-entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+}
+
+.spending-tracker-entry-kind {
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bg);
+}
+
+.spending-tracker-entry-kind--expense {
+  background: var(--coral);
+}
+
+.spending-tracker-entry-kind--outflow {
+  background: var(--accent-purple);
+}
+
+.spending-tracker-entry-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spending-tracker-entry-time {
+  color: var(--navy-soft);
+  font-size: 0.75rem;
+}
+
+.spending-tracker-entry-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
 /* ========== Écran Mois archivés ========== */
