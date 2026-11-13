@@ -27,16 +27,9 @@ jobs:
     needs: [ changes ]
     if: needs.changes.outputs.back == 'true'
     name: ⚙️ Back — Continuous Integration
+    # Directement sur le runner (pas de container job) : les tests d'intégration
+    # démarrent leur Postgres via Testcontainers et ont besoin du Docker du runner.
     runs-on: ubuntu-latest
-    container: node:24.22.1-bookworm-slim
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
     - uses: actions/checkout@v7
@@ -58,11 +51,6 @@ jobs:
       working-directory: ./back
       run: npm run tf
       env:
-        DB_URL_TEST: postgres
-        DB_PORT_TEST: 5432
-        DB_USER_TEST: postgres
-        DB_PASSWORD_TEST: postgres
-        DB_NAME_TEST: postgres
         PORT: ${{ secrets.PORT }}
         CLIENT_ID: ${{ secrets.CLIENT_ID }}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
