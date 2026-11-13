@@ -4327,6 +4327,22 @@ buddj-spending-tracker-chart[hidden] {
   color: var(--navy-soft);
 }
 
+/* Ligne de synthèse de la période, séparée des lignes par jour */
+.spending-tracker-bar-row--period {
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.spending-tracker-bar--period {
+  cursor: default;
+  font-weight: 600;
+}
+
+.spending-tracker-bar--period .spending-tracker-bar-label::first-letter {
+  text-transform: uppercase;
+}
+
 .spending-tracker-bar-label {
   overflow: hidden;
   text-overflow: ellipsis;
