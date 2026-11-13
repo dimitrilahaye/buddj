@@ -67,7 +67,9 @@ describe('écran suivi des dépenses', () => {
     expect((screen.getByLabelText('Au') as HTMLInputElement).value).toBe('2026-11-13');
     expect(service.calls).toEqual([{ granularity: 'day', from: '2026-11-01', to: '2026-11-13' }]);
     const bars = screen.getByRole('list', { name: 'Dépenses par jour' });
-    expect(within(bars).getAllByRole('listitem')).toHaveLength(13);
+    const [periodRow, ...dayRows] = within(bars).getAllByRole('listitem');
+    expect(periodRow!.getAttribute('aria-label')).toBe('Toute la période, novembre 2026 : 872,63 €');
+    expect(dayRows).toHaveLength(13);
     expect(totalText()).toContain('Dépenses 58,60 €');
     expect(totalText()).toContain('Sorties 814,03 €');
   });
@@ -95,6 +97,7 @@ describe('écran suivi des dépenses', () => {
 
     await waitFor(() => expect(totalText()).toContain('173,22 €'));
     expect(service.calls.at(-1)).toEqual({ granularity: 'day', from: '2026-11-09', to: '2026-11-13' });
+    expect(screen.getByRole('listitem', { name: 'Toute la période, semaine du 9 nov. : 173,22 €' })).toBeTruthy();
   });
 
   it('une plage longue choisie aux date-pickers décoche les raccourcis et regroupe par mois', async () => {
@@ -109,7 +112,9 @@ describe('écran suivi des dépenses', () => {
       expect((screen.getByRole('radio', { name }) as HTMLInputElement).checked).toBe(false);
     }
     const bars = screen.getByRole('list', { name: 'Dépenses par mois' });
-    expect(within(bars).getAllByRole('listitem')).toHaveLength(11);
+    const [periodRow, ...monthRows] = within(bars).getAllByRole('listitem');
+    expect(periodRow!.getAttribute('aria-label')).toBe('Toute la période, du 1 janv. au 13 nov. : 1172,63 €');
+    expect(monthRows).toHaveLength(11);
     expect(within(bars).getByRole('button', { name: 'septembre 2026 : 300,00 €' })).toBeTruthy();
   });
 
@@ -214,7 +219,7 @@ describe('écran suivi des dépenses', () => {
     expect(within(chart).queryByText('Dépenses')).toBeNull();
   });
 
-  it('trace la journée heure par heure jusqu’à l’heure actuelle', async () => {
+  it('trace la journée heure par heure jusqu’à l’heure actuelle, sans ligne de synthèse', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 

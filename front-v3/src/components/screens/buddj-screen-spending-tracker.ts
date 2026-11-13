@@ -20,7 +20,7 @@ import type {
 } from '../../application/spending-tracker/spending-tracker-types.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
-import { formatBucketLabel } from '../../shared/spending-bucket-label.js';
+import { formatBucketLabel, formatRangeLabel } from '../../shared/spending-bucket-label.js';
 import {
   cumulativeSpending,
   hourlyCumulativeSpending,
@@ -375,7 +375,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     }
 
     const max = Math.max(...view.buckets.map((b) => b.total));
-    list.innerHTML = view.buckets
+    list.innerHTML = this._periodRowHtml({ view }) + view.buckets
       .map((bucket) => {
         const label = formatBucketLabel({ start: bucket.start, granularity: view.granularity });
         const amount = formatEuros(bucket.total);
@@ -398,6 +398,26 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
         </li>`;
       })
       .join('');
+  }
+
+  /** Ligne de synthèse de toute la période, en tête de liste dès qu'il y a plusieurs buckets. */
+  private _periodRowHtml({ view }: { view: SpendingTrackerView }): string {
+    if (view.buckets.length < 2) return '';
+    const label = formatRangeLabel({ from: view.from, to: view.to });
+    const amount = formatEuros(view.total);
+    const expenseWidth = view.total > 0 ? (view.expensesTotal / view.total) * 100 : 0;
+    const outflowWidth = view.total > 0 ? (view.outflowsTotal / view.total) * 100 : 0;
+    return `
+        <li class="spending-tracker-bar-row spending-tracker-bar-row--period" aria-label="${escapeAttr(`Toute la période, ${label} : ${amount}`)}">
+          <div class="spending-tracker-bar spending-tracker-bar--period">
+            <span class="spending-tracker-bar-label">${escapeHtml(label)}</span>
+            <span class="spending-tracker-bar-track" aria-hidden="true">
+              <span class="spending-tracker-bar-fill spending-tracker-bar-fill--expense" style="width:${expenseWidth.toFixed(2)}%"></span>
+              <span class="spending-tracker-bar-fill spending-tracker-bar-fill--outflow" style="width:${outflowWidth.toFixed(2)}%"></span>
+            </span>
+            <span class="spending-tracker-bar-amount">${escapeHtml(amount)}</span>
+          </div>
+        </li>`;
   }
 
   private _renderDetail({ main, view }: { main: HTMLElement; view: SpendingTrackerView | null }): void {
