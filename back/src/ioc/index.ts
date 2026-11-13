@@ -103,6 +103,10 @@ import projectDto, {
 } from "../consumers/api/dtos/projectDto.js";
 import { client, userRepository } from "./persistence.js";
 import * as usecases from "./usecases.js";
+import { eventBus } from "./events.js";
+import { registerSubscriptions } from "./subscriptions.js";
+
+registerSubscriptions(eventBus, usecases);
 
 export type Deps = {
   userRepository: UserRepository;

@@ -8,6 +8,12 @@ const eventPublisherStub = {
   publish: sinon.stub(),
 };
 
+const trackedSpendingRepositoryStub = {
+  save: sinon.stub(),
+  deleteBySource: sinon.stub(),
+  findBetween: sinon.stub(),
+};
+
 const projectRepositoryStub = {
   getAllByCategory: sinon.stub(),
   getById: sinon.stub(),
@@ -70,6 +76,9 @@ const yearlyOutflowRepositoryStub = {
 
 function resetStubs() {
   eventPublisherStub.publish.reset();
+  trackedSpendingRepositoryStub.save.reset();
+  trackedSpendingRepositoryStub.deleteBySource.reset();
+  trackedSpendingRepositoryStub.findBetween.reset();
   monthRepositoryStub.addExpenseToWeeklyBudget.reset();
   monthRepositoryStub.addOutflow.reset();
   monthRepositoryStub.addBudget.reset();
@@ -122,5 +131,6 @@ export {
   idProviderStub,
   projectRepositoryStub,
   eventPublisherStub,
+  trackedSpendingRepositoryStub,
   resetStubs,
 };
