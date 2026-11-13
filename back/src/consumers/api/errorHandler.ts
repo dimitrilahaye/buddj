@@ -42,6 +42,7 @@ const errorHandler = (
     case "ProjectTargetMustBePositiveError":
     case "ProjectAmountMustBePositiveError":
     case "UnknownCategoryError":
+    case "SpendingTrackerRangeError":
       statusCode = 422;
       break;
     default:
