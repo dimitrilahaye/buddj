@@ -21,6 +21,12 @@ Règles communes :
 - **Erreurs isolées :** l'erreur d'un handler est loggée (`[events] handler for "<event>" failed`) et n'est jamais remontée à l'utilisateur.
 - **Idempotence :** l'unicité de `(kind, source_id)` fait qu'un rejeu de `expenseAdded` ou `outflowAdded` est ignoré (`ON CONFLICT DO NOTHING`).
 
+Choix assumés :
+
+- **Suppression d'un budget hebdo :** `RemoveBudget` efface les dépenses du budget en cascade sans rien publier. Elles restent donc dans le journal, comme pour un mois supprimé. C'est voulu : supprimer un budget à 0 € dont toutes les dépenses sont cochées sert à désencombrer l'écran des budgets, pas à effacer des dépenses réelles. Seul un `DELETE` explicite de dépense ou de sortie retire une ligne du journal.
+- **Modification d'une dépense :** la route dépréciée `UpdateExpense` n'est pas utilisée par le front. Elle ne publie aucun événement, et le journal garde les valeurs de l'ajout.
+- **Échec d'écriture dans le journal :** la ligne est perdue et il n'y a pas de rattrapage. L'opération de l'utilisateur, elle, est conservée.
+
 ## Ajout d'une dépense hebdo
 
 `POST /months/:monthId/weeks/:weekId/expenses`
