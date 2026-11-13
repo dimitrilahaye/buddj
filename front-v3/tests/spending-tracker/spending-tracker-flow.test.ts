@@ -170,19 +170,37 @@ describe('écran suivi des dépenses', () => {
     expect(screen.queryByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeNull();
   });
 
-  it('indique une période sans dépense', async () => {
+  it('indique une période sans dépense et explique comment le suivi se remplit', async () => {
     startOn('/spending-tracker', createSpendingTrackerServiceFromInMemory({ spendings: [] }));
 
     expect(await screen.findByText('Aucune dépense sur cette période.')).toBeTruthy();
+    expect(screen.getByText(/apparaissent ici au fil de l’eau/)).toBeTruthy();
     expect(screen.queryByRole('list', { name: 'Dépenses par jour' })).toBeNull();
+    const results = screen.getByRole('region', { name: 'Résultats du suivi des dépenses' });
+    expect(within(results).queryByRole('alert')).toBeNull();
   });
 
-  it('affiche l’erreur quand le chargement échoue', async () => {
-    startOn('/spending-tracker', createSpendingTrackerServiceFromInMemory({ failWith: 'Serveur indisponible' }));
+  it('affiche un message clair quand le chargement échoue, puis réessaie', async () => {
+    const working = createSpendingTrackerServiceFromInMemory({ spendings: SPENDINGS });
+    let failures = 1;
+    const flaky = {
+      async get(input: Parameters<typeof working.get>[0]) {
+        if (failures-- > 0) throw new Error('Erreur réseau');
+        return working.get(input);
+      },
+    };
+    startOn('/spending-tracker', flaky as typeof working);
 
-    await waitFor(() => {
-      expect(screen.getAllByRole('alert').some((el) => el.textContent === 'Serveur indisponible')).toBe(true);
-    });
+    const results = await screen.findByRole('region', { name: 'Résultats du suivi des dépenses' });
+    const alert = await within(results).findByRole('alert');
+    expect(alert.textContent).toContain('Impossible d’afficher ton suivi pour le moment');
+    expect(alert.textContent).not.toContain('Erreur réseau');
     expect(screen.queryByRole('status', { name: 'Total de la période' })).toBeNull();
+
+    fireEvent.click(within(alert).getByRole('button', { name: 'Réessayer' }));
+
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+    expect(within(results).queryByRole('alert')).toBeNull();
+    expect(working.calls).toEqual([{ granularity: 'day', from: '2026-11-01', to: '2026-11-13' }]);
   });
 });
