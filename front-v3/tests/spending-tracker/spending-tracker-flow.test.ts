@@ -170,6 +170,60 @@ describe('écran suivi des dépenses', () => {
     expect(screen.queryByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeNull();
   });
 
+  it('trace la courbe cumulée entre le résumé et le détail, avec une légende par type', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    const chart = screen.getByRole('figure');
+    expect(within(chart).getByText('Cumul sur la période')).toBeTruthy();
+    expect(within(chart).getByText('Dépenses')).toBeTruthy();
+    expect(within(chart).getByText('Sorties')).toBeTruthy();
+    expect(screen.getByRole('group', { name: /^Cumul de 872,63 € au .*13 nov\./ })).toBeTruthy();
+    const summary = screen.getByRole('status', { name: 'Total de la période' });
+    expect(summary.compareDocumentPosition(chart) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('parcourt la courbe au clavier et ouvre le détail de la période avec Entrée', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+    const plot = screen.getByRole('group', { name: /^Cumul de/ });
+
+    fireEvent.keyDown(plot, { key: 'ArrowLeft' });
+    fireEvent.keyDown(plot, { key: 'ArrowLeft' });
+
+    const readout = screen.getByRole('status', { name: 'Valeurs de la période survolée' });
+    expect(readout.textContent).toMatch(/12 nov\./);
+    expect(readout.textContent).toContain('856,13 € cumulés');
+    expect(readout.textContent).toContain('156,72 € ce jour');
+
+    fireEvent.keyDown(plot, { key: 'Enter' });
+
+    const detail = await screen.findByRole('list', { name: /^Dépenses : .*12 nov\./ });
+    expect(within(detail).getAllByRole('listitem')).toHaveLength(2);
+  });
+
+  it('suit le filtre par type : une seule série, sans légende', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Sorties' }));
+
+    await waitFor(() => expect(screen.getByRole('group', { name: /^Cumul de 58,60 €/ })).toBeTruthy());
+    const chart = screen.getByRole('figure');
+    expect(within(chart).queryByText('Sorties')).toBeNull();
+    expect(within(chart).queryByText('Dépenses')).toBeNull();
+  });
+
+  it('masque la courbe sur une plage d’un seul jour', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    fireEvent.click(screen.getByRole('radio', { name: "Aujourd'hui" }));
+
+    await waitFor(() => expect(totalText()).toContain('16,50 €'));
+    expect(screen.queryByRole('figure')).toBeNull();
+  });
+
   it('indique une période sans dépense et explique comment le suivi se remplit', async () => {
     startOn('/spending-tracker', createSpendingTrackerServiceFromInMemory({ spendings: [] }));
 
