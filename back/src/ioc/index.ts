@@ -101,6 +101,13 @@ import UpdateProject from "../core/usecases/project/UpdateProject.js";
 import projectDto, {
   ProjectDtoBuilder,
 } from "../consumers/api/dtos/projectDto.js";
+import GetSpendingTracker from "../core/usecases/spending-tracker/GetSpendingTracker.js";
+import getSpendingTrackerDeserializer, {
+  GetSpendingTrackerDeserializer,
+} from "../consumers/api/deserializers/spending-tracker/getSpendingTracker.js";
+import spendingTrackerDto, {
+  SpendingTrackerDtoBuilder,
+} from "../consumers/api/dtos/spendingTrackerDto.js";
 import { client, userRepository } from "./persistence.js";
 import * as usecases from "./usecases.js";
 import { eventBus } from "./events.js";
@@ -112,6 +119,7 @@ export type Deps = {
   userRepository: UserRepository;
   projectDto: ProjectDtoBuilder;
   monthDto: MonthDtoBuilder;
+  spendingTrackerDto: SpendingTrackerDtoBuilder;
   yearlyOutflowsDto: YearlyOutflowsDtoBuilder;
   getDefaultMonthlyTemplateUsecase: GetDefaultMonthlyTemplate;
   deleteMonthlyOutflowUsecase: DeleteMonthlyOutflow;
@@ -148,6 +156,7 @@ export type Deps = {
   removeProjectUsecase: RemoveProject;
   rollbackProjectUsecase: RollbackProject;
   updateProjectUsecase: UpdateProject;
+  getSpendingTrackerUsecase: GetSpendingTracker;
   addOutflowDeserializer: AddOutflowDeserializer;
   addBudgetDeserializer: AddBudgetDeserializer;
   updateBudgetDeserializer: UpdateBudgetDeserializer;
@@ -168,6 +177,7 @@ export type Deps = {
   deleteMonthlyBudgetDeserializer: DeleteMonthlyBudgetDeserializer;
   addMonthlyOutflowDeserializer: AddMonthlyOutflowDeserializer;
   addMonthlyBudgetDeserializer: AddMonthlyBudgetDeserializer;
+  getSpendingTrackerDeserializer: GetSpendingTrackerDeserializer;
 };
 
 export default {
@@ -175,6 +185,7 @@ export default {
   dbClient: client,
   userRepository,
   monthDto,
+  spendingTrackerDto,
   yearlyOutflowsDto,
   projectDto,
   addOutflowDeserializer,
@@ -197,4 +208,5 @@ export default {
   deleteMonthlyBudgetDeserializer,
   addMonthlyOutflowDeserializer,
   addMonthlyBudgetDeserializer,
+  getSpendingTrackerDeserializer,
 } as const;

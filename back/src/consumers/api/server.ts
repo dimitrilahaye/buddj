@@ -394,6 +394,14 @@ function buildApi(
     })
   );
 
+  api.use(
+    routes.spendingTracker.getSpendingTracker(router, {
+      usecase: dependencies.getSpendingTrackerUsecase,
+      dto: dependencies.spendingTrackerDto,
+      deserializer: dependencies.getSpendingTrackerDeserializer,
+    })
+  );
+
   /** @deprecated */
   api.use(
     routes.month.updateExpense(router, {
