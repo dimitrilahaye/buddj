@@ -35,6 +35,7 @@ import GetYearlyOutflows from "../core/usecases/yearly-saving/GetYearlyOutflows.
 import RemoveYearlyOutflow from "../core/usecases/yearly-saving/RemoveYearlyOutflow.js";
 import TrackSpending from "../core/usecases/spending-tracker/TrackSpending.js";
 import UntrackSpending from "../core/usecases/spending-tracker/UntrackSpending.js";
+import GetSpendingTracker from "../core/usecases/spending-tracker/GetSpendingTracker.js";
 import { eventBus } from "./events.js";
 import {
   monthRepository,
@@ -192,6 +193,10 @@ const trackSpendingUsecase = new TrackSpending(
 
 const untrackSpendingUsecase = new UntrackSpending(trackedSpendingRepository);
 
+const getSpendingTrackerUsecase = new GetSpendingTracker(
+  trackedSpendingRepository
+);
+
 export {
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
@@ -230,4 +235,5 @@ export {
   updateProjectUsecase,
   trackSpendingUsecase,
   untrackSpendingUsecase,
+  getSpendingTrackerUsecase,
 };
