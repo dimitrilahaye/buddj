@@ -33,6 +33,8 @@ import UpdateProject from "../core/usecases/project/UpdateProject.js";
 import AddYearlyOutflow from "../core/usecases/yearly-saving/AddYearlyOutflow.js";
 import GetYearlyOutflows from "../core/usecases/yearly-saving/GetYearlyOutflows.js";
 import RemoveYearlyOutflow from "../core/usecases/yearly-saving/RemoveYearlyOutflow.js";
+import TrackSpending from "../core/usecases/spending-tracker/TrackSpending.js";
+import UntrackSpending from "../core/usecases/spending-tracker/UntrackSpending.js";
 import { eventBus } from "./events.js";
 import {
   monthRepository,
@@ -42,6 +44,7 @@ import {
   pendingDebitRepository,
   yearlyOutflowRepository,
   projectRepository,
+  trackedSpendingRepository,
 } from "./persistence.js";
 import {
   monthFactory,
@@ -182,6 +185,13 @@ const rollbackProjectUsecase = new RollbackProject(projectRepository);
 
 const updateProjectUsecase = new UpdateProject(projectRepository);
 
+const trackSpendingUsecase = new TrackSpending(
+  idProvider,
+  trackedSpendingRepository
+);
+
+const untrackSpendingUsecase = new UntrackSpending(trackedSpendingRepository);
+
 export {
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
@@ -218,4 +228,6 @@ export {
   removeProjectUsecase,
   rollbackProjectUsecase,
   updateProjectUsecase,
+  trackSpendingUsecase,
+  untrackSpendingUsecase,
 };
