@@ -3975,17 +3975,64 @@ buddj-screen-spending-tracker {
   outline-offset: 1px;
 }
 
-.spending-tracker-range-error,
-.spending-tracker-error {
+.spending-tracker-range-error {
   margin: 0;
   color: var(--coral);
   font-size: 0.85rem;
 }
 
-.spending-tracker-loading,
-.spending-tracker-empty {
+.spending-tracker-loading {
   color: var(--navy-soft);
   text-align: center;
+}
+
+.spending-tracker-error,
+.spending-tracker-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  text-align: center;
+}
+
+.spending-tracker-error[hidden],
+.spending-tracker-empty[hidden] {
+  display: none;
+}
+
+.spending-tracker-error-text,
+.spending-tracker-empty-title {
+  margin: 0;
+  color: var(--navy);
+}
+
+.spending-tracker-empty-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--navy-soft);
+}
+
+.spending-tracker-retry {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--coral);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--coral);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.spending-tracker-retry:hover {
+  box-shadow: 0 0 12px var(--coral-glow);
+}
+
+.spending-tracker-retry:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .spending-tracker-summary {

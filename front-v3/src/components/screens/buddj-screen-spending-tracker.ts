@@ -18,7 +18,6 @@ import type {
   SpendingTrackerView,
   TrackedSpendingKind,
 } from '../../application/spending-tracker/spending-tracker-types.js';
-import { getToast } from '../atoms/buddj-toast.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
 
@@ -135,10 +134,16 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
         </form>
         <section class="spending-tracker-results" aria-label="Résultats du suivi des dépenses">
           <p class="spending-tracker-loading" hidden>Chargement du suivi…</p>
-          <p class="spending-tracker-error" role="alert" hidden></p>
+          <div class="spending-tracker-error" role="alert" hidden>
+            <p class="spending-tracker-error-text">Impossible d’afficher ton suivi pour le moment. Vérifie ta connexion puis réessaie.</p>
+            <button type="button" class="btn spending-tracker-retry">Réessayer</button>
+          </div>
           <div class="spending-tracker-summary" role="status" aria-label="Total de la période" hidden></div>
           <ol class="spending-tracker-bars"></ol>
-          <p class="spending-tracker-empty" hidden>Aucune dépense sur cette période.</p>
+          <div class="spending-tracker-empty" hidden>
+            <p class="spending-tracker-empty-title">Aucune dépense sur cette période.</p>
+            <p class="spending-tracker-empty-hint">Les dépenses et sorties que tu ajoutes à un mois apparaissent ici au fil de l’eau.</p>
+          </div>
           <section class="spending-tracker-detail" hidden></section>
         </section>
       </div>
@@ -149,7 +154,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     main.addEventListener('click', this._onClick);
     main.querySelector('form')?.addEventListener('submit', this._onSubmit);
     store.addEventListener('spendingTrackerStateUpdated', this._onStateUpdated);
-    store.addEventListener('spendingTrackerLoadFailed', this._onLoadFailed);
 
     const { range, shortcut } = store.getState();
     if (shortcut) {
@@ -172,7 +176,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     }
     if (store) {
       store.removeEventListener('spendingTrackerStateUpdated', this._onStateUpdated);
-      store.removeEventListener('spendingTrackerLoadFailed', this._onLoadFailed);
     }
     this._main = undefined;
   }
@@ -187,11 +190,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
   private _onStateUpdated = (): void => {
     this._syncFromStore();
   };
-
-  private _onLoadFailed = ((e: Event) => {
-    const message = (e as CustomEvent<{ message?: string }>).detail?.message ?? 'Impossible de charger le suivi des dépenses';
-    getToast()?.show({ message, variant: 'error', durationMs: 3500 });
-  }) as EventListener;
 
   private _onSubmit = (e: Event): void => {
     e.preventDefault();
@@ -245,6 +243,10 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
   }
 
   private _onClick = (e: Event): void => {
+    if ((e.target as Element).closest('.spending-tracker-retry')) {
+      this._retry();
+      return;
+    }
     const button = (e.target as Element).closest('.spending-tracker-bar');
     if (!button) return;
     const start = button.getAttribute('data-start');
@@ -252,6 +254,18 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     this._selectedStart = this._selectedStart === start ? null : start;
     this._syncFromStore();
   };
+
+  /** Relance la dernière plage demandée (raccourci recalculé s'il y en a un). */
+  private _retry(): void {
+    const store = this._store;
+    if (!store) return;
+    const { range, shortcut } = store.getState();
+    if (shortcut) {
+      this._requestShortcut(shortcut);
+    } else if (range) {
+      store.emitAction('loadSpendingTracker', { ...range, shortcut: null });
+    }
+  }
 
   private _syncFromStore(): void {
     const store = this._store;
@@ -265,7 +279,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     const errorEl = main.querySelector('.spending-tracker-error') as HTMLElement;
     loadingEl.hidden = !isLoading;
     errorEl.hidden = !loadErrorMessage || isLoading;
-    errorEl.textContent = loadErrorMessage ?? '';
 
     const showView = view !== null && !loadErrorMessage;
     const filtered = view ? filterSpendingTrackerView({ view, kinds }) : null;
