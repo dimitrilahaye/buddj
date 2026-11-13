@@ -14,7 +14,7 @@ flowchart LR
     subgraph consumers["consumers/api (adapters primaires)"]
         server["server.ts<br/>Express, cookie-session, isLoggedIn"]
         middleware["middleware/request-validator"]
-        routes["routes/<br/>month, monthly-template,<br/>project, yearly-saving"]
+        routes["routes/<br/>month, monthly-template,<br/>project, yearly-saving,<br/>spending-tracker"]
         deserializers["deserializers/<br/>Koi ou zod (schemas.ts)<br/>params + body vers Command"]
         dtos["dtos/<br/>modèle vers JSON"]
         errorHandler["errorHandler.ts<br/>400 / 404 / 422"]
@@ -22,13 +22,13 @@ flowchart LR
 
     subgraph core["core (domaine, sans dépendance externe)"]
         commands["commands/<br/>entrées des use-cases"]
-        usecases["usecases/<br/>month, monthly-template,<br/>project, yearly-saving"]
+        usecases["usecases/<br/>month, monthly-template,<br/>project, yearly-saving,<br/>spending-tracker"]
         models["models/<br/>Month (agrégat) > Account ><br/>WeeklyBudget > WeeklyExpense,<br/>AccountOutflow, Project..."]
         factories["factories/"]
         domainServices["domain-services/"]
         errors["errors/"]
         subgraph ports["ports"]
-            repoPorts["repositories/<br/>MonthRepository,<br/>ProjectRepository..."]
+            repoPorts["repositories/<br/>MonthRepository, ProjectRepository,<br/>TrackedSpendingRepository..."]
             providerPorts["providers/<br/>IdProvider"]
         end
     end
@@ -86,20 +86,21 @@ flowchart LR
     iocPersistence -. "instancie" .-> repos
     iocProviders -. "instancie" .-> factories & idProvider
 
-    %% Prévu : spending-tracker (bus d'événements)
-    subgraph events["Prévu : événements spending-tracker"]
+    %% Événements de domaine (spending-tracker)
+    subgraph events["Événements de domaine (voir docs/workflows/spending-tracker)"]
         eventPorts["core/ports/providers<br/>EventPublisher, EventSubscriber"]
         eventMap["core/events<br/>DomainEventMap typée"]
-        bus["providers/events/NodeEventBus<br/>node:events, fire-and-forget"]
+        bus["providers/events/NodeEventBus<br/>node:events + setImmediate"]
+        subscriptions["ioc/subscriptions.ts<br/>événement vers use-case"]
         trackUsecases["usecases/spending-tracker<br/>TrackSpending, UntrackSpending"]
     end
     usecases -. "publish(expenseAdded, outflowDeleted...)" .-> eventPorts
     eventPorts --> eventMap
     bus -. "implémente" .-> eventPorts
+    iocIndex -. "registerSubscriptions" .-> subscriptions
+    subscriptions -- "subscribe" --> bus
     bus -. "handlers asynchrones" .-> trackUsecases
     trackUsecases --> repoPorts
 
     classDef external fill:#eee,stroke:#999,color:#333
-    classDef planned stroke-dasharray: 5 5
     class client,google,pg external
-    class eventPorts,eventMap,bus,trackUsecases planned
