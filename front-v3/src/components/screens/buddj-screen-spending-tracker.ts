@@ -20,6 +20,7 @@ import type {
 } from '../../application/spending-tracker/spending-tracker-types.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
+import { formatBucketLabel } from '../../shared/spending-bucket-label.js';
 
 const DEFAULT_SHORTCUT: SpendingRangeShortcut = 'month';
 
@@ -40,14 +41,6 @@ const GRANULARITY_LIST_LABELS: Record<SpendingGranularity, string> = {
   month: 'Dépenses par mois',
 };
 
-const dayFormatter = new Intl.DateTimeFormat('fr-FR', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'UTC',
-});
-const weekFormatter = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', timeZone: 'UTC' });
-const monthFormatter = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const timeFormatter = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' });
 const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
   day: 'numeric',
@@ -55,20 +48,6 @@ const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
   hour: '2-digit',
   minute: '2-digit',
 });
-
-/** Libellé d'un bucket : « lun. 2 nov. », « semaine du 2 nov. », « novembre 2026 ». */
-export function formatBucketLabel({
-  start,
-  granularity,
-}: {
-  start: string;
-  granularity: SpendingGranularity;
-}): string {
-  const date = new Date(`${start}T00:00:00Z`);
-  if (granularity === 'week') return `semaine du ${weekFormatter.format(date)}`;
-  if (granularity === 'month') return monthFormatter.format(date);
-  return dayFormatter.format(date);
-}
 
 export class BuddjScreenSpendingTracker extends HTMLElement {
   static readonly tagName = 'buddj-screen-spending-tracker';
