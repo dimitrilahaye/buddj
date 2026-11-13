@@ -1,10 +1,6 @@
 import { configDotenv } from "dotenv";
-import { execSync } from "node:child_process";
 
 configDotenv();
 
+// La BDD (conteneur éphémère + migrations) est préparée par run-with-testcontainer.ts
 process.env.NODE_ENV = "test";
-
-execSync("npm run db:prepare:test", {
-  stdio: "inherit",
-});
