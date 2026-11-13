@@ -1,0 +1,73 @@
+---
+title: Front (front-v3/src) - Web Components + ports / adapters
+---
+flowchart LR
+    api(["API back<br/>VITE_API_URL"])
+    browser(["Navigateur<br/>History API, DOM"])
+
+    subgraph entry["Démarrage"]
+        main["main.ts"]
+        config["config.ts<br/>buildConfigFromEnv"]
+        bootstrap["bootstrap.ts<br/>instancie services, use-cases, stores<br/>délégation des clics SPA, lien actif du burger"]
+        register["register-components.ts"]
+    end
+
+    subgraph routing["Routage"]
+        routerConfig["router-config.ts<br/>createRoutes, wrapGuard (auth)"]
+        router["router.ts<br/>createRouter, outlet #screen-outlet"]
+    end
+
+    subgraph components["components (Custom Elements, innerHTML, sans Shadow DOM)"]
+        screens["screens/<br/>buddj-screen-*<br/>init({ stores })"]
+        organisms["organisms/<br/>drawers, burger-panel, nav, cards"]
+        molecules["molecules/<br/>modals, items"]
+        atoms["atoms/ + icons/"]
+    end
+
+    subgraph application["application (coeur front)"]
+        store["store.ts<br/>Store&lt;T&gt; extends EventTarget<br/>getState, setState, emitAction"]
+        stores["*-store.ts<br/>month, archived-month, templates,<br/>yearly-outflows, savings,<br/>reimbursements, auth"]
+        usecases["use-cases<br/>create-expense, update-budget..."]
+        servicePorts["ports *-service.ts<br/>MonthService, TemplateService..."]
+        views["view models<br/>MonthView, month-types"]
+    end
+
+    subgraph adapters["adapters"]
+        fromApi["*-service-from-api.ts<br/>fetch, credentials: include"]
+        fromMemory["*-service-from-in-memory.ts<br/>utilisés par les tests"]
+        mappers["map-api-*-to-view.ts"]
+    end
+
+    subgraph shared["shared"]
+        httpError["http-error.ts<br/>toast + throw"]
+        getData["get-reponse-data-or-fail.ts<br/>déballe { success, data }"]
+        utils["escape, search, emoji-label..."]
+    end
+
+    %% Démarrage et routage
+    main --> config
+    main --> bootstrap
+    bootstrap --> register --> components
+    bootstrap --> routerConfig --> router
+    router -- "replaceChildren" --> screens
+    browser <--> router
+
+    %% Cycle d'un store
+    screens --> organisms --> molecules --> atoms
+    screens & organisms -- "emitAction('createExpense', payload)" --> stores
+    stores -- "events d'état<br/>expenseCreateLoaded..." --> screens & organisms
+    stores --> store
+    stores -- "execute" --> usecases
+    usecases --> servicePorts
+    usecases --> views
+
+    %% Adapters
+    fromApi -. "implémente" .-> servicePorts
+    fromMemory -. "implémente" .-> servicePorts
+    fromApi --> mappers --> views
+    fromApi --> httpError & getData
+    fromApi -- "HTTP" --> api
+    bootstrap -. "injecte from-api<br/>(ou in-memory en test)" .-> fromApi
+
+    classDef external fill:#eee,stroke:#999,color:#333
+    class api,browser external

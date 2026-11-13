@@ -1,0 +1,105 @@
+---
+title: Back (back/src) - architecture hexagonale
+---
+flowchart LR
+    client(["Front (front-v3)"])
+    google(["Google OAuth"])
+    pg[("PostgreSQL")]
+
+    subgraph entry["Points d'entrée"]
+        index["index.ts<br/>connexion BDD + buildApi"]
+        env["env-vars.ts<br/>dotenv, DB_*_TEST si NODE_ENV=test"]
+    end
+
+    subgraph consumers["consumers/api (adapters primaires)"]
+        server["server.ts<br/>Express, cookie-session, isLoggedIn"]
+        middleware["middleware/request-validator"]
+        routes["routes/<br/>month, monthly-template,<br/>project, yearly-saving"]
+        deserializers["deserializers/<br/>Koi ou zod (schemas.ts)<br/>params + body vers Command"]
+        dtos["dtos/<br/>modèle vers JSON"]
+        errorHandler["errorHandler.ts<br/>400 / 404 / 422"]
+    end
+
+    subgraph core["core (domaine, sans dépendance externe)"]
+        commands["commands/<br/>entrées des use-cases"]
+        usecases["usecases/<br/>month, monthly-template,<br/>project, yearly-saving"]
+        models["models/<br/>Month (agrégat) > Account ><br/>WeeklyBudget > WeeklyExpense,<br/>AccountOutflow, Project..."]
+        factories["factories/"]
+        domainServices["domain-services/"]
+        errors["errors/"]
+        subgraph ports["ports"]
+            repoPorts["repositories/<br/>MonthRepository,<br/>ProjectRepository..."]
+            providerPorts["providers/<br/>IdProvider"]
+        end
+    end
+
+    subgraph providers["providers (adapters secondaires)"]
+        subgraph persistence["persistence"]
+            typeorm["typeormConfig.ts<br/>DataSource"]
+            repos["repositories/<br/>TypeOrm*Repository<br/>UserRepository (pg brut)"]
+            entities["entities/<br/>DAO fromDomain / toDomain"]
+            migrations["migrations/"]
+            db["db.ts<br/>client pg"]
+        end
+        idProvider["IdProvider.ts<br/>uuid v4"]
+        passport["auth/passport-provider.ts"]
+    end
+
+    subgraph ioc["ioc (composition root)"]
+        iocIndex["index.ts<br/>type Deps"]
+        iocUsecases["usecases.ts"]
+        iocPersistence["persistence.ts"]
+        iocProviders["providers.ts"]
+    end
+
+    %% Flux d'une requête
+    client -- "HTTP + cookie de session" --> server
+    server --> middleware --> routes
+    routes --> deserializers --> commands
+    routes -- "execute(command)" --> usecases
+    routes --> dtos
+    routes -. "next(error)" .-> errorHandler
+    server --> passport --> google
+
+    %% Domaine
+    usecases --> factories --> models
+    usecases --> models
+    usecases --> domainServices
+    usecases --> repoPorts
+    factories --> providerPorts
+    models --> errors
+
+    %% Adapters vers ports (inversion de dépendance)
+    repos -. "implémente" .-> repoPorts
+    idProvider -. "implémente" .-> providerPorts
+    repos --> entities --> models
+    repos --> typeorm --> pg
+    repos --> db --> pg
+    migrations --> pg
+
+    %% Câblage
+    index --> env
+    index --> server
+    index --> iocIndex
+    iocIndex --> iocUsecases & iocPersistence & iocProviders
+    iocUsecases -. "injecte" .-> usecases
+    iocPersistence -. "instancie" .-> repos
+    iocProviders -. "instancie" .-> factories & idProvider
+
+    %% Prévu : spending-tracker (bus d'événements)
+    subgraph events["Prévu : événements spending-tracker"]
+        eventPorts["core/ports/providers<br/>EventPublisher, EventSubscriber"]
+        eventMap["core/events<br/>DomainEventMap typée"]
+        bus["providers/events/NodeEventBus<br/>node:events, fire-and-forget"]
+        trackUsecases["usecases/spending-tracker<br/>TrackSpending, UntrackSpending"]
+    end
+    usecases -. "publish(expenseAdded, outflowDeleted...)" .-> eventPorts
+    eventPorts --> eventMap
+    bus -. "implémente" .-> eventPorts
+    bus -. "handlers asynchrones" .-> trackUsecases
+    trackUsecases --> repoPorts
+
+    classDef external fill:#eee,stroke:#999,color:#333
+    classDef planned stroke-dasharray: 5 5
+    class client,google,pg external
+    class eventPorts,eventMap,bus,trackUsecases planned
