@@ -21,6 +21,13 @@ import type {
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
 import { formatBucketLabel } from '../../shared/spending-bucket-label.js';
+import '../organisms/buddj-spending-tracker-chart.js';
+import type {
+  BuddjSpendingTrackerChart,
+  SpendingBucketSelect,
+} from '../organisms/buddj-spending-tracker-chart.js';
+
+const BUDDJ_CHART_TAG = 'buddj-spending-tracker-chart';
 
 const DEFAULT_SHORTCUT: SpendingRangeShortcut = 'month';
 
@@ -118,6 +125,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
             <button type="button" class="btn spending-tracker-retry">Réessayer</button>
           </div>
           <div class="spending-tracker-summary" role="status" aria-label="Total de la période" hidden></div>
+          <buddj-spending-tracker-chart hidden></buddj-spending-tracker-chart>
           <ol class="spending-tracker-bars"></ol>
           <div class="spending-tracker-empty" hidden>
             <p class="spending-tracker-empty-title">Aucune dépense sur cette période.</p>
@@ -131,6 +139,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
 
     main.addEventListener('change', this._onChange);
     main.addEventListener('click', this._onClick);
+    main.addEventListener('spending-bucket-select', this._onBucketSelect);
     main.querySelector('form')?.addEventListener('submit', this._onSubmit);
     store.addEventListener('spendingTrackerStateUpdated', this._onStateUpdated);
 
@@ -151,6 +160,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     if (main) {
       main.removeEventListener('change', this._onChange);
       main.removeEventListener('click', this._onClick);
+      main.removeEventListener('spending-bucket-select', this._onBucketSelect);
       main.querySelector('form')?.removeEventListener('submit', this._onSubmit);
     }
     if (store) {
@@ -234,6 +244,13 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     this._syncFromStore();
   };
 
+  /** Sélection depuis le graphique : affiche le détail de la période. */
+  private _onBucketSelect = (e: Event): void => {
+    const { start } = (e as CustomEvent<SpendingBucketSelect>).detail;
+    this._selectedStart = start;
+    this._syncFromStore();
+  };
+
   /** Relance la dernière plage demandée (raccourci recalculé s'il y en a un). */
   private _retry(): void {
     const store = this._store;
@@ -262,6 +279,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     const showView = view !== null && !loadErrorMessage;
     const filtered = view ? filterSpendingTrackerView({ view, kinds }) : null;
     this._renderSummary({ main, view: showView ? filtered : null });
+    this._renderChart({ main, view: showView ? filtered : null, kinds, isRefreshing: isLoading });
     this._renderBars({ main, view: showView ? filtered : null });
     this._renderDetail({ main, view: showView ? filtered : null });
   }
@@ -306,6 +324,25 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
         <span class="spending-tracker-split-item spending-tracker-split-item--outflow">Sorties ${escapeHtml(formatEuros(view.outflowsTotal))}</span>
       </p>
     `;
+  }
+
+  private _renderChart({
+    main,
+    view,
+    kinds,
+    isRefreshing,
+  }: {
+    main: HTMLElement;
+    view: SpendingTrackerView | null;
+    kinds: Record<TrackedSpendingKind, boolean>;
+    isRefreshing: boolean;
+  }): void {
+    const chart = main.querySelector(BUDDJ_CHART_TAG) as BuddjSpendingTrackerChart;
+    // Un seul point ne fait pas une courbe : la plage d'un jour garde résumé et détail.
+    const hasCurve = view !== null && view.total > 0 && view.buckets.length > 1;
+    chart.hidden = !hasCurve;
+    if (!hasCurve || !view) return;
+    chart.render({ view, kinds, selectedStart: this._selectedStart, isRefreshing });
   }
 
   private _renderBars({ main, view }: { main: HTMLElement; view: SpendingTrackerView | null }): void {

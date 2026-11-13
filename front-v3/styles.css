@@ -4076,13 +4076,209 @@ buddj-screen-spending-tracker {
 }
 
 .spending-tracker-split-item--expense::before,
-.spending-tracker-bar-fill--expense {
+.spending-tracker-bar-fill--expense,
+.spending-chart-swatch--expense {
   background: var(--series-expense);
 }
 
 .spending-tracker-split-item--outflow::before,
-.spending-tracker-bar-fill--outflow {
+.spending-tracker-bar-fill--outflow,
+.spending-chart-swatch--outflow {
   background: var(--series-outflow);
+}
+
+/* Graphique cumulé */
+buddj-spending-tracker-chart {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+buddj-spending-tracker-chart[hidden] {
+  display: none;
+}
+
+.spending-chart {
+  margin: 0;
+  padding: 0.85rem 0.75rem 0.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.spending-chart-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0 0.5rem 0.5rem;
+}
+
+.spending-chart-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.spending-chart-legend {
+  display: flex;
+  gap: 0.85rem;
+  font-size: 0.75rem;
+  color: var(--navy-soft);
+}
+
+.spending-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.spending-chart-swatch {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 2px;
+}
+
+.spending-chart-plot {
+  position: relative;
+  border-radius: var(--radius);
+  cursor: crosshair;
+  touch-action: pan-y;
+  transition: opacity 0.2s;
+}
+
+.spending-chart-plot:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.spending-chart-plot--refreshing {
+  opacity: 0.5;
+}
+
+.spending-chart-svg {
+  display: block;
+  overflow: visible;
+}
+
+.spending-chart-grid {
+  stroke: rgba(255, 255, 255, 0.07);
+  stroke-width: 1;
+}
+
+.spending-chart-tick {
+  fill: var(--navy-soft);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-chart-area--expense {
+  fill: var(--series-expense);
+  fill-opacity: 0.14;
+}
+
+.spending-chart-area--outflow {
+  fill: var(--series-outflow);
+  fill-opacity: 0.14;
+}
+
+.spending-chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.spending-chart-line--expense {
+  stroke: var(--series-expense);
+}
+
+.spending-chart-line--outflow {
+  stroke: var(--series-outflow);
+}
+
+.spending-chart-dot {
+  stroke: var(--bg-card);
+  stroke-width: 2;
+}
+
+.spending-chart-dot--expense {
+  fill: var(--series-expense);
+}
+
+.spending-chart-dot--outflow {
+  fill: var(--series-outflow);
+}
+
+.spending-chart-end-label {
+  fill: var(--navy);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.spending-chart-crosshair {
+  stroke: var(--navy-soft);
+  stroke-width: 1;
+}
+
+.spending-chart-selected {
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-opacity: 0.7;
+}
+
+.spending-chart-tooltip {
+  position: absolute;
+  top: 0.25rem;
+  left: var(--x, 0);
+  transform: translateX(0.6rem);
+  min-width: 9rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  font-size: 0.75rem;
+  color: var(--navy-soft);
+  z-index: 1;
+}
+
+.spending-chart-tooltip--left {
+  transform: translateX(calc(-100% - 0.6rem));
+}
+
+.spending-chart-tooltip-title {
+  margin: 0 0 0.25rem;
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.spending-chart-tooltip-title::first-letter {
+  text-transform: uppercase;
+}
+
+.spending-chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.1rem 0;
+}
+
+.spending-chart-tooltip-row {
+  white-space: nowrap;
+}
+
+.spending-chart-tooltip-row strong {
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-chart-tooltip-key {
+  display: inline-block;
+  width: 0.75rem;
+  height: 2px;
+  border-radius: 1px;
 }
 
 .spending-tracker-bars {
