@@ -3840,6 +3840,12 @@ body.route-budgets .budget-list {
 }
 
 /* ========== Écran Suivi des dépenses ========== */
+/* Couleurs des types, validées sur --bg-card (contraste, daltonisme, écart en vision normale). */
+:root {
+  --series-expense: #d4694e;
+  --series-outflow: #8a6fd6;
+}
+
 buddj-screen-spending-tracker {
   display: none;
 }
@@ -4071,12 +4077,12 @@ buddj-screen-spending-tracker {
 
 .spending-tracker-split-item--expense::before,
 .spending-tracker-bar-fill--expense {
-  background: var(--coral);
+  background: var(--series-expense);
 }
 
 .spending-tracker-split-item--outflow::before,
 .spending-tracker-bar-fill--outflow {
-  background: var(--accent-purple);
+  background: var(--series-outflow);
 }
 
 .spending-tracker-bars {
@@ -4192,11 +4198,11 @@ buddj-screen-spending-tracker {
 }
 
 .spending-tracker-entry-kind--expense {
-  background: var(--coral);
+  background: var(--series-expense);
 }
 
 .spending-tracker-entry-kind--outflow {
-  background: var(--accent-purple);
+  background: var(--series-outflow);
 }
 
 .spending-tracker-entry-label {
