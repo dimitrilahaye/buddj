@@ -77,6 +77,10 @@ export class BuddjBurgerPanel extends HTMLElement {
         </div>
         <nav class="burger-panel-content">
           <ul class="burger-panel-list">
+            <li><a href="/spending-tracker" class="burger-panel-link">Suivi des dépenses</a></li>
+          </ul>
+          <div class="burger-panel-divider" aria-hidden="true"></div>
+          <ul class="burger-panel-list">
             <li><a href="/new-month" class="burger-panel-link">Créer un nouveau mois</a></li>
             <li><a href="/archived" class="burger-panel-link">Accéder aux mois archivés</a></li>
             <li><a href="/templates" class="burger-panel-link">Gérer les templates</a></li>
