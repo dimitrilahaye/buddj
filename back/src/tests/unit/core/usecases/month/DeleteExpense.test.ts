@@ -4,7 +4,11 @@ import expect from "../../../../test-helpers.js";
 import DeleteExpenseCommand from "../../../../../core/commands/DeleteExpenseCommand.js";
 import DeleteExpense from "../../../../../core/usecases/month/DeleteExpense.js";
 import { MonthNotFoundError } from "../../../../../core/errors/MonthErrors.js";
-import { monthRepositoryStub, resetStubs } from "../test-helpers.js";
+import {
+  eventPublisherStub,
+  monthRepositoryStub,
+  resetStubs,
+} from "../test-helpers.js";
 
 describe("Unit | Core | Usecases | DeleteExpense", function () {
   beforeEach(() => {
@@ -23,7 +27,7 @@ describe("Unit | Core | Usecases | DeleteExpense", function () {
     };
     monthRepositoryStub.getById.withArgs(command.monthId).resolves(foundMonth);
 
-    const usecase = new DeleteExpense(monthRepositoryStub);
+    const usecase = new DeleteExpense(monthRepositoryStub, eventPublisherStub);
 
     // when
     const month = await usecase.execute(command);
@@ -38,6 +42,10 @@ describe("Unit | Core | Usecases | DeleteExpense", function () {
     expect(
       monthRepositoryStub.updateWeeklyBudgetCurrentBalance
     ).to.have.been.calledOnceWith(foundMonth, command.weeklyId);
+    expect(eventPublisherStub.publish).to.have.been.calledOnceWithExactly(
+      "expenseDeleted",
+      { expenseId: command.expenseId }
+    );
     expect(month).to.deep.equal(foundMonth);
   });
   it("should throw an error if month is not found", async function () {
@@ -50,11 +58,12 @@ describe("Unit | Core | Usecases | DeleteExpense", function () {
 
     monthRepositoryStub.getById.withArgs(command.monthId).resolves(null);
 
-    const usecase = new DeleteExpense(monthRepositoryStub);
+    const usecase = new DeleteExpense(monthRepositoryStub, eventPublisherStub);
 
     // when / then
     await expect(usecase.execute(command)).to.be.rejectedWith(
       MonthNotFoundError
     );
+    expect(eventPublisherStub.publish).not.to.have.been.called;
   });
 });

@@ -33,6 +33,7 @@ import UpdateProject from "../core/usecases/project/UpdateProject.js";
 import AddYearlyOutflow from "../core/usecases/yearly-saving/AddYearlyOutflow.js";
 import GetYearlyOutflows from "../core/usecases/yearly-saving/GetYearlyOutflows.js";
 import RemoveYearlyOutflow from "../core/usecases/yearly-saving/RemoveYearlyOutflow.js";
+import { eventBus } from "./events.js";
 import {
   monthRepository,
   monthlyTemplateRepository,
@@ -117,7 +118,8 @@ const addMonthlyBudgetUsecase = new AddMonthlyBudget(
 
 const addWeeklyExpenseUsecase = new AddWeeklyExpense(
   weeklyExpenseFactory,
-  monthRepository
+  monthRepository,
+  eventBus
 );
 
 const archiveMonthUsecase = new ArchiveMonth(monthRepository);
@@ -126,13 +128,17 @@ const unarchiveMonthUsecase = new UnarchiveMonth(monthRepository);
 
 const deleteMonthUsecase = new DeleteMonth(monthRepository);
 
-const deleteExpenseUsecase = new DeleteExpense(monthRepository);
+const deleteExpenseUsecase = new DeleteExpense(monthRepository, eventBus);
 
 const updateExpenseUsecase = new UpdateExpense(monthRepository);
 
-const deleteOutflowUsecase = new DeleteOutflow(monthRepository);
+const deleteOutflowUsecase = new DeleteOutflow(monthRepository, eventBus);
 
-const addOutflowUsecase = new AddOutflow(outflowFactory, monthRepository);
+const addOutflowUsecase = new AddOutflow(
+  outflowFactory,
+  monthRepository,
+  eventBus
+);
 
 const addBudgetUsecase = new AddBudget(budgetFactory, monthRepository);
 
