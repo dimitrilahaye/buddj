@@ -122,6 +122,7 @@ function getBodyClassToggles(match: { name: string }): Array<{ class: string; ac
 }
 
 const BURGER_LINK_ACTIVE_BY_HREF: Record<string, string[]> = {
+  '/spending-tracker': ['spending-tracker'],
   '/new-month': ['new-month'],
   '/archived': ['archived'],
   '/templates': ['templates', 'template-detail'],
