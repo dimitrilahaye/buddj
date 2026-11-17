@@ -120,6 +120,8 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
 
   private _onStore = (): void => {
     this._syncFromStore();
+    const search = document.getElementById('annual-outflows-search-drawer') as { refresh?: () => void } | null;
+    search?.refresh?.();
   };
 
   private _renderShell(): void {

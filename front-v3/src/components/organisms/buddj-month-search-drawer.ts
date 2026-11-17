@@ -8,6 +8,8 @@ import { getCurrentMonth } from '../../application/month/month-state.js';
 import type { MonthStore } from '../../application/month/month-store.js';
 import type { BuddjSearchDrawerElement, SearchDrawerEntry } from './buddj-search-drawer.js';
 import type { BuddjConfirmModalElement } from '../molecules/buddj-confirm-modal.js';
+import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
+import { openChargeEditDrawer, openExpenseEditDrawer } from '../../shared/line-edit-drawers.js';
 
 const CHARGE_CB_PREFIX = 'buddj-month-search-charge-cb-';
 const EXPENSE_CB_PREFIX = 'buddj-month-search-expense-cb-';
@@ -166,36 +168,47 @@ export class BuddjMonthSearchDrawer extends HTMLElement {
     });
 
     lineItem.appendChild(checkbox);
-
-    const deleteBtn = document.createElement('buddj-icon-delete');
-    deleteBtn.setAttribute('title', 'Supprimer');
-    deleteBtn.slot = 'actions';
-    deleteBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const oid = entry.outflowId;
-      const realRow = !oid
-        ? null
-        : (document.querySelector(
-          `buddj-charge-item[outflow-id="${CSS.escape(oid)}"]`,
-        ) as LineRowElement | null);
-      if (realRow?.requestDelete) {
-        realRow.requestDelete();
-        return;
-      }
-      const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
-      modal?.show({
-        title: `Voulez-vous vraiment supprimer la charge "${entry.label}" ?`,
-        onConfirm: () => {
-          if (oid && this._monthStore) {
-            this._monthStore.emitAction('deleteOutflow', { outflowId: oid });
-          }
-        },
-        onCancel: () => {},
-      });
+    lineItem.appendChild(createLineActionsMenu({ subject: 'la charge' }));
+    listenLineMenuActions(lineItem, {
+      onEdit: () => this.editCharge(entry),
+      onDelete: () => this.deleteCharge(entry),
     });
-
-    lineItem.appendChild(deleteBtn);
     return lineItem;
+  }
+
+  /** Édition directe via le store : la ligne réelle peut ne pas être affichée (autre écran). */
+  private editCharge(entry: Extract<MonthSearchEntry, { kind: 'charge' }>): void {
+    const outflowId = entry.outflowId;
+    if (!outflowId) return;
+    openChargeEditDrawer({
+      label: entry.label,
+      icon: entry.icon,
+      amount: parseFloat(entry.amount) || 0,
+      onSubmit: (label, amount) => this._monthStore?.emitAction('updateOutflow', { outflowId, label, amount }),
+    });
+  }
+
+  private deleteCharge(entry: Extract<MonthSearchEntry, { kind: 'charge' }>): void {
+    const oid = entry.outflowId;
+    const realRow = !oid
+      ? null
+      : (document.querySelector(
+        `buddj-charge-item[outflow-id="${CSS.escape(oid)}"]`,
+      ) as LineRowElement | null);
+    if (realRow?.requestDelete) {
+      realRow.requestDelete();
+      return;
+    }
+    const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
+    modal?.show({
+      title: `Voulez-vous vraiment supprimer la charge "${entry.label}" ?`,
+      onConfirm: () => {
+        if (oid && this._monthStore) {
+          this._monthStore.emitAction('deleteOutflow', { outflowId: oid });
+        }
+      },
+      onCancel: () => {},
+    });
   }
 
   private createExpenseMirrorRow(entry: Extract<MonthSearchEntry, { kind: 'expense' }>): HTMLElement {
@@ -242,37 +255,50 @@ export class BuddjMonthSearchDrawer extends HTMLElement {
       }
     });
 
-    const deleteBtn = document.createElement('buddj-icon-delete');
-    deleteBtn.setAttribute('title', 'Supprimer');
-    deleteBtn.slot = 'actions';
-    deleteBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const eid = entry.expenseId;
-      const wid = entry.weeklyBudgetId;
-      const realRow = !eid
-        ? null
-        : (document.querySelector(
-          `#budgets buddj-expense-item[expense-id="${CSS.escape(eid)}"]`,
-        ) as LineRowElement | null);
-      if (realRow?.requestDelete) {
-        realRow.requestDelete();
-        return;
-      }
-      const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
-      modal?.show({
-        title: `Voulez-vous vraiment supprimer la dépense "${entry.label}" ?`,
-        onConfirm: () => {
-          if (eid && wid && this._monthStore) {
-            this._monthStore.emitAction('deleteExpense', { expenseId: eid, weeklyBudgetId: wid });
-          }
-        },
-        onCancel: () => {},
-      });
-    });
-
     lineItem.appendChild(checkbox);
-    lineItem.appendChild(deleteBtn);
+    lineItem.appendChild(createLineActionsMenu({ subject: 'la dépense' }));
+    listenLineMenuActions(lineItem, {
+      onEdit: () => this.editExpense(entry),
+      onDelete: () => this.deleteExpense(entry),
+    });
     return lineItem;
+  }
+
+  /** Édition directe via le store : la ligne réelle peut ne pas être affichée (autre écran). */
+  private editExpense(entry: Extract<MonthSearchEntry, { kind: 'expense' }>): void {
+    const { expenseId, weeklyBudgetId } = entry;
+    if (!expenseId || !weeklyBudgetId) return;
+    openExpenseEditDrawer({
+      label: entry.label,
+      icon: entry.icon,
+      amount: parseFloat(entry.amount) || 0,
+      onSubmit: (label, amount) =>
+        this._monthStore?.emitAction('updateExpense', { expenseId, weeklyBudgetId, label, amount }),
+    });
+  }
+
+  private deleteExpense(entry: Extract<MonthSearchEntry, { kind: 'expense' }>): void {
+    const eid = entry.expenseId;
+    const wid = entry.weeklyBudgetId;
+    const realRow = !eid
+      ? null
+      : (document.querySelector(
+        `#budgets buddj-expense-item[expense-id="${CSS.escape(eid)}"]`,
+      ) as LineRowElement | null);
+    if (realRow?.requestDelete) {
+      realRow.requestDelete();
+      return;
+    }
+    const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
+    modal?.show({
+      title: `Voulez-vous vraiment supprimer la dépense "${entry.label}" ?`,
+      onConfirm: () => {
+        if (eid && wid && this._monthStore) {
+          this._monthStore.emitAction('deleteExpense', { expenseId: eid, weeklyBudgetId: wid });
+        }
+      },
+      onCancel: () => {},
+    });
   }
 }
 

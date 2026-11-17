@@ -144,6 +144,9 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
 
   private _onStore = (): void => {
     this._render();
+    for (const id of ['charge-search-drawer', 'budget-search-drawer']) {
+      (document.getElementById(id) as { refresh?: () => void } | null)?.refresh?.();
+    }
   };
 
   private _onChargeAddDone = (e: Event): void => {
