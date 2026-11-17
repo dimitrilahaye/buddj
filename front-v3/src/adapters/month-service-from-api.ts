@@ -221,6 +221,40 @@ export function createMonthServiceFromApi({ apiUrl }: { apiUrl: string }): Month
       const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
       return mapApiMonthPayloadToView(data);
     },
+    async updateExpense({ monthId, weeklyBudgetId, expenseId, label, amount }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/weekly/${encodeURIComponent(weeklyBudgetId)}/expenses/${encodeURIComponent(expenseId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newWeeklyId: weeklyBudgetId, label, amount }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
+    async updateOutflow({ monthId, outflowId, label, amount }) {
+      const url = `${baseUrl}/months/${encodeURIComponent(monthId)}/outflows/${encodeURIComponent(outflowId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, amount }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiMonthPayload>(response, url);
+      return mapApiMonthPayloadToView(data);
+    },
     async transferFromWeeklyBudget({
       monthId,
       fromWeeklyBudgetId,

@@ -39,6 +39,19 @@ export interface MonthService {
     amount: number;
   }): Promise<MonthView>;
   updateBudget(input: { monthId: string; budgetId: string; name: string }): Promise<MonthView>;
+  updateExpense(input: {
+    monthId: string;
+    weeklyBudgetId: string;
+    expenseId: string;
+    label: string;
+    amount: number;
+  }): Promise<MonthView>;
+  updateOutflow(input: {
+    monthId: string;
+    outflowId: string;
+    label: string;
+    amount: number;
+  }): Promise<MonthView>;
   transferFromWeeklyBudget(input: {
     monthId: string;
     fromWeeklyBudgetId: string;
