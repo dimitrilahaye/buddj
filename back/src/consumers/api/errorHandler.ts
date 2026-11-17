@@ -25,6 +25,8 @@ const errorHandler = (
       break;
     case "AccountInitialBalanceError":
     case "WeeklyExpenseAmountError":
+    case "AccountOutflowLabelCanNotBeEmptyError":
+    case "AccountOutflowAmountMustBePositiveError":
     case "TransferBalanceIntoMonthError":
     case "YearlySavingsAddError":
     case "MonthlyTemplateNameCanNotBeEmptyError":

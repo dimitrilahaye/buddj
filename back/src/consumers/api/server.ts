@@ -409,6 +409,14 @@ function buildApi(
     })
   );
 
+  api.use(
+    routes.month.updateOutflow(router, {
+      usecase: dependencies.updateOutflowUsecase,
+      dto: dependencies.monthDto,
+      deserializer: dependencies.updateOutflowDeserializer,
+    })
+  );
+
   router.get("/me", isLoggedIn, async (req, res) => {
     try {
       res.send(req.user);

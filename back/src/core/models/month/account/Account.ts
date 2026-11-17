@@ -95,6 +95,12 @@ export default class Account {
     outflow.uncheck();
   }
 
+  updateOutflow(outflowId: string, label: string, amount: number) {
+    const outflow = this.findAccountOutflowById(outflowId);
+    outflow.update(label, amount);
+    return outflow;
+  }
+
   updateExpenseWeeklyBudget(
     originalWeeklyId: string,
     newWeeklyId: string,

@@ -15,3 +15,4 @@ export * from "./transferBalanceIntoMonth.js";
 export * from "./unarchiveMonth.js";
 export * from "./updateBudget.js";
 export * from "./updateExpense.js";
+export * from "./updateOutflow.js";

@@ -19,6 +19,8 @@ export default interface MonthRepository {
 
   updateBudget(budgetId: string, name: string): Promise<void>;
 
+  updateOutflow(outflow: AccountOutflow): Promise<void>;
+
   updateAccountCurrentBalance(month: Month): Promise<void>;
 
   updateWeeklyBudgetCurrentBalance(
