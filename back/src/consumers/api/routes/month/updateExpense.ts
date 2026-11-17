@@ -8,9 +8,6 @@ type UpdateExpenseDeps = {
   monthDto: MonthDtoBuilder;
 };
 
-/**
- * @deprecated
- */
 function updateExpense(
   router: Router,
   { updateExpenseUsecase, monthDto }: UpdateExpenseDeps

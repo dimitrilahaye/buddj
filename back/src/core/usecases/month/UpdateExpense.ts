@@ -2,9 +2,6 @@ import MonthRepository from "../../ports/repositories/MonthRepository.js";
 import UpdateExpenseCommand from "../../commands/UpdateExpenseCommand.js";
 import { MonthNotFoundError } from "../../errors/MonthErrors.js";
 
-/**
- * @deprecated
- */
 export default class UpdateExpense {
   constructor(public readonly monthRepository: MonthRepository) {}
 

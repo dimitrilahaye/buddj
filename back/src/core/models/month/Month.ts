@@ -38,9 +38,6 @@ export default class Month {
     return new Dashboard({ account: this.account });
   }
 
-  /**
-   * @deprecated
-   */
   updateExpenseWeeklyBudget(
     originalWeeklyId: string,
     newWeeklyId: string,
@@ -61,9 +58,6 @@ export default class Month {
     this.account.deleteExpenseFromWeeklyBudget(weeklyId, expenseId);
   }
 
-  /**
-   * @deprecated
-   */
   updateExpenseAmountFromWeeklyBudget(
     weeklyId: string,
     expenseId: string,
@@ -92,9 +86,6 @@ export default class Month {
     this.account.updateBudget(budgetId, name);
   }
 
-  /**
-   * @deprecated
-   */
   updateExpenseLabelFromWeeklyBudget(
     weeklyId: string,
     expenseId: string,
