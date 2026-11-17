@@ -67,6 +67,14 @@ const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
   minute: '2-digit',
 });
 
+/** Récap affiché sous une ligne : `key` est PERIOD_KEY ou le start du bucket. */
+type SpendingDetail = {
+  key: string;
+  label: string;
+  entries: TrackedSpendingEntry[];
+  formatTime: Intl.DateTimeFormat;
+};
+
 export class BuddjScreenSpendingTracker extends HTMLElement {
   static readonly tagName = 'buddj-screen-spending-tracker';
 
@@ -135,7 +143,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
             <p class="spending-tracker-empty-title">Aucune dépense sur cette période.</p>
             <p class="spending-tracker-empty-hint">Les dépenses et sorties que tu ajoutes à un mois apparaissent ici au fil de l’eau.</p>
           </div>
-          <section class="spending-tracker-detail" hidden></section>
         </section>
       </div>
       <buddj-date-range-picker-drawer></buddj-date-range-picker-drawer>
@@ -276,7 +283,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     this._renderSummary({ main, view: showView ? filtered : null });
     this._renderChart({ main, view: showView ? filtered : null, kinds, isRefreshing: isLoading });
     this._renderBars({ main, view: showView ? filtered : null });
-    this._renderDetail({ main, view: showView ? filtered : null });
   }
 
   private _syncFilters({
@@ -366,7 +372,10 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     }
 
     const max = Math.max(...view.buckets.map((b) => b.total));
-    list.innerHTML = this._periodRowHtml({ view }) + view.buckets
+    // Le récap s'ouvre dans la ligne cliquée, juste sous sa barre.
+    const detail = this._selectedDetail({ view });
+    const detailHtmlFor = (key: string): string => (detail?.key === key ? this._detailHtml(detail) : '');
+    list.innerHTML = this._periodRowHtml({ view, detailHtml: detailHtmlFor(PERIOD_KEY) }) + view.buckets
       .map((bucket) => {
         const label = formatBucketLabel({ start: bucket.start, granularity: view.granularity });
         const amount = formatEuros(bucket.total);
@@ -385,14 +394,14 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
               <span class="spending-tracker-bar-fill spending-tracker-bar-fill--outflow" style="width:${outflowWidth.toFixed(2)}%"></span>
             </span>
             <span class="spending-tracker-bar-amount">${escapeHtml(amount)}</span>
-          </button>
+          </button>${detailHtmlFor(bucket.start)}
         </li>`;
       })
       .join('');
   }
 
   /** Ligne de synthèse de toute la période, en tête de liste dès qu'il y a plusieurs buckets. */
-  private _periodRowHtml({ view }: { view: SpendingTrackerView }): string {
+  private _periodRowHtml({ view, detailHtml }: { view: SpendingTrackerView; detailHtml: string }): string {
     if (view.buckets.length < 2) return '';
     const label = formatRangeLabel({ from: view.from, to: view.to });
     const amount = formatEuros(view.total);
@@ -410,49 +419,36 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
               <span class="spending-tracker-bar-fill spending-tracker-bar-fill--outflow" style="width:${outflowWidth.toFixed(2)}%"></span>
             </span>
             <span class="spending-tracker-bar-amount">${escapeHtml(amount)}</span>
-          </button>
+          </button>${detailHtml}
         </li>`;
   }
 
-  private _renderDetail({ main, view }: { main: HTMLElement; view: SpendingTrackerView | null }): void {
-    const detail = main.querySelector('.spending-tracker-detail') as HTMLElement;
-    const selection = view ? this._selectedDetail({ view }) : null;
-    if (!view || !selection) {
-      detail.hidden = true;
-      detail.innerHTML = '';
-      return;
-    }
-    const { label, entries, formatTime } = selection;
-    detail.hidden = false;
-    detail.setAttribute('aria-label', `Détail : ${label}`);
-    detail.innerHTML = `
-      <h2 class="spending-tracker-detail-title">Détail : ${escapeHtml(label)}</h2>
-      <ul class="spending-tracker-entries" aria-label="${escapeAttr(`Dépenses : ${label}`)}">
-        ${entries
-          .map(
-            (entry) => `
-        <li class="spending-tracker-entry" aria-label="${escapeAttr(`${entry.label} : ${formatEuros(entry.amount)}`)}">
-          <span class="spending-tracker-entry-kind spending-tracker-entry-kind--${entry.kind}">${KIND_LABELS[entry.kind]}</span>
-          <span class="spending-tracker-entry-label">${escapeHtml(entry.label)}</span>
-          <time class="spending-tracker-entry-time" datetime="${escapeAttr(entry.occurredAt)}">${escapeHtml(formatTime.format(new Date(entry.occurredAt)))}</time>
-          <span class="spending-tracker-entry-amount">${escapeHtml(formatEuros(entry.amount))}</span>
-        </li>`
-          )
-          .join('')}
-      </ul>
-    `;
+  private _detailHtml({ label, entries, formatTime }: SpendingDetail): string {
+    return `
+          <section class="spending-tracker-detail" aria-label="${escapeAttr(`Détail : ${label}`)}">
+            <h2 class="spending-tracker-detail-title">Détail : ${escapeHtml(label)}</h2>
+            <ul class="spending-tracker-entries" aria-label="${escapeAttr(`Dépenses : ${label}`)}">
+              ${entries
+                .map(
+                  (entry) => `
+              <li class="spending-tracker-entry" aria-label="${escapeAttr(`${entry.label} : ${formatEuros(entry.amount)}`)}">
+                <span class="spending-tracker-entry-kind spending-tracker-entry-kind--${entry.kind}">${KIND_LABELS[entry.kind]}</span>
+                <span class="spending-tracker-entry-label">${escapeHtml(entry.label)}</span>
+                <time class="spending-tracker-entry-time" datetime="${escapeAttr(entry.occurredAt)}">${escapeHtml(formatTime.format(new Date(entry.occurredAt)))}</time>
+                <span class="spending-tracker-entry-amount">${escapeHtml(formatEuros(entry.amount))}</span>
+              </li>`
+                )
+                .join('')}
+            </ul>
+          </section>`;
   }
 
   /** Dépenses à détailler : toute la période, le bucket sélectionné, ou l'unique bucket d'une plage d'un jour. */
-  private _selectedDetail({ view }: { view: SpendingTrackerView }): {
-    label: string;
-    entries: TrackedSpendingEntry[];
-    formatTime: Intl.DateTimeFormat;
-  } | null {
+  private _selectedDetail({ view }: { view: SpendingTrackerView }): SpendingDetail | null {
     if (this._selectedStart === PERIOD_KEY) {
       const entries = view.buckets.flatMap((b) => b.entries).sort((a, b) => b.amount - a.amount);
       if (entries.length === 0) return null;
-      return { label: formatRangeLabel({ from: view.from, to: view.to }), entries, formatTime: dateTimeFormatter };
+      return { key: PERIOD_KEY, label: formatRangeLabel({ from: view.from, to: view.to }), entries, formatTime: dateTimeFormatter };
     }
     const nonEmpty = view.buckets.filter((b) => b.entries.length > 0);
     // Une plage d'un seul jour (ou un seul bucket rempli) s'affiche directement.
@@ -461,6 +457,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
       (view.buckets.length === 1 ? nonEmpty[0] : undefined);
     if (!bucket) return null;
     return {
+      key: bucket.start,
       label: formatBucketLabel({ start: bucket.start, granularity: view.granularity }),
       entries: bucket.entries,
       formatTime: view.granularity === 'day' ? timeFormatter : dateTimeFormatter,

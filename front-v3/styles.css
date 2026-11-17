@@ -4552,7 +4552,7 @@ buddj-spending-tracker-chart[hidden] {
 }
 
 .spending-tracker-detail {
-  margin-top: 1.25rem;
+  margin-top: 0.35rem;
   padding: 1rem 1.25rem;
   border-radius: var(--radius-lg);
   background: var(--bg-card);
