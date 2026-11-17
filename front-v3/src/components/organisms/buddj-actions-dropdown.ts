@@ -3,6 +3,7 @@
  * Émet buddj-dropdown-action avec { actionId, targetId } au clic sur un item.
  * Slots : trigger (bouton), items (boutons avec data-action="id").
  * Attribut position : "center" (défaut) | "left" | "right" — alignement du panneau par rapport au trigger.
+ * Attribut `open` reflété sur l’hôte tant que le panneau est ouvert (styles du parent).
  */
 export class BuddjActionsDropdown extends HTMLElement {
   static readonly tagName = 'buddj-actions-dropdown';
@@ -151,6 +152,7 @@ export class BuddjActionsDropdown extends HTMLElement {
     this._panel.classList.remove('dropdown-panel--upward');
     this._panel.classList.add('dropdown-panel--open');
     this._panel.setAttribute('aria-hidden', 'false');
+    this.setAttribute('open', '');
     this.closeOtherDropdowns();
     requestAnimationFrame(() => this.adjustPosition());
   }
@@ -159,6 +161,7 @@ export class BuddjActionsDropdown extends HTMLElement {
     if (!this._panel) return;
     this._panel.classList.remove('dropdown-panel--open', 'dropdown-panel--upward');
     this._panel.setAttribute('aria-hidden', 'true');
+    this.removeAttribute('open');
   }
 
   private adjustPosition(): void {
@@ -167,6 +170,9 @@ export class BuddjActionsDropdown extends HTMLElement {
     if (rect.bottom > window.innerHeight) {
       this._panel.classList.add('dropdown-panel--upward');
     }
+    /* Dans une liste qui défile (ex. résultats de recherche), le panneau peut sortir de la zone visible :
+       on fait défiler le conteneur juste assez pour l’afficher (sans effet s’il est déjà visible). */
+    this._panel.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   }
 
   private closeOnOutside(e: Event): void {

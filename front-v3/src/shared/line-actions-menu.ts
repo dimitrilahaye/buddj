@@ -12,6 +12,7 @@ export type LineMenuHandlers = {
 export function createLineActionsMenu({ subject }: { subject: string }): HTMLElement {
   const dropdown = document.createElement('buddj-actions-dropdown');
   dropdown.setAttribute('position', 'right');
+  dropdown.className = 'line-actions-menu';
   dropdown.slot = 'actions';
 
   const trigger = document.createElement('button');
