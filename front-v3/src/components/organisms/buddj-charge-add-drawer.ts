@@ -17,9 +17,11 @@ export interface ChargeAddDrawerOptions {
   initialEmoji?: string;
   /** Si fourni, mode édition : au valid on appelle ce callback au lieu d’émettre l’événement. */
   onValidate?: BudgetChargeDrawerOnValidate;
+  /** En édition : pas de toast à la validation (l’appelant l’affiche au retour de l’API). */
+  silentValidate?: boolean;
 }
 
-export type BuddjChargeAddDrawerElement = HTMLElement & { open: () => void };
+export type BuddjChargeAddDrawerElement = HTMLElement & { open: (options?: ChargeAddDrawerOptions) => void };
 
 export class BuddjChargeAddDrawer extends HTMLElement {
   static readonly tagName = 'buddj-charge-add-drawer';
@@ -28,6 +30,7 @@ export class BuddjChargeAddDrawer extends HTMLElement {
   private _amount = '0,00 €';
   private _emoji = DEFAULT_CHARGE_EMOJI;
   private _onValidate: BudgetChargeDrawerOnValidate | null = null;
+  private _silentValidate = false;
 
   private _title = 'Ajouter une charge';
 
@@ -37,6 +40,7 @@ export class BuddjChargeAddDrawer extends HTMLElement {
     this._amount = options?.initialAmount ?? '0,00 €';
     this._emoji = options?.initialEmoji ?? DEFAULT_CHARGE_EMOJI;
     this._onValidate = options?.onValidate ?? null;
+    this._silentValidate = options?.silentValidate ?? false;
     this.render();
     this.classList.add('charge-add-drawer--open');
     this.attachListeners();
@@ -151,7 +155,7 @@ export class BuddjChargeAddDrawer extends HTMLElement {
     this.close();
     if (this._onValidate) {
       this._onValidate(this._label, this._amount, this._emoji);
-      toast?.show({ message: 'La charge a bien été modifiée' });
+      if (!this._silentValidate) toast?.show({ message: 'La charge a bien été modifiée' });
     } else {
       this.dispatchEvent(new CustomEvent('buddj-charge-add-done', { bubbles: true, detail: { label: this._label, amount: this._amount, emoji: this._emoji } }));
       toast?.show({ message: 'La charge a bien été ajoutée' });

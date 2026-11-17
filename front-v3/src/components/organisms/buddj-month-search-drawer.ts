@@ -37,6 +37,8 @@ function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
   return el.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
 }
 
+type LineRowElement = HTMLElement & { requestDelete?: () => void };
+
 export class BuddjMonthSearchDrawer extends HTMLElement {
   static readonly tagName = 'buddj-month-search-drawer';
 
@@ -171,13 +173,13 @@ export class BuddjMonthSearchDrawer extends HTMLElement {
     deleteBtn.addEventListener('click', (e) => {
       e.preventDefault();
       const oid = entry.outflowId;
-      const realDel =
-        oid &&
-        (document.querySelector(
-          `buddj-charge-item[outflow-id="${CSS.escape(oid)}"] buddj-icon-delete`,
-        ) as HTMLElement | null);
-      if (realDel) {
-        realDel.click();
+      const realRow = !oid
+        ? null
+        : (document.querySelector(
+          `buddj-charge-item[outflow-id="${CSS.escape(oid)}"]`,
+        ) as LineRowElement | null);
+      if (realRow?.requestDelete) {
+        realRow.requestDelete();
         return;
       }
       const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
@@ -247,13 +249,13 @@ export class BuddjMonthSearchDrawer extends HTMLElement {
       e.preventDefault();
       const eid = entry.expenseId;
       const wid = entry.weeklyBudgetId;
-      const realDel =
-        eid &&
-        (document.querySelector(
-          `#budgets buddj-expense-item[expense-id="${CSS.escape(eid)}"] buddj-icon-delete`,
-        ) as HTMLElement | null);
-      if (realDel) {
-        realDel.click();
+      const realRow = !eid
+        ? null
+        : (document.querySelector(
+          `#budgets buddj-expense-item[expense-id="${CSS.escape(eid)}"]`,
+        ) as LineRowElement | null);
+      if (realRow?.requestDelete) {
+        realRow.requestDelete();
         return;
       }
       const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;

@@ -52,6 +52,8 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
     store.addEventListener('yearlySavingRemoveFailed', this._onMutationError);
     store.addEventListener('yearlySavingAddLoaded', this._onSuccessAdd);
     store.addEventListener('yearlySavingRemoveLoaded', this._onSuccessRemove);
+    store.addEventListener('yearlySavingUpdateFailed', this._onMutationError);
+    store.addEventListener('yearlySavingUpdateLoaded', this._onSuccessUpdate);
     document.addEventListener('buddj-annual-charge-add-submit', this._onAnnualChargeAddSubmit);
     document.addEventListener('buddj-annual-budget-add-submit', this._onAnnualBudgetAddSubmit);
     store.emitAction('loadYearlyOutflows');
@@ -65,6 +67,8 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
     this._store?.removeEventListener('yearlySavingRemoveFailed', this._onMutationError);
     this._store?.removeEventListener('yearlySavingAddLoaded', this._onSuccessAdd);
     this._store?.removeEventListener('yearlySavingRemoveLoaded', this._onSuccessRemove);
+    this._store?.removeEventListener('yearlySavingUpdateFailed', this._onMutationError);
+    this._store?.removeEventListener('yearlySavingUpdateLoaded', this._onSuccessUpdate);
     document.removeEventListener('buddj-annual-charge-add-submit', this._onAnnualChargeAddSubmit);
     document.removeEventListener('buddj-annual-budget-add-submit', this._onAnnualBudgetAddSubmit);
   }
@@ -80,6 +84,10 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
 
   private _onSuccessRemove = ((): void => {
     getToast()?.show({ message: 'Suppression enregistrée' });
+  }) as EventListener;
+
+  private _onSuccessUpdate = ((): void => {
+    getToast()?.show({ message: 'Modification enregistrée' });
   }) as EventListener;
 
   private _onAnnualChargeAddSubmit = (e: Event): void => {
@@ -272,6 +280,18 @@ export class BuddjScreenAnnualOutflows extends HTMLElement {
       const d = (e as CustomEvent<{ budgetId: string }>).detail;
       if (!d?.budgetId || !this._store) return;
       this._store.emitAction('removeYearlySaving', { id: d.budgetId });
+    });
+
+    this.addEventListener('buddj-charge-update-confirmed', (e) => {
+      const d = (e as CustomEvent<{ outflowId: string; label: string; amount: number }>).detail;
+      if (!d?.outflowId || !this._store) return;
+      this._store.emitAction('updateYearlySaving', { id: d.outflowId, label: d.label, amount: d.amount });
+    });
+
+    this.addEventListener('buddj-template-budget-update-confirmed', (e) => {
+      const d = (e as CustomEvent<{ budgetId: string; name: string; initialBalance: number }>).detail;
+      if (!d?.budgetId || !this._store) return;
+      this._store.emitAction('updateYearlySaving', { id: d.budgetId, label: d.name, amount: d.initialBalance });
     });
   }
 

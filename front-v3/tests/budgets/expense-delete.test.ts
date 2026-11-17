@@ -7,6 +7,7 @@ import { formatEuros } from '../../src/shared/goal.js';
 import type { MonthView } from '../../src/application/month/month-view.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { clickLineMenuAction } from '../helpers/line-menu.js';
 
 function shellDocument(): void {
   document.body.innerHTML = `
@@ -89,9 +90,7 @@ describe('suppression dépense → DELETE (in-memory)', () => {
 
     const interItem = screen.getByRole('checkbox', { name: /Intermarché/ }).closest('buddj-expense-item');
     expect(interItem).toBeTruthy();
-    const deleteBtn = interItem!.querySelector('buddj-icon-delete');
-    expect(deleteBtn).toBeTruthy();
-    fireEvent.click(deleteBtn!);
+    clickLineMenuAction(interItem!, 'delete');
 
     fireEvent.click(screen.getByRole('button', { name: 'Confirmer' }));
 

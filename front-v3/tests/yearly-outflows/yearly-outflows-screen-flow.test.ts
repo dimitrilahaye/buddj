@@ -16,6 +16,7 @@ import {
 import { yearlyAveragePerMonthEuros } from '../../src/application/yearly-outflows/yearly-totals.js';
 import { parseEurosToNumber } from '../../src/shared/goal.js';
 import '../../src/register-components.js';
+import { clickLineMenuAction, fillLineDrawer } from '../helpers/line-menu.js';
 import {
   ANNUAL_OUTFLOWS_MONTH_LABELS_FR,
   BuddjScreenAnnualOutflows,
@@ -70,6 +71,10 @@ describe('écran sorties annuelles (store + DOM)', () => {
     document.body.innerHTML = `
       <buddj-toast></buddj-toast>
       <buddj-confirm-modal id="delete-confirm-modal"></buddj-confirm-modal>
+      <buddj-calculator-drawer id="calculator-drawer"></buddj-calculator-drawer>
+      <buddj-emoji-picker-drawer id="emoji-picker-drawer"></buddj-emoji-picker-drawer>
+      <buddj-charge-add-drawer id="charge-add-drawer"></buddj-charge-add-drawer>
+      <buddj-budget-add-drawer id="budget-add-drawer"></buddj-budget-add-drawer>
       <div id="host"></div>
     `;
   });
@@ -148,9 +153,7 @@ describe('écran sorties annuelles (store + DOM)', () => {
     });
 
     const item = document.querySelector('buddj-charge-item[outflow-id="seed-out-1"]')!;
-    const delBtn = item.querySelector('buddj-icon-delete');
-    expect(delBtn).toBeTruthy();
-    fireEvent.click(delBtn!);
+    clickLineMenuAction(item, 'delete');
     await waitFor(() => {
       expect(screen.getByText(/Voulez-vous vraiment supprimer la charge/)).toBeTruthy();
     });
@@ -189,5 +192,44 @@ describe('écran sorties annuelles (store + DOM)', () => {
     expect(febAfter.open).toBe(true);
     const jan = document.querySelector('details[data-api-month="1"]') as HTMLDetailsElement;
     expect(jan.open).toBe(false);
+  });
+
+  it('modifie une charge et un budget annuels via le menu ⋮, en gardant leur mois', async () => {
+    const store = createStoreFromSeedFixed();
+    const host = document.getElementById('host')!;
+    const el = document.createElement(BuddjScreenAnnualOutflows.tagName) as InstanceType<typeof BuddjScreenAnnualOutflows>;
+    el.init({ yearlyOutflowsStore: store });
+    host.appendChild(el);
+    store.emitAction('addYearlySaving', { kind: 'budget', month: 1, label: '🏖️ Vacances', amount: 300 });
+    await waitStoreEvent(store, 'yearlySavingAddLoaded');
+    await waitFor(() => {
+      expect(document.querySelector('buddj-template-budget-card')).toBeTruthy();
+    });
+
+    clickLineMenuAction(document.querySelector('buddj-charge-item[outflow-id="seed-out-1"]')!, 'edit');
+    const chargeDrawer = document.getElementById('charge-add-drawer')!;
+    await waitFor(() => {
+      expect(chargeDrawer.classList.contains('charge-add-drawer--open')).toBe(true);
+    });
+    expect((chargeDrawer.querySelector('[data-charge-add-label]') as HTMLInputElement).value).toBe('Croquettes');
+    await fillLineDrawer({ drawer: chargeDrawer, prefix: 'charge', label: 'Croquettes bio', amountDigits: ['1', '5', '0'], waitFor });
+    await waitStoreEvent(store, 'yearlySavingUpdateLoaded');
+
+    const jan = store.getState().view.months[0]!;
+    expect(jan.outflows).toEqual([{ id: 'seed-out-1', month: 1, label: '🐕 Croquettes bio', amount: 150 }]);
+
+    clickLineMenuAction(document.querySelector('buddj-template-budget-card')!, 'edit');
+    const budgetDrawer = document.getElementById('budget-add-drawer')!;
+    await waitFor(() => {
+      expect(budgetDrawer.classList.contains('budget-add-drawer--open')).toBe(true);
+    });
+    await fillLineDrawer({ drawer: budgetDrawer, prefix: 'budget', label: 'Vacances été', amountDigits: ['4', '0', '0'], waitFor });
+    await waitStoreEvent(store, 'yearlySavingUpdateLoaded');
+
+    const budget = store.getState().view.months[0]!.budgets[0]!;
+    expect(budget).toMatchObject({ month: 1, name: '🏖️ Vacances été', initialBalance: 400 });
+    await waitFor(() => {
+      expect(recapLines(1).budgets).toContain('400');
+    });
   });
 });

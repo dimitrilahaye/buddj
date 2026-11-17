@@ -9,6 +9,7 @@ import {
   LOADING_DELETE_EXPENSE_TEXT,
   LOADING_EXPENSES_CHECKING_TEXT,
   LOADING_UPDATE_BUDGET_TEXT,
+  LOADING_UPDATE_EXPENSE_TEXT,
   LOADING_TRANSFER_BUDGET_TEXT,
   type CreateBudgetActionDetail,
   type CreateExpenseActionDetail,
@@ -18,6 +19,7 @@ import {
   type PutExpensesCheckingActionDetail,
   type TransferFromWeeklyBudgetActionDetail,
   type UpdateBudgetActionDetail,
+  type UpdateExpenseActionDetail,
   type TransferFromAccountActionDetail,
 } from '../../application/month/month-store.js';
 import { getToast } from '../atoms/buddj-toast.js';
@@ -103,6 +105,7 @@ export class BuddjScreenBudgets extends HTMLElement {
     this.attachListeners();
     this.attachExpenseCheckingListener(main);
     this.attachExpenseDeleteListener(main);
+    this.attachExpenseUpdateListener(main);
     this.attachBudgetDeleteListener(main);
     this.attachBudgetUpdateListener(main);
     this.attachBudgetTransferListener(main);
@@ -139,6 +142,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.addEventListener('expenseDeleteLoading', this._onExpenseDeleteLoading);
     this._monthStore.addEventListener('expenseDeleteLoaded', this._onExpenseDeleteLoaded);
     this._monthStore.addEventListener('expenseDeleteFailed', this._onExpenseDeleteFailed);
+    this._monthStore.addEventListener('expenseUpdateLoading', this._onExpenseUpdateLoading);
+    this._monthStore.addEventListener('expenseUpdateLoaded', this._onExpenseUpdateLoaded);
+    this._monthStore.addEventListener('expenseUpdateFailed', this._onExpenseUpdateFailed);
     this._monthStore.addEventListener('budgetDeleteLoading', this._onBudgetDeleteLoading);
     this._monthStore.addEventListener('budgetDeleteLoaded', this._onBudgetDeleteLoaded);
     this._monthStore.addEventListener('budgetDeleteFailed', this._onBudgetDeleteFailed);
@@ -168,6 +174,9 @@ export class BuddjScreenBudgets extends HTMLElement {
     this._monthStore.removeEventListener('expenseDeleteLoading', this._onExpenseDeleteLoading);
     this._monthStore.removeEventListener('expenseDeleteLoaded', this._onExpenseDeleteLoaded);
     this._monthStore.removeEventListener('expenseDeleteFailed', this._onExpenseDeleteFailed);
+    this._monthStore.removeEventListener('expenseUpdateLoading', this._onExpenseUpdateLoading);
+    this._monthStore.removeEventListener('expenseUpdateLoaded', this._onExpenseUpdateLoaded);
+    this._monthStore.removeEventListener('expenseUpdateFailed', this._onExpenseUpdateFailed);
     this._monthStore.removeEventListener('budgetDeleteLoading', this._onBudgetDeleteLoading);
     this._monthStore.removeEventListener('budgetDeleteLoaded', this._onBudgetDeleteLoaded);
     this._monthStore.removeEventListener('budgetDeleteFailed', this._onBudgetDeleteFailed);
@@ -220,6 +229,21 @@ export class BuddjScreenBudgets extends HTMLElement {
 
   private _onExpenseDeleteFailed = (): void => {
     this._loadingModal?.hide();
+  };
+
+  private _onExpenseUpdateLoading = (): void => {
+    this._loadingModal?.show(LOADING_UPDATE_EXPENSE_TEXT);
+  };
+
+  private _onExpenseUpdateLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'La dépense a bien été modifiée' });
+  };
+
+  private _onExpenseUpdateFailed = (e: Event): void => {
+    this._loadingModal?.hide();
+    const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de la modification de la dépense';
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
   };
 
   private _onBudgetDeleteLoading = (): void => {
@@ -430,6 +454,16 @@ export class BuddjScreenBudgets extends HTMLElement {
       const { expenseId, weeklyBudgetId } = ev.detail ?? {};
       if (!expenseId || !weeklyBudgetId) return;
       this._monthStore.emitAction('deleteExpense', { expenseId, weeklyBudgetId });
+    });
+  }
+
+  private attachExpenseUpdateListener(main: HTMLElement): void {
+    main.addEventListener('buddj-expense-update-confirmed', (e) => {
+      if (!this._monthStore) return;
+      const ev = e as CustomEvent<Partial<UpdateExpenseActionDetail>>;
+      const { expenseId, weeklyBudgetId, label, amount } = ev.detail ?? {};
+      if (!expenseId || !weeklyBudgetId || !label?.trim() || amount === undefined || amount <= 0) return;
+      this._monthStore.emitAction('updateExpense', { expenseId, weeklyBudgetId, label: label.trim(), amount });
     });
   }
 

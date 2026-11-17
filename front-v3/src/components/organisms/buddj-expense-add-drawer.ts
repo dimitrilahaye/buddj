@@ -1,6 +1,7 @@
 /**
  * Drawer d’ajout d’une dépense dans un budget : emoji (picker global), label, montant (calculette globale), Annuler / Valider.
- * Même modèle que l’ajout de charge.
+ * Même modèle que l’ajout de charge. En édition (`onValidate` fourni), pré-remplit les champs et rend la main
+ * à l’appelant au lieu d’émettre `buddj-expense-add-submit`.
  */
 import type { BuddjEmojiPickerDrawerElement } from './buddj-emoji-picker-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
@@ -10,8 +11,20 @@ import { attachInputClear } from '../../shared/input-clear.js';
 import { parseEurosToNumber } from '../../shared/goal.js';
 
 const DEFAULT_EXPENSE_EMOJI = '🛒';
+const DEFAULT_TITLE = 'Ajouter une dépense';
 
-export type BuddjExpenseAddDrawerOpenOptions = { weeklyBudgetId?: string };
+/** Callback d’édition : libellé API (emoji + texte) et montant numérique. */
+export type ExpenseDrawerOnValidate = (apiLabel: string, amount: number) => void;
+
+export type BuddjExpenseAddDrawerOpenOptions = {
+  weeklyBudgetId?: string;
+  title?: string;
+  initialLabel?: string;
+  /** Montant formaté (ex. « 12,50 € »). */
+  initialAmount?: string;
+  initialEmoji?: string;
+  onValidate?: ExpenseDrawerOnValidate;
+};
 
 export type BuddjExpenseAddDrawerElement = HTMLElement & {
   open: (opts?: BuddjExpenseAddDrawerOpenOptions) => void;
@@ -24,12 +37,16 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
   private _amount = '0,00 €';
   private _emoji = DEFAULT_EXPENSE_EMOJI;
   private _weeklyBudgetId = '';
+  private _title = DEFAULT_TITLE;
+  private _onValidate: ExpenseDrawerOnValidate | null = null;
 
   open(opts?: BuddjExpenseAddDrawerOpenOptions): void {
     this._weeklyBudgetId = opts?.weeklyBudgetId ?? '';
-    this._label = '';
-    this._amount = '0,00 €';
-    this._emoji = DEFAULT_EXPENSE_EMOJI;
+    this._title = opts?.title ?? DEFAULT_TITLE;
+    this._label = opts?.initialLabel ?? '';
+    this._amount = opts?.initialAmount ?? '0,00 €';
+    this._emoji = opts?.initialEmoji ?? DEFAULT_EXPENSE_EMOJI;
+    this._onValidate = opts?.onValidate ?? null;
     this.render();
     this.classList.add('expense-add-drawer--open');
     this.attachListeners();
@@ -37,14 +54,15 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
 
   close(): void {
     this.classList.remove('expense-add-drawer--open');
+    this._onValidate = null;
   }
 
   private render(): void {
     this.innerHTML = `
       <div class="expense-add-drawer-backdrop" data-expense-add-backdrop></div>
-      <div class="expense-add-drawer-panel" role="dialog" aria-modal="true" aria-label="Ajouter une dépense">
+      <div class="expense-add-drawer-panel" role="dialog" aria-modal="true" aria-label="${escapeAttr(this._title)}">
         <div class="expense-add-drawer-header">
-          <h2 class="expense-add-drawer-title">Ajouter une dépense</h2>
+          <h2 class="expense-add-drawer-title">${escapeHtml(this._title)}</h2>
         </div>
         <div class="expense-add-drawer-body">
           <div class="expense-add-drawer-field">
@@ -118,6 +136,7 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
     calculator?.open({
       title: 'Montant',
       initialValue: this._amount,
+      startWithInitialValue: this._amount !== '0,00 €',
       onValidate: (value: string) => {
         this._amount = value;
         this.updateAmountDisplay();
@@ -140,7 +159,7 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
       toast?.show({ message: 'Le champ libellé est requis', variant: 'warning' });
       return;
     }
-    if (!this._weeklyBudgetId) {
+    if (!this._weeklyBudgetId && !this._onValidate) {
       toast?.show({ message: 'Impossible d’associer la dépense à un budget', variant: 'warning' });
       return;
     }
@@ -150,7 +169,12 @@ export class BuddjExpenseAddDrawer extends HTMLElement {
       return;
     }
     const apiLabel = `${this._emoji} ${this._label}`.trim();
+    const onValidate = this._onValidate;
     this.close();
+    if (onValidate) {
+      onValidate(apiLabel, amountNum);
+      return;
+    }
     this.dispatchEvent(
       new CustomEvent('buddj-expense-add-submit', {
         bubbles: true,

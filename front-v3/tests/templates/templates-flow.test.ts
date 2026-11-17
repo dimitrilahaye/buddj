@@ -7,6 +7,7 @@ import type { TemplateView } from '../../src/application/template/template-view.
 import { formatEuros, parseEurosToNumber } from '../../src/shared/goal.js';
 import '../../src/register-components.js';
 import { bootstrap } from '../../src/bootstrap.js';
+import { clickLineMenuAction, fillLineDrawer } from '../helpers/line-menu.js';
 
 const TEMPLATE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const OUTFLOW_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
@@ -18,6 +19,9 @@ function shellDocument(): void {
     <buddj-confirm-modal id="delete-confirm-modal"></buddj-confirm-modal>
     <buddj-emoji-picker-drawer id="emoji-picker-drawer"></buddj-emoji-picker-drawer>
     <buddj-budget-edit-drawer id="budget-edit-drawer"></buddj-budget-edit-drawer>
+    <buddj-calculator-drawer id="calculator-drawer"></buddj-calculator-drawer>
+    <buddj-charge-add-drawer id="charge-add-drawer"></buddj-charge-add-drawer>
+    <buddj-budget-add-drawer id="budget-add-drawer"></buddj-budget-add-drawer>
     <main id="screen-outlet" role="main"></main>
   `;
 }
@@ -147,9 +151,7 @@ describe('écran templates (API in-memory)', () => {
       (el) => el.getAttribute('label') === 'Extra',
     );
     expect(extraItem).toBeTruthy();
-    const del = extraItem!.querySelector('buddj-icon-delete');
-    expect(del).toBeTruthy();
-    fireEvent.click(del!);
+    clickLineMenuAction(extraItem!, 'delete');
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeTruthy();
@@ -159,6 +161,41 @@ describe('écran templates (API in-memory)', () => {
     await waitFor(() => {
       expect(document.querySelectorAll('buddj-charge-item')).toHaveLength(1);
     });
+  });
+
+  it('modifie une charge et un budget du template via le menu ⋮', async () => {
+    shellDocument();
+    bootstrapTemplates(`/templates/${TEMPLATE_ID}`);
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: '📆 Modèle test', level: 1 })).toBeTruthy();
+    });
+
+    clickLineMenuAction(document.querySelector(`buddj-charge-item[outflow-id="${OUTFLOW_ID}"]`)!, 'edit');
+    const chargeDrawer = document.getElementById('charge-add-drawer')!;
+    await waitFor(() => {
+      expect(chargeDrawer.classList.contains('charge-add-drawer--open')).toBe(true);
+    });
+    expect(within(chargeDrawer).getByRole('heading', { name: 'Modifier la charge' })).toBeTruthy();
+    await fillLineDrawer({ drawer: chargeDrawer, prefix: 'charge', label: 'Loyer T3', amountDigits: ['9', '5', '0'], waitFor });
+    await waitFor(() => {
+      const item = document.querySelector(`buddj-charge-item[outflow-id="${OUTFLOW_ID}"]`);
+      expect(item?.getAttribute('label')).toBe('Loyer T3');
+      expect(item?.getAttribute('amount')).toBe('950');
+    });
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Budgets' }));
+    clickLineMenuAction(document.querySelector(`buddj-template-budget-card[budget-id="${BUDGET_ID}"]`)!, 'edit');
+    const budgetDrawer = document.getElementById('budget-add-drawer')!;
+    await waitFor(() => {
+      expect(budgetDrawer.classList.contains('budget-add-drawer--open')).toBe(true);
+    });
+    await fillLineDrawer({ drawer: budgetDrawer, prefix: 'budget', label: 'Courses bio', amountDigits: ['8', '0'], waitFor });
+    await waitFor(() => {
+      const card = document.querySelector(`buddj-template-budget-card[budget-id="${BUDGET_ID}"]`);
+      expect(card?.getAttribute('name')).toBe('Courses bio');
+      expect(card?.getAttribute('allocated')).toBe('80');
+    });
+    expectProjectedEuros(950 + 80);
   });
 
   it('ajoute puis supprime un budget', async () => {
@@ -185,8 +222,7 @@ describe('écran templates (API in-memory)', () => {
     const cards = Array.from(document.getElementsByTagName('buddj-template-budget-card'));
     const loisirs = cards.find((c) => c.getAttribute('name') === 'Loisirs test');
     expect(loisirs).toBeTruthy();
-    const del = loisirs!.querySelector('buddj-icon-delete');
-    fireEvent.click(del!);
+    clickLineMenuAction(loisirs!, 'delete');
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeTruthy();
@@ -237,7 +273,7 @@ describe('détail template — total projeté (data-new-month-projected)', () =>
     const extraItem = Array.from(document.getElementsByTagName('buddj-charge-item')).find(
       (el) => el.getAttribute('label') === 'Extra',
     );
-    fireEvent.click(extraItem!.querySelector('buddj-icon-delete')!);
+    clickLineMenuAction(extraItem!, 'delete');
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeTruthy();
     });
@@ -272,7 +308,7 @@ describe('détail template — total projeté (data-new-month-projected)', () =>
     const loisirs = Array.from(document.getElementsByTagName('buddj-template-budget-card')).find(
       (c) => c.getAttribute('name') === 'Loisirs test',
     );
-    fireEvent.click(loisirs!.querySelector('buddj-icon-delete')!);
+    clickLineMenuAction(loisirs!, 'delete');
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeTruthy();
     });

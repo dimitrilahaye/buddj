@@ -11,9 +11,11 @@ import {
   LOADING_CREATE_OUTFLOW_TEXT,
   LOADING_DELETE_OUTFLOW_TEXT,
   LOADING_OUTFLOWS_CHECKING_TEXT,
+  LOADING_UPDATE_OUTFLOW_TEXT,
   type CreateOutflowActionDetail,
   type DeleteOutflowActionDetail,
   type PutOutflowsCheckingActionDetail,
+  type UpdateOutflowActionDetail,
   type TransferFromAccountActionDetail,
 } from '../../application/month/month-store.js';
 import type { MonthView } from '../../application/month/month-view.js';
@@ -64,6 +66,7 @@ export class BuddjScreenRecurring extends HTMLElement {
     document.removeEventListener('buddj-account-transfer-confirmed', this._onAccountTransferSubmit as EventListener);
     this.removeEventListener('buddj-charge-taken-change', this._onChargeTakenChange as EventListener);
     this.removeEventListener('buddj-charge-delete-confirmed', this._onChargeDeleteConfirmed as EventListener);
+    this.removeEventListener('buddj-charge-update-confirmed', this._onChargeUpdateConfirmed as EventListener);
     this._detachMonthStoreListeners();
   }
 
@@ -158,6 +161,7 @@ export class BuddjScreenRecurring extends HTMLElement {
     });
     this.addEventListener('buddj-charge-taken-change', this._onChargeTakenChange as EventListener);
     this.addEventListener('buddj-charge-delete-confirmed', this._onChargeDeleteConfirmed as EventListener);
+    this.addEventListener('buddj-charge-update-confirmed', this._onChargeUpdateConfirmed as EventListener);
   }
 
   private _onChargeAddDone = (e: Event): void => {
@@ -196,6 +200,14 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._monthStore.emitAction('deleteOutflow', { outflowId });
   };
 
+  private _onChargeUpdateConfirmed = (e: Event): void => {
+    if (!this._monthStore) return;
+    const ev = e as CustomEvent<Partial<UpdateOutflowActionDetail>>;
+    const { outflowId, label, amount } = ev.detail ?? {};
+    if (!outflowId || !label?.trim() || amount === undefined || amount <= 0) return;
+    this._monthStore.emitAction('updateOutflow', { outflowId, label: label.trim(), amount });
+  };
+
   private _onChargeTakenChange = (e: Event): void => {
     if (!this._monthStore) return;
     const ev = e as CustomEvent<Partial<PutOutflowsCheckingActionDetail>>;
@@ -220,6 +232,9 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._monthStore.addEventListener('outflowDeleteLoading', this._onOutflowDeleteLoading);
     this._monthStore.addEventListener('outflowDeleteLoaded', this._onOutflowDeleteLoaded);
     this._monthStore.addEventListener('outflowDeleteFailed', this._onOutflowDeleteFailed);
+    this._monthStore.addEventListener('outflowUpdateLoading', this._onOutflowUpdateLoading);
+    this._monthStore.addEventListener('outflowUpdateLoaded', this._onOutflowUpdateLoaded);
+    this._monthStore.addEventListener('outflowUpdateFailed', this._onOutflowUpdateFailed);
     this._monthStore.addEventListener('outflowsCheckingLoading', this._onOutflowsCheckingLoading);
     this._monthStore.addEventListener('outflowsCheckingLoaded', this._onOutflowsCheckingLoaded);
     this._monthStore.addEventListener('outflowsCheckingFailed', this._onOutflowsCheckingFailed);
@@ -243,6 +258,9 @@ export class BuddjScreenRecurring extends HTMLElement {
     this._monthStore.removeEventListener('outflowDeleteLoading', this._onOutflowDeleteLoading);
     this._monthStore.removeEventListener('outflowDeleteLoaded', this._onOutflowDeleteLoaded);
     this._monthStore.removeEventListener('outflowDeleteFailed', this._onOutflowDeleteFailed);
+    this._monthStore.removeEventListener('outflowUpdateLoading', this._onOutflowUpdateLoading);
+    this._monthStore.removeEventListener('outflowUpdateLoaded', this._onOutflowUpdateLoaded);
+    this._monthStore.removeEventListener('outflowUpdateFailed', this._onOutflowUpdateFailed);
     this._monthStore.removeEventListener('outflowsCheckingLoading', this._onOutflowsCheckingLoading);
     this._monthStore.removeEventListener('outflowsCheckingLoaded', this._onOutflowsCheckingLoaded);
     this._monthStore.removeEventListener('outflowsCheckingFailed', this._onOutflowsCheckingFailed);
@@ -286,6 +304,21 @@ export class BuddjScreenRecurring extends HTMLElement {
   private _onOutflowDeleteFailed = (e: Event): void => {
     this._loadingModal?.hide();
     const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de la suppression de la charge';
+    getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
+  };
+
+  private _onOutflowUpdateLoading = (): void => {
+    this._loadingModal?.show(LOADING_UPDATE_OUTFLOW_TEXT);
+  };
+
+  private _onOutflowUpdateLoaded = (): void => {
+    this._loadingModal?.hide();
+    getToast()?.show({ message: 'La charge a bien été modifiée' });
+  };
+
+  private _onOutflowUpdateFailed = (e: Event): void => {
+    this._loadingModal?.hide();
+    const msg = (e as CustomEvent<{ message: string }>).detail?.message ?? 'Erreur lors de la modification de la charge';
     getToast()?.show({ message: msg, variant: 'error', durationMs: 1250 });
   };
 
