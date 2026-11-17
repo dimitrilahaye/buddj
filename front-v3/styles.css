@@ -27,6 +27,8 @@
   --font-body: 'DM Sans', sans-serif;
   --global-header-height: 8.5rem;
   --global-header-height-nav-only: 4rem;
+  /* iPhone (encoche / Dynamic Island) : viewport-fit=cover + status bar translucide → le contenu passe sous la barre d'état. */
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 *,
@@ -85,6 +87,7 @@ body::after {
   background: rgba(26, 27, 35, 0.95);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow);
+  padding-top: var(--safe-top);
 }
 
 .global-header-top {
@@ -3410,6 +3413,7 @@ buddj-burger-panel.burger-panel--open .burger-panel-drawer {
   display: flex;
   justify-content: flex-end;
   padding: 0.875rem 1rem;
+  padding-top: calc(0.875rem + var(--safe-top));
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -3582,6 +3586,7 @@ body.route-home buddj-screen-home main.screen {
   align-items: center;
   justify-content: flex-start;
   padding: 2rem 1.25rem;
+  padding-top: calc(2rem + var(--safe-top));
   text-align: center;
   overflow-y: auto;
   overflow-x: hidden;
@@ -5868,7 +5873,7 @@ body.route-archived .archived-section {
 buddj-screen-new-month {
   display: none;
   position: fixed;
-  top: var(--global-header-height);
+  top: calc(var(--global-header-height) + var(--safe-top));
   left: 0;
   right: 0;
   bottom: 0;
@@ -5877,7 +5882,7 @@ buddj-screen-new-month {
 }
 
 body.route-new-month buddj-screen-new-month {
-  top: var(--global-header-height-nav-only);
+  top: calc(var(--global-header-height-nav-only) + var(--safe-top));
 }
 
 buddj-screen-new-month.new-month-screen--open,
