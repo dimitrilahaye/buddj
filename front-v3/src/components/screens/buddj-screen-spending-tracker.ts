@@ -89,6 +89,10 @@ function groupByDay(entries: TrackedSpendingEntry[]): SpendingDayGroup[] {
   return groups;
 }
 
+function dayTotal({ entries }: SpendingDayGroup): number {
+  return entries.reduce((sum, entry) => sum + entry.amount, 0);
+}
+
 /** Récap affiché sous une ligne : `key` est PERIOD_KEY ou le start du bucket. */
 type SpendingDetail = {
   key: string;
@@ -466,7 +470,10 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
           .map(
             (group) => `
             <section class="spending-tracker-day" aria-label="${escapeAttr(group.label)}">
-              <h3 class="spending-tracker-day-title">${escapeHtml(group.label)}</h3>
+              <div class="spending-tracker-day-header">
+                <h3 class="spending-tracker-day-title">${escapeHtml(group.label)}</h3>
+                <span class="spending-tracker-day-total" aria-label="${escapeAttr(`Total du ${group.label} : ${formatEuros(dayTotal(group))}`)}">${escapeHtml(formatEuros(dayTotal(group)))}</span>
+              </div>
               ${this._entriesHtml(group)}
             </section>`
           )
