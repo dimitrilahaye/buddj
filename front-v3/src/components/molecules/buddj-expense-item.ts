@@ -5,10 +5,10 @@
  * Attribut amount : nombre (buddj-line-item formate en « X € »).
  */
 import type { BuddjConfirmModalElement } from './buddj-confirm-modal.js';
-import type { BuddjExpenseAddDrawerElement } from '../organisms/buddj-expense-add-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { formatEuros } from '../../shared/goal.js';
 import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
+import { openExpenseEditDrawer } from '../../shared/line-edit-drawers.js';
 
 export class BuddjExpenseItem extends HTMLElement {
   static readonly tagName = 'buddj-expense-item';
@@ -56,17 +56,20 @@ export class BuddjExpenseItem extends HTMLElement {
     });
   }
 
+  /** Ouvre l’édition (utilisé aussi par les drawers de recherche). */
+  requestEdit(): void {
+    this.openEditDrawer();
+  }
+
   private openEditDrawer(): void {
     const expenseId = this.getAttribute('expense-id') ?? '';
     const weeklyBudgetId = this.closest('buddj-budget-card')?.getAttribute('weekly-budget-id') ?? '';
     if (!expenseId || !weeklyBudgetId) return;
-    const drawer = document.getElementById('expense-add-drawer') as BuddjExpenseAddDrawerElement | null;
-    drawer?.open({
-      title: 'Modifier la dépense',
-      initialLabel: this.getAttribute('desc') ?? '',
-      initialAmount: formatEuros(parseFloat(this.getAttribute('amount') ?? '0') || 0),
-      initialEmoji: this.getAttribute('icon') || undefined,
-      onValidate: (label, amount) => {
+    openExpenseEditDrawer({
+      label: this.getAttribute('desc') ?? '',
+      icon: this.getAttribute('icon') ?? '',
+      amount: parseFloat(this.getAttribute('amount') ?? '0') || 0,
+      onSubmit: (label, amount) => {
         this.dispatchEvent(
           new CustomEvent('buddj-expense-update-confirmed', {
             bubbles: true,

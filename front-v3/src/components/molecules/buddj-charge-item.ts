@@ -6,10 +6,8 @@
  * Attribut amount : nombre (buddj-line-item formate en « X € »).
  */
 import type { BuddjConfirmModalElement } from './buddj-confirm-modal.js';
-import type { BuddjChargeAddDrawerElement } from '../organisms/buddj-charge-add-drawer.js';
-import { getToast } from '../atoms/buddj-toast.js';
-import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
+import { openChargeEditDrawer } from '../../shared/line-edit-drawers.js';
 
 import {
   PROJECTED_SIMULATION_INCLUDE_ATTR,
@@ -85,27 +83,24 @@ export class BuddjChargeItem extends HTMLElement {
     });
   }
 
+  /** Ouvre l’édition (utilisé aussi par les drawers de recherche). */
+  requestEdit(): void {
+    this.openEditDrawer();
+  }
+
   private openEditDrawer(): void {
     const outflowId = this.getAttribute('outflow-id') ?? '';
     if (!outflowId) return;
-    const drawer = document.getElementById('charge-add-drawer') as BuddjChargeAddDrawerElement | null;
-    drawer?.open({
-      title: 'Modifier la charge',
-      initialLabel: this.getAttribute('label') ?? '',
-      initialAmount: formatEuros(parseFloat(this.getAttribute('amount') ?? '0') || 0),
-      initialEmoji: this.getAttribute('icon') || undefined,
-      silentValidate: true,
-      onValidate: (label, amountText, emoji) => {
-        const amount = parseEurosToNumber(amountText);
-        if (amount <= 0) {
-          getToast()?.show({ message: 'Le montant doit être supérieur à 0', variant: 'warning' });
-          return;
-        }
+    openChargeEditDrawer({
+      label: this.getAttribute('label') ?? '',
+      icon: this.getAttribute('icon') ?? '',
+      amount: parseFloat(this.getAttribute('amount') ?? '0') || 0,
+      onSubmit: (label, amount) => {
         this.dispatchEvent(
           new CustomEvent('buddj-charge-update-confirmed', {
             bubbles: true,
             composed: true,
-            detail: { outflowId, label: `${emoji.trim()} ${label.trim()}`.trim(), amount },
+            detail: { outflowId, label, amount },
           }),
         );
       },
