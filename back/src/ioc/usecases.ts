@@ -15,6 +15,7 @@ import TransferBalanceIntoMonth from "../core/usecases/month/TransferBalanceInto
 import UnarchiveMonth from "../core/usecases/month/UnarchiveMonth.js";
 import UpdateBudget from "../core/usecases/month/UpdateBudget.js";
 import UpdateExpense from "../core/usecases/month/UpdateExpense.js";
+import UpdateOutflow from "../core/usecases/month/UpdateOutflow.js";
 import UpdateTrackedSpending from "../core/usecases/spending-tracker/UpdateTrackedSpending.js";
 import AddMonthlyBudget from "../core/usecases/monthly-template/AddMonthlyBudget.js";
 import AddMonthlyOutflow from "../core/usecases/monthly-template/AddMonthlyOutflow.js";
@@ -137,6 +138,8 @@ const deleteExpenseUsecase = new DeleteExpense(monthRepository, eventBus);
 
 const updateExpenseUsecase = new UpdateExpense(monthRepository, eventBus);
 
+const updateOutflowUsecase = new UpdateOutflow(monthRepository, eventBus);
+
 const updateTrackedSpendingUsecase = new UpdateTrackedSpending(
   trackedSpendingRepository
 );
@@ -221,6 +224,7 @@ export {
   deleteMonthUsecase,
   deleteExpenseUsecase,
   updateExpenseUsecase,
+  updateOutflowUsecase,
   updateTrackedSpendingUsecase,
   deleteOutflowUsecase,
   addOutflowUsecase,

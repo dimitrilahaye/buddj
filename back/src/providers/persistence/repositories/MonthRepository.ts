@@ -60,6 +60,13 @@ export default class TypeOrmMonthRepository implements MonthRepository {
     });
   }
 
+  async updateOutflow(outflow: AccountOutflow): Promise<void> {
+    await OutflowDao.update(outflow.id, {
+      label: outflow.label,
+      amount: outflow.amount,
+    });
+  }
+
   async updateAccountCurrentBalance(month: Month): Promise<void> {
     await AccountDao.update(month.account.id, {
       currentBalance: month.account.currentBalance,

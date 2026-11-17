@@ -1,3 +1,8 @@
+import {
+  AccountOutflowAmountMustBePositiveError,
+  AccountOutflowLabelCanNotBeEmptyError,
+} from "../../../errors/AccountOuflowErrors.js";
+
 export default class AccountOutflow {
   id: string;
   amount: number;
@@ -31,5 +36,16 @@ export default class AccountOutflow {
 
   uncheck() {
     this.isChecked = false;
+  }
+
+  update(label: string, amount: number) {
+    if (label.trim().length === 0) {
+      throw new AccountOutflowLabelCanNotBeEmptyError();
+    }
+    if (amount <= 0) {
+      throw new AccountOutflowAmountMustBePositiveError();
+    }
+    this.label = label;
+    this.amount = Number(amount.toFixed(2));
   }
 }

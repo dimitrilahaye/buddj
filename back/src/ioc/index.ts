@@ -12,6 +12,10 @@ import yearlyOutflowsDto, {
 } from "../consumers/api/dtos/yearlyOutflowsDto.js";
 import DeleteExpense from "../core/usecases/month/DeleteExpense.js";
 import UpdateExpense from "../core/usecases/month/UpdateExpense.js";
+import UpdateOutflow from "../core/usecases/month/UpdateOutflow.js";
+import updateOutflowDeserializer, {
+  UpdateOutflowDeserializer,
+} from "../consumers/api/deserializers/month/updateOutflow.js";
 import DeleteOutflow from "../core/usecases/month/DeleteOutflow.js";
 import AddOutflow from "../core/usecases/month/AddOutflow.js";
 import GetArchivedMonths from "../core/usecases/month/GetArchivedMonths.js";
@@ -134,6 +138,7 @@ export type Deps = {
   archiveMonthUsecase: ArchiveMonth;
   deleteExpenseUsecase: DeleteExpense;
   updateExpenseUsecase: UpdateExpense;
+  updateOutflowUsecase: UpdateOutflow;
   deleteOutflowUsecase: DeleteOutflow;
   addOutflowUsecase: AddOutflow;
   addBudgetUsecase: AddBudget;
@@ -178,6 +183,7 @@ export type Deps = {
   addMonthlyOutflowDeserializer: AddMonthlyOutflowDeserializer;
   addMonthlyBudgetDeserializer: AddMonthlyBudgetDeserializer;
   getSpendingTrackerDeserializer: GetSpendingTrackerDeserializer;
+  updateOutflowDeserializer: UpdateOutflowDeserializer;
 };
 
 export default {
@@ -209,4 +215,5 @@ export default {
   addMonthlyOutflowDeserializer,
   addMonthlyBudgetDeserializer,
   getSpendingTrackerDeserializer,
+  updateOutflowDeserializer,
 } as const;
