@@ -81,10 +81,14 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
     store.addEventListener('templateOutflowDeleteFailed', this._onMutationError);
     store.addEventListener('templateBudgetAddFailed', this._onMutationError);
     store.addEventListener('templateBudgetDeleteFailed', this._onMutationError);
+    store.addEventListener('templateOutflowUpdateFailed', this._onMutationError);
+    store.addEventListener('templateBudgetUpdateFailed', this._onMutationError);
     store.addEventListener('templateOutflowAddLoaded', this._onSuccessToast);
     store.addEventListener('templateOutflowDeleteLoaded', this._onSuccessToast);
     store.addEventListener('templateBudgetAddLoaded', this._onSuccessToast);
     store.addEventListener('templateBudgetDeleteLoaded', this._onSuccessToast);
+    store.addEventListener('templateOutflowUpdateLoaded', this._onSuccessToast);
+    store.addEventListener('templateBudgetUpdateLoaded', this._onSuccessToast);
 
     document.addEventListener('buddj-charge-add-done', this._onChargeAddDone);
     document.addEventListener('buddj-budget-create-submit', this._onBudgetCreateSubmit);
@@ -105,10 +109,14 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
     this._store?.removeEventListener('templateOutflowDeleteFailed', this._onMutationError);
     this._store?.removeEventListener('templateBudgetAddFailed', this._onMutationError);
     this._store?.removeEventListener('templateBudgetDeleteFailed', this._onMutationError);
+    this._store?.removeEventListener('templateOutflowUpdateFailed', this._onMutationError);
+    this._store?.removeEventListener('templateBudgetUpdateFailed', this._onMutationError);
     this._store?.removeEventListener('templateOutflowAddLoaded', this._onSuccessToast);
     this._store?.removeEventListener('templateOutflowDeleteLoaded', this._onSuccessToast);
     this._store?.removeEventListener('templateBudgetAddLoaded', this._onSuccessToast);
     this._store?.removeEventListener('templateBudgetDeleteLoaded', this._onSuccessToast);
+    this._store?.removeEventListener('templateOutflowUpdateLoaded', this._onSuccessToast);
+    this._store?.removeEventListener('templateBudgetUpdateLoaded', this._onSuccessToast);
     document.removeEventListener('buddj-charge-add-done', this._onChargeAddDone);
     document.removeEventListener('buddj-budget-create-submit', this._onBudgetCreateSubmit);
     document.removeEventListener('buddj-charge-search', this._chargeSearchListener);
@@ -129,6 +137,8 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
     else if (name === 'templateOutflowDeleteLoaded') msg = 'Charge supprimée';
     else if (name === 'templateBudgetAddLoaded') msg = 'Budget ajouté';
     else if (name === 'templateBudgetDeleteLoaded') msg = 'Budget supprimé';
+    else if (name === 'templateOutflowUpdateLoaded') msg = 'Charge modifiée';
+    else if (name === 'templateBudgetUpdateLoaded') msg = 'Budget modifié';
     getToast()?.show({ message: msg });
   }) as EventListener;
 
@@ -432,6 +442,28 @@ export class BuddjScreenTemplateDetail extends HTMLElement {
       this._store.emitAction('deleteTemplateBudget', {
         templateId: this._templateId,
         budgetId: d.budgetId,
+      });
+    });
+
+    this.addEventListener('buddj-charge-update-confirmed', (e) => {
+      const d = (e as CustomEvent<{ outflowId: string; label: string; amount: number }>).detail;
+      if (!d?.outflowId || !this._store || !this._templateId) return;
+      this._store.emitAction('updateTemplateOutflow', {
+        templateId: this._templateId,
+        outflowId: d.outflowId,
+        label: d.label,
+        amount: d.amount,
+      });
+    });
+
+    this.addEventListener('buddj-template-budget-update-confirmed', (e) => {
+      const d = (e as CustomEvent<{ budgetId: string; name: string; initialBalance: number }>).detail;
+      if (!d?.budgetId || !this._store || !this._templateId) return;
+      this._store.emitAction('updateTemplateBudget', {
+        templateId: this._templateId,
+        budgetId: d.budgetId,
+        name: d.name,
+        initialBalance: d.initialBalance,
       });
     });
 

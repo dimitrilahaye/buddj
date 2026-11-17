@@ -1,12 +1,14 @@
 /**
- * Une ligne de dépense dans un budget (toggle débité, libellé, montant, supprimer).
- * Utilise buddj-line-item ; logique checkbox et delete côté parent (ce composant).
+ * Une ligne de dépense dans un budget (toggle débité, libellé, montant, menu ⋮ Modifier / Supprimer).
+ * Utilise buddj-line-item ; logique checkbox, édition et suppression côté parent (ce composant).
  * Cas vide (empty) : affiche un placeholder sans line-item.
  * Attribut amount : nombre (buddj-line-item formate en « X € »).
  */
 import type { BuddjConfirmModalElement } from './buddj-confirm-modal.js';
+import type { BuddjExpenseAddDrawerElement } from '../organisms/buddj-expense-add-drawer.js';
 import { getToast } from '../atoms/buddj-toast.js';
 import { formatEuros } from '../../shared/goal.js';
+import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
 
 export class BuddjExpenseItem extends HTMLElement {
   static readonly tagName = 'buddj-expense-item';
@@ -43,16 +45,37 @@ export class BuddjExpenseItem extends HTMLElement {
     checkbox.checked = taken;
     checkbox.slot = 'prefix';
 
-    const deleteBtn = document.createElement('buddj-icon-delete');
-    deleteBtn.setAttribute('title', 'Supprimer');
-    deleteBtn.slot = 'actions';
-
     lineItem.appendChild(checkbox);
-    lineItem.appendChild(deleteBtn);
+    lineItem.appendChild(createLineActionsMenu({ subject: 'la dépense' }));
     this.appendChild(lineItem);
 
     this.attachToggleListener();
-    this.attachDeleteListener(desc);
+    listenLineMenuActions(this, {
+      onEdit: () => this.openEditDrawer(),
+      onDelete: () => this.openDeleteConfirm(desc),
+    });
+  }
+
+  private openEditDrawer(): void {
+    const expenseId = this.getAttribute('expense-id') ?? '';
+    const weeklyBudgetId = this.closest('buddj-budget-card')?.getAttribute('weekly-budget-id') ?? '';
+    if (!expenseId || !weeklyBudgetId) return;
+    const drawer = document.getElementById('expense-add-drawer') as BuddjExpenseAddDrawerElement | null;
+    drawer?.open({
+      title: 'Modifier la dépense',
+      initialLabel: this.getAttribute('desc') ?? '',
+      initialAmount: formatEuros(parseFloat(this.getAttribute('amount') ?? '0') || 0),
+      initialEmoji: this.getAttribute('icon') || undefined,
+      onValidate: (label, amount) => {
+        this.dispatchEvent(
+          new CustomEvent('buddj-expense-update-confirmed', {
+            bubbles: true,
+            composed: true,
+            detail: { expenseId, weeklyBudgetId, label, amount },
+          }),
+        );
+      },
+    });
   }
 
   private attachToggleListener(): void {
@@ -75,33 +98,33 @@ export class BuddjExpenseItem extends HTMLElement {
     });
   }
 
-  private attachDeleteListener(expenseDesc: string): void {
-    this.addEventListener('click', (e) => {
-      if (!(e.target as Element).closest('buddj-icon-delete')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const desc = this.getAttribute('desc') ?? expenseDesc;
-      const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
-      modal?.show({
-        title: `Voulez-vous vraiment supprimer la dépense "${desc}" ?`,
-        onConfirm: () => {
-          const expenseId = this.getAttribute('expense-id') ?? '';
-          const card = this.closest('buddj-budget-card');
-          const weeklyBudgetId = card?.getAttribute('weekly-budget-id') ?? '';
-          if (expenseId && weeklyBudgetId) {
-            this.dispatchEvent(
-              new CustomEvent('buddj-expense-delete-confirmed', {
-                bubbles: true,
-                detail: { expenseId, weeklyBudgetId },
-              }),
-            );
-            return;
-          }
-          const toast = getToast();
-          toast?.show({ message: 'La dépense a bien été supprimée' });
-        },
-        onCancel: () => {},
-      });
+  /** Ouvre la confirmation de suppression (utilisé aussi par les drawers de recherche). */
+  requestDelete(): void {
+    this.openDeleteConfirm(this.getAttribute('desc') ?? '');
+  }
+
+  private openDeleteConfirm(expenseDesc: string): void {
+    const desc = this.getAttribute('desc') ?? expenseDesc;
+    const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
+    modal?.show({
+      title: `Voulez-vous vraiment supprimer la dépense "${desc}" ?`,
+      onConfirm: () => {
+        const expenseId = this.getAttribute('expense-id') ?? '';
+        const card = this.closest('buddj-budget-card');
+        const weeklyBudgetId = card?.getAttribute('weekly-budget-id') ?? '';
+        if (expenseId && weeklyBudgetId) {
+          this.dispatchEvent(
+            new CustomEvent('buddj-expense-delete-confirmed', {
+              bubbles: true,
+              detail: { expenseId, weeklyBudgetId },
+            }),
+          );
+          return;
+        }
+        const toast = getToast();
+        toast?.show({ message: 'La dépense a bien été supprimée' });
+      },
+      onCancel: () => {},
     });
   }
 }

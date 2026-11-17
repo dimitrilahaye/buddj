@@ -16,6 +16,8 @@ function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
   return el.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
 }
 
+type LineRowElement = HTMLElement & { requestDelete?: () => void };
+
 export class BuddjBudgetSearchDrawer extends HTMLElement {
   static readonly tagName = 'buddj-budget-search-drawer';
 
@@ -50,7 +52,7 @@ export class BuddjBudgetSearchDrawer extends HTMLElement {
     deleteBtn.slot = 'actions';
     deleteBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      entry.element?.querySelector<HTMLElement>('buddj-icon-delete')?.click();
+      (entry.element as LineRowElement | null | undefined)?.requestDelete?.();
     });
 
     lineItem.appendChild(deleteBtn);

@@ -19,6 +19,8 @@ function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
   return el.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
 }
 
+type LineRowElement = HTMLElement & { requestDelete?: () => void };
+
 export class BuddjChargeSearchDrawer extends HTMLElement {
   static readonly tagName = 'buddj-charge-search-drawer';
 
@@ -85,10 +87,10 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
       e.preventDefault();
       const outflowId = entry.outflowId ?? '';
       if (outflowId) {
-        document.querySelector<HTMLElement>(`buddj-charge-item[outflow-id="${outflowId}"] buddj-icon-delete`)?.click();
+        document.querySelector<LineRowElement>(`buddj-charge-item[outflow-id="${outflowId}"]`)?.requestDelete?.();
         return;
       }
-      entry.element?.querySelector<HTMLElement>('buddj-icon-delete')?.click();
+      (entry.element as LineRowElement | null | undefined)?.requestDelete?.();
     });
 
     lineItem.appendChild(deleteBtn);

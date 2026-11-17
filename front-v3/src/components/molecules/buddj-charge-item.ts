@@ -1,9 +1,15 @@
 /**
- * Une ligne de charge récurrente (toggle taken = prélevé du compte, libellé, montant, supprimer).
+ * Une ligne de charge récurrente (toggle taken = prélevé du compte, libellé, montant, menu ⋮ Modifier / Supprimer).
+ * « Modifier » ouvre le drawer de charge pré-rempli puis émet `buddj-charge-update-confirmed`
+ * ({ outflowId, label API, amount }) ; « Supprimer » émet `buddj-charge-delete-confirmed` après confirmation.
  * Même vocabulaire et logique que les dépenses (taken). Utilise buddj-line-item.
  * Attribut amount : nombre (buddj-line-item formate en « X € »).
  */
 import type { BuddjConfirmModalElement } from './buddj-confirm-modal.js';
+import type { BuddjChargeAddDrawerElement } from '../organisms/buddj-charge-add-drawer.js';
+import { getToast } from '../atoms/buddj-toast.js';
+import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
+import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
 
 import {
   PROJECTED_SIMULATION_INCLUDE_ATTR,
@@ -43,10 +49,6 @@ export class BuddjChargeItem extends HTMLElement {
       lineItem.setAttribute('checkable-for', cbId);
     }
 
-    const deleteBtn = document.createElement('buddj-icon-delete');
-    deleteBtn.setAttribute('title', 'Supprimer');
-    deleteBtn.slot = 'actions';
-
     if (projectedSimulation) {
       const rowId = this.getAttribute('outflow-id') ?? '';
       const included = this.getAttribute('simulation-included') !== 'false';
@@ -72,12 +74,42 @@ export class BuddjChargeItem extends HTMLElement {
       lineItem.appendChild(checkbox);
     }
 
-    lineItem.appendChild(deleteBtn);
+    lineItem.appendChild(createLineActionsMenu({ subject: 'la charge' }));
     this.appendChild(lineItem);
 
     if (projectedSimulation) this.attachProjectedSimulationListener();
     else if (!hideTaken) this.attachToggleListener();
-    this.attachDeleteListener(label);
+    listenLineMenuActions(this, {
+      onEdit: () => this.openEditDrawer(),
+      onDelete: () => this.openDeleteConfirm(label),
+    });
+  }
+
+  private openEditDrawer(): void {
+    const outflowId = this.getAttribute('outflow-id') ?? '';
+    if (!outflowId) return;
+    const drawer = document.getElementById('charge-add-drawer') as BuddjChargeAddDrawerElement | null;
+    drawer?.open({
+      title: 'Modifier la charge',
+      initialLabel: this.getAttribute('label') ?? '',
+      initialAmount: formatEuros(parseFloat(this.getAttribute('amount') ?? '0') || 0),
+      initialEmoji: this.getAttribute('icon') || undefined,
+      silentValidate: true,
+      onValidate: (label, amountText, emoji) => {
+        const amount = parseEurosToNumber(amountText);
+        if (amount <= 0) {
+          getToast()?.show({ message: 'Le montant doit être supérieur à 0', variant: 'warning' });
+          return;
+        }
+        this.dispatchEvent(
+          new CustomEvent('buddj-charge-update-confirmed', {
+            bubbles: true,
+            composed: true,
+            detail: { outflowId, label: `${emoji.trim()} ${label.trim()}`.trim(), amount },
+          }),
+        );
+      },
+    });
   }
 
   private attachProjectedSimulationListener(): void {
@@ -119,28 +151,29 @@ export class BuddjChargeItem extends HTMLElement {
     });
   }
 
-  private attachDeleteListener(chargeLabel: string): void {
-    this.addEventListener('click', (e) => {
-      if (!(e.target as Element).closest('buddj-icon-delete')) return;
-      e.preventDefault();
-      const label = this.getAttribute('label') ?? chargeLabel;
-      const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
-      modal?.show({
-        title: `Voulez-vous vraiment supprimer la charge "${label}" ?`,
-        onConfirm: () => {
-          const outflowId = this.getAttribute('outflow-id') ?? '';
-          if (outflowId) {
-            this.dispatchEvent(
-              new CustomEvent('buddj-charge-delete-confirmed', {
-                bubbles: true,
-                composed: true,
-                detail: { outflowId },
-              }),
-            );
-          }
-        },
-        onCancel: () => {},
-      });
+  /** Ouvre la confirmation de suppression (utilisé aussi par les drawers de recherche). */
+  requestDelete(): void {
+    this.openDeleteConfirm(this.getAttribute('label') ?? '');
+  }
+
+  private openDeleteConfirm(chargeLabel: string): void {
+    const label = this.getAttribute('label') ?? chargeLabel;
+    const modal = document.getElementById('delete-confirm-modal') as BuddjConfirmModalElement;
+    modal?.show({
+      title: `Voulez-vous vraiment supprimer la charge "${label}" ?`,
+      onConfirm: () => {
+        const outflowId = this.getAttribute('outflow-id') ?? '';
+        if (outflowId) {
+          this.dispatchEvent(
+            new CustomEvent('buddj-charge-delete-confirmed', {
+              bubbles: true,
+              composed: true,
+              detail: { outflowId },
+            }),
+          );
+        }
+      },
+      onCancel: () => {},
     });
   }
 }
