@@ -98,8 +98,6 @@ type SpendingDetail = {
   key: string;
   label: string;
   entries: TrackedSpendingEntry[];
-  /** Récap d'un seul jour : pas d'en-tête de jour, le titre suffit. */
-  singleDay: boolean;
 };
 
 export class BuddjScreenSpendingTracker extends HTMLElement {
@@ -463,10 +461,8 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
         </li>`;
   }
 
-  private _detailHtml({ label, entries, singleDay }: SpendingDetail): string {
-    const body = singleDay
-      ? this._entriesHtml({ label, entries })
-      : `<div class="spending-tracker-days">${groupByDay(entries)
+  private _detailHtml({ label, entries }: SpendingDetail): string {
+    const body = `<div class="spending-tracker-days">${groupByDay(entries)
           .map(
             (group) => `
             <section class="spending-tracker-day" aria-label="${escapeAttr(group.label)}">
@@ -508,7 +504,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     if (this._selectedStart === PERIOD_KEY) {
       const entries = chronological(view.buckets.flatMap((b) => b.entries));
       if (entries.length === 0) return null;
-      return { key: PERIOD_KEY, label: formatRangeLabel({ from: view.from, to: view.to }), entries, singleDay: false };
+      return { key: PERIOD_KEY, label: formatRangeLabel({ from: view.from, to: view.to }), entries };
     }
     const nonEmpty = view.buckets.filter((b) => b.entries.length > 0);
     // Une plage d'un seul jour (ou un seul bucket rempli) s'affiche directement.
@@ -520,7 +516,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
       key: bucket.start,
       label: formatBucketLabel({ start: bucket.start, granularity: view.granularity }),
       entries: chronological(bucket.entries),
-      singleDay: view.granularity === 'day',
     };
   }
 }
