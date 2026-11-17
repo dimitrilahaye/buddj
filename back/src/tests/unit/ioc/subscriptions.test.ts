@@ -12,11 +12,20 @@ describe("Unit | IoC | Subscriptions", function () {
     };
     const trackSpendingUsecase = { execute: sinon.stub().resolves() } as any;
     const untrackSpendingUsecase = { execute: sinon.stub().resolves() } as any;
+    const updateTrackedSpendingUsecase = {
+      execute: sinon.stub().resolves(),
+    } as any;
     registerSubscriptions(subscriber, {
       trackSpendingUsecase,
       untrackSpendingUsecase,
+      updateTrackedSpendingUsecase,
     });
-    return { handlers, trackSpendingUsecase, untrackSpendingUsecase };
+    return {
+      handlers,
+      trackSpendingUsecase,
+      untrackSpendingUsecase,
+      updateTrackedSpendingUsecase,
+    };
   }
 
   it("should track an added expense", async function () {
@@ -78,6 +87,44 @@ describe("Unit | IoC | Subscriptions", function () {
     expect(untrackSpendingUsecase.execute).to.have.been.calledOnceWithExactly({
       kind: "outflow",
       sourceId: "outflow-id",
+    });
+  });
+
+  it("should update the tracked spending of an updated expense", async function () {
+    const { handlers, updateTrackedSpendingUsecase } = setup();
+
+    await handlers.get("expenseUpdated")!({
+      expenseId: "expense-id",
+      label: "Courses bio",
+      amount: 50,
+    });
+
+    expect(
+      updateTrackedSpendingUsecase.execute
+    ).to.have.been.calledOnceWithExactly({
+      kind: "expense",
+      sourceId: "expense-id",
+      label: "Courses bio",
+      amount: 50,
+    });
+  });
+
+  it("should update the tracked spending of an updated outflow", async function () {
+    const { handlers, updateTrackedSpendingUsecase } = setup();
+
+    await handlers.get("outflowUpdated")!({
+      outflowId: "outflow-id",
+      label: "EDF",
+      amount: 120,
+    });
+
+    expect(
+      updateTrackedSpendingUsecase.execute
+    ).to.have.been.calledOnceWithExactly({
+      kind: "outflow",
+      sourceId: "outflow-id",
+      label: "EDF",
+      amount: 120,
     });
   });
 });

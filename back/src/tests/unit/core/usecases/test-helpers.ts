@@ -11,6 +11,7 @@ const eventPublisherStub = {
 const trackedSpendingRepositoryStub = {
   save: sinon.stub(),
   deleteBySource: sinon.stub(),
+  updateBySource: sinon.stub(),
   findBetween: sinon.stub(),
 };
 
@@ -78,6 +79,7 @@ function resetStubs() {
   eventPublisherStub.publish.reset();
   trackedSpendingRepositoryStub.save.reset();
   trackedSpendingRepositoryStub.deleteBySource.reset();
+  trackedSpendingRepositoryStub.updateBySource.reset();
   trackedSpendingRepositoryStub.findBetween.reset();
   monthRepositoryStub.addExpenseToWeeklyBudget.reset();
   monthRepositoryStub.addOutflow.reset();

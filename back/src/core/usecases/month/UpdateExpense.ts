@@ -1,9 +1,13 @@
+import EventPublisher from "../../ports/providers/EventPublisher.js";
 import MonthRepository from "../../ports/repositories/MonthRepository.js";
 import UpdateExpenseCommand from "../../commands/UpdateExpenseCommand.js";
 import { MonthNotFoundError } from "../../errors/MonthErrors.js";
 
 export default class UpdateExpense {
-  constructor(public readonly monthRepository: MonthRepository) {}
+  constructor(
+    public readonly monthRepository: MonthRepository,
+    public readonly eventPublisher: EventPublisher
+  ) {}
 
   async execute(command: UpdateExpenseCommand) {
     const month = await this.monthRepository.getById(command.monthId);
@@ -28,6 +32,14 @@ export default class UpdateExpense {
       command.expenseId
     );
 
-    return await this.monthRepository.save(month);
+    const savedMonth = await this.monthRepository.save(month);
+
+    this.eventPublisher.publish("expenseUpdated", {
+      expenseId: command.expenseId,
+      label: command.label,
+      amount: command.amount,
+    });
+
+    return savedMonth;
   }
 }
