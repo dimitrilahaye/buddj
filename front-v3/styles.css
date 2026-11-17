@@ -4607,8 +4607,7 @@ buddj-spending-tracker-chart[hidden] {
 .spending-tracker-entries {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin: 0;
+  margin: 0 -0.5rem;
   padding: 0;
   list-style: none;
 }
@@ -4618,7 +4617,13 @@ buddj-spending-tracker-chart[hidden] {
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 0.6rem;
+  padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
+}
+
+/* Un jour sur deux teinté : les jours d'un récap sur plusieurs jours se distinguent d'un coup d'œil. */
+.spending-tracker-entry--alt-day {
+  background: var(--bg-card-hover);
 }
 
 .spending-tracker-entry-kind {

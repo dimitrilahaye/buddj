@@ -90,7 +90,7 @@ describe('écran suivi des dépenses', () => {
     expect(totalText()).toContain('Sorties 814,03 €');
   });
 
-  it('le raccourci Aujourd’hui affiche directement le détail du jour, du plus gros au plus petit', async () => {
+  it('le raccourci Aujourd’hui affiche directement le détail du jour, du plus ancien au plus récent', async () => {
     const service = startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
@@ -100,8 +100,8 @@ describe('écran suivi des dépenses', () => {
     expect(service.calls.at(-1)).toEqual({ granularity: 'day', from: '2026-11-13', to: '2026-11-13' });
     const entries = screen.getByRole('list', { name: /^Dépenses : .*13 nov\./ });
     expect(within(entries).getAllByRole('listitem').map((li) => li.getAttribute('aria-label'))).toEqual([
-      'Kebab : 12,00 €',
       'Boulangerie : 4,50 €',
+      'Kebab : 12,00 €',
     ]);
   });
 
@@ -116,7 +116,7 @@ describe('écran suivi des dépenses', () => {
     expect(screen.getByRole('listitem', { name: 'Toute la période, semaine du 9 nov. : 173,22 €' })).toBeTruthy();
   });
 
-  it('chaque récap s’ouvre sous la ligne cliquée, y compris celui de toute la période', async () => {
+  it('chaque récap s’ouvre sous la ligne cliquée, y compris celui de toute la période, trié chronologiquement avec un jour sur deux distingué', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
@@ -129,11 +129,18 @@ describe('écran suivi des dépenses', () => {
     expect(screen.getByRole('button', { name: periodName }).getAttribute('aria-pressed')).toBe('true');
     const periodRow = screen.getByRole('listitem', { name: periodName });
     const entries = within(periodRow).getByRole('list', { name: 'Dépenses : semaine du 9 nov.' });
-    expect(within(entries).getAllByRole('listitem').map((li) => li.getAttribute('aria-label'))).toEqual([
+    const periodEntries = within(entries).getAllByRole('listitem');
+    expect(periodEntries.map((li) => li.getAttribute('aria-label'))).toEqual([
       'EDF : 114,62 €',
       'Courses : 42,10 €',
-      'Kebab : 12,00 €',
       'Boulangerie : 4,50 €',
+      'Kebab : 12,00 €',
+    ]);
+    expect(periodEntries.map((li) => li.classList.contains('spending-tracker-entry--alt-day'))).toEqual([
+      false,
+      false,
+      true,
+      true,
     ]);
 
     const dayName = /12 nov\.? : 156,72 €$/;
