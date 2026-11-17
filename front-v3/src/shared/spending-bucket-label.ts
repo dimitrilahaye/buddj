@@ -59,3 +59,12 @@ export function formatRangeLabel({ from, to }: { from: string; to: string }): st
   const formatter = from.slice(0, 4) === to.slice(0, 4) ? shortDayFormatter : shortDayWithYearFormatter;
   return `du ${formatter.format(fromDate)} au ${formatter.format(toDate)}`;
 }
+
+/**
+ * Libellé littéral d'une plage, sans regroupement : « ven. 13 nov. » ou « du 1 nov. au 13 nov. ».
+ */
+export function formatDaySpanLabel({ from, to }: { from: string; to: string }): string {
+  if (from === to) return dayFormatter.format(dateOf(from));
+  const formatter = from.slice(0, 4) === to.slice(0, 4) ? shortDayFormatter : shortDayWithYearFormatter;
+  return `du ${formatter.format(dateOf(from))} au ${formatter.format(dateOf(to))}`;
+}

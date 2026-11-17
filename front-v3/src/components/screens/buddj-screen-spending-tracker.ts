@@ -1,31 +1,34 @@
 /**
  * Écran « Suivi des dépenses » : dépenses hebdo et sorties ajoutées au fil de l'eau,
  * regroupées par jour, semaine ou mois (GET /spending-tracker).
- * Raccourcis (aujourd'hui, cette semaine, ce mois) ou plage libre via date-pickers ;
+ * Raccourcis (aujourd'hui, cette semaine, ce mois) ou plage libre via un calendrier unique ;
  * filtre par type côté front, sans rechargement.
  */
 import type { SpendingTrackerStore } from '../../application/spending-tracker/spending-tracker-store.js';
 import { filterSpendingTrackerView } from '../../application/spending-tracker/spending-tracker-filter.js';
-import {
-  isCalendarDay,
-  rangeForShortcut,
-  todayIso,
-} from '../../application/spending-tracker/spending-tracker-range.js';
+import { rangeForShortcut, todayIso } from '../../application/spending-tracker/spending-tracker-range.js';
 import type {
   SpendingBucket,
   SpendingGranularity,
+  SpendingRange,
   SpendingRangeShortcut,
   SpendingTrackerView,
   TrackedSpendingKind,
 } from '../../application/spending-tracker/spending-tracker-types.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
-import { formatBucketLabel, formatRangeLabel } from '../../shared/spending-bucket-label.js';
+import {
+  formatBucketLabel,
+  formatDaySpanLabel,
+  formatRangeLabel,
+} from '../../shared/spending-bucket-label.js';
 import {
   cumulativeSpending,
   hourlyCumulativeSpending,
 } from '../../application/spending-tracker/spending-tracker-cumulative.js';
 import '../organisms/buddj-spending-tracker-chart.js';
+import '../organisms/buddj-date-range-picker-drawer.js';
+import type { BuddjDateRangePickerDrawerElement } from '../organisms/buddj-date-range-picker-drawer.js';
 import type {
   BuddjSpendingTrackerChart,
   SpendingBucketSelect,
@@ -99,17 +102,10 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
             </label>`
             ).join('')}
           </fieldset>
-          <div class="spending-tracker-dates">
-            <label class="spending-tracker-date">
-              <span>Du</span>
-              <input type="date" name="spending-from" required>
-            </label>
-            <label class="spending-tracker-date">
-              <span>Au</span>
-              <input type="date" name="spending-to" required>
-            </label>
-          </div>
-          <p class="spending-tracker-range-error" role="alert" hidden></p>
+          <button type="button" class="spending-tracker-range-button" aria-haspopup="dialog">
+            <span class="spending-tracker-range-icon" aria-hidden="true">📅</span>
+            <span class="spending-tracker-range-text">Choisir des dates</span>
+          </button>
           <fieldset class="spending-tracker-fieldset spending-tracker-kinds">
             <legend class="spending-tracker-legend">Types</legend>
             <label class="spending-tracker-chip">
@@ -138,6 +134,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
           <section class="spending-tracker-detail" hidden></section>
         </section>
       </div>
+      <buddj-date-range-picker-drawer></buddj-date-range-picker-drawer>
     `;
     this.appendChild(main);
 
@@ -199,43 +196,33 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
       return;
     }
 
-    if (input.name === 'spending-from' || input.name === 'spending-to') {
-      this._onDatesChanged();
-      return;
-    }
-
     if (input.name === 'spending-kind') {
       const kinds = { ...store.getState().kinds, [input.value]: input.checked };
       store.emitAction('setSpendingKinds', kinds);
     }
   };
 
-  private _onDatesChanged(): void {
-    const store = this._store;
+  private _openRangePicker(): void {
     const main = this._main;
-    if (!store || !main) return;
-    const from = (main.querySelector('input[name="spending-from"]') as HTMLInputElement).value;
-    const to = (main.querySelector('input[name="spending-to"]') as HTMLInputElement).value;
-    main.querySelectorAll<HTMLInputElement>('input[name="spending-shortcut"]').forEach((radio) => {
-      radio.checked = false;
+    if (!main) return;
+    const picker = main.querySelector('buddj-date-range-picker-drawer') as BuddjDateRangePickerDrawerElement;
+    picker.open({
+      range: this._store?.getState().range ?? null,
+      today: todayIso(),
+      onValidate: (range) => this._requestRange(range),
     });
+  }
 
-    const errorEl = main.querySelector('.spending-tracker-range-error') as HTMLElement;
-    if (!isCalendarDay(from) || !isCalendarDay(to)) {
-      errorEl.hidden = true;
-      return;
-    }
-    if (from > to) {
-      errorEl.textContent = 'La date de début doit précéder la date de fin.';
-      errorEl.hidden = false;
-      return;
-    }
-    errorEl.hidden = true;
+  private _requestRange(range: SpendingRange): void {
     this._selectedStart = null;
-    store.emitAction('loadSpendingTracker', { from, to, shortcut: null });
+    this._store?.emitAction('loadSpendingTracker', { ...range, shortcut: null });
   }
 
   private _onClick = (e: Event): void => {
+    if ((e.target as Element).closest('.spending-tracker-range-button')) {
+      this._openRangePicker();
+      return;
+    }
     if ((e.target as Element).closest('.spending-tracker-retry')) {
       this._retry();
       return;
@@ -302,12 +289,12 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     main.querySelectorAll<HTMLInputElement>('input[name="spending-shortcut"]').forEach((radio) => {
       radio.checked = radio.value === shortcut;
     });
-    const fromInput = main.querySelector('input[name="spending-from"]') as HTMLInputElement;
-    const toInput = main.querySelector('input[name="spending-to"]') as HTMLInputElement;
-    if (range) {
-      fromInput.value = range.from;
-      toInput.value = range.to;
-    }
+    const rangeButton = main.querySelector('.spending-tracker-range-button') as HTMLButtonElement;
+    const rangeText = rangeButton.querySelector('.spending-tracker-range-text') as HTMLElement;
+    const rangeLabel = range ? formatDaySpanLabel(range) : 'Choisir des dates';
+    rangeText.textContent = rangeLabel;
+    rangeButton.setAttribute('aria-label', `Dates : ${rangeLabel}`);
+    rangeButton.classList.toggle('spending-tracker-range-button--custom', range !== null && shortcut === null);
     const checkedCount = Number(kinds.expense) + Number(kinds.outflow);
     main.querySelectorAll<HTMLInputElement>('input[name="spending-kind"]').forEach((checkbox) => {
       const kind = checkbox.value as TrackedSpendingKind;

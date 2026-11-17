@@ -45,6 +45,19 @@ function totalText(): string {
   return screen.getByRole('status', { name: 'Total de la période' }).textContent ?? '';
 }
 
+function openRangePicker(): HTMLElement {
+  fireEvent.click(screen.getByRole('button', { name: /^Dates : / }));
+  return screen.getByRole('dialog', { name: 'Choisir une période' });
+}
+
+function pickDay(picker: HTMLElement, name: string): void {
+  fireEvent.click(within(picker).getByRole('button', { name }));
+}
+
+function goBackMonths(picker: HTMLElement, count: number): void {
+  for (let i = 0; i < count; i++) fireEvent.click(within(picker).getByRole('button', { name: 'Mois précédent' }));
+}
+
 describe('écran suivi des dépenses', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 10, 13, 18, 0) });
@@ -63,8 +76,7 @@ describe('écran suivi des dépenses', () => {
       expect(totalText()).toContain('872,63 €');
     });
     expect((screen.getByRole('radio', { name: 'Ce mois' }) as HTMLInputElement).checked).toBe(true);
-    expect((screen.getByLabelText('Du') as HTMLInputElement).value).toBe('2026-11-01');
-    expect((screen.getByLabelText('Au') as HTMLInputElement).value).toBe('2026-11-13');
+    expect(screen.getByRole('button', { name: 'Dates : du 1 nov. au 13 nov.' })).toBeTruthy();
     expect(service.calls).toEqual([{ granularity: 'day', from: '2026-11-01', to: '2026-11-13' }]);
     const bars = screen.getByRole('list', { name: 'Dépenses par jour' });
     const [periodRow, ...dayRows] = within(bars).getAllByRole('listitem');
@@ -100,11 +112,17 @@ describe('écran suivi des dépenses', () => {
     expect(screen.getByRole('listitem', { name: 'Toute la période, semaine du 9 nov. : 173,22 €' })).toBeTruthy();
   });
 
-  it('une plage longue choisie aux date-pickers décoche les raccourcis et regroupe par mois', async () => {
+  it('une plage longue choisie au calendrier décoche les raccourcis et regroupe par mois', async () => {
     const service = startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
-    fireEvent.change(screen.getByLabelText('Du'), { target: { value: '2026-01-01' } });
+    const picker = openRangePicker();
+    goBackMonths(picker, 10);
+    expect(within(picker).getByRole('heading', { name: 'janvier 2026' })).toBeTruthy();
+    pickDay(picker, 'jeudi 1 janvier 2026');
+    for (let i = 0; i < 10; i++) fireEvent.click(within(picker).getByRole('button', { name: 'Mois suivant' }));
+    pickDay(picker, 'vendredi 13 novembre 2026');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Valider' }));
 
     await waitFor(() => expect(totalText()).toContain('1172,63 €'));
     expect(service.calls.at(-1)).toEqual({ granularity: 'month', from: '2026-01-01', to: '2026-11-13' });
@@ -116,26 +134,97 @@ describe('écran suivi des dépenses', () => {
     expect(periodRow!.getAttribute('aria-label')).toBe('Toute la période, du 1 janv. au 13 nov. : 1172,63 €');
     expect(monthRows).toHaveLength(11);
     expect(within(bars).getByRole('button', { name: 'septembre 2026 : 300,00 €' })).toBeTruthy();
+    expect(screen.queryByRole('dialog', { name: 'Choisir une période' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Dates : du 1 janv. au 13 nov.' })).toBeTruthy();
   });
 
   it('une plage moyenne est regroupée par semaine', async () => {
     const service = startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
-    fireEvent.change(screen.getByLabelText('Du'), { target: { value: '2026-09-01' } });
+    const picker = openRangePicker();
+    goBackMonths(picker, 2);
+    pickDay(picker, 'mardi 1 septembre 2026');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Mois suivant' }));
+    fireEvent.click(within(picker).getByRole('button', { name: 'Mois suivant' }));
+    pickDay(picker, 'vendredi 13 novembre 2026');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Valider' }));
 
     await waitFor(() => expect(screen.getByRole('list', { name: 'Dépenses par semaine' })).toBeTruthy());
     expect(service.calls.at(-1)).toEqual({ granularity: 'week', from: '2026-09-01', to: '2026-11-13' });
   });
 
-  it('signale une plage inversée sans recharger', async () => {
+  it('valider sans date de fin affiche ce seul jour', async () => {
     const service = startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
-    fireEvent.change(screen.getByLabelText('Du'), { target: { value: '2026-11-20' } });
+    const picker = openRangePicker();
+    pickDay(picker, 'jeudi 12 novembre 2026');
+    expect(within(picker).getByRole('status').textContent).toContain('valide pour ce seul jour');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Valider' }));
 
-    expect(screen.getByRole('alert').textContent).toBe('La date de début doit précéder la date de fin.');
+    await waitFor(() => expect(totalText()).toContain('156,72 €'));
+    expect(service.calls.at(-1)).toEqual({ granularity: 'day', from: '2026-11-12', to: '2026-11-12' });
+    expect(screen.getByRole('button', { name: 'Dates : jeu. 12 nov.' })).toBeTruthy();
+    const entries = screen.getByRole('list', { name: /^Dépenses : .*12 nov\./ });
+    expect(within(entries).getAllByRole('listitem')).toHaveLength(2);
+  });
+
+  it('un jour antérieur au début choisi devient le nouveau début', async () => {
+    const service = startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    const picker = openRangePicker();
+    pickDay(picker, 'jeudi 12 novembre 2026');
+    pickDay(picker, 'lundi 9 novembre 2026');
+    pickDay(picker, 'mercredi 11 novembre 2026');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Valider' }));
+
+    await waitFor(() => expect(service.calls).toHaveLength(2));
+    expect(service.calls.at(-1)).toEqual({ granularity: 'day', from: '2026-11-09', to: '2026-11-11' });
+  });
+
+  it('s’ouvre sur la période en cours, aujourd’hui mis en évidence', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    const picker = openRangePicker();
+
+    expect(within(picker).getByRole('heading', { name: 'novembre 2026' })).toBeTruthy();
+    const pressed = within(picker)
+      .getAllByRole('button', { pressed: true })
+      .map((b) => b.getAttribute('aria-label'));
+    expect(pressed).toEqual(['dimanche 1 novembre 2026', 'vendredi 13 novembre 2026']);
+    expect(within(picker).getByRole('button', { name: 'vendredi 13 novembre 2026' }).getAttribute('aria-current')).toBe('date');
+  });
+
+  it('permet de choisir une période dans le futur', async () => {
+    const service = startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    const picker = openRangePicker();
+    pickDay(picker, 'vendredi 13 novembre 2026');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Mois suivant' }));
+    expect(within(picker).getByRole('heading', { name: 'décembre 2026' })).toBeTruthy();
+    pickDay(picker, 'jeudi 31 décembre 2026');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Valider' }));
+
+    await waitFor(() => expect(service.calls).toHaveLength(2));
+    expect(service.calls.at(-1)).toEqual({ granularity: 'week', from: '2026-11-13', to: '2026-12-31' });
+    expect(screen.getByRole('button', { name: 'Dates : du 13 nov. au 31 déc.' })).toBeTruthy();
+  });
+
+  it('annuler ferme le calendrier sans recharger', async () => {
+    const service = startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    const picker = openRangePicker();
+    pickDay(picker, 'jeudi 12 novembre 2026');
+    fireEvent.click(within(picker).getByRole('button', { name: 'Annuler' }));
+
+    expect(screen.queryByRole('dialog', { name: 'Choisir une période' })).toBeNull();
     expect(service.calls).toHaveLength(1);
+    expect((screen.getByRole('radio', { name: 'Ce mois' }) as HTMLInputElement).checked).toBe(true);
   });
 
   it('filtre par type sans recharger et empêche de tout décocher', async () => {
