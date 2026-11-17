@@ -48,6 +48,7 @@ import { createYearlyOutflowsServiceFromApi } from './adapters/yearly-outflows-s
 import { createLoadYearlyOutflows } from './application/yearly-outflows/load-yearly-outflows.js';
 import { createAddYearlySaving } from './application/yearly-outflows/add-yearly-saving.js';
 import { createRemoveYearlySaving } from './application/yearly-outflows/remove-yearly-saving.js';
+import { createUpdateYearlySaving } from './application/yearly-outflows/update-yearly-saving.js';
 import { YearlyOutflowsStore } from './application/yearly-outflows/yearly-outflows-store.js';
 import type { YearlyOutflowsService } from './application/yearly-outflows/yearly-outflows-service.js';
 import type { ProjectService } from './application/project/project-service.js';
@@ -218,10 +219,12 @@ export function bootstrap(options: BootstrapOptions): void {
   const loadYearlyOutflows = createLoadYearlyOutflows({ yearlyOutflowsService });
   const addYearlySaving = createAddYearlySaving({ yearlyOutflowsService });
   const removeYearlySaving = createRemoveYearlySaving({ yearlyOutflowsService });
+  const updateYearlySaving = createUpdateYearlySaving({ yearlyOutflowsService });
   const yearlyOutflowsStore = new YearlyOutflowsStore({
     loadYearlyOutflows,
     addYearlySaving,
     removeYearlySaving,
+    updateYearlySaving,
   });
   const loadProjectsByCategory = createLoadProjectsByCategory({ projectService });
   const createProject = createCreateProject({ projectService });

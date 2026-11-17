@@ -62,6 +62,23 @@ export function createYearlyOutflowsServiceFromApi({ apiUrl }: { apiUrl: string 
       const data = await getReponseDataOrFail<ApiYearlyOutflowsPayload>(response, '/yearly-outflows');
       return mapApiYearlyOutflowsPayloadToView(data);
     },
+    async update({ id, label, amount }) {
+      const url = `${baseUrl}/yearly-outflows/${encodeURIComponent(id)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, amount }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiYearlyOutflowsPayload>(response, url);
+      return mapApiYearlyOutflowsPayloadToView(data);
+    },
     async remove({ id }) {
       const url = `${baseUrl}/yearly-outflows/${encodeURIComponent(id)}`;
       let response: Response;

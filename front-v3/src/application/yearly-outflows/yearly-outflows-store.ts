@@ -3,6 +3,7 @@ import type { AddYearlySavingUseCase } from './add-yearly-saving.js';
 import { createEmptyYearlyOutflowsView } from './yearly-outflows-view.js';
 import type { LoadYearlyOutflowsUseCase } from './load-yearly-outflows.js';
 import type { RemoveYearlySavingUseCase } from './remove-yearly-saving.js';
+import type { UpdateYearlySavingUseCase } from './update-yearly-saving.js';
 import type { YearlyOutflowsView } from './yearly-outflows-view.js';
 
 export type YearlyOutflowsState = {
@@ -28,20 +29,25 @@ export type AddYearlySavingActionDetail = {
 
 export type RemoveYearlySavingActionDetail = { id: string };
 
+export type UpdateYearlySavingActionDetail = { id: string; label: string; amount: number };
+
 export class YearlyOutflowsStore extends Store<YearlyOutflowsState> {
   constructor({
     loadYearlyOutflows,
     addYearlySaving,
     removeYearlySaving,
+    updateYearlySaving,
   }: {
     loadYearlyOutflows: LoadYearlyOutflowsUseCase;
     addYearlySaving: AddYearlySavingUseCase;
     removeYearlySaving: RemoveYearlySavingUseCase;
+    updateYearlySaving: UpdateYearlySavingUseCase;
   }) {
     super(DEFAULT_STATE);
     this._loadYearlyOutflows = loadYearlyOutflows;
     this._addYearlySaving = addYearlySaving;
     this._removeYearlySaving = removeYearlySaving;
+    this._updateYearlySaving = updateYearlySaving;
 
     this.addEventListener('loadYearlyOutflows', () => void this.handleLoad());
     this.addEventListener('addYearlySaving', (e: Event) => {
@@ -61,11 +67,16 @@ export class YearlyOutflowsStore extends Store<YearlyOutflowsState> {
       const d = (e as CustomEvent<RemoveYearlySavingActionDetail>).detail;
       if (d?.id) void this.handleRemove(d);
     });
+    this.addEventListener('updateYearlySaving', (e: Event) => {
+      const d = (e as CustomEvent<UpdateYearlySavingActionDetail>).detail;
+      if (d?.id && d.label?.trim() && d.amount > 0) void this.handleUpdate(d);
+    });
   }
 
   private _loadYearlyOutflows: LoadYearlyOutflowsUseCase;
   private _addYearlySaving: AddYearlySavingUseCase;
   private _removeYearlySaving: RemoveYearlySavingUseCase;
+  private _updateYearlySaving: UpdateYearlySavingUseCase;
 
   private _notify(): void {
     this.emitStateChange('yearlyOutflowsStateUpdated');
@@ -123,6 +134,28 @@ export class YearlyOutflowsStore extends Store<YearlyOutflowsState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('yearlySavingRemoveFailed', { message });
+    } finally {
+      this.setState({ busy: false });
+      this._notify();
+    }
+  }
+
+  private async handleUpdate(detail: UpdateYearlySavingActionDetail): Promise<void> {
+    if (this.getState().busy) return;
+    this.setState({ busy: true });
+    this.emitStateChange('yearlySavingUpdateLoading');
+    this._notify();
+    try {
+      const view = await this._updateYearlySaving({
+        id: detail.id,
+        label: detail.label.trim(),
+        amount: detail.amount,
+      });
+      this.setState({ view });
+      this.emitStateChange('yearlySavingUpdateLoaded');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('yearlySavingUpdateFailed', { message });
     } finally {
       this.setState({ busy: false });
       this._notify();

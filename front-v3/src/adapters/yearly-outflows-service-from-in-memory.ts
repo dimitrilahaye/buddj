@@ -62,6 +62,32 @@ export function createYearlyOutflowsServiceFromInMemory({
       state = next;
       return cloneView(state);
     },
+    async update({ id, label, amount }) {
+      await delay();
+      const next = cloneView(state);
+      let found = false;
+      for (const m of next.months) {
+        const outflow = m.outflows.find((o) => o.id === id);
+        if (outflow) {
+          outflow.label = label;
+          outflow.amount = amount;
+          found = true;
+          break;
+        }
+        const budget = m.budgets.find((b) => b.id === id);
+        if (budget) {
+          budget.name = label;
+          budget.initialBalance = amount;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        throw new Error('Élément introuvable');
+      }
+      state = next;
+      return cloneView(state);
+    },
     async remove({ id }) {
       await delay();
       const next = cloneView(state);

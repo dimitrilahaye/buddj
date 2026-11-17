@@ -7,6 +7,7 @@ import { createYearlyOutflowsServiceFromInMemory } from '../../src/adapters/year
 import { createLoadYearlyOutflows } from '../../src/application/yearly-outflows/load-yearly-outflows.js';
 import { createAddYearlySaving } from '../../src/application/yearly-outflows/add-yearly-saving.js';
 import { createRemoveYearlySaving } from '../../src/application/yearly-outflows/remove-yearly-saving.js';
+import { createUpdateYearlySaving } from '../../src/application/yearly-outflows/update-yearly-saving.js';
 import { YearlyOutflowsStore } from '../../src/application/yearly-outflows/yearly-outflows-store.js';
 import {
   createEmptyYearlyOutflowsView,
@@ -46,6 +47,7 @@ function createStoreFromSeedFixed() {
     loadYearlyOutflows: createLoadYearlyOutflows({ yearlyOutflowsService }),
     addYearlySaving: createAddYearlySaving({ yearlyOutflowsService }),
     removeYearlySaving: createRemoveYearlySaving({ yearlyOutflowsService }),
+    updateYearlySaving: createUpdateYearlySaving({ yearlyOutflowsService }),
   });
 }
 
