@@ -23,6 +23,17 @@ export default class TypeormTrackedSpendingRepository
     await TrackedSpendingDao.delete({ kind, sourceId });
   }
 
+  async updateBySource(
+    kind: TrackedSpendingKind,
+    sourceId: string,
+    changes: { label: string; amount: number }
+  ): Promise<void> {
+    await TrackedSpendingDao.update(
+      { kind, sourceId },
+      { label: changes.label, amount: changes.amount }
+    );
+  }
+
   async findBetween(from: Date, to: Date): Promise<TrackedSpending[]> {
     const daos = await TrackedSpendingDao.find({
       where: { occurredAt: And(MoreThanOrEqual(from), LessThan(to)) },

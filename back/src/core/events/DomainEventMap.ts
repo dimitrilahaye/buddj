@@ -20,11 +20,25 @@ export type OutflowDeletedEvent = {
   outflowId: string;
 };
 
+export type ExpenseUpdatedEvent = {
+  expenseId: string;
+  label: string;
+  amount: number;
+};
+
+export type OutflowUpdatedEvent = {
+  outflowId: string;
+  label: string;
+  amount: number;
+};
+
 export type DomainEventMap = {
   expenseAdded: ExpenseAddedEvent;
   expenseDeleted: ExpenseDeletedEvent;
   outflowAdded: OutflowAddedEvent;
   outflowDeleted: OutflowDeletedEvent;
+  expenseUpdated: ExpenseUpdatedEvent;
+  outflowUpdated: OutflowUpdatedEvent;
 };
 
 export type DomainEventName = keyof DomainEventMap;
