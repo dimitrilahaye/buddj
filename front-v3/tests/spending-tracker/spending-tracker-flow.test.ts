@@ -138,6 +138,8 @@ describe('écran suivi des dépenses', () => {
         .map((li) => li.getAttribute('aria-label'));
     expect(entriesOf('jeudi 12 nov.')).toEqual(['EDF : 114,62 €', 'Courses : 42,10 €']);
     expect(entriesOf('vendredi 13 nov.')).toEqual(['Boulangerie : 4,50 €', 'Kebab : 12,00 €']);
+    expect(within(periodRow).getByLabelText('Total du jeudi 12 nov. : 156,72 €')).toBeTruthy();
+    expect(within(periodRow).getByLabelText('Total du vendredi 13 nov. : 16,50 €')).toBeTruthy();
 
     const dayName = /12 nov\.? : 156,72 €$/;
     fireEvent.click(screen.getByRole('button', { name: dayName }));

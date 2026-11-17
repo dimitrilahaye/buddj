@@ -4617,8 +4617,23 @@ buddj-spending-tracker-chart[hidden] {
   background: var(--bg-card-hover);
 }
 
+.spending-tracker-day-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.spending-tracker-day-total {
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--navy-soft);
+}
+
 .spending-tracker-day-title {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--navy-soft);
