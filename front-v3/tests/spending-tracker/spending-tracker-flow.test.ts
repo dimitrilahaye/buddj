@@ -116,7 +116,7 @@ describe('écran suivi des dépenses', () => {
     expect(screen.getByRole('listitem', { name: 'Toute la période, semaine du 9 nov. : 173,22 €' })).toBeTruthy();
   });
 
-  it('chaque récap s’ouvre sous la ligne cliquée, y compris celui de toute la période, trié chronologiquement avec un jour sur deux distingué', async () => {
+  it('chaque récap s’ouvre sous la ligne cliquée, y compris celui de toute la période, en un bloc chronologique par jour', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
@@ -128,25 +128,22 @@ describe('écran suivi des dépenses', () => {
 
     expect(screen.getByRole('button', { name: periodName }).getAttribute('aria-pressed')).toBe('true');
     const periodRow = screen.getByRole('listitem', { name: periodName });
-    const entries = within(periodRow).getByRole('list', { name: 'Dépenses : semaine du 9 nov.' });
-    const periodEntries = within(entries).getAllByRole('listitem');
-    expect(periodEntries.map((li) => li.getAttribute('aria-label'))).toEqual([
-      'EDF : 114,62 €',
-      'Courses : 42,10 €',
-      'Boulangerie : 4,50 €',
-      'Kebab : 12,00 €',
+    expect(within(periodRow).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      'jeudi 12 nov.',
+      'vendredi 13 nov.',
     ]);
-    expect(periodEntries.map((li) => li.classList.contains('spending-tracker-entry--alt-day'))).toEqual([
-      false,
-      false,
-      true,
-      true,
-    ]);
+    const entriesOf = (day: string): Array<string | null> =>
+      within(within(periodRow).getByRole('list', { name: `Dépenses : ${day}` }))
+        .getAllByRole('listitem')
+        .map((li) => li.getAttribute('aria-label'));
+    expect(entriesOf('jeudi 12 nov.')).toEqual(['EDF : 114,62 €', 'Courses : 42,10 €']);
+    expect(entriesOf('vendredi 13 nov.')).toEqual(['Boulangerie : 4,50 €', 'Kebab : 12,00 €']);
 
     const dayName = /12 nov\.? : 156,72 €$/;
     fireEvent.click(screen.getByRole('button', { name: dayName }));
     const dayRow = screen.getByRole('button', { name: dayName }).closest('li') as HTMLElement;
     expect(within(dayRow).getByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeTruthy();
+    expect(within(dayRow).queryByRole('heading', { level: 3 })).toBeNull();
     expect(screen.getAllByRole('list', { name: /^Dépenses : / })).toHaveLength(1);
 
     fireEvent.click(screen.getByRole('button', { name: dayName }));
