@@ -57,9 +57,6 @@ export default class Account {
     );
   }
 
-  /**
-   * @deprecated
-   */
   updateExpenseAmountFromWeeklyBudget(
     weeklyId: string,
     expenseId: string,
@@ -69,9 +66,6 @@ export default class Account {
     weekly.updateExpenseAmount(expenseId, amount);
   }
 
-  /**
-   * @deprecated
-   */
   updateExpenseLabelFromWeeklyBudget(
     weeklyId: string,
     expenseId: string,
@@ -101,9 +95,6 @@ export default class Account {
     outflow.uncheck();
   }
 
-  /**
-   * @deprecated
-   */
   updateExpenseWeeklyBudget(
     originalWeeklyId: string,
     newWeeklyId: string,

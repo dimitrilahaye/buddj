@@ -2,9 +2,6 @@ import UpdateExpenseCommandInterface from "../../../core/commands/UpdateExpenseC
 import Koi from "../validators/Koi.js";
 import UpdateExpenseCommandError from "../errors/UpdateExpenseCommandError.js";
 
-/**
- * @deprecated
- */
 export default class UpdateExpenseCommand
   implements UpdateExpenseCommandInterface
 {

@@ -402,7 +402,6 @@ function buildApi(
     })
   );
 
-  /** @deprecated */
   api.use(
     routes.month.updateExpense(router, {
       updateExpenseUsecase: dependencies.updateExpenseUsecase,

@@ -8,7 +8,6 @@ const errorHandler = (
 ) => {
   let statusCode: number;
   switch (error.name) {
-    /** @deprecated */
     case "UpdateExpenseCommandError":
     case "RequestValidationError":
       statusCode = 400;

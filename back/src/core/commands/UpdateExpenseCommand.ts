@@ -1,6 +1,3 @@
-/**
- * @deprecated
- */
 export default interface UpdateExpenseCommand {
   monthId: string;
   originalWeeklyId: string;
