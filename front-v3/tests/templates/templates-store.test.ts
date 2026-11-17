@@ -6,6 +6,8 @@ import { createAddTemplateOutflow } from '../../src/application/template/add-tem
 import { createDeleteTemplateOutflow } from '../../src/application/template/delete-template-outflow.js';
 import { createAddTemplateBudget } from '../../src/application/template/add-template-budget.js';
 import { createDeleteTemplateBudget } from '../../src/application/template/delete-template-budget.js';
+import { createUpdateTemplateOutflow } from '../../src/application/template/update-template-outflow.js';
+import { createUpdateTemplateBudget } from '../../src/application/template/update-template-budget.js';
 import { TemplatesStore } from '../../src/application/template/templates-store.js';
 import type { TemplateView } from '../../src/application/template/template-view.js';
 
@@ -35,6 +37,8 @@ function createStore(initial: TemplateView[]) {
     deleteTemplateOutflow: createDeleteTemplateOutflow({ templateService }),
     addTemplateBudget: createAddTemplateBudget({ templateService }),
     deleteTemplateBudget: createDeleteTemplateBudget({ templateService }),
+    updateTemplateOutflow: createUpdateTemplateOutflow({ templateService }),
+    updateTemplateBudget: createUpdateTemplateBudget({ templateService }),
   });
 }
 
