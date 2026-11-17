@@ -4604,10 +4604,35 @@ buddj-spending-tracker-chart[hidden] {
   text-transform: uppercase;
 }
 
+.spending-tracker-days {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Un bloc par jour dans les récaps qui couvrent plusieurs jours. */
+.spending-tracker-day {
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius);
+  background: var(--bg-card-hover);
+}
+
+.spending-tracker-day-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--navy-soft);
+}
+
+.spending-tracker-day-title::first-letter {
+  text-transform: uppercase;
+}
+
 .spending-tracker-entries {
   display: flex;
   flex-direction: column;
-  margin: 0 -0.5rem;
+  gap: 0.5rem;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -4617,13 +4642,7 @@ buddj-spending-tracker-chart[hidden] {
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
-}
-
-/* Un jour sur deux teinté : les jours d'un récap sur plusieurs jours se distinguent d'un coup d'œil. */
-.spending-tracker-entry--alt-day {
-  background: var(--bg-card-hover);
 }
 
 .spending-tracker-entry-kind {
