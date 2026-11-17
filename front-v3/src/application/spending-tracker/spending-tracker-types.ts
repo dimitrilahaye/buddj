@@ -26,7 +26,7 @@ export type SpendingBucket = {
   total: number;
   expensesTotal: number;
   outflowsTotal: number;
-  /** Triées par montant décroissant */
+  /** Ordre du back (montant décroissant) ; le récap les réordonne chronologiquement */
   entries: TrackedSpendingEntry[];
 };
 
