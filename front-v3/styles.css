@@ -5456,6 +5456,7 @@ buddj-screen-reimbursements .goal-section {
 .goal-card .goal-card-actions .btn-menu-dots,
 .budget-card-actions .btn-menu-dots,
 buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots,
+buddj-actions-dropdown.line-actions-menu .btn-menu-dots,
 .goal-section-header buddj-actions-dropdown .btn-menu-dots {
   width: 2rem;
   height: 2rem;
@@ -5477,6 +5478,7 @@ buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-
 .goal-card .goal-card-actions .btn-menu-dots:hover,
 .budget-card-actions .btn-menu-dots:hover,
 buddj-screen-new-month .new-month-line-actions buddj-actions-dropdown .btn-menu-dots:hover,
+buddj-actions-dropdown.line-actions-menu .btn-menu-dots:hover,
 .goal-section-header buddj-actions-dropdown .btn-menu-dots:hover {
   background: rgba(255, 255, 255, 0.06);
   color: var(--navy);
@@ -6558,6 +6560,17 @@ buddj-screen-new-month .new-month-sr-checkbox {
   border: 0;
   opacity: 0;
   pointer-events: none;
+}
+
+/* Lignes avec menu ⋮ (dépenses, charges, budgets de template / annuels, miroirs de recherche) :
+   le panneau doit déborder de la ligne, et la ligne au menu ouvert passer devant ses voisines. */
+buddj-line-item:has(> buddj-actions-dropdown.line-actions-menu) {
+  overflow: visible;
+  position: relative;
+}
+
+buddj-line-item:has(> buddj-actions-dropdown.line-actions-menu[open]) {
+  z-index: 5;
 }
 
 buddj-screen-new-month .new-month-line-actions {
