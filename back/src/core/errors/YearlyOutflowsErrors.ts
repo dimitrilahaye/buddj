@@ -19,7 +19,23 @@ class YearlySavingTypeDoesNotExistError extends Error {
   }
 }
 
+class YearlySavingLabelCanNotBeEmptyError extends Error {
+  constructor() {
+    super("Le libellé ne peut pas être vide");
+    this.name = "YearlySavingLabelCanNotBeEmptyError";
+  }
+}
+
+class YearlySavingAmountMustBePositiveError extends Error {
+  constructor() {
+    super("Le montant doit être positif");
+    this.name = "YearlySavingAmountMustBePositiveError";
+  }
+}
+
 export {
+  YearlySavingLabelCanNotBeEmptyError,
+  YearlySavingAmountMustBePositiveError,
   YearlySavingsAddError,
   YearlySavingsIdDoesNotExistError,
   YearlySavingTypeDoesNotExistError,

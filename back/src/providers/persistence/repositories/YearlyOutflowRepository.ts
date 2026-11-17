@@ -29,6 +29,18 @@ export default class TypeOrmYearlyOutflowRepository
     return this.getAll();
   }
 
+  async update(saving: YearlyOutflow | YearlyBudget): Promise<YearlyOutflows> {
+    await YearlyOutflowDao.update(saving.id, {
+      label: saving.type === "outflow" ? saving.label : saving.name,
+      amount:
+        saving.type === "outflow"
+          ? Number(saving.amount)
+          : Number(saving.initialBalance),
+    });
+
+    return this.getAll();
+  }
+
   async remove(id: string): Promise<YearlyOutflows> {
     await YearlyOutflowDao.delete(id);
 

@@ -431,6 +431,14 @@ function buildApi(
     })
   );
 
+  api.use(
+    routes.yearlySaving.updateYearlyOutflow(router, {
+      updateYearlyOutflow: dependencies.updateYearlyOutflowUsecase,
+      deserializer: dependencies.updateYearlyOutflowDeserializer,
+      yearlyOutflowsDto: dependencies.yearlyOutflowsDto,
+    })
+  );
+
   router.get("/me", isLoggedIn, async (req, res) => {
     try {
       res.send(req.user);

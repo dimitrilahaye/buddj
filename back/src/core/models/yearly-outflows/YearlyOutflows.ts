@@ -1,4 +1,6 @@
 import {
+  YearlySavingAmountMustBePositiveError,
+  YearlySavingLabelCanNotBeEmptyError,
   YearlySavingsAddError,
   YearlySavingsIdDoesNotExistError,
   YearlySavingTypeDoesNotExistError,
@@ -46,6 +48,40 @@ export default class YearlyOutflows {
       default:
         throw new YearlySavingTypeDoesNotExistError();
     }
+  }
+
+  update(id: string, label: string, amount: number) {
+    if (label.trim().length === 0) {
+      throw new YearlySavingLabelCanNotBeEmptyError();
+    }
+    if (amount <= 0) {
+      throw new YearlySavingAmountMustBePositiveError();
+    }
+    const outflowIndex = this.outflowsList.findIndex((o) => o.id === id);
+    if (outflowIndex !== -1) {
+      const current = this.outflowsList[outflowIndex];
+      const updated = new YearlyOutflow({
+        id,
+        month: current.month,
+        label,
+        amount,
+      });
+      this.outflowsList[outflowIndex] = updated;
+      return updated;
+    }
+    const budgetIndex = this.budgetsList.findIndex((b) => b.id === id);
+    if (budgetIndex !== -1) {
+      const current = this.budgetsList[budgetIndex];
+      const updated = new YearlyBudget({
+        id,
+        month: current.month,
+        name: label,
+        initialBalance: amount,
+      });
+      this.budgetsList[budgetIndex] = updated;
+      return updated;
+    }
+    throw new YearlySavingsIdDoesNotExistError();
   }
 
   remove(id: string) {

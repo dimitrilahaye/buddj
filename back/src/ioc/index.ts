@@ -15,6 +15,7 @@ import UpdateExpense from "../core/usecases/month/UpdateExpense.js";
 import UpdateOutflow from "../core/usecases/month/UpdateOutflow.js";
 import UpdateMonthlyOutflow from "../core/usecases/monthly-template/UpdateMonthlyOutflow.js";
 import UpdateMonthlyBudget from "../core/usecases/monthly-template/UpdateMonthlyBudget.js";
+import UpdateYearlyOutflow from "../core/usecases/yearly-saving/UpdateYearlyOutflow.js";
 import updateOutflowDeserializer, {
   UpdateOutflowDeserializer,
 } from "../consumers/api/deserializers/month/updateOutflow.js";
@@ -24,6 +25,9 @@ import updateMonthlyOutflowDeserializer, {
 import updateMonthlyBudgetDeserializer, {
   UpdateMonthlyBudgetDeserializer,
 } from "../consumers/api/deserializers/monthly-template/updateMonthlyBudget.js";
+import updateYearlyOutflowDeserializer, {
+  UpdateYearlyOutflowDeserializer,
+} from "../consumers/api/deserializers/yearly-saving/updateYearlyOutflow.js";
 import DeleteOutflow from "../core/usecases/month/DeleteOutflow.js";
 import AddOutflow from "../core/usecases/month/AddOutflow.js";
 import GetArchivedMonths from "../core/usecases/month/GetArchivedMonths.js";
@@ -149,6 +153,7 @@ export type Deps = {
   updateOutflowUsecase: UpdateOutflow;
   updateMonthlyOutflowUsecase: UpdateMonthlyOutflow;
   updateMonthlyBudgetUsecase: UpdateMonthlyBudget;
+  updateYearlyOutflowUsecase: UpdateYearlyOutflow;
   deleteOutflowUsecase: DeleteOutflow;
   addOutflowUsecase: AddOutflow;
   addBudgetUsecase: AddBudget;
@@ -196,6 +201,7 @@ export type Deps = {
   updateOutflowDeserializer: UpdateOutflowDeserializer;
   updateMonthlyOutflowDeserializer: UpdateMonthlyOutflowDeserializer;
   updateMonthlyBudgetDeserializer: UpdateMonthlyBudgetDeserializer;
+  updateYearlyOutflowDeserializer: UpdateYearlyOutflowDeserializer;
 };
 
 export default {
@@ -230,4 +236,5 @@ export default {
   updateOutflowDeserializer,
   updateMonthlyOutflowDeserializer,
   updateMonthlyBudgetDeserializer,
+  updateYearlyOutflowDeserializer,
 } as const;
