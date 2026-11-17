@@ -112,6 +112,29 @@ describe('écran suivi des dépenses', () => {
     expect(screen.getByRole('listitem', { name: 'Toute la période, semaine du 9 nov. : 173,22 €' })).toBeTruthy();
   });
 
+  it('cliquer sur la ligne de toute la période affiche le détail de la période, du plus gros au plus petit', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Cette semaine' }));
+    await waitFor(() => expect(totalText()).toContain('173,22 €'));
+
+    const periodName = 'Toute la période, semaine du 9 nov. : 173,22 €';
+    fireEvent.click(screen.getByRole('button', { name: periodName }));
+
+    expect(screen.getByRole('button', { name: periodName }).getAttribute('aria-pressed')).toBe('true');
+    const entries = screen.getByRole('list', { name: 'Dépenses : semaine du 9 nov.' });
+    expect(within(entries).getAllByRole('listitem').map((li) => li.getAttribute('aria-label'))).toEqual([
+      'EDF : 114,62 €',
+      'Courses : 42,10 €',
+      'Kebab : 12,00 €',
+      'Boulangerie : 4,50 €',
+    ]);
+
+    fireEvent.click(screen.getByRole('button', { name: periodName }));
+    expect(screen.queryByRole('list', { name: /^Dépenses : / })).toBeNull();
+  });
+
   it('une plage longue choisie au calendrier décoche les raccourcis et regroupe par mois', async () => {
     const service = startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
