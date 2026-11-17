@@ -4,10 +4,8 @@
  * « Modifier » émet `buddj-template-budget-update-confirmed` ({ budgetId, name API, initialBalance }).
  */
 import type { BuddjConfirmModalElement } from '../molecules/buddj-confirm-modal.js';
-import type { BuddjBudgetAddDrawerElement } from './buddj-budget-add-drawer.js';
-import { getToast } from '../atoms/buddj-toast.js';
-import { formatEuros, parseEurosToNumber } from '../../shared/goal.js';
 import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
+import { openBudgetEditDrawer } from '../../shared/line-edit-drawers.js';
 import {
   PROJECTED_SIMULATION_INCLUDE_ATTR,
   PROJECTED_SIMULATION_ROW_ID_ATTR,
@@ -67,26 +65,24 @@ export class BuddjTemplateBudgetCard extends HTMLElement {
     this.openDeleteConfirm(this.getAttribute('name') ?? '');
   }
 
+  /** Ouvre l’édition (utilisé aussi par les drawers de recherche). */
+  requestEdit(): void {
+    this.openEditDrawer();
+  }
+
   private openEditDrawer(): void {
     const budgetId = this.getAttribute('budget-id') ?? '';
     if (!budgetId) return;
-    const drawer = document.getElementById('budget-add-drawer') as BuddjBudgetAddDrawerElement | null;
-    drawer?.open({
-      title: 'Modifier le budget',
-      initialLabel: this.getAttribute('name') ?? '',
-      initialAmount: formatEuros(parseFloat(this.getAttribute('allocated') ?? '0') || 0),
-      initialEmoji: this.getAttribute('icon') || undefined,
-      onValidate: (label, amountText, emoji) => {
-        const initialBalance = parseEurosToNumber(amountText);
-        if (initialBalance <= 0) {
-          getToast()?.show({ message: 'Le montant doit être supérieur à 0', variant: 'warning' });
-          return;
-        }
+    openBudgetEditDrawer({
+      label: this.getAttribute('name') ?? '',
+      icon: this.getAttribute('icon') ?? '',
+      amount: parseFloat(this.getAttribute('allocated') ?? '0') || 0,
+      onSubmit: (name, initialBalance) => {
         this.dispatchEvent(
           new CustomEvent('buddj-template-budget-update-confirmed', {
             bubbles: true,
             composed: true,
-            detail: { budgetId, name: `${emoji.trim()} ${label.trim()}`.trim(), initialBalance },
+            detail: { budgetId, name, initialBalance },
           }),
         );
       },
