@@ -31,6 +31,8 @@ const errorHandler = (
     case "AccountOutflowAmountMustBePositiveError":
     case "TransferBalanceIntoMonthError":
     case "YearlySavingsAddError":
+    case "YearlySavingLabelCanNotBeEmptyError":
+    case "YearlySavingAmountMustBePositiveError":
     case "MonthlyTemplateNameCanNotBeEmptyError":
     case "MonthlyOutflowTemplateLabelCanNotBeEmptyError":
     case "MonthlyBudgetTemplateNameCanNotBeEmptyError":

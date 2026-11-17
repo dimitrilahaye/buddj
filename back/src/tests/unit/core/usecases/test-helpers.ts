@@ -73,6 +73,7 @@ const pendingDebitRepositoryStub = {
 const yearlyOutflowRepositoryStub = {
   getAll: sinon.stub(),
   add: sinon.stub(),
+  update: sinon.stub(),
   remove: sinon.stub(),
 };
 
@@ -106,6 +107,7 @@ function resetStubs() {
   pendingDebitRepositoryStub.getAll.reset();
   yearlyOutflowRepositoryStub.getAll.reset();
   yearlyOutflowRepositoryStub.add.reset();
+  yearlyOutflowRepositoryStub.update.reset();
   yearlyOutflowRepositoryStub.remove.reset();
   monthlyTemplateRepositoryStub.getDefault.reset();
   monthlyTemplateRepositoryStub.getById.reset();
