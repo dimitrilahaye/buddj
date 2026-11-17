@@ -145,7 +145,8 @@ describe('écran suivi des dépenses', () => {
     fireEvent.click(screen.getByRole('button', { name: dayName }));
     const dayRow = screen.getByRole('button', { name: dayName }).closest('li') as HTMLElement;
     expect(within(dayRow).getByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeTruthy();
-    expect(within(dayRow).queryByRole('heading', { level: 3 })).toBeNull();
+    expect(within(dayRow).getByRole('heading', { level: 3 }).textContent).toBe('jeudi 12 nov.');
+    expect(within(dayRow).getByLabelText('Total du jeudi 12 nov. : 156,72 €')).toBeTruthy();
     expect(screen.getAllByRole('list', { name: /^Dépenses : / })).toHaveLength(1);
 
     fireEvent.click(screen.getByRole('button', { name: dayName }));
