@@ -1,6 +1,10 @@
 import MonthlyBudgetTemplate from "./MonthlyBudgetTemplate.js";
 import MonthlyOutflowTemplate from "./MonthlyOutflowTemplate.js";
-import { MonthlyTemplateNameCanNotBeEmptyError } from "../../errors/MonthlyTemplateErrors.js";
+import {
+  MonthlyBudgetTemplateNotFoundError,
+  MonthlyOutflowTemplateNotFoundError,
+  MonthlyTemplateNameCanNotBeEmptyError,
+} from "../../errors/MonthlyTemplateErrors.js";
 import IdProvider from "../../ports/providers/IdProvider.js";
 
 export default class MonthlyTemplate {
@@ -50,6 +54,30 @@ export default class MonthlyTemplate {
 
   removeBudget(budgetId: string) {
     this.budgets = this.budgets.filter((b) => b.id !== budgetId);
+  }
+
+  updateOutflow(outflowId: string, label: string, amount: number) {
+    const index = this.outflows.findIndex((o) => o.id === outflowId);
+    if (index === -1) {
+      throw new MonthlyOutflowTemplateNotFoundError();
+    }
+    const updated = new MonthlyOutflowTemplate({ id: outflowId, label, amount });
+    this.outflows[index] = updated;
+    return updated;
+  }
+
+  updateBudget(budgetId: string, name: string, initialBalance: number) {
+    const index = this.budgets.findIndex((b) => b.id === budgetId);
+    if (index === -1) {
+      throw new MonthlyBudgetTemplateNotFoundError();
+    }
+    const updated = new MonthlyBudgetTemplate({
+      id: budgetId,
+      name,
+      initialBalance,
+    });
+    this.budgets[index] = updated;
+    return updated;
   }
 
   addOutflow(outflow: MonthlyOutflowTemplate) {

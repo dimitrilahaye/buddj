@@ -20,6 +20,8 @@ const errorHandler = (
     case "TransferableWeeklyBudgetNotFoundError":
     case "YearlySavingsIdDoesNotExistError":
     case "MonthlyTemplateDoesNotExistError":
+    case "MonthlyOutflowTemplateNotFoundError":
+    case "MonthlyBudgetTemplateNotFoundError":
     case "ProjectNotFoundError":
       statusCode = 404;
       break;

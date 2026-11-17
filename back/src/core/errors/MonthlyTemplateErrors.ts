@@ -40,7 +40,23 @@ class MonthlyBudgetTemplateInitialBalanceCanNotBeLessThanOneError extends Error 
   }
 }
 
+class MonthlyOutflowTemplateNotFoundError extends Error {
+  constructor() {
+    super("Sortie du template inconnue");
+    this.name = "MonthlyOutflowTemplateNotFoundError";
+  }
+}
+
+class MonthlyBudgetTemplateNotFoundError extends Error {
+  constructor() {
+    super("Budget du template inconnu");
+    this.name = "MonthlyBudgetTemplateNotFoundError";
+  }
+}
+
 export {
+  MonthlyOutflowTemplateNotFoundError,
+  MonthlyBudgetTemplateNotFoundError,
   MonthlyTemplateNameCanNotBeEmptyError,
   MonthlyTemplateDoesNotExistError,
   MonthlyOutflowTemplateLabelCanNotBeEmptyError,
