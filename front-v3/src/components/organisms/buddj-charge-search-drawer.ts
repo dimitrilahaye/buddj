@@ -2,12 +2,13 @@
  * Drawer de recherche des charges. Délègue l’UI au shell buddj-search-drawer ;
  * ne contient que la logique de collecte et de création des lignes miroir pour les charges.
  */
+import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
 import type { BuddjSearchDrawerElement, SearchDrawerEntry } from './buddj-search-drawer.js';
 
 const CHECKBOX_ID_PREFIX = 'buddj-charge-search-cb-';
 const EVENT_SEARCH = 'buddj-charge-search';
 
-export type BuddjChargeSearchDrawerElement = HTMLElement & { open: () => void };
+export type BuddjChargeSearchDrawerElement = HTMLElement & { open: () => void; refresh: () => void };
 
 interface ChargeEntry extends SearchDrawerEntry {
   month: string;
@@ -19,7 +20,7 @@ function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
   return el.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
 }
 
-type LineRowElement = HTMLElement & { requestDelete?: () => void };
+type LineRowElement = HTMLElement & { requestDelete?: () => void; requestEdit?: () => void };
 
 export class BuddjChargeSearchDrawer extends HTMLElement {
   static readonly tagName = 'buddj-charge-search-drawer';
@@ -27,6 +28,11 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
   connectedCallback(): void {
     if (this.querySelector('buddj-search-drawer')) return;
     this.appendChild(document.createElement('buddj-search-drawer'));
+  }
+
+  /** Recalcule les résultats (ex. après une modification) en conservant la requête. */
+  refresh(): void {
+    getShell(this)?.refresh();
   }
 
   open(): void {
@@ -80,20 +86,18 @@ export class BuddjChargeSearchDrawer extends HTMLElement {
       lineItem.appendChild(checkbox);
     }
 
-    const deleteBtn = document.createElement('buddj-icon-delete');
-    deleteBtn.setAttribute('title', 'Supprimer');
-    deleteBtn.slot = 'actions';
-    deleteBtn.addEventListener('click', (e) => {
-      e.preventDefault();
+    const row = (): LineRowElement | null | undefined => {
       const outflowId = entry.outflowId ?? '';
       if (outflowId) {
-        document.querySelector<LineRowElement>(`buddj-charge-item[outflow-id="${outflowId}"]`)?.requestDelete?.();
-        return;
+        return document.querySelector<LineRowElement>(`buddj-charge-item[outflow-id="${CSS.escape(outflowId)}"]`);
       }
-      (entry.element as LineRowElement | null | undefined)?.requestDelete?.();
+      return entry.element as LineRowElement | null | undefined;
+    };
+    lineItem.appendChild(createLineActionsMenu({ subject: 'la charge' }));
+    listenLineMenuActions(lineItem, {
+      onEdit: () => row()?.requestEdit?.(),
+      onDelete: () => row()?.requestDelete?.(),
     });
-
-    lineItem.appendChild(deleteBtn);
     return lineItem;
   }
 

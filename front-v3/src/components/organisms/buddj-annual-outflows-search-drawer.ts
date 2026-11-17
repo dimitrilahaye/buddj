@@ -2,6 +2,7 @@
  * Drawer de recherche des sorties annuelles : charges et budgets de tous les mois.
  * Résultats groupés par mois, avec le nom du mois en en-tête de chaque section.
  */
+import { createLineActionsMenu, listenLineMenuActions } from '../../shared/line-actions-menu.js';
 import type { BuddjSearchDrawerElement, SearchDrawerEntry } from './buddj-search-drawer.js';
 
 const EVENT_SEARCH = 'buddj-annual-outflows-search';
@@ -21,7 +22,7 @@ function getShell(el: HTMLElement): BuddjSearchDrawerElement | null {
   return el.querySelector('buddj-search-drawer') as BuddjSearchDrawerElement | null;
 }
 
-type LineRowElement = HTMLElement & { requestDelete?: () => void };
+type LineRowElement = HTMLElement & { requestDelete?: () => void; requestEdit?: () => void };
 
 export class BuddjAnnualOutflowsSearchDrawer extends HTMLElement {
   static readonly tagName = 'buddj-annual-outflows-search-drawer';
@@ -29,6 +30,11 @@ export class BuddjAnnualOutflowsSearchDrawer extends HTMLElement {
   connectedCallback(): void {
     if (this.querySelector('buddj-search-drawer')) return;
     this.appendChild(document.createElement('buddj-search-drawer'));
+  }
+
+  /** Recalcule les résultats (ex. après une modification) en conservant la requête. */
+  refresh(): void {
+    getShell(this)?.refresh();
   }
 
   open(): void {
@@ -52,15 +58,12 @@ export class BuddjAnnualOutflowsSearchDrawer extends HTMLElement {
     lineItem.setAttribute('label', entry.label);
     lineItem.setAttribute('amount', String(parseFloat(String(entry.amount)) || 0));
 
-    const deleteBtn = document.createElement('buddj-icon-delete');
-    deleteBtn.setAttribute('title', 'Supprimer');
-    deleteBtn.slot = 'actions';
-    deleteBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      (entry.element as LineRowElement | null | undefined)?.requestDelete?.();
+    const row = (): LineRowElement | null | undefined => entry.element as LineRowElement | null | undefined;
+    lineItem.appendChild(createLineActionsMenu({ subject: 'la ligne' }));
+    listenLineMenuActions(lineItem, {
+      onEdit: () => row()?.requestEdit?.(),
+      onDelete: () => row()?.requestDelete?.(),
     });
-
-    lineItem.appendChild(deleteBtn);
     return lineItem;
   }
 
