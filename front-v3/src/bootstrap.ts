@@ -39,6 +39,8 @@ import { createAddTemplateOutflow } from './application/template/add-template-ou
 import { createDeleteTemplateOutflow } from './application/template/delete-template-outflow.js';
 import { createAddTemplateBudget } from './application/template/add-template-budget.js';
 import { createDeleteTemplateBudget } from './application/template/delete-template-budget.js';
+import { createUpdateTemplateOutflow } from './application/template/update-template-outflow.js';
+import { createUpdateTemplateBudget } from './application/template/update-template-budget.js';
 import { TemplatesStore } from './application/template/templates-store.js';
 import type { TemplateService } from './application/template/template-service.js';
 import { createTemplateServiceFromApi } from './adapters/template-service-from-api.js';
@@ -201,6 +203,8 @@ export function bootstrap(options: BootstrapOptions): void {
   const deleteTemplateOutflow = createDeleteTemplateOutflow({ templateService });
   const addTemplateBudget = createAddTemplateBudget({ templateService });
   const deleteTemplateBudget = createDeleteTemplateBudget({ templateService });
+  const updateTemplateOutflow = createUpdateTemplateOutflow({ templateService });
+  const updateTemplateBudget = createUpdateTemplateBudget({ templateService });
   const templatesStore = new TemplatesStore({
     loadTemplates,
     updateTemplate,
@@ -208,6 +212,8 @@ export function bootstrap(options: BootstrapOptions): void {
     deleteTemplateOutflow,
     addTemplateBudget,
     deleteTemplateBudget,
+    updateTemplateOutflow,
+    updateTemplateBudget,
   });
   const loadYearlyOutflows = createLoadYearlyOutflows({ yearlyOutflowsService });
   const addYearlySaving = createAddYearlySaving({ yearlyOutflowsService });

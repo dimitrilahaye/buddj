@@ -88,6 +88,28 @@ export function createTemplateServiceFromInMemory({
       return deepClone(t);
     },
 
+    async updateTemplateOutflow({ templateId, outflowId, label, amount }) {
+      await tick();
+      const t = templates.find((x) => x.id === templateId);
+      if (!t) throw new Error(`Template introuvable : ${templateId}`);
+      const outflow = t.outflows.find((o) => o.id === outflowId);
+      if (!outflow) throw new Error(`Charge introuvable : ${outflowId}`);
+      outflow.label = label;
+      outflow.amount = amount;
+      return deepClone(t);
+    },
+
+    async updateTemplateBudget({ templateId, budgetId, name, initialBalance }) {
+      await tick();
+      const t = templates.find((x) => x.id === templateId);
+      if (!t) throw new Error(`Template introuvable : ${templateId}`);
+      const budget = t.budgets.find((b) => b.id === budgetId);
+      if (!budget) throw new Error(`Budget introuvable : ${budgetId}`);
+      budget.name = name;
+      budget.initialBalance = initialBalance;
+      return deepClone(t);
+    },
+
     async deleteTemplateBudget({ templateId, budgetId }) {
       await tick();
       const t = templates.find((x) => x.id === templateId);

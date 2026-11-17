@@ -116,6 +116,42 @@ export function createTemplateServiceFromApi({ apiUrl }: { apiUrl: string }): Te
       return mapApiTemplatePayloadToView(data);
     },
 
+    async updateTemplateOutflow({ templateId, outflowId, label, amount }) {
+      const url = `${baseUrl}/monthly-templates/${encodeURIComponent(templateId)}/monthly-outflows/${encodeURIComponent(outflowId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, amount }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiTemplatePayload>(response, url);
+      return mapApiTemplatePayloadToView(data);
+    },
+
+    async updateTemplateBudget({ templateId, budgetId, name, initialBalance }) {
+      const url = `${baseUrl}/monthly-templates/${encodeURIComponent(templateId)}/monthly-budgets/${encodeURIComponent(budgetId)}`;
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, initialBalance }),
+        });
+      } catch (err) {
+        return handleHttpError({ err });
+      }
+      if (!response.ok) await handleNotOkResponse(response);
+      const data = await getReponseDataOrFail<ApiTemplatePayload>(response, url);
+      return mapApiTemplatePayloadToView(data);
+    },
+
     async deleteTemplateBudget({ templateId, budgetId }) {
       const url = `${baseUrl}/monthly-templates/${encodeURIComponent(templateId)}/monthly-budgets/${encodeURIComponent(budgetId)}`;
       let response: Response;

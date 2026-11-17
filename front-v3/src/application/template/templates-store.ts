@@ -6,6 +6,8 @@ import type { DeleteTemplateOutflowUseCase } from './delete-template-outflow.js'
 import type { LoadTemplatesUseCase } from './load-templates.js';
 import type { TemplateView } from './template-view.js';
 import type { UpdateTemplateUseCase } from './update-template.js';
+import type { UpdateTemplateOutflowUseCase } from './update-template-outflow.js';
+import type { UpdateTemplateBudgetUseCase } from './update-template-budget.js';
 
 export type TemplatesState = {
   templates: TemplateView[];
@@ -27,6 +29,18 @@ export type AddTemplateOutflowActionDetail = { templateId: string; label: string
 export type DeleteTemplateOutflowActionDetail = { templateId: string; outflowId: string };
 export type AddTemplateBudgetActionDetail = { templateId: string; name: string; initialBalance: number };
 export type DeleteTemplateBudgetActionDetail = { templateId: string; budgetId: string };
+export type UpdateTemplateOutflowActionDetail = {
+  templateId: string;
+  outflowId: string;
+  label: string;
+  amount: number;
+};
+export type UpdateTemplateBudgetActionDetail = {
+  templateId: string;
+  budgetId: string;
+  name: string;
+  initialBalance: number;
+};
 
 /**
  * Liste et mutations des templates mensuels (API /months/template, /monthly-templates/…).
@@ -39,6 +53,8 @@ export class TemplatesStore extends Store<TemplatesState> {
     deleteTemplateOutflow,
     addTemplateBudget,
     deleteTemplateBudget,
+    updateTemplateOutflow,
+    updateTemplateBudget,
   }: {
     loadTemplates: LoadTemplatesUseCase;
     updateTemplate: UpdateTemplateUseCase;
@@ -46,6 +62,8 @@ export class TemplatesStore extends Store<TemplatesState> {
     deleteTemplateOutflow: DeleteTemplateOutflowUseCase;
     addTemplateBudget: AddTemplateBudgetUseCase;
     deleteTemplateBudget: DeleteTemplateBudgetUseCase;
+    updateTemplateOutflow: UpdateTemplateOutflowUseCase;
+    updateTemplateBudget: UpdateTemplateBudgetUseCase;
   }) {
     super(DEFAULT_STATE);
     this._loadTemplates = loadTemplates;
@@ -54,6 +72,8 @@ export class TemplatesStore extends Store<TemplatesState> {
     this._deleteTemplateOutflow = deleteTemplateOutflow;
     this._addTemplateBudget = addTemplateBudget;
     this._deleteTemplateBudget = deleteTemplateBudget;
+    this._updateTemplateOutflow = updateTemplateOutflow;
+    this._updateTemplateBudget = updateTemplateBudget;
 
     this.addEventListener('loadTemplates', () => void this.handleLoadTemplates());
     this.addEventListener('updateTemplate', (e: Event) => {
@@ -78,6 +98,14 @@ export class TemplatesStore extends Store<TemplatesState> {
       const d = (e as CustomEvent<DeleteTemplateBudgetActionDetail>).detail;
       if (d?.templateId && d.budgetId) void this.handleDeleteBudget(d);
     });
+    this.addEventListener('updateTemplateOutflow', (e: Event) => {
+      const d = (e as CustomEvent<UpdateTemplateOutflowActionDetail>).detail;
+      if (d?.templateId && d.outflowId && d.label?.trim() && d.amount > 0) void this.handleUpdateOutflow(d);
+    });
+    this.addEventListener('updateTemplateBudget', (e: Event) => {
+      const d = (e as CustomEvent<UpdateTemplateBudgetActionDetail>).detail;
+      if (d?.templateId && d.budgetId && d.name?.trim() && d.initialBalance > 0) void this.handleUpdateBudget(d);
+    });
   }
 
   private _loadTemplates: LoadTemplatesUseCase;
@@ -86,6 +114,8 @@ export class TemplatesStore extends Store<TemplatesState> {
   private _deleteTemplateOutflow: DeleteTemplateOutflowUseCase;
   private _addTemplateBudget: AddTemplateBudgetUseCase;
   private _deleteTemplateBudget: DeleteTemplateBudgetUseCase;
+  private _updateTemplateOutflow: UpdateTemplateOutflowUseCase;
+  private _updateTemplateBudget: UpdateTemplateBudgetUseCase;
 
   private _replaceTemplateInList(updated: TemplateView): void {
     const { templates } = this.getState();
@@ -201,6 +231,42 @@ export class TemplatesStore extends Store<TemplatesState> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.emitStateChange('templateBudgetDeleteFailed', { message });
+    } finally {
+      this.setState({ busyTemplateId: null });
+      this.emitStateChange('templatesStateUpdated');
+    }
+  }
+
+  private async handleUpdateOutflow(detail: UpdateTemplateOutflowActionDetail): Promise<void> {
+    const { templateId } = detail;
+    if (this.getState().busyTemplateId) return;
+    this.setState({ busyTemplateId: templateId });
+    this.emitStateChange('templateOutflowUpdateLoading', { templateId });
+    try {
+      const updated = await this._updateTemplateOutflow({ ...detail, label: detail.label.trim() });
+      this._replaceTemplateInList(updated);
+      this.emitStateChange('templateOutflowUpdateLoaded', { templateId });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('templateOutflowUpdateFailed', { message });
+    } finally {
+      this.setState({ busyTemplateId: null });
+      this.emitStateChange('templatesStateUpdated');
+    }
+  }
+
+  private async handleUpdateBudget(detail: UpdateTemplateBudgetActionDetail): Promise<void> {
+    const { templateId } = detail;
+    if (this.getState().busyTemplateId) return;
+    this.setState({ busyTemplateId: templateId });
+    this.emitStateChange('templateBudgetUpdateLoading', { templateId });
+    try {
+      const updated = await this._updateTemplateBudget({ ...detail, name: detail.name.trim() });
+      this._replaceTemplateInList(updated);
+      this.emitStateChange('templateBudgetUpdateLoaded', { templateId });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.emitStateChange('templateBudgetUpdateFailed', { message });
     } finally {
       this.setState({ busyTemplateId: null });
       this.emitStateChange('templatesStateUpdated');
