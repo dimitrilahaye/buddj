@@ -112,7 +112,7 @@ describe('écran suivi des dépenses', () => {
     expect(screen.getByRole('listitem', { name: 'Toute la période, semaine du 9 nov. : 173,22 €' })).toBeTruthy();
   });
 
-  it('cliquer sur la ligne de toute la période affiche le détail de la période, du plus gros au plus petit', async () => {
+  it('chaque récap s’ouvre sous la ligne cliquée, y compris celui de toute la période', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
@@ -123,7 +123,8 @@ describe('écran suivi des dépenses', () => {
     fireEvent.click(screen.getByRole('button', { name: periodName }));
 
     expect(screen.getByRole('button', { name: periodName }).getAttribute('aria-pressed')).toBe('true');
-    const entries = screen.getByRole('list', { name: 'Dépenses : semaine du 9 nov.' });
+    const periodRow = screen.getByRole('listitem', { name: periodName });
+    const entries = within(periodRow).getByRole('list', { name: 'Dépenses : semaine du 9 nov.' });
     expect(within(entries).getAllByRole('listitem').map((li) => li.getAttribute('aria-label'))).toEqual([
       'EDF : 114,62 €',
       'Courses : 42,10 €',
@@ -131,7 +132,13 @@ describe('écran suivi des dépenses', () => {
       'Boulangerie : 4,50 €',
     ]);
 
-    fireEvent.click(screen.getByRole('button', { name: periodName }));
+    const dayName = /12 nov\.? : 156,72 €$/;
+    fireEvent.click(screen.getByRole('button', { name: dayName }));
+    const dayRow = screen.getByRole('button', { name: dayName }).closest('li') as HTMLElement;
+    expect(within(dayRow).getByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeTruthy();
+    expect(screen.getAllByRole('list', { name: /^Dépenses : / })).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole('button', { name: dayName }));
     expect(screen.queryByRole('list', { name: /^Dépenses : / })).toBeNull();
   });
 
@@ -341,7 +348,8 @@ describe('écran suivi des dépenses', () => {
     const plot = screen.getByRole('group', { name: /^Cumul de 16,50 € à 18 h\./ });
     expect(plot.getAttribute('aria-label')).not.toContain('Entrée');
     const bars = screen.getByRole('list', { name: 'Dépenses par jour' });
-    expect(within(bars).getAllByRole('listitem')).toHaveLength(1);
+    // Une seule ligne (sans synthèse), le récap du jour s'ouvre dedans.
+    expect(bars.children).toHaveLength(1);
 
     // La boulangerie est à 07:30 UTC, heure locale selon le fuseau de la machine.
     const hour = new Date('2026-11-13T07:30:00.000Z').getHours();
