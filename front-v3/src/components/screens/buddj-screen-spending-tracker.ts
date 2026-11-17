@@ -40,6 +40,8 @@ const BUDDJ_CHART_TAG = 'buddj-spending-tracker-chart';
 /** Clé de sélection de la ligne « toute la période » (jamais une date de bucket). */
 const PERIOD_KEY = 'period';
 
+const CHART_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></svg>`;
+
 const DEFAULT_SHORTCUT: SpendingRangeShortcut = 'month';
 
 const SHORTCUTS: Array<{ value: SpendingRangeShortcut; label: string }> = [
@@ -82,6 +84,8 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
   private _main?: HTMLElement;
   /** Bucket dont le détail est affiché (start), PERIOD_KEY pour toute la période, null si aucun. */
   private _selectedStart: string | null = null;
+  /** Courbe cumulée repliée par défaut, dépliée via l'icône du résumé. */
+  private _isChartOpen = false;
 
   init({ spendingTrackerStore }: { spendingTrackerStore: SpendingTrackerStore }): void {
     this._store = spendingTrackerStore;
@@ -137,7 +141,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
             <button type="button" class="btn spending-tracker-retry">Réessayer</button>
           </div>
           <div class="spending-tracker-summary" role="status" aria-label="Total de la période" hidden></div>
-          <buddj-spending-tracker-chart hidden></buddj-spending-tracker-chart>
+          <buddj-spending-tracker-chart id="spending-tracker-chart" hidden></buddj-spending-tracker-chart>
           <ol class="spending-tracker-bars"></ol>
           <div class="spending-tracker-empty" hidden>
             <p class="spending-tracker-empty-title">Aucune dépense sur cette période.</p>
@@ -238,6 +242,11 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
       this._retry();
       return;
     }
+    if ((e.target as Element).closest('.spending-tracker-chart-toggle')) {
+      this._isChartOpen = !this._isChartOpen;
+      this._syncFromStore();
+      return;
+    }
     const button = (e.target as Element).closest('.spending-tracker-bar');
     if (!button) return;
     const start = button.hasAttribute('data-period') ? PERIOD_KEY : button.getAttribute('data-start');
@@ -318,7 +327,13 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     const summary = main.querySelector('.spending-tracker-summary') as HTMLElement;
     summary.hidden = view === null;
     if (!view) return;
-    summary.innerHTML = `
+    const chartToggle =
+      view.total > 0
+        ? `
+      <button type="button" class="spending-tracker-chart-toggle${this._isChartOpen ? ' spending-tracker-chart-toggle--open' : ''}"
+        aria-label="Courbe cumulée" aria-expanded="${this._isChartOpen}" aria-controls="spending-tracker-chart">${CHART_ICON_SVG}</button>`
+        : '';
+    summary.innerHTML = `${chartToggle}
       <p class="spending-tracker-total">${escapeHtml(formatEuros(view.total))}</p>
       <p class="spending-tracker-split">
         <span class="spending-tracker-split-item spending-tracker-split-item--expense">Dépenses ${escapeHtml(formatEuros(view.expensesTotal))}</span>
@@ -340,8 +355,8 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
   }): void {
     const chart = main.querySelector(BUDDJ_CHART_TAG) as BuddjSpendingTrackerChart;
     const hasCurve = view !== null && view.total > 0;
-    chart.hidden = !hasCurve;
-    if (!hasCurve || !view) return;
+    chart.hidden = !hasCurve || !this._isChartOpen;
+    if (!hasCurve || !view || !this._isChartOpen) return;
     // Une plage d'un seul jour se lit heure par heure.
     const [singleDay] = view.granularity === 'day' && view.buckets.length === 1 ? view.buckets : [];
     chart.render({

@@ -45,6 +45,10 @@ function totalText(): string {
   return screen.getByRole('status', { name: 'Total de la période' }).textContent ?? '';
 }
 
+function openChart(): void {
+  fireEvent.click(screen.getByRole('button', { name: 'Courbe cumulée' }));
+}
+
 function openRangePicker(): HTMLElement {
   fireEvent.click(screen.getByRole('button', { name: /^Dates : / }));
   return screen.getByRole('dialog', { name: 'Choisir une période' });
@@ -294,9 +298,27 @@ describe('écran suivi des dépenses', () => {
     expect(screen.queryByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeNull();
   });
 
+  it('replie la courbe par défaut et la déplie / replie via l’icône du résumé', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+    const summary = screen.getByRole('status', { name: 'Total de la période' });
+    const toggle = within(summary).getByRole('button', { name: 'Courbe cumulée' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByRole('figure')).toBeNull();
+
+    openChart();
+    expect(screen.getByRole('button', { name: 'Courbe cumulée' }).getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('figure')).toBeTruthy();
+
+    openChart();
+    expect(screen.queryByRole('figure')).toBeNull();
+  });
+
   it('trace la courbe cumulée entre le résumé et le détail, avec une légende par type', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
+    openChart();
 
     const chart = screen.getByRole('figure');
     expect(within(chart).getByText('Cumul sur la période')).toBeTruthy();
@@ -310,6 +332,7 @@ describe('écran suivi des dépenses', () => {
   it('parcourt la courbe au clavier et ouvre le détail de la période avec Entrée', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
+    openChart();
     const plot = screen.getByRole('group', { name: /^Cumul de/ });
 
     fireEvent.keyDown(plot, { key: 'ArrowLeft' });
@@ -329,6 +352,7 @@ describe('écran suivi des dépenses', () => {
   it('suit le filtre par type : une seule série, sans légende', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
+    openChart();
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Sorties' }));
 
@@ -345,6 +369,7 @@ describe('écran suivi des dépenses', () => {
     fireEvent.click(screen.getByRole('radio', { name: "Aujourd'hui" }));
 
     await waitFor(() => expect(totalText()).toContain('16,50 €'));
+    openChart();
     const plot = screen.getByRole('group', { name: /^Cumul de 16,50 € à 18 h\./ });
     expect(plot.getAttribute('aria-label')).not.toContain('Entrée');
     const bars = screen.getByRole('list', { name: 'Dépenses par jour' });
