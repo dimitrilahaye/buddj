@@ -8,6 +8,10 @@ import type { CreateMonthApiBody } from '../application/new-month/default-new-mo
 import { removeBudgetFromMonthView } from '../application/month/remove-budget-from-month-view.js';
 import { updateBudgetInMonthView } from '../application/month/update-budget-in-month-view.js';
 import { removeExpenseFromMonthView } from '../application/month/remove-expense-from-month-view.js';
+import {
+  updateExpenseInMonthView,
+  updateOutflowInMonthView,
+} from '../application/month/update-line-in-month-view.js';
 import { splitLeadingEmoji } from '../shared/emoji-label.js';
 
 function deepCloneMonths(source: MonthView[]): MonthView[] {
@@ -30,6 +34,7 @@ export function createMonthServiceFromInMemory({
   createOutflowDelayMs,
   createBudgetDelayMs,
   updateBudgetDelayMs,
+  updateLineDelayMs,
   transferDelayMs,
   archiveMonthDelayMs,
   archiveMonthFailure,
@@ -58,6 +63,8 @@ export function createMonthServiceFromInMemory({
   createBudgetDelayMs?: number;
   /** Délai simulé pour `updateBudget` (défaut : `delayMs`). */
   updateBudgetDelayMs?: number;
+  /** Délai simulé pour `updateExpense` / `updateOutflow` (défaut : `delayMs`). */
+  updateLineDelayMs?: number;
   /** Délai simulé pour `transferFromWeeklyBudget` (défaut : `delayMs`). */
   transferDelayMs?: number;
   /** Délai simulé pour `archiveMonth` (défaut : `delayMs`). */
@@ -78,6 +85,7 @@ export function createMonthServiceFromInMemory({
   const waitCreateOutflow = createOutflowDelayMs ?? delayMs;
   const waitCreateBudget = createBudgetDelayMs ?? delayMs;
   const waitUpdateBudget = updateBudgetDelayMs ?? delayMs;
+  const waitUpdateLine = updateLineDelayMs ?? delayMs;
   const waitTransfer = transferDelayMs ?? delayMs;
   const waitArchiveMonth = archiveMonthDelayMs ?? delayMs;
   const waitCreateMonth = createMonthDelayMs ?? delayMs;
@@ -204,6 +212,22 @@ export function createMonthServiceFromInMemory({
       const idx = months.findIndex((m) => m.id === monthId);
       if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
       const updated = updateBudgetInMonthView(months[idx], budgetId, name);
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
+    async updateExpense({ monthId, weeklyBudgetId, expenseId, label, amount }) {
+      if (waitUpdateLine > 0) await new Promise((r) => setTimeout(r, waitUpdateLine));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const updated = updateExpenseInMonthView({ month: months[idx], weeklyBudgetId, expenseId, label, amount });
+      months[idx] = updated;
+      return deepCloneMonths([updated])[0]!;
+    },
+    async updateOutflow({ monthId, outflowId, label, amount }) {
+      if (waitUpdateLine > 0) await new Promise((r) => setTimeout(r, waitUpdateLine));
+      const idx = months.findIndex((m) => m.id === monthId);
+      if (idx < 0) throw new Error(`Mois introuvable : ${monthId}`);
+      const updated = updateOutflowInMonthView({ month: months[idx], outflowId, label, amount });
       months[idx] = updated;
       return deepCloneMonths([updated])[0]!;
     },
