@@ -5,3 +5,5 @@ export * from "./deleteMonthlyOutflow.js";
 export * from "./getAllMonthlyTemplates.js";
 export * from "./getDefaultMonthlyTemplate.js";
 export * from "./updateMonthlyTemplate.js";
+export * from "./updateMonthlyOutflow.js";
+export * from "./updateMonthlyBudget.js";

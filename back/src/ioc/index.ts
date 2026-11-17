@@ -13,9 +13,17 @@ import yearlyOutflowsDto, {
 import DeleteExpense from "../core/usecases/month/DeleteExpense.js";
 import UpdateExpense from "../core/usecases/month/UpdateExpense.js";
 import UpdateOutflow from "../core/usecases/month/UpdateOutflow.js";
+import UpdateMonthlyOutflow from "../core/usecases/monthly-template/UpdateMonthlyOutflow.js";
+import UpdateMonthlyBudget from "../core/usecases/monthly-template/UpdateMonthlyBudget.js";
 import updateOutflowDeserializer, {
   UpdateOutflowDeserializer,
 } from "../consumers/api/deserializers/month/updateOutflow.js";
+import updateMonthlyOutflowDeserializer, {
+  UpdateMonthlyOutflowDeserializer,
+} from "../consumers/api/deserializers/monthly-template/updateMonthlyOutflow.js";
+import updateMonthlyBudgetDeserializer, {
+  UpdateMonthlyBudgetDeserializer,
+} from "../consumers/api/deserializers/monthly-template/updateMonthlyBudget.js";
 import DeleteOutflow from "../core/usecases/month/DeleteOutflow.js";
 import AddOutflow from "../core/usecases/month/AddOutflow.js";
 import GetArchivedMonths from "../core/usecases/month/GetArchivedMonths.js";
@@ -139,6 +147,8 @@ export type Deps = {
   deleteExpenseUsecase: DeleteExpense;
   updateExpenseUsecase: UpdateExpense;
   updateOutflowUsecase: UpdateOutflow;
+  updateMonthlyOutflowUsecase: UpdateMonthlyOutflow;
+  updateMonthlyBudgetUsecase: UpdateMonthlyBudget;
   deleteOutflowUsecase: DeleteOutflow;
   addOutflowUsecase: AddOutflow;
   addBudgetUsecase: AddBudget;
@@ -184,6 +194,8 @@ export type Deps = {
   addMonthlyBudgetDeserializer: AddMonthlyBudgetDeserializer;
   getSpendingTrackerDeserializer: GetSpendingTrackerDeserializer;
   updateOutflowDeserializer: UpdateOutflowDeserializer;
+  updateMonthlyOutflowDeserializer: UpdateMonthlyOutflowDeserializer;
+  updateMonthlyBudgetDeserializer: UpdateMonthlyBudgetDeserializer;
 };
 
 export default {
@@ -216,4 +228,6 @@ export default {
   addMonthlyBudgetDeserializer,
   getSpendingTrackerDeserializer,
   updateOutflowDeserializer,
+  updateMonthlyOutflowDeserializer,
+  updateMonthlyBudgetDeserializer,
 } as const;

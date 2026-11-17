@@ -417,6 +417,20 @@ function buildApi(
     })
   );
 
+  api.use(
+    routes.monthlyTemplate.updateMonthlyOutflow(router, {
+      usecase: dependencies.updateMonthlyOutflowUsecase,
+      deserializer: dependencies.updateMonthlyOutflowDeserializer,
+    })
+  );
+
+  api.use(
+    routes.monthlyTemplate.updateMonthlyBudget(router, {
+      usecase: dependencies.updateMonthlyBudgetUsecase,
+      deserializer: dependencies.updateMonthlyBudgetDeserializer,
+    })
+  );
+
   router.get("/me", isLoggedIn, async (req, res) => {
     try {
       res.send(req.user);
