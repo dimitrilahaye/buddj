@@ -291,7 +291,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     this._syncFromStore();
   };
 
-  /** Encart observé ou tableau de bord replié : la courbe suit. */
+  /** Encart observé : la courbe suit. */
   private _onDashboardChange = (): void => {
     this._syncFromStore();
   };
@@ -386,7 +386,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     const chart = main.querySelector(BUDDJ_CHART_TAG) as BuddjSpendingTrackerChart;
     const dashboard = this._dashboard(main);
     const hasCurve = view !== null && view.total > 0;
-    const isShown = hasCurve && this._isChartOpen && dashboard.isOpen;
+    const isShown = hasCurve && this._isChartOpen;
     chart.hidden = !isShown;
     if (!isShown || !view) return;
     // Une plage d'un seul jour se lit heure par heure.
