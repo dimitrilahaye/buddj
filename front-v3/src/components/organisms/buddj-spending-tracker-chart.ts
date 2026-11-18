@@ -1,28 +1,26 @@
 /**
- * Courbe cumulée du suivi des dépenses : aires empilées (sorties en bas, dépenses au-dessus),
- * le haut de la pile est le total cumulé. SVG fait main, sans dépendance.
+ * Courbe cumulée du suivi des dépenses : aires empilées (par type ou par catégorie, selon
+ * l'encart observé), le haut de la pile est le total cumulé. SVG fait main, sans dépendance.
  *
  * Interaction : le réticule suit le pointeur et s'aligne sur la période la plus proche,
  * l'infobulle donne les cumuls ; flèches gauche/droite au clavier ; clic ou Entrée
  * émet `spending-bucket-select` ({ start }) pour afficher le détail de la période
  * (sauf en pas horaire, où le détail de la journée est déjà affiché).
  */
-import {
-  niceAxisTicks,
-  type CumulativePoint,
-  type CumulativeStep,
-} from '../../application/spending-tracker/spending-tracker-cumulative.js';
-import type { SpendingKindsFilter } from '../../application/spending-tracker/spending-tracker-types.js';
+import { niceAxisTicks, type CumulativeStep } from '../../application/spending-tracker/spending-tracker-cumulative.js';
+import type { ChartSeries, StackPoint } from '../../application/spending-tracker/spending-chart-series.js';
 import { formatEuros } from '../../shared/goal.js';
 import { formatBucketAxisLabel, formatBucketLabel } from '../../shared/spending-bucket-label.js';
 
 export type SpendingBucketSelect = { start: string };
 
 export type SpendingTrackerChartData = {
+  title: string;
+  /** Séries de bas en haut de la pile */
+  series: ChartSeries[];
   /** Points cumulés, déjà filtrés par type */
-  points: CumulativePoint[];
+  points: StackPoint[];
   step: CumulativeStep;
-  kinds: SpendingKindsFilter;
   selectedKey: string | null;
   isRefreshing: boolean;
 };
@@ -58,7 +56,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
   static readonly tagName = 'buddj-spending-tracker-chart';
 
   private _data?: SpendingTrackerChartData;
-  private _points: CumulativePoint[] = [];
+  private _points: StackPoint[] = [];
   private _activeIndex: number | null = null;
   private _xs: number[] = [];
   private _resizeObserver?: ResizeObserver;
@@ -115,12 +113,8 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     return this.querySelector('.spending-chart-plot') as HTMLElement;
   }
 
-  private _series(): Array<{ kind: 'outflow' | 'expense'; label: string }> {
-    const kinds = this._data?.kinds ?? { expense: true, outflow: true };
-    const series: Array<{ kind: 'outflow' | 'expense'; label: string }> = [];
-    if (kinds.outflow) series.push({ kind: 'outflow', label: 'Sorties' });
-    if (kinds.expense) series.push({ kind: 'expense', label: 'Dépenses' });
-    return series;
+  private _series(): ChartSeries[] {
+    return this._data?.series ?? [];
   }
 
   private _draw(): void {
@@ -136,6 +130,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     const selectable = step !== 'hour';
 
     plot.classList.toggle('spending-chart-plot--refreshing', data.isRefreshing);
+    (this.querySelector('.spending-chart-title') as HTMLElement).textContent = data.title;
     this._renderLegend(series);
 
     const last = points.at(-1);
@@ -191,15 +186,15 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
 
     if (points.length === 0) return;
 
-    // Aires empilées : sorties en bas, dépenses au-dessus
+    // Aires empilées, dans l'ordre des séries (de bas en haut)
     let lower = points.map(() => 0);
-    for (const { kind } of series) {
-      const upper = points.map((p, i) => lower[i]! + (kind === 'outflow' ? p.outflows : p.expenses));
+    for (const { key, color } of series) {
+      const upper = points.map((p, i) => lower[i]! + (p.values[key] ?? 0));
       const top = points.map((_, i) => `${x(i)},${y(upper[i]!)}`);
       const bottom = points.map((_, i) => `${x(i)},${y(lower[i]!)}`).reverse();
       if (points.length > 1) {
-        add('polygon', { class: `spending-chart-area spending-chart-area--${kind}`, points: [...top, ...bottom].join(' ') });
-        add('polyline', { class: `spending-chart-line spending-chart-line--${kind}`, points: top.join(' ') });
+        add('polygon', { class: 'spending-chart-area', style: `fill: ${color}`, points: [...top, ...bottom].join(' ') });
+        add('polyline', { class: 'spending-chart-line', style: `stroke: ${color}`, points: top.join(' ') });
       }
       lower = upper;
     }
@@ -217,9 +212,9 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     }
 
     // Point final + valeur au bout de la courbe
-    const topKind = series.at(-1)?.kind ?? 'expense';
+    const topColor = series.at(-1)?.color ?? 'var(--coral)';
     const lastIndex = points.length - 1;
-    add('circle', { class: `spending-chart-dot spending-chart-dot--${topKind}`, cx: x(lastIndex), cy: y(total), r: 4 });
+    add('circle', { class: 'spending-chart-dot', style: `fill: ${topColor}`, cx: x(lastIndex), cy: y(total), r: 4 });
     const endLabel = add('text', {
       class: 'spending-chart-end-label',
       x: x(lastIndex),
@@ -233,21 +228,22 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
       const i = this._activeIndex;
       const p = points[i]!;
       add('line', { class: 'spending-chart-crosshair', x1: x(i), x2: x(i), y1: PAD.top, y2: PAD.top + innerH });
-      add('circle', { class: `spending-chart-dot spending-chart-dot--${topKind}`, cx: x(i), cy: y(p.total), r: 4 });
+      add('circle', { class: 'spending-chart-dot', style: `fill: ${topColor}`, cx: x(i), cy: y(p.total), r: 4 });
     }
     this._renderTooltip();
   }
 
-  private _renderLegend(series: Array<{ kind: string; label: string }>): void {
+  private _renderLegend(series: ChartSeries[]): void {
     const legend = this.querySelector('.spending-chart-legend') as HTMLElement;
     legend.replaceChildren();
     // Une seule série : le titre suffit, pas de légende.
     if (series.length < 2) return;
-    for (const { kind, label } of [...series].reverse()) {
+    for (const { color, label } of [...series].reverse()) {
       const item = document.createElement('span');
       item.className = 'spending-chart-legend-item';
       const swatch = document.createElement('span');
-      swatch.className = `spending-chart-swatch spending-chart-swatch--${kind}`;
+      swatch.className = 'spending-chart-swatch';
+      swatch.style.background = color;
       swatch.setAttribute('aria-hidden', 'true');
       item.append(swatch, document.createTextNode(label));
       legend.appendChild(item);
@@ -269,11 +265,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
       ...this._series()
         .slice()
         .reverse()
-        .map(({ kind, label }): [string, string, string] => [
-          formatEuros(kind === 'outflow' ? p.outflows : p.expenses),
-          label,
-          kind,
-        ]),
+        .map(({ key, label, color }): [string, string, string] => [formatEuros(p.values[key] ?? 0), label, color]),
       [formatEuros(p.bucketTotal), BUCKET_TOTAL_LABELS[data.step], null],
     ];
     tooltip.replaceChildren();
@@ -281,12 +273,13 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     title.className = 'spending-chart-tooltip-title';
     title.textContent = pointLabel({ key: p.key, step: data.step });
     tooltip.appendChild(title);
-    for (const [value, label, kind] of rows) {
+    for (const [value, label, color] of rows) {
       const row = document.createElement('p');
       row.className = 'spending-chart-tooltip-row';
-      if (kind) {
+      if (color) {
         const key = document.createElement('span');
-        key.className = `spending-chart-tooltip-key spending-chart-swatch--${kind}`;
+        key.className = 'spending-chart-tooltip-key';
+        key.style.background = color;
         key.setAttribute('aria-hidden', 'true');
         row.appendChild(key);
       }

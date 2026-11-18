@@ -20,3 +20,29 @@ export const EMOJI_CATEGORIES: EmojiCategory[] = [
   { id: 'pets', title: 'Animaux', emojis: ['🐕', '🐈', '🐠', '🐦'] },
   { id: 'misc', title: 'Divers', emojis: ['💐', '🎉', '📌', '🔔', '⏰', '📆', '🚬'] },
 ];
+
+/** Catégorie des libellés sans emoji connu en tête. */
+export const UNCATEGORIZED: EmojiCategory = { id: 'uncategorized', title: 'Sans catégorie', emojis: ['🏷️'] };
+
+const LEADING_EMOJI_RE = /^\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*/u;
+
+/** ✈ et ✈️ désignent le même emoji : on ignore le sélecteur de variante. */
+function normalizeEmoji(emoji: string): string {
+  return emoji.replace(/️/g, '');
+}
+
+/** Un emoji présent dans deux catégories reste dans la première. */
+const CATEGORY_BY_EMOJI = new Map<string, EmojiCategory>();
+for (const category of EMOJI_CATEGORIES) {
+  for (const emoji of category.emojis) {
+    const key = normalizeEmoji(emoji);
+    if (!CATEGORY_BY_EMOJI.has(key)) CATEGORY_BY_EMOJI.set(key, category);
+  }
+}
+
+/** Catégorie d'un libellé « emoji texte », d'après son emoji de tête. */
+export function categoryOfLabel(label: string): EmojiCategory {
+  const match = label.trim().match(LEADING_EMOJI_RE);
+  if (!match) return UNCATEGORIZED;
+  return CATEGORY_BY_EMOJI.get(normalizeEmoji(match[0])) ?? UNCATEGORIZED;
+}
