@@ -445,7 +445,7 @@ describe('écran suivi des dépenses', () => {
       await waitFor(() => expect(totalText()).toContain('839,00 €'));
     }
 
-    it('s’affiche par défaut avec le total et ses moyennes par jour et par semaine', async () => {
+    it('s’affiche par défaut avec le total et ses moyennes par jour, par semaine et par mois', async () => {
       startOn('/spending-tracker');
       await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
@@ -458,6 +458,7 @@ describe('écran suivi des dépenses', () => {
       expect(within(averages).getAllByRole('listitem').map((li) => li.getAttribute('aria-label'))).toEqual([
         'Moyenne par jour : 67,13 €',
         'Moyenne par semaine : 469,88 €',
+        'Moyenne par mois : 2043,13 €',
       ]);
     });
 
@@ -514,9 +515,19 @@ describe('écran suivi des dépenses', () => {
       const sheet = screen.getByRole('dialog', { name: 'Par catégorie' });
       const food = within(sheet).getByRole('region', { name: 'Alimentation' });
       expect(food.textContent).toContain('26,00 €');
-      expect(food.textContent).toMatch(/3,1\s%/);
-      expect(food.textContent).toMatch(/Moyenne par jour\s*2,00 €/);
-      expect(food.textContent).toMatch(/Moyenne par semaine\s*14,00 €/);
+      expect(within(food).getByLabelText(/^26,00 €, 3,1\s% du total$/).textContent).toMatch(/26,00 €\s*\(3,1\s%\)/);
+      const statsOf = (name: string): Array<[string | null, string | null]> =>
+        [...food.querySelectorAll(`dl[aria-label="${name}"] > div`)].map((div) => [div.querySelector('dt')!.textContent, div.querySelector('dd')!.textContent]);
+      expect(statsOf('Répartition')).toEqual([
+        ['Dépenses', '26,00 €'],
+        ['Sorties', '0,00 €'],
+      ]);
+      expect(within(food).getByText('Moyennes :')).toBeTruthy();
+      expect(statsOf('Moyennes')).toEqual([
+        ['Par jour', '2,00 €'],
+        ['Par semaine', '14,00 €'],
+        ['Par mois', '60,88 €'],
+      ]);
       expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
 
       fireEvent.keyDown(sheet, { key: 'Escape' });

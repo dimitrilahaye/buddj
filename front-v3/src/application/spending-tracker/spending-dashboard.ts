@@ -46,9 +46,15 @@ export function elapsedDays({ from, to, today }: { from: string; to: string; tod
   return daysInRange({ from, to: to < today ? to : today });
 }
 
-/** Une moyenne par unité n'a de sens que si la période en couvre plus d'une. */
+/**
+ * Moyenne par jour dès deux jours écoulés ; par semaine et par mois au-delà d'une semaine
+ * (sur une période plus courte qu'un mois, la moyenne par mois est un rythme mensuel).
+ */
 export function averageUnits({ days }: { days: number }): AverageUnit[] {
-  return (['day', 'week', 'month'] as const).filter((unit) => days > UNIT_DAYS[unit]);
+  const units: AverageUnit[] = [];
+  if (days > UNIT_DAYS.day) units.push('day');
+  if (days > UNIT_DAYS.week) units.push('week', 'month');
+  return units;
 }
 
 function averagesOf({ amounts, days, units }: { amounts: SpendingAmounts; days: number; units: AverageUnit[] }): SpendingAverage[] {
