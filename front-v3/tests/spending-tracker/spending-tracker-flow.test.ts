@@ -305,12 +305,12 @@ describe('écran suivi des dépenses', () => {
     expect(screen.queryByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeNull();
   });
 
-  it('replie la courbe par défaut et la déplie / replie via l’icône du résumé', async () => {
+  it('replie la courbe par défaut et la déplie / replie via l’icône du tableau de bord', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
-    const summary = screen.getByRole('status', { name: 'Total de la période' });
-    const toggle = within(summary).getByRole('button', { name: 'Courbe cumulée' });
+    const dashboard = screen.getByRole('region', { name: 'Tableau de bord' });
+    const toggle = within(dashboard).getByRole('button', { name: 'Courbe cumulée' });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     expect(screen.queryByRole('figure')).toBeNull();
 
@@ -426,5 +426,142 @@ describe('écran suivi des dépenses', () => {
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
     expect(within(results).queryByRole('alert')).toBeNull();
     expect(working.calls).toEqual([{ granularity: 'day', from: '2026-11-01', to: '2026-11-13' }]);
+  });
+  describe('tableau de bord', () => {
+    const CATEGORIZED: InMemoryTrackedSpending[] = [
+      { id: 'loyer', kind: 'outflow', label: '🏠 Loyer', amount: 700, day: '2026-11-02', occurredAt: '2026-11-02T08:00:00.000Z' },
+      { id: 'edf', kind: 'outflow', label: '⚡ EDF', amount: 100, day: '2026-11-12', occurredAt: '2026-11-12T08:00:00.000Z' },
+      { id: 'pizza', kind: 'expense', label: '🍕 Pizza', amount: 20, day: '2026-11-12', occurredAt: '2026-11-12T19:00:00.000Z' },
+      { id: 'primeur', kind: 'expense', label: '🍎 Primeur', amount: 6, day: '2026-11-13', occurredAt: '2026-11-13T09:00:00.000Z' },
+      { id: 'tabac', kind: 'expense', label: '🚬 Tabac', amount: 13, day: '2026-11-13', occurredAt: '2026-11-13T10:00:00.000Z' },
+    ];
+
+    function dashboard(): HTMLElement {
+      return screen.getByRole('region', { name: 'Tableau de bord' });
+    }
+
+    async function startCategorized(): Promise<void> {
+      startOn('/spending-tracker', createSpendingTrackerServiceFromInMemory({ spendings: CATEGORIZED }));
+      await waitFor(() => expect(totalText()).toContain('839,00 €'));
+    }
+
+    it('s’affiche par défaut avec le total et ses moyennes par jour et par semaine', async () => {
+      startOn('/spending-tracker');
+      await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+      const tabs = within(dashboard()).getAllByRole('tab');
+      expect(tabs.map((t) => [t.textContent?.trim(), t.getAttribute('aria-selected')])).toEqual([
+        ['Total', 'true'],
+        ['Par catégorie', 'false'],
+      ]);
+      const averages = within(dashboard()).getByRole('list', { name: 'Moyennes' });
+      expect(within(averages).getAllByRole('listitem').map((li) => li.getAttribute('aria-label'))).toEqual([
+        'Moyenne par jour : 67,13 €',
+        'Moyenne par semaine : 469,88 €',
+      ]);
+    });
+
+    it('n’affiche pas de moyenne sur une seule journée', async () => {
+      startOn('/spending-tracker');
+      await waitFor(() => expect(totalText()).toContain('872,63 €'));
+
+      fireEvent.click(screen.getByRole('radio', { name: "Aujourd'hui" }));
+
+      await waitFor(() => expect(totalText()).toContain('16,50 €'));
+      expect(within(dashboard()).queryByRole('list', { name: 'Moyennes' })).toBeNull();
+    });
+
+    it('se replie et se déplie, la courbe avec lui', async () => {
+      startOn('/spending-tracker');
+      await waitFor(() => expect(totalText()).toContain('872,63 €'));
+      openChart();
+      expect(screen.getByRole('figure')).toBeTruthy();
+
+      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Masquer le tableau de bord' }));
+
+      expect(screen.queryByRole('status', { name: 'Total de la période' })).toBeNull();
+      expect(screen.queryByRole('figure')).toBeNull();
+      expect(within(dashboard()).queryByRole('button', { name: 'Courbe cumulée' })).toBeNull();
+
+      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Afficher le tableau de bord' }));
+
+      expect(totalText()).toContain('872,63 €');
+      expect(screen.getByRole('figure')).toBeTruthy();
+    });
+
+    it('liste les catégories de la plus coûteuse à la moins coûteuse, avec leur moyenne', async () => {
+      await startCategorized();
+
+      fireEvent.click(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }));
+
+      expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
+      const list = within(dashboard()).getByRole('list', { name: 'Dépenses par catégorie' });
+      const rows = within(list).getAllByRole('listitem');
+      expect(rows.map((li) => li.getAttribute('aria-label'))).toEqual([
+        '🏠 Logement : 700,00 €',
+        '⚡ Énergie : 100,00 €',
+        '🍎 Alimentation : 26,00 €',
+        '💐 Divers : 13,00 €',
+      ]);
+      expect(rows[2]!.textContent).toContain('2,00 € / jour');
+    });
+
+    it('ouvre l’encart Total en grand avec les moyennes des dépenses et des sorties', async () => {
+      await startCategorized();
+
+      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Ouvrir en grand : Total' }));
+
+      const sheet = screen.getByRole('dialog', { name: 'Total' });
+      const rows = within(sheet)
+        .getAllByRole('row')
+        .map((row) => within(row).queryAllByRole('cell').map((c) => c.textContent));
+      expect(rows).toContainEqual(['839,00 €', '39,00 €', '800,00 €']);
+      expect(rows).toContainEqual(['64,54 €', '3,00 €', '61,54 €']);
+      expect(within(sheet).getByRole('rowheader', { name: 'Moyenne par semaine' })).toBeTruthy();
+      expect(within(sheet).getByText('Moyennes sur 13 jours écoulés.')).toBeTruthy();
+
+      fireEvent.click(within(sheet).getByRole('button', { name: 'Fermer' }));
+      expect(screen.queryByRole('dialog', { name: 'Total' })).toBeNull();
+    });
+
+    it('ouvre l’encart Par catégorie en grand avec toutes les catégories, et se ferme avec Échap', async () => {
+      await startCategorized();
+
+      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Ouvrir en grand : Par catégorie' }));
+
+      const sheet = screen.getByRole('dialog', { name: 'Par catégorie' });
+      const food = within(sheet).getByRole('region', { name: '🍎 Alimentation' });
+      expect(food.textContent).toContain('26,00 €');
+      expect(food.textContent).toMatch(/3,1\s%/);
+      expect(food.textContent).toMatch(/Moyenne par jour\s*2,00 €/);
+      expect(food.textContent).toMatch(/Moyenne par semaine\s*14,00 €/);
+      expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
+
+      fireEvent.keyDown(sheet, { key: 'Escape' });
+      expect(screen.queryByRole('dialog', { name: 'Par catégorie' })).toBeNull();
+    });
+
+    it('la courbe suit l’encart observé : par type pour le total, par catégorie sinon', async () => {
+      await startCategorized();
+      openChart();
+      const chart = (): HTMLElement => screen.getByRole('figure');
+      expect(within(chart()).getByText('Cumul sur la période')).toBeTruthy();
+      expect(within(chart()).getByText('Sorties')).toBeTruthy();
+
+      fireEvent.click(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }));
+
+      expect(within(chart()).getByText('Cumul par catégorie')).toBeTruthy();
+      const legend = chart().querySelector('.spending-chart-legend') as HTMLElement;
+      expect([...legend.children].map((item) => item.textContent)).toEqual([
+        '💐 Divers',
+        '🍎 Alimentation',
+        '⚡ Énergie',
+        '🏠 Logement',
+      ]);
+      expect(screen.getByRole('group', { name: /^Cumul de 839,00 €/ })).toBeTruthy();
+
+      fireEvent.click(within(dashboard()).getByRole('tab', { name: 'Total' }));
+      expect(within(chart()).getByText('Cumul sur la période')).toBeTruthy();
+    });
   });
 });

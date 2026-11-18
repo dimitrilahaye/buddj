@@ -3,6 +3,8 @@
  * regroupées par jour, semaine ou mois (GET /spending-tracker).
  * Raccourcis (aujourd'hui, cette semaine, ce mois) ou plage libre via un calendrier unique ;
  * filtre par type côté front, sans rechargement.
+ * Un tableau de bord (total, moyennes, catégories) résume la période ; la courbe cumulée
+ * suit l'encart observé (par type ou par catégorie).
  */
 import type { SpendingTrackerStore } from '../../application/spending-tracker/spending-tracker-store.js';
 import { filterSpendingTrackerView } from '../../application/spending-tracker/spending-tracker-filter.js';
@@ -27,7 +29,11 @@ import {
   cumulativeSpending,
   hourlyCumulativeSpending,
 } from '../../application/spending-tracker/spending-tracker-cumulative.js';
+import { spendingDashboard } from '../../application/spending-tracker/spending-dashboard.js';
+import { categoryStack, kindStack } from '../../application/spending-tracker/spending-chart-series.js';
 import '../organisms/buddj-spending-tracker-chart.js';
+import '../organisms/buddj-spending-dashboard.js';
+import type { BuddjSpendingDashboardElement } from '../organisms/buddj-spending-dashboard.js';
 import '../organisms/buddj-date-range-picker-drawer.js';
 import type { BuddjDateRangePickerDrawerElement } from '../organisms/buddj-date-range-picker-drawer.js';
 import type {
@@ -39,8 +45,6 @@ const BUDDJ_CHART_TAG = 'buddj-spending-tracker-chart';
 
 /** Clé de sélection de la ligne « toute la période » (jamais une date de bucket). */
 const PERIOD_KEY = 'period';
-
-const CHART_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></svg>`;
 
 const DEFAULT_SHORTCUT: SpendingRangeShortcut = 'month';
 
@@ -107,7 +111,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
   private _main?: HTMLElement;
   /** Bucket dont le détail est affiché (start), PERIOD_KEY pour toute la période, null si aucun. */
   private _selectedStart: string | null = null;
-  /** Courbe cumulée repliée par défaut, dépliée via l'icône du résumé. */
+  /** Courbe cumulée repliée par défaut, dépliée via l'icône du tableau de bord. */
   private _isChartOpen = false;
 
   init({ spendingTrackerStore }: { spendingTrackerStore: SpendingTrackerStore }): void {
@@ -163,7 +167,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
             <p class="spending-tracker-error-text">Impossible d’afficher ton suivi pour le moment. Vérifie ta connexion puis réessaie.</p>
             <button type="button" class="btn spending-tracker-retry">Réessayer</button>
           </div>
-          <div class="spending-tracker-summary" role="status" aria-label="Total de la période" hidden></div>
+          <buddj-spending-dashboard hidden></buddj-spending-dashboard>
           <buddj-spending-tracker-chart id="spending-tracker-chart" hidden></buddj-spending-tracker-chart>
           <ol class="spending-tracker-bars"></ol>
           <div class="spending-tracker-empty" hidden>
@@ -179,6 +183,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     main.addEventListener('change', this._onChange);
     main.addEventListener('click', this._onClick);
     main.addEventListener('spending-bucket-select', this._onBucketSelect);
+    main.addEventListener('spending-dashboard-change', this._onDashboardChange);
     main.querySelector('form')?.addEventListener('submit', this._onSubmit);
     store.addEventListener('spendingTrackerStateUpdated', this._onStateUpdated);
 
@@ -200,6 +205,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
       main.removeEventListener('change', this._onChange);
       main.removeEventListener('click', this._onClick);
       main.removeEventListener('spending-bucket-select', this._onBucketSelect);
+      main.removeEventListener('spending-dashboard-change', this._onDashboardChange);
       main.querySelector('form')?.removeEventListener('submit', this._onSubmit);
     }
     if (store) {
@@ -285,6 +291,11 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     this._syncFromStore();
   };
 
+  /** Encart observé ou tableau de bord replié : la courbe suit. */
+  private _onDashboardChange = (): void => {
+    this._syncFromStore();
+  };
+
   /** Relance la dernière plage demandée (raccourci recalculé s'il y en a un). */
   private _retry(): void {
     const store = this._store;
@@ -312,7 +323,7 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
 
     const showView = view !== null && !loadErrorMessage;
     const filtered = view ? filterSpendingTrackerView({ view, kinds }) : null;
-    this._renderSummary({ main, view: showView ? filtered : null });
+    this._renderDashboard({ main, view: showView ? filtered : null });
     this._renderChart({ main, view: showView ? filtered : null, kinds, isRefreshing: isLoading });
     this._renderBars({ main, view: showView ? filtered : null });
   }
@@ -346,23 +357,19 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     });
   }
 
-  private _renderSummary({ main, view }: { main: HTMLElement; view: SpendingTrackerView | null }): void {
-    const summary = main.querySelector('.spending-tracker-summary') as HTMLElement;
-    summary.hidden = view === null;
+  private _dashboard(main: HTMLElement): BuddjSpendingDashboardElement {
+    return main.querySelector('buddj-spending-dashboard') as BuddjSpendingDashboardElement;
+  }
+
+  private _renderDashboard({ main, view }: { main: HTMLElement; view: SpendingTrackerView | null }): void {
+    const dashboard = this._dashboard(main);
+    dashboard.hidden = view === null;
     if (!view) return;
-    const chartToggle =
-      view.total > 0
-        ? `
-      <button type="button" class="spending-tracker-chart-toggle${this._isChartOpen ? ' spending-tracker-chart-toggle--open' : ''}"
-        aria-label="Courbe cumulée" aria-expanded="${this._isChartOpen}" aria-controls="spending-tracker-chart">${CHART_ICON_SVG}</button>`
-        : '';
-    summary.innerHTML = `${chartToggle}
-      <p class="spending-tracker-total">${escapeHtml(formatEuros(view.total))}</p>
-      <p class="spending-tracker-split">
-        <span class="spending-tracker-split-item spending-tracker-split-item--expense">Dépenses ${escapeHtml(formatEuros(view.expensesTotal))}</span>
-        <span class="spending-tracker-split-item spending-tracker-split-item--outflow">Sorties ${escapeHtml(formatEuros(view.outflowsTotal))}</span>
-      </p>
-    `;
+    dashboard.render({
+      dashboard: spendingDashboard({ view, today: todayIso() }),
+      isChartOpen: this._isChartOpen,
+      hasChart: view.total > 0,
+    });
   }
 
   private _renderChart({
@@ -377,15 +384,29 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     isRefreshing: boolean;
   }): void {
     const chart = main.querySelector(BUDDJ_CHART_TAG) as BuddjSpendingTrackerChart;
+    const dashboard = this._dashboard(main);
     const hasCurve = view !== null && view.total > 0;
-    chart.hidden = !hasCurve || !this._isChartOpen;
-    if (!hasCurve || !view || !this._isChartOpen) return;
+    const isShown = hasCurve && this._isChartOpen && dashboard.isOpen;
+    chart.hidden = !isShown;
+    if (!isShown || !view) return;
     // Une plage d'un seul jour se lit heure par heure.
     const [singleDay] = view.granularity === 'day' && view.buckets.length === 1 ? view.buckets : [];
+    const byCategory = dashboard.observed === 'categories';
+    const stack = byCategory
+      ? categoryStack({ view, hourly: singleDay !== undefined })
+      : kindStack({
+          points: singleDay ? hourlyCumulativeSpending({ bucket: singleDay }) : cumulativeSpending({ view }),
+          kinds,
+        });
     chart.render({
-      points: singleDay ? hourlyCumulativeSpending({ bucket: singleDay }) : cumulativeSpending({ view }),
+      // Une seule série n'a pas de légende : le titre la nomme.
+      title: byCategory
+        ? stack.series.length === 1
+          ? `Cumul : ${stack.series[0]!.label}`
+          : 'Cumul par catégorie'
+        : 'Cumul sur la période',
+      ...stack,
       step: singleDay ? 'hour' : view.granularity,
-      kinds,
       selectedKey: this._selectedStart === PERIOD_KEY ? null : this._selectedStart,
       isRefreshing,
     });

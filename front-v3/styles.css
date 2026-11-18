@@ -4309,20 +4309,424 @@ buddj-date-range-picker-drawer.date-range-picker-drawer--open {
   outline-offset: 2px;
 }
 
-.spending-tracker-summary {
-  position: relative;
+/* ========== Tableau de bord du suivi des dépenses ========== */
+buddj-spending-dashboard {
+  display: block;
   margin-bottom: 1rem;
-  padding: 1rem 3.5rem 1rem 1.25rem;
+}
+
+buddj-spending-dashboard[hidden] {
+  display: none;
+}
+
+.spending-dashboard-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.spending-dashboard-tabs {
+  display: inline-flex;
+  flex: 1;
+  min-width: 0;
+  gap: 0.25rem;
+}
+
+.spending-dashboard-tabs[hidden],
+.spending-dashboard-collapsed-title[hidden],
+.spending-dashboard-track[hidden],
+.spending-dashboard-sheet[hidden] {
+  display: none;
+}
+
+.spending-dashboard-tab {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--navy-soft);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.spending-dashboard-tab[aria-selected='true'] {
+  border-color: var(--coral);
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.spending-dashboard-tab:focus-visible,
+.spending-dashboard-toggle:focus-visible,
+.spending-dashboard-expand:focus-visible,
+.spending-dashboard-sheet-close:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.spending-dashboard-collapsed-title {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy-soft);
+}
+
+.spending-dashboard-chart-toggle-slot {
+  display: contents;
+}
+
+.spending-dashboard-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--navy-soft);
+  cursor: pointer;
+}
+
+.spending-dashboard-toggle svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  transition: transform 0.2s ease;
+}
+
+.spending-dashboard-toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+/* Les deux encarts côte à côte, un par écran, qu'on fait défiler au doigt */
+.spending-dashboard-track {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  transition: height 0.2s ease;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.spending-dashboard-track::-webkit-scrollbar {
+  display: none;
+}
+
+.spending-dashboard-card {
+  position: relative;
+  flex: 0 0 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  scroll-snap-align: start;
+  padding: 1rem 3.25rem 1rem 1.25rem;
   border-radius: var(--radius-lg);
   background: var(--bg-card);
   box-shadow: var(--shadow);
 }
 
-/* Icône qui déplie / replie la courbe cumulée */
-.spending-tracker-chart-toggle {
+.spending-dashboard-expand {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--navy-soft);
+  cursor: pointer;
+}
+
+.spending-dashboard-expand svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.spending-dashboard-expand:hover {
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.spending-dashboard-averages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  list-style: none;
+}
+
+.spending-dashboard-average-amount {
+  color: var(--navy);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-dashboard-average-unit,
+.spending-dashboard-category-average,
+.spending-dashboard-more,
+.spending-dashboard-note,
+.spending-dashboard-empty {
+  font-size: 0.8rem;
+  color: var(--navy-soft);
+}
+
+.spending-dashboard-more,
+.spending-dashboard-empty {
+  margin: 0.5rem 0 0;
+}
+
+.spending-dashboard-empty:first-child {
+  margin-top: 0;
+}
+
+.spending-dashboard-note {
+  margin: 1rem 0 0;
+}
+
+.spending-dashboard-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spending-dashboard-category {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.spending-dashboard-category-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--navy);
+}
+
+.spending-dashboard-category-amounts {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-dashboard-category-total,
+.spending-dashboard-category-detail-total {
+  color: var(--navy);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-dashboard-category-track {
+  grid-column: 1 / -1;
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.spending-dashboard-category-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--coral);
+}
+
+/* Encart ouvert en grand */
+.spending-dashboard-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 105;
+}
+
+.spending-dashboard-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.spending-dashboard-sheet-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  max-width: 40rem;
+  margin: 0 auto;
+  height: calc(100dvh - 1rem - env(safe-area-inset-top));
+  box-sizing: border-box;
+  padding: 1rem 1.25rem max(1.5rem, env(safe-area-inset-bottom));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--bg-card);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.35);
+  animation: spending-dashboard-sheet-in 0.25s ease;
+}
+
+@keyframes spending-dashboard-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.spending-dashboard-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.spending-dashboard-sheet-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  color: var(--navy);
+}
+
+.spending-dashboard-sheet-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--navy-soft);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.spending-dashboard-sheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.spending-dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-dashboard-table-caption {
+  margin-bottom: 0.5rem;
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--navy-soft);
+}
+
+.spending-dashboard-table th,
+.spending-dashboard-table td {
+  padding: 0.55rem 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.spending-dashboard-table thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--navy-soft);
+  text-align: right;
+}
+
+.spending-dashboard-table tbody th {
+  font-weight: 500;
+  color: var(--navy-soft);
+  text-align: left;
+}
+
+.spending-dashboard-table td {
+  color: var(--navy);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.spending-dashboard-table-row--total td {
+  font-weight: 700;
+}
+
+.spending-dashboard-table-row--total td:nth-of-type(1) {
+  color: var(--coral);
+}
+
+.spending-dashboard-category-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spending-dashboard-category-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.spending-dashboard-category-detail-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.spending-dashboard-category-detail-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.spending-dashboard-category-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.4rem 1rem;
+  margin: 0.2rem 0 0;
+}
+
+.spending-dashboard-category-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.spending-dashboard-category-stats dt {
+  font-size: 0.72rem;
+  color: var(--navy-soft);
+}
+
+.spending-dashboard-category-stats dd {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Icône qui déplie / replie la courbe cumulée */
+.spending-tracker-chart-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4379,14 +4783,12 @@ buddj-date-range-picker-drawer.date-range-picker-drawer--open {
 }
 
 .spending-tracker-split-item--expense::before,
-.spending-tracker-bar-fill--expense,
-.spending-chart-swatch--expense {
+.spending-tracker-bar-fill--expense {
   background: var(--series-expense);
 }
 
 .spending-tracker-split-item--outflow::before,
-.spending-tracker-bar-fill--outflow,
-.spending-chart-swatch--outflow {
+.spending-tracker-bar-fill--outflow {
   background: var(--series-outflow);
 }
 
@@ -4424,13 +4826,15 @@ buddj-spending-tracker-chart[hidden] {
 
 .spending-chart-legend {
   display: flex;
-  gap: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.85rem;
   font-size: 0.75rem;
   color: var(--navy-soft);
 }
 
 .spending-chart-legend-item {
   display: inline-flex;
+  white-space: nowrap;
   align-items: center;
   gap: 0.35rem;
 }
@@ -4475,13 +4879,7 @@ buddj-spending-tracker-chart[hidden] {
   font-variant-numeric: tabular-nums;
 }
 
-.spending-chart-area--expense {
-  fill: var(--series-expense);
-  fill-opacity: 0.14;
-}
-
-.spending-chart-area--outflow {
-  fill: var(--series-outflow);
+.spending-chart-area {
   fill-opacity: 0.14;
 }
 
@@ -4492,25 +4890,9 @@ buddj-spending-tracker-chart[hidden] {
   stroke-linecap: round;
 }
 
-.spending-chart-line--expense {
-  stroke: var(--series-expense);
-}
-
-.spending-chart-line--outflow {
-  stroke: var(--series-outflow);
-}
-
 .spending-chart-dot {
   stroke: var(--bg-card);
   stroke-width: 2;
-}
-
-.spending-chart-dot--expense {
-  fill: var(--series-expense);
-}
-
-.spending-chart-dot--outflow {
-  fill: var(--series-outflow);
 }
 
 .spending-chart-end-label {
