@@ -55,11 +55,12 @@ describe('moyennes du tableau de bord', () => {
     expect(elapsedDays({ from: '2026-12-01', to: '2026-12-31', today: '2026-11-13' })).toBe(0);
   });
 
-  it('ne propose une unité que si la période en couvre plus d’une', () => {
+  it('propose la moyenne par jour dès deux jours, par semaine et par mois au-delà d’une semaine', () => {
     expect(averageUnits({ days: 1 })).toEqual([]);
     expect(averageUnits({ days: 5 })).toEqual(['day']);
-    expect(averageUnits({ days: 13 })).toEqual(['day', 'week']);
-    expect(averageUnits({ days: 30 })).toEqual(['day', 'week']);
+    expect(averageUnits({ days: 7 })).toEqual(['day']);
+    expect(averageUnits({ days: 13 })).toEqual(['day', 'week', 'month']);
+    expect(averageUnits({ days: 30 })).toEqual(['day', 'week', 'month']);
     expect(averageUnits({ days: 62 })).toEqual(['day', 'week', 'month']);
   });
 

@@ -4666,11 +4666,25 @@ buddj-spending-dashboard[hidden] {
   color: var(--navy);
 }
 
+.spending-dashboard-category-detail-share {
+  margin-left: 0.25rem;
+  font-weight: 400;
+  color: var(--navy-soft);
+}
+
+/* Dépenses / sorties puis moyennes, alignées sur les mêmes trois colonnes */
 .spending-dashboard-category-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.4rem 1rem;
   margin: 0.2rem 0 0;
+}
+
+.spending-dashboard-category-stats-title {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--navy-soft);
 }
 
 .spending-dashboard-category-stats div {

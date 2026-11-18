@@ -40,6 +40,7 @@ const PANELS: Array<{ id: SpendingDashboardPanel; label: string }> = [
 const COMPACT_CATEGORY_COUNT = 4;
 
 const UNIT_LABELS: Record<AverageUnit, string> = { day: 'par jour', week: 'par semaine', month: 'par mois' };
+const UNIT_TITLES: Record<AverageUnit, string> = { day: 'Par jour', week: 'Par semaine', month: 'Par mois' };
 const UNIT_SHORT_LABELS: Record<AverageUnit, string> = { day: '/ jour', week: '/ sem.', month: '/ mois' };
 
 const percentFormatter = new Intl.NumberFormat('fr-FR', { style: 'percent', maximumFractionDigits: 1 });
@@ -62,6 +63,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
   /** Encart ouvert en grand, null si aucun. */
   private _expanded: SpendingDashboardPanel | null = null;
   private _scrollFrame = 0;
+  private _resizeObserver?: ResizeObserver;
   /** Encart ouvert en grand, rendu dans <body>. */
   private readonly _sheet: HTMLElement = (() => {
     const sheet = document.createElement('div');
@@ -119,6 +121,11 @@ export class BuddjSpendingDashboard extends HTMLElement {
     this._sheet.addEventListener('click', this._onClick);
     this._sheet.addEventListener('keydown', this._onKeyDown);
     this._track().addEventListener('scroll', this._onScroll, { passive: true });
+    // Le contenu d'un encart peut changer de hauteur après coup (polices chargées, largeur).
+    if (typeof ResizeObserver !== 'undefined') {
+      this._resizeObserver = new ResizeObserver(() => this._syncTrackHeight());
+      this.querySelectorAll('.spending-dashboard-card').forEach((card) => this._resizeObserver?.observe(card));
+    }
     this._draw();
   }
 
@@ -128,6 +135,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
     this._sheet.removeEventListener('click', this._onClick);
     this._sheet.removeEventListener('keydown', this._onKeyDown);
     this._sheet.remove();
+    this._resizeObserver?.disconnect();
     this.querySelector('.spending-dashboard-track')?.removeEventListener('scroll', this._onScroll);
     cancelAnimationFrame(this._scrollFrame);
   }
@@ -370,22 +378,30 @@ export class BuddjSpendingDashboard extends HTMLElement {
         <section class="spending-dashboard-category-detail" aria-label="${escapeAttr(name)}">
           <div class="spending-dashboard-category-detail-header">
             <h3 class="spending-dashboard-category-detail-title">${escapeHtml(name)}</h3>
-            <span class="spending-dashboard-category-detail-total">${escapeHtml(formatEuros(c.total))}</span>
+            <span class="spending-dashboard-category-detail-total"
+              aria-label="${escapeAttr(`${formatEuros(c.total)}, ${percentFormatter.format(c.share)} du total`)}">${escapeHtml(formatEuros(c.total))}
+              <span class="spending-dashboard-category-detail-share">(${escapeHtml(percentFormatter.format(c.share))})</span></span>
           </div>
           <span class="spending-dashboard-category-track" aria-hidden="true">
             <span class="spending-dashboard-category-fill" style="width:${(c.share * 100).toFixed(2)}%"></span>
           </span>
-          <dl class="spending-dashboard-category-stats">
-            <div><dt>Part du total</dt><dd>${escapeHtml(percentFormatter.format(c.share))}</dd></div>
+          <dl class="spending-dashboard-category-stats" aria-label="Répartition">
             <div><dt>Dépenses</dt><dd>${escapeHtml(formatEuros(c.expensesTotal))}</dd></div>
             <div><dt>Sorties</dt><dd>${escapeHtml(formatEuros(c.outflowsTotal))}</dd></div>
+          </dl>
+          ${
+            c.averages.length > 0
+              ? `<p class="spending-dashboard-category-stats-title">Moyennes :</p>
+          <dl class="spending-dashboard-category-stats" aria-label="Moyennes">
             ${c.averages
               .map(
                 (a) =>
-                  `<div><dt>Moyenne ${escapeHtml(UNIT_LABELS[a.unit])}</dt><dd>${escapeHtml(formatEuros(a.total))}</dd></div>`
+                  `<div><dt>${escapeHtml(UNIT_TITLES[a.unit])}</dt><dd>${escapeHtml(formatEuros(a.total))}</dd></div>`
               )
               .join('')}
-          </dl>
+          </dl>`
+              : ''
+          }
         </section>`;
           })
           .join('')}
