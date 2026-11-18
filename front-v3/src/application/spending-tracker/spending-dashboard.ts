@@ -20,7 +20,6 @@ export type SpendingAverage = { unit: AverageUnit } & SpendingAmounts;
 export type SpendingCategoryStats = SpendingAmounts & {
   id: string;
   title: string;
-  emoji: string;
   /** Part du total de la période, entre 0 et 1 */
   share: number;
   averages: SpendingAverage[];
@@ -102,7 +101,6 @@ export function spendingDashboard({ view, today }: { view: SpendingTrackerView; 
       return {
         id: category.id,
         title: category.title,
-        emoji: category.emojis[0] ?? '',
         ...amounts,
         share: totals.total > 0 ? amounts.total / totals.total : 0,
         averages: averagesOf({ amounts, days, units }),

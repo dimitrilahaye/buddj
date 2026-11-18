@@ -480,10 +480,10 @@ describe('écran suivi des dépenses', () => {
       const list = within(dashboard()).getByRole('list', { name: 'Dépenses par catégorie' });
       const rows = within(list).getAllByRole('listitem');
       expect(rows.map((li) => li.getAttribute('aria-label'))).toEqual([
-        '🏠 Logement : 700,00 €',
-        '⚡ Énergie : 100,00 €',
-        '🍎 Alimentation : 26,00 €',
-        '💐 Divers : 13,00 €',
+        'Logement : 700,00 €',
+        'Énergie : 100,00 €',
+        'Alimentation : 26,00 €',
+        'Divers : 13,00 €',
       ]);
       expect(rows[2]!.textContent).toContain('2,00 € / jour');
     });
@@ -512,7 +512,7 @@ describe('écran suivi des dépenses', () => {
       fireEvent.click(within(dashboard()).getByRole('button', { name: 'Ouvrir en grand : Par catégorie' }));
 
       const sheet = screen.getByRole('dialog', { name: 'Par catégorie' });
-      const food = within(sheet).getByRole('region', { name: '🍎 Alimentation' });
+      const food = within(sheet).getByRole('region', { name: 'Alimentation' });
       expect(food.textContent).toContain('26,00 €');
       expect(food.textContent).toMatch(/3,1\s%/);
       expect(food.textContent).toMatch(/Moyenne par jour\s*2,00 €/);
@@ -535,10 +535,10 @@ describe('écran suivi des dépenses', () => {
       expect(within(chart()).getByText('Cumul par catégorie')).toBeTruthy();
       const legend = chart().querySelector('.spending-chart-legend') as HTMLElement;
       expect([...legend.children].map((item) => item.textContent)).toEqual([
-        '💐 Divers',
-        '🍎 Alimentation',
-        '⚡ Énergie',
-        '🏠 Logement',
+        'Divers',
+        'Alimentation',
+        'Énergie',
+        'Logement',
       ]);
       expect(screen.getByRole('group', { name: /^Cumul de 839,00 €/ })).toBeTruthy();
 
