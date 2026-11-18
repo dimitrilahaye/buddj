@@ -471,24 +471,6 @@ describe('écran suivi des dépenses', () => {
       expect(within(dashboard()).queryByRole('list', { name: 'Moyennes' })).toBeNull();
     });
 
-    it('se replie et se déplie, la courbe avec lui', async () => {
-      startOn('/spending-tracker');
-      await waitFor(() => expect(totalText()).toContain('872,63 €'));
-      openChart();
-      expect(screen.getByRole('figure')).toBeTruthy();
-
-      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Masquer le tableau de bord' }));
-
-      expect(screen.queryByRole('status', { name: 'Total de la période' })).toBeNull();
-      expect(screen.queryByRole('figure')).toBeNull();
-      expect(within(dashboard()).queryByRole('button', { name: 'Courbe cumulée' })).toBeNull();
-
-      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Afficher le tableau de bord' }));
-
-      expect(totalText()).toContain('872,63 €');
-      expect(screen.getByRole('figure')).toBeTruthy();
-    });
-
     it('liste les catégories de la plus coûteuse à la moins coûteuse, avec leur moyenne', async () => {
       await startCategorized();
 

@@ -2,11 +2,10 @@
  * Tableau de bord du suivi des dépenses, en deux encarts qu'on fait défiler (onglets ou balayage) :
  * - « Total » : total de la période, dépenses / sorties, moyennes par jour, semaine, mois ;
  * - « Par catégorie » : total et moyennes de chaque catégorie d'emoji.
- * Chaque encart s'ouvre en grand pour l'étudier. Le tableau de bord se replie.
+ * Chaque encart s'ouvre en grand pour l'étudier.
  *
  * API : render({ dashboard, isChartOpen, hasChart }).
- * Émet `spending-dashboard-change` quand l'encart observé change ou que le tableau de bord
- * est replié / déplié (la courbe suit l'encart observé) ; le bouton de courbe
+ * Émet `spending-dashboard-change` quand l'encart observé change (la courbe le suit) ; le bouton de courbe
  * (`.spending-tracker-chart-toggle`) est géré par l'écran.
  */
 import type {
@@ -30,7 +29,6 @@ export type SpendingDashboardRenderData = {
 export type BuddjSpendingDashboardElement = HTMLElement & {
   render: (data: SpendingDashboardRenderData) => void;
   readonly observed: SpendingDashboardPanel;
-  readonly isOpen: boolean;
 };
 
 const PANELS: Array<{ id: SpendingDashboardPanel; label: string }> = [
@@ -48,7 +46,6 @@ const percentFormatter = new Intl.NumberFormat('fr-FR', { style: 'percent', maxi
 
 const CHART_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></svg>`;
 const EXPAND_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>`;
-const CHEVRON_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>`;
 
 function averagesNote(dashboard: SpendingDashboard): string {
   if (dashboard.elapsedDays === 0) return 'La période n’a pas encore commencé : pas de moyenne.';
@@ -62,7 +59,6 @@ export class BuddjSpendingDashboard extends HTMLElement {
 
   private _data?: SpendingDashboardRenderData;
   private _observed: SpendingDashboardPanel = 'total';
-  private _isOpen = true;
   /** Encart ouvert en grand, null si aucun. */
   private _expanded: SpendingDashboardPanel | null = null;
   private _scrollFrame = 0;
@@ -88,10 +84,6 @@ export class BuddjSpendingDashboard extends HTMLElement {
     return this._observed;
   }
 
-  get isOpen(): boolean {
-    return this._isOpen;
-  }
-
   connectedCallback(): void {
     if (!this.querySelector('.spending-dashboard')) {
       this.innerHTML = `
@@ -104,9 +96,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
                 data-panel="${p.id}" aria-controls="spending-dashboard-${p.id}">${escapeHtml(p.label)}</button>`
               ).join('')}
             </div>
-            <span class="spending-dashboard-collapsed-title">Tableau de bord</span>
             <span class="spending-dashboard-chart-toggle-slot"></span>
-            <button type="button" class="spending-dashboard-toggle" aria-controls="spending-dashboard-track">${CHEVRON_ICON_SVG}</button>
           </div>
           <div class="spending-dashboard-track" id="spending-dashboard-track">
             ${PANELS.map(
@@ -196,12 +186,6 @@ export class BuddjSpendingDashboard extends HTMLElement {
       this._observe(tab.dataset.panel as SpendingDashboardPanel, { scroll: true });
       return;
     }
-    if (target.closest('.spending-dashboard-toggle')) {
-      this._isOpen = !this._isOpen;
-      this._draw();
-      this._emitChange();
-      return;
-    }
     const expand = target.closest<HTMLElement>('.spending-dashboard-expand');
     if (expand) {
       this._expanded = expand.dataset.expand as SpendingDashboardPanel;
@@ -246,20 +230,12 @@ export class BuddjSpendingDashboard extends HTMLElement {
 
   private _draw(): void {
     if (!this.querySelector('.spending-dashboard')) return;
-    const root = this.querySelector('.spending-dashboard') as HTMLElement;
-    root.classList.toggle('spending-dashboard--collapsed', !this._isOpen);
-    const toggle = this.querySelector('.spending-dashboard-toggle') as HTMLElement;
-    toggle.setAttribute('aria-expanded', String(this._isOpen));
-    toggle.setAttribute('aria-label', this._isOpen ? 'Masquer le tableau de bord' : 'Afficher le tableau de bord');
-    (this.querySelector('.spending-dashboard-tabs') as HTMLElement).hidden = !this._isOpen;
-    (this.querySelector('.spending-dashboard-collapsed-title') as HTMLElement).hidden = this._isOpen;
-    this._track().hidden = !this._isOpen;
     this._syncTabs();
 
     const data = this._data;
     const chartSlot = this.querySelector('.spending-dashboard-chart-toggle-slot') as HTMLElement;
     chartSlot.innerHTML =
-      data && data.hasChart && this._isOpen
+      data && data.hasChart
         ? `<button type="button" class="spending-tracker-chart-toggle${data.isChartOpen ? ' spending-tracker-chart-toggle--open' : ''}"
             aria-label="Courbe cumulée" aria-expanded="${data.isChartOpen}" aria-controls="spending-tracker-chart">${CHART_ICON_SVG}</button>`
         : '';

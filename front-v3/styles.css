@@ -4333,9 +4333,6 @@ buddj-spending-dashboard[hidden] {
   gap: 0.25rem;
 }
 
-.spending-dashboard-tabs[hidden],
-.spending-dashboard-collapsed-title[hidden],
-.spending-dashboard-track[hidden],
 .spending-dashboard-sheet[hidden] {
   display: none;
 }
@@ -4358,46 +4355,14 @@ buddj-spending-dashboard[hidden] {
 }
 
 .spending-dashboard-tab:focus-visible,
-.spending-dashboard-toggle:focus-visible,
 .spending-dashboard-expand:focus-visible,
 .spending-dashboard-sheet-close:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 1px;
 }
 
-.spending-dashboard-collapsed-title {
-  flex: 1;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--navy-soft);
-}
-
 .spending-dashboard-chart-toggle-slot {
   display: contents;
-}
-
-.spending-dashboard-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--navy-soft);
-  cursor: pointer;
-}
-
-.spending-dashboard-toggle svg {
-  width: 1.15rem;
-  height: 1.15rem;
-  transition: transform 0.2s ease;
-}
-
-.spending-dashboard-toggle[aria-expanded='true'] svg {
-  transform: rotate(180deg);
 }
 
 /* Les deux encarts côte à côte, un par écran, qu'on fait défiler au doigt */
