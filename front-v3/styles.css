@@ -4312,7 +4312,8 @@ buddj-date-range-picker-drawer.date-range-picker-drawer--open {
 /* ========== Tableau de bord du suivi des dépenses ========== */
 buddj-spending-dashboard {
   display: block;
-  margin-bottom: 1rem;
+  /* Pas moins que la place laissée à l'ombre sous les encarts */
+  margin-bottom: 1.5rem;
 }
 
 buddj-spending-dashboard[hidden] {
@@ -4320,6 +4321,9 @@ buddj-spending-dashboard[hidden] {
 }
 
 .spending-dashboard-bar {
+  /* Au-dessus de la marge intérieure de la piste, qui la chevauche */
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -4366,10 +4370,20 @@ buddj-spending-dashboard[hidden] {
 }
 
 /* Les deux encarts côte à côte, un par écran, qu'on fait défiler au doigt */
+/*
+ * La marge intérieure laisse la place à l'ombre des encarts (sinon rognée en rectangle
+ * par le défilement), compensée par une marge négative ; content-box pour que la hauteur
+ * fixée en JS soit celle de l'encart.
+ */
 .spending-dashboard-track {
+  --shadow-room: 1.5rem;
+  box-sizing: content-box;
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: calc(2 * var(--shadow-room));
+  padding: var(--shadow-room);
+  margin: calc(-1 * var(--shadow-room));
+  scroll-padding-inline: var(--shadow-room);
   overflow-x: auto;
   overflow-y: hidden;
   transition: height 0.2s ease;
