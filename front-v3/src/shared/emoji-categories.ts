@@ -8,7 +8,8 @@ export const EMOJI_CATEGORIES: EmojiCategory[] = [
   { id: 'money', title: 'Argent & finances', emojis: ['💰', '🐖', '💳', '💵', '💴', '💶', '💸', '🏦', '📈', '📉', '🧾'] },
   { id: 'housing', title: 'Logement', emojis: ['🏠', '🏡', '🏢', '🏬', '🔑', '🛏️'] },
   { id: 'transport', title: 'Transport', emojis: ['🚗', '🚕', '🚎', '🚌', '🚅', '🚄', '✈️', '🚲', '🛵', '⛽', '🅿️'] },
-  { id: 'energy-utilities', title: 'Énergie & utilitaires', emojis: ['⚡', '💧', '🔥', '📱', '💻', '🌐', '🌍'] },
+  { id: 'energy', title: 'Énergie', emojis: ['⚡', '💡', '🔌', '🔋', '🔥', '💧', '🛢️', '🌡️'] },
+  { id: 'utilities', title: 'Utilitaires', emojis: ['📱', '💻', '🌐', '🌍', '📞', '📡', '📶', '🖨️', '✉️', '📮'] },
   { id: 'food', title: 'Alimentation', emojis: ['🍎', '🍽️', '☕', '🍔', '🍕', '🥐', '🥖', '🥗', '🍻', '🍫'] },
   { id: 'leisure', title: 'Shopping & loisirs', emojis: ['🛒', '🛍️', '🎬', '🍿', '🥤', '🎫', '🎟️', '🎮', '📺', '🎵', '📷', '🎁', '🎯', '🎪'] },
   { id: 'health', title: 'Santé', emojis: ['🏥', '💊', '🩺', '🦷', '🧴'] },
@@ -17,5 +18,5 @@ export const EMOJI_CATEGORIES: EmojiCategory[] = [
   { id: 'home', title: 'Maison & entretien', emojis: ['🧹', '🔧', '📦', '🛋️', '🪴', '🪣', '🧺'] },
   { id: 'personal', title: 'Personnel & style', emojis: ['💇', '👕', '👗', '💄', '💅'] },
   { id: 'pets', title: 'Animaux', emojis: ['🐕', '🐈', '🐠', '🐦'] },
-  { id: 'misc', title: 'Divers', emojis: ['💐', '🎉', '📌', '🔔', '⏰', '📆'] },
+  { id: 'misc', title: 'Divers', emojis: ['💐', '🎉', '📌', '🔔', '⏰', '📆', '🚬'] },
 ];
