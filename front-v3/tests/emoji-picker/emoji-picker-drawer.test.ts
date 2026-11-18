@@ -105,3 +105,28 @@ describe('drawer de choix d’emoji', () => {
     expect(isOpen()).toBe(false);
   });
 });
+
+describe('catégories du drawer de choix d’emoji', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<buddj-emoji-picker-drawer id="picker"></buddj-emoji-picker-drawer>';
+  });
+
+  function sectionEmojis(dialog: HTMLElement, title: string): string[] {
+    const section = within(dialog).getByText(title).closest('.emoji-picker-drawer-section') as HTMLElement;
+    return within(section)
+      .getAllByRole('button')
+      .map((b) => b.textContent ?? '');
+  }
+
+  it('sépare l’énergie des utilitaires', () => {
+    const dialog = openPicker();
+    expect(within(dialog).queryByText('Énergie & utilitaires')).toBeNull();
+    expect(sectionEmojis(dialog, 'Énergie')).toEqual(expect.arrayContaining(['⚡', '💡', '🔌', '🔋']));
+    expect(sectionEmojis(dialog, 'Utilitaires')).toEqual(expect.arrayContaining(['📱', '💻', '🌐', '📞']));
+  });
+
+  it('propose la cigarette dans Divers', () => {
+    const dialog = openPicker();
+    expect(sectionEmojis(dialog, 'Divers')).toContain('🚬');
+  });
+});
