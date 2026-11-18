@@ -90,10 +90,10 @@ export function categoryStack({
       ? hourlyGroups({ bucket: singleDay, now })
       : view.buckets.map((bucket) => ({ key: bucket.start, entries: bucket.entries }));
 
-  const totalsByCategory = new Map<string, { title: string; emoji: string; total: number }>();
+  const totalsByCategory = new Map<string, { title: string; total: number }>();
   for (const entry of groups.flatMap((g) => g.entries)) {
     const category = categoryOfLabel(entry.label);
-    const current = totalsByCategory.get(category.id) ?? { title: category.title, emoji: category.emojis[0] ?? '', total: 0 };
+    const current = totalsByCategory.get(category.id) ?? { title: category.title, total: 0 };
     current.total += entry.amount;
     totalsByCategory.set(category.id, current);
   }
@@ -101,9 +101,9 @@ export function categoryStack({
   // Une seule catégorie de trop ne vaut pas un regroupement : on la trace.
   const shown = ranked.length > MAX_CATEGORY_SERIES + 1 ? ranked.slice(0, MAX_CATEGORY_SERIES) : ranked;
   const shownIds = new Set(shown.map(([id]) => id));
-  const series: ChartSeries[] = shown.map(([id, { title, emoji }], index) => ({
+  const series: ChartSeries[] = shown.map(([id, { title }], index) => ({
     key: id,
-    label: `${emoji} ${title}`,
+    label: title,
     color: CATEGORY_SERIES_COLORS[index] ?? OTHER_CATEGORIES_COLOR,
   }));
   if (shown.length < ranked.length) {

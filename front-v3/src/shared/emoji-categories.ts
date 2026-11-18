@@ -1,6 +1,7 @@
 /**
  * Catégories d'emoji proposées par le drawer de choix d'emoji.
- * L'emoji en tête d'un libellé range la ligne dans sa catégorie (suivi des dépenses).
+ * L'emoji en tête d'un libellé range la ligne dans sa catégorie (suivi des dépenses),
+ * qui s'affiche par son seul titre.
  */
 export type EmojiCategory = { id: string; title: string; emojis: string[] };
 
@@ -22,7 +23,7 @@ export const EMOJI_CATEGORIES: EmojiCategory[] = [
 ];
 
 /** Catégorie des libellés sans emoji connu en tête. */
-export const UNCATEGORIZED: EmojiCategory = { id: 'uncategorized', title: 'Sans catégorie', emojis: ['🏷️'] };
+export const UNCATEGORIZED: EmojiCategory = { id: 'uncategorized', title: 'Sans catégorie', emojis: [] };
 
 const LEADING_EMOJI_RE = /^\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*/u;
 

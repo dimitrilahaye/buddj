@@ -291,7 +291,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
   }
 
   private _categoryRowHtml(category: SpendingCategoryStats, { withAverage }: { withAverage: boolean }): string {
-    const name = `${category.emoji} ${category.title}`;
+    const name = category.title;
     const [firstAverage] = category.averages;
     const average =
       withAverage && firstAverage
@@ -299,7 +299,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
         : '';
     return `
         <li class="spending-dashboard-category" aria-label="${escapeAttr(`${name} : ${formatEuros(category.total)}`)}">
-          <span class="spending-dashboard-category-name"><span aria-hidden="true">${escapeHtml(category.emoji)}</span> ${escapeHtml(category.title)}</span>
+          <span class="spending-dashboard-category-name">${escapeHtml(name)}</span>
           <span class="spending-dashboard-category-amounts">
             <span class="spending-dashboard-category-total">${escapeHtml(formatEuros(category.total))}</span>${average}
           </span>
@@ -365,7 +365,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
       <div class="spending-dashboard-category-details">
         ${categories
           .map((c) => {
-            const name = `${c.emoji} ${c.title}`;
+            const name = c.title;
             return `
         <section class="spending-dashboard-category-detail" aria-label="${escapeAttr(name)}">
           <div class="spending-dashboard-category-detail-header">

@@ -101,7 +101,7 @@ describe('courbe par catégorie', () => {
 
     const { series, points } = categoryStack({ view });
 
-    expect(series.map((s) => s.label)).toEqual(['⚡ Énergie', '🍎 Alimentation']);
+    expect(series.map((s) => s.label)).toEqual(['Énergie', 'Alimentation']);
     expect(points).toEqual([
       { key: '2026-11-01', bucketTotal: 82, total: 82, values: { energy: 70, food: 12 } },
       { key: '2026-11-02', bucketTotal: 8, total: 90, values: { energy: 70, food: 20 } },
