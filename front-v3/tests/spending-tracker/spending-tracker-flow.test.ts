@@ -509,7 +509,7 @@ describe('écran suivi des dépenses', () => {
       expect(screen.queryByRole('dialog', { name: 'Total' })).toBeNull();
     });
 
-    it('ouvre l’encart Par catégorie en grand avec un tableau par catégorie, et se ferme avec Échap', async () => {
+    it('ouvre l’encart Par catégorie en grand avec un tableau par catégorie, parts et moyennes repliées, et se ferme avec Échap', async () => {
       await startCategorized();
 
       fireEvent.click(within(dashboard()).getByRole('button', { name: 'Ouvrir en grand : Par catégorie' }));
@@ -531,6 +531,16 @@ describe('écran suivi des dépenses', () => {
           .map((row) => [within(row).queryByRole('rowheader')?.textContent ?? null, ...within(row).queryAllByRole('cell').map((c) => c.textContent?.replace(/\s+/g, ' ').trim())]);
       expect(rows()).toEqual([
         ['Sur la période', '26,00 €', '26,00 €', '0,00 €'],
+        [null, 'Parts et moyennes'],
+      ]);
+
+      const toggle = within(food).getByRole('button', { name: 'Parts et moyennes : Alimentation' });
+      expect(toggle.getAttribute('aria-expanded')).toBe('false');
+      fireEvent.click(toggle);
+      expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
+      expect(rows()).toEqual([
+        ['Sur la période', '26,00 €', '26,00 €', '0,00 €'],
         ['Parts'],
         ['sur toute la période', '3,1 %', '3,1 %', '0 %'],
         ['sur l’ensemble des catégories', '3,1 %', '66,7 %', '0 %'],
@@ -538,7 +548,10 @@ describe('écran suivi des dépenses', () => {
         ['par jour', '2,00 €', '2,00 €', '0,00 €'],
         ['par semaine', '14,00 €', '14,00 €', '0,00 €'],
         ['par mois', '60,88 €', '60,88 €', '0,00 €'],
+        [null, 'Masquer les parts et moyennes'],
       ]);
+      // Les autres catégories restent repliées.
+      expect(within(sheet).getByRole('button', { name: 'Parts et moyennes : Logement' }).getAttribute('aria-expanded')).toBe('false');
       expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
 
       fireEvent.keyDown(sheet, { key: 'Escape' });

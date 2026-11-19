@@ -4,6 +4,7 @@
  * - « Par catégorie » : total et moyennes de chaque catégorie d'emoji.
  * Des points sous les encarts indiquent qu'on peut balayer de l'un à l'autre.
  * Chaque encart s'ouvre en grand pour l'étudier ; on y balaie aussi d'un encart à l'autre (points en haut et en bas).
+ * Ouvert en grand, chaque catégorie montre son total sur la période ; ses parts et moyennes se déplient à la demande.
  *
  * API : render({ dashboard, isChartOpen, hasChart }).
  * Émet `spending-dashboard-change` quand l'encart observé change (la courbe le suit) ; le bouton de courbe
@@ -59,6 +60,10 @@ function cardDotsHtml(): string {
     </div>`;
 }
 
+function categoryToggleText(open: boolean): string {
+  return open ? 'Masquer les parts et moyennes' : 'Parts et moyennes';
+}
+
 function averagesNote(dashboard: SpendingDashboard): string {
   if (dashboard.elapsedDays === 0) return 'La période n’a pas encore commencé : pas de moyenne.';
   if (dashboard.units.length === 0) return 'Pas de moyenne sur une seule journée.';
@@ -73,6 +78,8 @@ export class BuddjSpendingDashboard extends HTMLElement {
   private _observed: SpendingDashboardPanel = 'total';
   private _scrollFrame = 0;
   private _resizeObserver?: ResizeObserver;
+  /** Catégories dont les parts et moyennes sont dépliées, ouvert en grand. */
+  private readonly _openCategoryDetails = new Set<string>();
   /** Encart ouvert en grand, rendu dans <body>. */
   private readonly _sheet: BuddjSwipeSheet = (() => {
     const sheet = document.createElement('buddj-swipe-sheet') as BuddjSwipeSheet;
@@ -118,6 +125,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
     document.body.appendChild(this._sheet);
     this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
+    this._sheet.addEventListener('click', this._onSheetClick);
     this._sheet.addEventListener('swipe-sheet-change', this._onSheetChange);
     this._sheet.addEventListener('swipe-sheet-close', this._onSheetClose);
     this._track().addEventListener('scroll', this._onScroll, { passive: true });
@@ -132,6 +140,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
   disconnectedCallback(): void {
     this.removeEventListener('click', this._onClick);
     this.removeEventListener('keydown', this._onKeyDown);
+    this._sheet.removeEventListener('click', this._onSheetClick);
     this._sheet.removeEventListener('swipe-sheet-change', this._onSheetChange);
     this._sheet.removeEventListener('swipe-sheet-close', this._onSheetClose);
     this._sheet.remove();
@@ -202,6 +211,21 @@ export class BuddjSpendingDashboard extends HTMLElement {
     this._drawSheet();
     this._sheet.open(panel);
   }
+
+  /** Déplie / replie les parts et moyennes d'une catégorie ouverte en grand. */
+  private _onSheetClick = (e: Event): void => {
+    const toggle = (e.target as Element).closest<HTMLElement>('.spending-dashboard-category-toggle');
+    if (!toggle) return;
+    const id = toggle.dataset.category!;
+    const open = !this._openCategoryDetails.has(id);
+    if (open) this._openCategoryDetails.add(id);
+    else this._openCategoryDetails.delete(id);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = categoryToggleText(open);
+    toggle.closest('table')?.querySelectorAll<HTMLElement>('.spending-dashboard-table-group').forEach((group) => {
+      group.hidden = !open;
+    });
+  };
 
   private _onClick = (e: Event): void => {
     const target = e.target as Element;
@@ -350,6 +374,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
     periodTotal,
     columnTotals,
     shareBar = false,
+    collapsible,
   }: {
     caption: string;
     captionClass: string;
@@ -359,6 +384,8 @@ export class BuddjSpendingDashboard extends HTMLElement {
     /** Totaux de chaque colonne sur l'ensemble des catégories : ajoute la part colonne par colonne */
     columnTotals?: SpendingAmounts;
     shareBar?: boolean;
+    /** Parts et moyennes repliées derrière un bouton ; `open` dit si elles sont dépliées. */
+    collapsible?: { id: string; open: boolean };
   }): string {
     const cells = (values: string[]): string => values.map((v) => `<td>${escapeHtml(v)}</td>`).join('');
     const euros = (a: SpendingAmounts): string[] => [a.total, a.expensesTotal, a.outflowsTotal].map(formatEuros);
@@ -370,7 +397,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
       : null;
     // Groupe de lignes coiffé d'une en-tête intermédiaire, ses lignes en retrait dessous
     const group = (title: string, rows: Array<{ label: string; values: string[] }>): string => `
-        <tbody class="spending-dashboard-table-group">
+        <tbody class="spending-dashboard-table-group"${collapsible && !collapsible.open ? ' hidden' : ''}>
           <tr><th scope="rowgroup" colspan="4" class="spending-dashboard-table-group-title">${escapeHtml(title)}</th></tr>
           ${rows.map((r) => `<tr><th scope="row" class="spending-dashboard-table-subrow">${escapeHtml(r.label)}</th>${cells(r.values)}</tr>`).join('')}
         </tbody>`;
@@ -403,6 +430,16 @@ export class BuddjSpendingDashboard extends HTMLElement {
             : ''
         }
         ${averages.length > 0 ? group('Moyennes', averages.map((a) => ({ label: UNIT_LABELS[a.unit], values: euros(a) }))) : ''}
+        ${
+          collapsible
+            ? `<tfoot>
+          <tr><td colspan="4" class="spending-dashboard-table-toggle-cell">
+            <button type="button" class="spending-dashboard-category-toggle" data-category="${escapeAttr(collapsible.id)}"
+              aria-expanded="${collapsible.open}" aria-label="${escapeAttr(`Parts et moyennes : ${caption}`)}">${categoryToggleText(collapsible.open)}</button>
+          </td></tr>
+        </tfoot>`
+            : ''
+        }
       </table>`;
   }
 
@@ -436,6 +473,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
               periodTotal: totals.total,
               columnTotals: totals,
               shareBar: true,
+              collapsible: { id: c.id, open: this._openCategoryDetails.has(c.id) },
             })
           )
           .join('')}
