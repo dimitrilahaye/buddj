@@ -553,17 +553,20 @@ describe('écran suivi des dépenses', () => {
           .getAllByRole('row')
           .slice(1)
           .map((row) => [within(row).queryByRole('rowheader')?.textContent ?? null, ...within(row).queryAllByRole('cell').map((c) => c.textContent?.replace(/\s+/g, ' ').trim())]);
-      expect(rows()).toEqual([['Sur la période', '26,00 €', '26,00 €', '0,00 €']]);
+      // Le bouton suit la ligne de la période, au-dessus du bloc qu'il déplie, ouvert ou non.
+      expect(rows()).toEqual([
+        ['Sur la période', '26,00 €', '26,00 €', '0,00 €'],
+        [null, 'Parts et moyennes'],
+      ]);
 
-      // Le bouton reste en haut du tableau, dans la cellule d'angle de l'en-tête.
       const toggle = within(food).getByRole('button', { name: 'Parts et moyennes : Alimentation' });
-      expect(toggle.closest('thead')).toBeTruthy();
       expect(toggle.getAttribute('aria-expanded')).toBe('false');
       fireEvent.click(toggle);
       expect(toggle.getAttribute('aria-expanded')).toBe('true');
 
       expect(rows()).toEqual([
         ['Sur la période', '26,00 €', '26,00 €', '0,00 €'],
+        [null, 'Parts et moyennes'],
         ['Parts'],
         ['sur toute la période', '3,1 %', '3,1 %', '0 %'],
         ['sur l’ensemble des catégories', '3,1 %', '66,7 %', '0 %'],
