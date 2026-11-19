@@ -4523,7 +4523,7 @@ buddj-spending-dashboard[hidden] {
   background: var(--coral);
 }
 
-/* Feuille ouverte en grand (encarts du tableau de bord), pages qu'on fait défiler au doigt */
+/* Feuille ouverte en grand (encarts du tableau de bord, graphiques), pages qu'on fait défiler au doigt */
 buddj-swipe-sheet {
   display: block;
   position: fixed;
@@ -4780,7 +4780,19 @@ buddj-swipe-sheet[hidden] {
   outline-offset: 1px;
 }
 
-/* Icône qui déplie / replie la courbe cumulée */
+/* Graphiques ouverts en grand : la feuille leur sert de carte */
+.spending-charts-sheet .spending-chart,
+.spending-charts-sheet .spending-pie {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.spending-charts-sheet .spending-pie-plot {
+  width: 14rem;
+  height: 14rem;
+}
+
+/* Icônes qui déplient / replient la courbe cumulée ou la répartition */
 .spending-tracker-chart-toggle {
   display: inline-flex;
   align-items: center;
@@ -4845,6 +4857,151 @@ buddj-swipe-sheet[hidden] {
 .spending-tracker-split-item--outflow::before,
 .spending-tracker-bar-fill--outflow {
   background: var(--series-outflow);
+}
+
+/* Répartition en anneau */
+buddj-spending-tracker-pie {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+buddj-spending-tracker-pie[hidden] {
+  display: none;
+}
+
+.spending-pie {
+  margin: 0;
+  padding: 0.85rem 1.25rem 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.spending-pie-title {
+  padding-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.spending-pie-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem 1.5rem;
+}
+
+.spending-pie-plot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 11rem;
+  height: 11rem;
+  transition: opacity 0.2s;
+}
+
+.spending-pie-plot--refreshing {
+  opacity: 0.5;
+}
+
+.spending-pie-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Écart de 2 px entre les parts, couleur de la surface */
+.spending-pie-slice {
+  stroke: var(--bg-card);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transition: opacity 0.15s ease;
+}
+
+.spending-pie-svg--focused .spending-pie-slice:not(.is-active) {
+  opacity: 0.35;
+}
+
+.spending-pie-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2.6rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.spending-pie-center-amount {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.spending-pie-center-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: var(--navy-soft);
+}
+
+.spending-pie-legend {
+  flex: 1 1 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.spending-pie-legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--radius);
+  cursor: default;
+}
+
+.spending-pie-legend-item.is-active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.spending-pie-legend-item:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.spending-pie-legend-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--navy);
+}
+
+.spending-pie-legend-amount,
+.spending-pie-legend-share {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.spending-pie-legend-amount {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.spending-pie-legend-share {
+  min-width: 3.2rem;
+  color: var(--navy-soft);
 }
 
 /* Graphique cumulé */
