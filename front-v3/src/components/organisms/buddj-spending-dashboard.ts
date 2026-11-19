@@ -6,9 +6,9 @@
  * Chaque encart s'ouvre en grand pour l'étudier ; on y balaie aussi d'un encart à l'autre (points en haut et en bas).
  * Ouvert en grand, chaque catégorie montre son total sur la période ; ses parts et moyennes se déplient à la demande.
  *
- * API : render({ dashboard, isChartOpen, hasChart }).
- * Émet `spending-dashboard-change` quand l'encart observé change (la courbe le suit) ; le bouton de courbe
- * (`.spending-tracker-chart-toggle`) est géré par l'écran.
+ * API : render({ dashboard, openChart, hasChart }).
+ * Émet `spending-dashboard-change` quand l'encart observé change (les graphiques le suivent) ; les boutons
+ * de courbe (`.spending-tracker-chart-toggle`) et de répartition (`.spending-tracker-pie-toggle`) sont gérés par l'écran.
  */
 import type {
   AverageUnit,
@@ -24,10 +24,13 @@ import { formatEuros } from '../../shared/goal.js';
 
 export type SpendingDashboardPanel = 'total' | 'categories';
 
+/** Graphique déplié sous le tableau de bord : courbe cumulée ou répartition en anneau. */
+export type SpendingTrackerChartKind = 'curve' | 'pie';
+
 export type SpendingDashboardRenderData = {
   dashboard: SpendingDashboard;
-  isChartOpen: boolean;
-  /** La courbe n'a de sens que s'il y a des dépenses. */
+  openChart: SpendingTrackerChartKind | null;
+  /** Les graphiques n'ont de sens que s'il y a des dépenses. */
   hasChart: boolean;
 };
 
@@ -50,6 +53,7 @@ const UNIT_SHORT_LABELS: Record<AverageUnit, string> = { day: '/ jour', week: '/
 const percentFormatter = new Intl.NumberFormat('fr-FR', { style: 'percent', maximumFractionDigits: 1 });
 
 const CHART_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></svg>`;
+const PIE_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>`;
 const EXPAND_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>`;
 
 /** Points de pagination : un par encart, celui observé mis en avant. Décoratifs, les onglets portent l'accessibilité. */
@@ -271,10 +275,15 @@ export class BuddjSpendingDashboard extends HTMLElement {
 
     const data = this._data;
     const chartSlot = this.querySelector('.spending-dashboard-chart-toggle-slot') as HTMLElement;
+    const toggle = ({ kind, className, label, controls, icon }: { kind: SpendingTrackerChartKind; className: string; label: string; controls: string; icon: string }): string => {
+      const open = data?.openChart === kind;
+      return `<button type="button" class="spending-tracker-chart-toggle ${className}${open ? ' spending-tracker-chart-toggle--open' : ''}"
+            aria-label="${label}" aria-expanded="${open}" aria-controls="${controls}">${icon}</button>`;
+    };
     chartSlot.innerHTML =
       data && data.hasChart
-        ? `<button type="button" class="spending-tracker-chart-toggle${data.isChartOpen ? ' spending-tracker-chart-toggle--open' : ''}"
-            aria-label="Courbe cumulée" aria-expanded="${data.isChartOpen}" aria-controls="spending-tracker-chart">${CHART_ICON_SVG}</button>`
+        ? toggle({ kind: 'curve', className: 'spending-tracker-curve-toggle', label: 'Courbe cumulée', controls: 'spending-tracker-chart', icon: CHART_ICON_SVG }) +
+          toggle({ kind: 'pie', className: 'spending-tracker-pie-toggle', label: 'Répartition', controls: 'spending-tracker-pie', icon: PIE_ICON_SVG })
         : '';
     if (!data) return;
 

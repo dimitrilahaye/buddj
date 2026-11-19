@@ -3,8 +3,9 @@
  * regroupées par jour, semaine ou mois (GET /spending-tracker).
  * Raccourcis (aujourd'hui, cette semaine, ce mois) ou plage libre via un calendrier unique ;
  * filtre par type côté front, sans rechargement.
- * Un tableau de bord (total, moyennes, catégories) résume la période ; la courbe cumulée
- * suit l'encart observé (par type ou par catégorie).
+ * Un tableau de bord (total, moyennes, catégories) résume la période ; ses icônes ouvrent en grand
+ * la courbe cumulée et la répartition en anneau, qu'on fait défiler au doigt de l'une à l'autre.
+ * Les deux suivent l'encart observé (par type ou par catégorie).
  */
 import type { SpendingTrackerStore } from '../../application/spending-tracker/spending-tracker-store.js';
 import { filterSpendingTrackerView } from '../../application/spending-tracker/spending-tracker-filter.js';
@@ -30,10 +31,18 @@ import {
   hourlyCumulativeSpending,
 } from '../../application/spending-tracker/spending-tracker-cumulative.js';
 import { spendingDashboard } from '../../application/spending-tracker/spending-dashboard.js';
-import { categoryStack, kindStack } from '../../application/spending-tracker/spending-chart-series.js';
+import { categoryStack, kindStack, type ChartStack } from '../../application/spending-tracker/spending-chart-series.js';
+import { pieSlices } from '../../application/spending-tracker/spending-pie-slices.js';
 import '../organisms/buddj-spending-tracker-chart.js';
+import '../organisms/buddj-spending-tracker-pie.js';
+import type { BuddjSpendingTrackerPie } from '../organisms/buddj-spending-tracker-pie.js';
 import '../organisms/buddj-spending-dashboard.js';
-import type { BuddjSpendingDashboardElement } from '../organisms/buddj-spending-dashboard.js';
+import '../organisms/buddj-swipe-sheet.js';
+import type { BuddjSwipeSheet, SwipeSheetEventDetail } from '../organisms/buddj-swipe-sheet.js';
+import type {
+  BuddjSpendingDashboardElement,
+  SpendingTrackerChartKind,
+} from '../organisms/buddj-spending-dashboard.js';
 import '../organisms/buddj-date-range-picker-drawer.js';
 import type { BuddjDateRangePickerDrawerElement } from '../organisms/buddj-date-range-picker-drawer.js';
 import type {
@@ -41,7 +50,10 @@ import type {
   SpendingBucketSelect,
 } from '../organisms/buddj-spending-tracker-chart.js';
 
-const BUDDJ_CHART_TAG = 'buddj-spending-tracker-chart';
+const CHART_PAGES: Array<{ id: SpendingTrackerChartKind; label: string }> = [
+  { id: 'curve', label: 'Courbe cumulée' },
+  { id: 'pie', label: 'Répartition' },
+];
 
 /** Clé de sélection de la ligne « toute la période » (jamais une date de bucket). */
 const PERIOD_KEY = 'period';
@@ -111,14 +123,40 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
   private _main?: HTMLElement;
   /** Bucket dont le détail est affiché (start), PERIOD_KEY pour toute la période, null si aucun. */
   private _selectedStart: string | null = null;
-  /** Courbe cumulée repliée par défaut, dépliée via l'icône du tableau de bord. */
-  private _isChartOpen = false;
+  /** Graphique affiché dans la feuille des graphiques, null quand elle est fermée. */
+  private _openChart: SpendingTrackerChartKind | null = null;
+  /** Courbe et répartition ouvertes en grand, côte à côte ; rendue dans <body>. */
+  private readonly _chartSheet: BuddjSwipeSheet = (() => {
+    const sheet = document.createElement('buddj-swipe-sheet') as BuddjSwipeSheet;
+    sheet.classList.add('spending-charts-sheet');
+    sheet.setPages(CHART_PAGES);
+    sheet.page('curve').innerHTML = '<buddj-spending-tracker-chart id="spending-tracker-chart"></buddj-spending-tracker-chart>';
+    sheet.page('pie').innerHTML = '<buddj-spending-tracker-pie id="spending-tracker-pie"></buddj-spending-tracker-pie>';
+    sheet.addEventListener('swipe-sheet-change', (e) => {
+      this._openChart = (e as CustomEvent<SwipeSheetEventDetail>).detail.id as SpendingTrackerChartKind;
+      this._syncFromStore();
+    });
+    sheet.addEventListener('swipe-sheet-close', (e) => {
+      this._openChart = null;
+      this._syncFromStore();
+      const { id } = (e as CustomEvent<SwipeSheetEventDetail>).detail;
+      this._main?.querySelector<HTMLElement>(`.spending-tracker-chart-toggle[aria-controls="spending-tracker-${id === 'pie' ? 'pie' : 'chart'}"]`)?.focus();
+    });
+    // Choisir une période sur la courbe ferme la feuille et en affiche le détail.
+    sheet.addEventListener('spending-bucket-select', (e) => {
+      sheet.close();
+      this._onBucketSelect(e);
+    });
+    return sheet;
+  })();
 
   init({ spendingTrackerStore }: { spendingTrackerStore: SpendingTrackerStore }): void {
     this._store = spendingTrackerStore;
   }
 
   connectedCallback(): void {
+    // La feuille vit dans <body> : l'écran crée un contexte d'empilement sous l'en-tête global.
+    document.body.appendChild(this._chartSheet);
     if (this.querySelector('#spending-tracker')) return;
     const store = this._store;
     if (!store) return;
@@ -168,7 +206,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
             <button type="button" class="btn spending-tracker-retry">Réessayer</button>
           </div>
           <buddj-spending-dashboard hidden></buddj-spending-dashboard>
-          <buddj-spending-tracker-chart id="spending-tracker-chart" hidden></buddj-spending-tracker-chart>
           <ol class="spending-tracker-bars"></ol>
           <div class="spending-tracker-empty" hidden>
             <p class="spending-tracker-empty-title">Aucune dépense sur cette période.</p>
@@ -199,6 +236,8 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this._chartSheet.close();
+    this._chartSheet.remove();
     const store = this._store;
     const main = this._main;
     if (main) {
@@ -271,9 +310,12 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
       this._retry();
       return;
     }
-    if ((e.target as Element).closest('.spending-tracker-chart-toggle')) {
-      this._isChartOpen = !this._isChartOpen;
+    const chartToggle = (e.target as Element).closest('.spending-tracker-chart-toggle');
+    if (chartToggle) {
+      const kind: SpendingTrackerChartKind = chartToggle.classList.contains('spending-tracker-pie-toggle') ? 'pie' : 'curve';
+      this._openChart = kind;
       this._syncFromStore();
+      this._chartSheet.open(kind);
       return;
     }
     const button = (e.target as Element).closest('.spending-tracker-bar');
@@ -367,9 +409,29 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     if (!view) return;
     dashboard.render({
       dashboard: spendingDashboard({ view, today: todayIso() }),
-      isChartOpen: this._isChartOpen,
+      openChart: this._openChart,
       hasChart: view.total > 0,
     });
+  }
+
+  /** Séries des graphiques : par catégorie ou par type selon l'encart observé. */
+  private _stack({
+    main,
+    view,
+    kinds,
+    hourlyDay,
+  }: {
+    main: HTMLElement;
+    view: SpendingTrackerView;
+    kinds: Record<TrackedSpendingKind, boolean>;
+    hourlyDay: SpendingBucket | undefined;
+  }): ChartStack {
+    return this._dashboard(main).observed === 'categories'
+      ? categoryStack({ view, hourly: hourlyDay !== undefined })
+      : kindStack({
+          points: hourlyDay ? hourlyCumulativeSpending({ bucket: hourlyDay }) : cumulativeSpending({ view }),
+          kinds,
+        });
   }
 
   private _renderChart({
@@ -383,28 +445,28 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     kinds: Record<TrackedSpendingKind, boolean>;
     isRefreshing: boolean;
   }): void {
-    const chart = main.querySelector(BUDDJ_CHART_TAG) as BuddjSpendingTrackerChart;
-    const dashboard = this._dashboard(main);
-    const hasCurve = view !== null && view.total > 0;
-    const isShown = hasCurve && this._isChartOpen;
-    chart.hidden = !isShown;
-    if (!isShown || !view) return;
+    if (!this._openChart) return;
+    if (!view || view.total === 0) {
+      // Plus rien à tracer (période sans dépense, erreur) : la feuille se ferme.
+      this._chartSheet.close();
+      return;
+    }
+    const chart = this._chartSheet.page('curve').querySelector('buddj-spending-tracker-chart') as BuddjSpendingTrackerChart;
+    const pie = this._chartSheet.page('pie').querySelector('buddj-spending-tracker-pie') as BuddjSpendingTrackerPie;
     // Une plage d'un seul jour se lit heure par heure.
     const [singleDay] = view.granularity === 'day' && view.buckets.length === 1 ? view.buckets : [];
-    const byCategory = dashboard.observed === 'categories';
-    const stack = byCategory
-      ? categoryStack({ view, hourly: singleDay !== undefined })
-      : kindStack({
-          points: singleDay ? hourlyCumulativeSpending({ bucket: singleDay }) : cumulativeSpending({ view }),
-          kinds,
-        });
+    const byCategory = this._dashboard(main).observed === 'categories';
+    const stack = this._stack({ main, view, kinds, hourlyDay: singleDay });
+    // Une seule série n'a pas de légende : le titre la nomme.
+    const single = stack.series.length === 1 ? stack.series[0]!.label : null;
+    // Les deux graphiques sont rendus : on passe de l'un à l'autre en balayant.
+    pie.render({
+      title: byCategory ? 'Répartition par catégorie' : 'Répartition dépenses / sorties',
+      slices: pieSlices(stack),
+      isRefreshing,
+    });
     chart.render({
-      // Une seule série n'a pas de légende : le titre la nomme.
-      title: byCategory
-        ? stack.series.length === 1
-          ? `Cumul : ${stack.series[0]!.label}`
-          : 'Cumul par catégorie'
-        : 'Cumul sur la période',
+      title: byCategory ? (single ? `Cumul : ${single}` : 'Cumul par catégorie') : 'Cumul sur la période',
       ...stack,
       step: singleDay ? 'hour' : view.granularity,
       selectedKey: this._selectedStart === PERIOD_KEY ? null : this._selectedStart,

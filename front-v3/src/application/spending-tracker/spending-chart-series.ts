@@ -37,7 +37,7 @@ export const MAX_CATEGORY_SERIES = 5;
 /** Palette catégorielle validée sur la surface sombre (ordre fixe, jamais cyclé). */
 export const CATEGORY_SERIES_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181'];
 const OTHER_CATEGORIES_COLOR = '#7d8090';
-const OTHER_CATEGORIES_KEY = 'other';
+export const OTHER_CATEGORIES_KEY = 'other';
 
 function roundCents(value: number): number {
   return Math.round(value * 100) / 100;
