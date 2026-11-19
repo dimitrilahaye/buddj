@@ -4,6 +4,8 @@
  *
  * Interaction : le réticule suit le pointeur (ou se pose au clic / au toucher) et s'aligne sur
  * la période la plus proche, l'infobulle donne les cumuls ; flèches gauche/droite au clavier.
+ * Chaque entrée de la légende masque ou réaffiche sa courbe : la pile et les cumuls ne portent
+ * alors que sur les courbes affichées (il en reste toujours au moins une).
  */
 import { niceAxisTicks, type CumulativeStep } from '../../application/spending-tracker/spending-tracker-cumulative.js';
 import type { ChartSeries, StackPoint } from '../../application/spending-tracker/spending-chart-series.js';
@@ -57,6 +59,8 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
   private _xs: number[] = [];
   private _resizeObserver?: ResizeObserver;
   private _lastWidth = 0;
+  /** Séries masquées via la légende, par clé. */
+  private readonly _hidden = new Set<string>();
 
   connectedCallback(): void {
     if (!this.querySelector('.spending-chart')) {
@@ -79,6 +83,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     plot.addEventListener('click', this._onClick);
     plot.addEventListener('keydown', this._onKeyDown);
     plot.addEventListener('blur', this._onPointerLeave);
+    this.querySelector('.spending-chart-legend')?.addEventListener('click', this._onLegendClick);
     if (typeof ResizeObserver !== 'undefined') {
       this._resizeObserver = new ResizeObserver(() => {
         if (this._plot().clientWidth !== this._lastWidth) this._draw();
@@ -96,11 +101,16 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     plot?.removeEventListener('keydown', this._onKeyDown);
     plot?.removeEventListener('blur', this._onPointerLeave);
     this._resizeObserver?.disconnect();
+    this.querySelector('.spending-chart-legend')?.removeEventListener('click', this._onLegendClick);
   }
 
   render(data: SpendingTrackerChartData): void {
     this._data = data;
-    this._points = data.points;
+    // Une série disparue n'est plus masquée ; si toutes le sont, on les réaffiche.
+    const keys = new Set(data.series.map((s) => s.key));
+    [...this._hidden].filter((key) => !keys.has(key)).forEach((key) => this._hidden.delete(key));
+    if (data.series.every((s) => this._hidden.has(s.key))) this._hidden.clear();
+    this._points = this._visiblePoints();
     if (this._activeIndex !== null && this._activeIndex >= this._points.length) this._activeIndex = null;
     this._draw();
   }
@@ -109,8 +119,24 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     return this.querySelector('.spending-chart-plot') as HTMLElement;
   }
 
+  /** Séries affichées, de bas en haut de la pile. */
   private _series(): ChartSeries[] {
-    return this._data?.series ?? [];
+    return (this._data?.series ?? []).filter((s) => !this._hidden.has(s.key));
+  }
+
+  /** Points recalculés sur les seules séries affichées (cumul et montant de la période). */
+  private _visiblePoints(): StackPoint[] {
+    const data = this._data;
+    if (!data) return [];
+    if (this._hidden.size === 0) return data.points;
+    const keys = this._series().map((s) => s.key);
+    const sum = (p: StackPoint | undefined): number => keys.reduce((total, key) => total + (p?.values[key] ?? 0), 0);
+    const round = (value: number): number => Math.round(value * 100) / 100;
+    return data.points.map((p, i) => ({
+      ...p,
+      total: round(sum(p)),
+      bucketTotal: round(sum(p) - sum(data.points[i - 1])),
+    }));
   }
 
   private _draw(): void {
@@ -126,7 +152,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
 
     plot.classList.toggle('spending-chart-plot--refreshing', data.isRefreshing);
     (this.querySelector('.spending-chart-title') as HTMLElement).textContent = data.title;
-    this._renderLegend(series);
+    this._renderLegend(this._data?.series ?? []);
 
     const last = points.at(-1);
     const total = last?.total ?? 0;
@@ -233,9 +259,17 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     legend.replaceChildren();
     // Une seule série : le titre suffit, pas de légende.
     if (series.length < 2) return;
-    for (const { color, label } of [...series].reverse()) {
-      const item = document.createElement('span');
+    const visibleCount = series.filter((s) => !this._hidden.has(s.key)).length;
+    for (const { key, color, label } of [...series].reverse()) {
+      const shown = !this._hidden.has(key);
+      const item = document.createElement('button');
+      item.type = 'button';
       item.className = 'spending-chart-legend-item';
+      item.dataset.series = key;
+      item.setAttribute('aria-pressed', String(shown));
+      item.setAttribute('aria-label', `Courbe ${label}`);
+      // La dernière courbe affichée ne se masque pas.
+      item.disabled = shown && visibleCount === 1;
       const swatch = document.createElement('span');
       swatch.className = 'spending-chart-swatch';
       swatch.style.background = color;
@@ -306,6 +340,17 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     this._activeIndex = index;
     this._draw();
   }
+
+  /** Masque ou réaffiche la courbe d'une entrée de la légende. */
+  private _onLegendClick = (e: Event): void => {
+    const item = (e.target as Element).closest<HTMLButtonElement>('.spending-chart-legend-item');
+    const key = item?.dataset.series;
+    if (!item || !key || item.disabled) return;
+    if (this._hidden.has(key)) this._hidden.delete(key);
+    else this._hidden.add(key);
+    this._points = this._visiblePoints();
+    this._draw();
+  };
 
   private _onPointerMove = (e: PointerEvent): void => {
     this._setActive(this._nearestIndex(e.clientX));

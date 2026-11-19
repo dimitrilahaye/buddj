@@ -5059,6 +5059,34 @@ buddj-spending-tracker-chart[hidden] {
   white-space: nowrap;
   align-items: center;
   gap: 0.35rem;
+  padding: 0.15rem 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+/* Courbe masquée : entrée estompée, pastille creuse */
+.spending-chart-legend-item[aria-pressed='false'] {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.spending-chart-legend-item[aria-pressed='false'] .spending-chart-swatch {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.spending-chart-legend-item:disabled {
+  cursor: default;
+}
+
+.spending-chart-legend-item:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .spending-chart-swatch {
