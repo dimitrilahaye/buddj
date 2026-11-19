@@ -382,6 +382,26 @@ describe('écran suivi des dépenses', () => {
     expect(screen.queryByRole('list', { name: /^Dépenses : / })).toBeNull();
   });
 
+  it('masque ou réaffiche une courbe via sa légende, sans jamais tout masquer', async () => {
+    startOn('/spending-tracker');
+    await waitFor(() => expect(totalText()).toContain('872,63 €'));
+    openChart();
+    const legend = (name: string): HTMLElement => within(curveChart()).getByRole('button', { name: `Courbe ${name}` });
+    expect(legend('Sorties').getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(legend('Sorties'));
+
+    expect(legend('Sorties').getAttribute('aria-pressed')).toBe('false');
+    expect(within(chartsPage()).getByRole('group', { name: /^Cumul de 58,60 €/ })).toBeTruthy();
+    expect((legend('Dépenses') as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(legend('Sorties'));
+
+    expect(legend('Sorties').getAttribute('aria-pressed')).toBe('true');
+    expect((legend('Dépenses') as HTMLButtonElement).disabled).toBe(false);
+    expect(within(chartsPage()).getByRole('group', { name: /^Cumul de 872,63 €/ })).toBeTruthy();
+  });
+
   it('suit le filtre par type : une seule série, sans légende', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
