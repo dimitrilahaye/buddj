@@ -495,13 +495,14 @@ describe('écran suivi des dépenses', () => {
       fireEvent.click(within(dashboard()).getByRole('button', { name: 'Ouvrir en grand : Total' }));
 
       const sheet = screen.getByRole('dialog', { name: 'Total' });
-      const rows = within(sheet)
+      const page = sheet.querySelector('.swipe-sheet-page[data-page="total"]') as HTMLElement;
+      const rows = within(page)
         .getAllByRole('row')
         .map((row) => within(row).queryAllByRole('cell').map((c) => c.textContent));
       expect(rows).toContainEqual(['839,00 €', '39,00 €', '800,00 €']);
       expect(rows).toContainEqual(['64,54 €', '3,00 €', '61,54 €']);
-      expect(within(sheet).getByRole('rowheader', { name: 'Moyenne par semaine' })).toBeTruthy();
-      expect(within(sheet).getByText('Moyennes sur 13 jours écoulés.')).toBeTruthy();
+      expect(within(page).getByRole('rowheader', { name: 'Moyenne par semaine' })).toBeTruthy();
+      expect(within(page).getByText('Moyennes sur 13 jours écoulés.')).toBeTruthy();
 
       fireEvent.click(within(sheet).getByRole('button', { name: 'Fermer' }));
       expect(screen.queryByRole('dialog', { name: 'Total' })).toBeNull();
@@ -532,6 +533,32 @@ describe('écran suivi des dépenses', () => {
 
       fireEvent.keyDown(sheet, { key: 'Escape' });
       expect(screen.queryByRole('dialog', { name: 'Par catégorie' })).toBeNull();
+    });
+
+    it('signale par des points qu’on passe d’un encart à l’autre, y compris ouvert en grand', async () => {
+      await startCategorized();
+      const activeDots = (root: Element): string[] =>
+        [...root.querySelectorAll<HTMLElement>('.pager-dot--active')].map((d) => d.dataset.dot!);
+
+      expect(dashboard().querySelectorAll('.pager-dot')).toHaveLength(2);
+      expect(activeDots(dashboard())).toEqual(['total']);
+      fireEvent.click(dashboard().querySelector('.pager-dot[data-dot="categories"]')!);
+      expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
+      expect(activeDots(dashboard())).toEqual(['categories']);
+
+      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Ouvrir en grand : Total' }));
+      const sheet = screen.getByRole('dialog', { name: 'Total' });
+      expect(sheet.querySelectorAll('.pager-dots')).toHaveLength(2);
+      expect(activeDots(sheet)).toEqual(['total', 'total']);
+
+      fireEvent.click(sheet.querySelector('.swipe-sheet-dots--bottom .pager-dot[data-dot="categories"]')!);
+      expect(screen.getByRole('dialog', { name: 'Par catégorie' })).toBe(sheet);
+      expect(activeDots(sheet)).toEqual(['categories', 'categories']);
+      expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
+
+      fireEvent.keyDown(within(sheet).getByRole('button', { name: 'Fermer' }), { key: 'ArrowLeft' });
+      expect(screen.getByRole('dialog', { name: 'Total' })).toBe(sheet);
+      expect(within(dashboard()).getByRole('tab', { name: 'Total' }).getAttribute('aria-selected')).toBe('true');
     });
 
     it('la courbe suit l’encart observé : par type pour le total, par catégorie sinon', async () => {
