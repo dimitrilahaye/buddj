@@ -359,11 +359,12 @@ describe('écran suivi des dépenses', () => {
     expect(within(chartsPage()).getByRole('group', { name: /^Cumul de 872,63 € au .*13 nov\./ })).toBeTruthy();
   });
 
-  it('parcourt la courbe au clavier et ouvre le détail de la période avec Entrée', async () => {
+  it('parcourt la courbe au clavier, et un clic y pose le réticule sans fermer la feuille', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
     openChart();
     const plot = within(chartsPage()).getByRole('group', { name: /^Cumul de/ });
+    expect(plot.getAttribute('aria-label')).not.toContain('Entrée');
 
     fireEvent.keyDown(plot, { key: 'ArrowLeft' });
     fireEvent.keyDown(plot, { key: 'ArrowLeft' });
@@ -374,10 +375,11 @@ describe('écran suivi des dépenses', () => {
     expect(readout.textContent).toContain('156,72 € ce jour');
 
     fireEvent.keyDown(plot, { key: 'Enter' });
+    fireEvent.click(plot, { clientX: 10 });
 
-    expect(openChartSheet()).toBeNull();
-    const detail = await screen.findByRole('list', { name: /^Dépenses : .*12 nov\./ });
-    expect(within(detail).getAllByRole('listitem')).toHaveLength(2);
+    expect(openChartSheet()).toBeTruthy();
+    expect(screen.getByRole('status', { name: 'Valeurs de la période survolée' }).textContent).toContain('cumulés');
+    expect(screen.queryByRole('list', { name: /^Dépenses : / })).toBeNull();
   });
 
   it('suit le filtre par type : une seule série, sans légende', async () => {

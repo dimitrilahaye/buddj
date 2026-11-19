@@ -2,17 +2,13 @@
  * Courbe cumulée du suivi des dépenses : aires empilées (par type ou par catégorie, selon
  * l'encart observé), le haut de la pile est le total cumulé. SVG fait main, sans dépendance.
  *
- * Interaction : le réticule suit le pointeur et s'aligne sur la période la plus proche,
- * l'infobulle donne les cumuls ; flèches gauche/droite au clavier ; clic ou Entrée
- * émet `spending-bucket-select` ({ start }) pour afficher le détail de la période
- * (sauf en pas horaire, où le détail de la journée est déjà affiché).
+ * Interaction : le réticule suit le pointeur (ou se pose au clic / au toucher) et s'aligne sur
+ * la période la plus proche, l'infobulle donne les cumuls ; flèches gauche/droite au clavier.
  */
 import { niceAxisTicks, type CumulativeStep } from '../../application/spending-tracker/spending-tracker-cumulative.js';
 import type { ChartSeries, StackPoint } from '../../application/spending-tracker/spending-chart-series.js';
 import { formatEuros } from '../../shared/goal.js';
 import { formatBucketAxisLabel, formatBucketLabel } from '../../shared/spending-bucket-label.js';
-
-export type SpendingBucketSelect = { start: string };
 
 export type SpendingTrackerChartData = {
   title: string;
@@ -127,7 +123,6 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     const points = this._points;
     const series = this._series();
     const { step } = data;
-    const selectable = step !== 'hour';
 
     plot.classList.toggle('spending-chart-plot--refreshing', data.isRefreshing);
     (this.querySelector('.spending-chart-title') as HTMLElement).textContent = data.title;
@@ -138,7 +133,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     plot.setAttribute(
       'aria-label',
       last
-        ? `Cumul de ${formatEuros(total)} ${step === 'hour' ? `à ${last.key} h` : `au ${pointLabel({ key: last.key, step })}`}. Flèches gauche et droite pour parcourir${selectable ? ', Entrée pour le détail' : ''}.`
+        ? `Cumul de ${formatEuros(total)} ${step === 'hour' ? `à ${last.key} h` : `au ${pointLabel({ key: last.key, step })}`}. Flèches gauche et droite pour parcourir.`
         : 'Aucune donnée'
     );
 
@@ -312,15 +307,6 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     this._draw();
   }
 
-  private _select(index: number | null): void {
-    const p = index === null ? undefined : this._points[index];
-    // En pas horaire, le détail de la journée est déjà affiché.
-    if (!p || this._data?.step === 'hour') return;
-    this.dispatchEvent(
-      new CustomEvent<SpendingBucketSelect>('spending-bucket-select', { detail: { start: p.key }, bubbles: true })
-    );
-  }
-
   private _onPointerMove = (e: PointerEvent): void => {
     this._setActive(this._nearestIndex(e.clientX));
   };
@@ -329,10 +315,9 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     this._setActive(null);
   };
 
+  /** Au toucher, pas de survol : le clic pose le réticule. */
   private _onClick = (e: MouseEvent): void => {
-    const index = this._nearestIndex(e.clientX);
-    this._setActive(index);
-    this._select(index);
+    this._setActive(this._nearestIndex(e.clientX));
   };
 
   private _onKeyDown = (e: KeyboardEvent): void => {
@@ -345,9 +330,6 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       this._setActive(Math.min(count - 1, this._activeIndex === null ? count - 1 : current + 1));
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      this._select(current);
     } else if (e.key === 'Escape') {
       this._setActive(null);
     }
