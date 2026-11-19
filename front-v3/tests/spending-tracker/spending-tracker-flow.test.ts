@@ -46,22 +46,27 @@ function totalText(): string {
 }
 
 function openChart(): void {
-  fireEvent.click(screen.getByRole('button', { name: 'Courbe cumulée' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Graphiques' }));
 }
 
-/** Courbe cumulée, dans la feuille des graphiques. */
-function curveChart(): HTMLElement {
-  return document.querySelector('#spending-tracker-chart figure') as HTMLElement;
+/** Page de la feuille des graphiques consacrée à un encart. */
+function chartsPage(panel: 'total' | 'categories' = 'total'): HTMLElement {
+  return document.querySelector(`.spending-charts-sheet .swipe-sheet-page[data-page="${panel}"]`) as HTMLElement;
 }
 
-/** Répartition en anneau, dans la feuille des graphiques. */
+/** Courbe cumulée d'une page de la feuille des graphiques. */
+function curveChart(panel: 'total' | 'categories' = 'total'): HTMLElement {
+  return chartsPage(panel).querySelector('buddj-spending-tracker-chart figure') as HTMLElement;
+}
+
+/** Répartition en anneau d'une page de la feuille des graphiques. */
+function pieChart(panel: 'total' | 'categories' = 'total'): HTMLElement {
+  return chartsPage(panel).querySelector('buddj-spending-tracker-pie figure') as HTMLElement;
+}
+
 /** Feuille des graphiques ouverte, quelle que soit la page affichée. */
 function openChartSheet(): HTMLElement | null {
-  return screen.queryByRole('dialog', { name: /^(Courbe cumulée|Répartition)$/ });
-}
-
-function pieChart(): HTMLElement {
-  return document.querySelector('#spending-tracker-pie figure') as HTMLElement;
+  return screen.queryByRole('dialog', { name: /^Graphiques / });
 }
 
 function openRangePicker(): HTMLElement {
@@ -320,37 +325,26 @@ describe('écran suivi des dépenses', () => {
     expect(screen.queryByRole('list', { name: /^Dépenses : .*12 nov\./ })).toBeNull();
   });
 
-  it('ouvre les graphiques en grand via les icônes du tableau de bord, et passe de l’un à l’autre', async () => {
+  it('ouvre les graphiques en grand via l’icône du tableau de bord, la courbe au-dessus de la répartition', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
 
     const dashboard = screen.getByRole('region', { name: 'Tableau de bord' });
-    const curveToggle = (): HTMLElement => within(dashboard).getByRole('button', { name: 'Courbe cumulée' });
-    const pieToggle = (): HTMLElement => within(dashboard).getByRole('button', { name: 'Répartition' });
-    expect(curveToggle().getAttribute('aria-expanded')).toBe('false');
+    const toggle = (): HTMLElement => within(dashboard).getByRole('button', { name: 'Graphiques' });
+    expect(toggle().getAttribute('aria-expanded')).toBe('false');
     expect(openChartSheet()).toBeNull();
 
     openChart();
-    const sheet = screen.getByRole('dialog', { name: 'Courbe cumulée' });
-    expect(curveToggle().getAttribute('aria-expanded')).toBe('true');
+    const sheet = screen.getByRole('dialog', { name: 'Graphiques du total' });
+    expect(toggle().getAttribute('aria-expanded')).toBe('true');
     expect(within(curveChart()).getByText('Cumul sur la période')).toBeTruthy();
-    const activeDots = (): string[] =>
-      [...sheet.querySelectorAll<HTMLElement>('.pager-dot--active')].map((d) => d.dataset.dot!);
-    expect(activeDots()).toEqual(['curve', 'curve']);
-
-    fireEvent.click(sheet.querySelector('.swipe-sheet-dots--bottom .pager-dot[data-dot="pie"]')!);
-    expect(screen.getByRole('dialog', { name: 'Répartition' })).toBe(sheet);
-    expect(activeDots()).toEqual(['pie', 'pie']);
-    expect(pieToggle().getAttribute('aria-expanded')).toBe('true');
-    expect(curveToggle().getAttribute('aria-expanded')).toBe('false');
-
-    fireEvent.keyDown(within(sheet).getByRole('button', { name: 'Fermer' }), { key: 'ArrowLeft' });
-    expect(screen.getByRole('dialog', { name: 'Courbe cumulée' })).toBe(sheet);
+    expect(within(pieChart()).getByText('Répartition dépenses / sorties')).toBeTruthy();
+    expect(curveChart().compareDocumentPosition(pieChart()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     fireEvent.click(within(sheet).getByRole('button', { name: 'Fermer' }));
     expect(openChartSheet()).toBeNull();
-    expect(curveToggle().getAttribute('aria-expanded')).toBe('false');
-    expect(document.activeElement).toBe(curveToggle());
+    expect(toggle().getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(toggle());
   });
 
   it('trace la courbe cumulée avec une légende par type', async () => {
@@ -362,14 +356,14 @@ describe('écran suivi des dépenses', () => {
     expect(within(chart).getByText('Cumul sur la période')).toBeTruthy();
     expect(within(chart).getByText('Dépenses')).toBeTruthy();
     expect(within(chart).getByText('Sorties')).toBeTruthy();
-    expect(screen.getByRole('group', { name: /^Cumul de 872,63 € au .*13 nov\./ })).toBeTruthy();
+    expect(within(chartsPage()).getByRole('group', { name: /^Cumul de 872,63 € au .*13 nov\./ })).toBeTruthy();
   });
 
   it('parcourt la courbe au clavier et ouvre le détail de la période avec Entrée', async () => {
     startOn('/spending-tracker');
     await waitFor(() => expect(totalText()).toContain('872,63 €'));
     openChart();
-    const plot = screen.getByRole('group', { name: /^Cumul de/ });
+    const plot = within(chartsPage()).getByRole('group', { name: /^Cumul de/ });
 
     fireEvent.keyDown(plot, { key: 'ArrowLeft' });
     fireEvent.keyDown(plot, { key: 'ArrowLeft' });
@@ -393,7 +387,7 @@ describe('écran suivi des dépenses', () => {
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Sorties' }));
 
-    await waitFor(() => expect(screen.getByRole('group', { name: /^Cumul de 58,60 €/ })).toBeTruthy());
+    await waitFor(() => expect(within(chartsPage()).getByRole('group', { name: /^Cumul de 58,60 €/ })).toBeTruthy());
     const chart = curveChart();
     expect(within(chart).queryByText('Sorties')).toBeNull();
     expect(within(chart).queryByText('Dépenses')).toBeNull();
@@ -407,7 +401,7 @@ describe('écran suivi des dépenses', () => {
 
     await waitFor(() => expect(totalText()).toContain('16,50 €'));
     openChart();
-    const plot = screen.getByRole('group', { name: /^Cumul de 16,50 € à 18 h\./ });
+    const plot = within(chartsPage()).getByRole('group', { name: /^Cumul de 16,50 € à 18 h\./ });
     expect(plot.getAttribute('aria-label')).not.toContain('Entrée');
     const bars = screen.getByRole('list', { name: 'Dépenses par jour' });
     // Une seule ligne (sans synthèse), le récap du jour s'ouvre dedans.
@@ -612,58 +606,63 @@ describe('écran suivi des dépenses', () => {
       expect(within(dashboard()).getByRole('tab', { name: 'Total' }).getAttribute('aria-selected')).toBe('true');
     });
 
-    it('la courbe suit l’encart observé : par type pour le total, par catégorie sinon', async () => {
+    it('présente les graphiques du total par type et ceux par catégorie, et passe des uns aux autres avec l’encart observé', async () => {
       await startCategorized();
       openChart();
-      const chart = curveChart;
-      expect(within(chart()).getByText('Cumul sur la période')).toBeTruthy();
-      expect(within(chart()).getByText('Sorties')).toBeTruthy();
+      const sheet = screen.getByRole('dialog', { name: 'Graphiques du total' });
+      const parts = (panel: 'total' | 'categories'): Array<string | null> =>
+        within(within(pieChart(panel)).getByRole('list', { name: 'Parts' }))
+          .getAllByRole('listitem')
+          .map((li) => li.getAttribute('aria-label')?.replace(/\s/g, ' ') ?? null);
 
-      fireEvent.click(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }));
+      expect(within(curveChart('total')).getByText('Cumul sur la période')).toBeTruthy();
+      expect(within(curveChart('total')).getByText('Sorties')).toBeTruthy();
+      expect(parts('total')).toEqual(['Sorties : 800,00 €, 95,4 %', 'Dépenses : 39,00 €, 4,6 %']);
 
-      expect(within(chart()).getByText('Cumul par catégorie')).toBeTruthy();
-      const legend = chart().querySelector('.spending-chart-legend') as HTMLElement;
+      expect(within(curveChart('categories')).getByText('Cumul par catégorie')).toBeTruthy();
+      const legend = curveChart('categories').querySelector('.spending-chart-legend') as HTMLElement;
       expect([...legend.children].map((item) => item.textContent)).toEqual([
         'Divers',
         'Alimentation',
         'Énergie',
         'Logement',
       ]);
-      expect(screen.getByRole('group', { name: /^Cumul de 839,00 €/ })).toBeTruthy();
-
-      fireEvent.click(within(dashboard()).getByRole('tab', { name: 'Total' }));
-      expect(within(chart()).getByText('Cumul sur la période')).toBeTruthy();
-    });
-
-    it('ouvre la répartition en anneau en grand, par type puis par catégorie', async () => {
-      await startCategorized();
-      const parts = (): Array<string | null> =>
-        within(screen.getByRole('list', { name: 'Parts' }))
-          .getAllByRole('listitem')
-          .map((li) => li.getAttribute('aria-label')?.replace(/\s/g, ' ') ?? null);
-
-      fireEvent.click(within(dashboard()).getByRole('button', { name: 'Répartition' }));
-
-      const sheet = screen.getByRole('dialog', { name: 'Répartition' });
-      expect(within(sheet).getByRole('figure', { name: 'Répartition dépenses / sorties' })).toBeTruthy();
-      expect(parts()).toEqual(['Sorties : 800,00 €, 95,4 %', 'Dépenses : 39,00 €, 4,6 %']);
-
-      fireEvent.click(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }));
-
-      expect(within(sheet).getByRole('figure', { name: 'Répartition par catégorie' })).toBeTruthy();
-      expect(parts()).toEqual([
+      expect(within(chartsPage('categories')).getByRole('group', { name: /^Cumul de 839,00 €/ })).toBeTruthy();
+      expect(within(pieChart('categories')).getByText('Répartition par catégorie')).toBeTruthy();
+      expect(parts('categories')).toEqual([
         'Logement : 700,00 €, 83,4 %',
         'Énergie : 100,00 €, 11,9 %',
         'Alimentation : 26,00 €, 3,1 %',
         'Divers : 13,00 €, 1,5 %',
       ]);
-      const center = pieChart().querySelector('.spending-pie-center') as HTMLElement;
-      expect(center.textContent).toContain('839,00 €');
-      fireEvent.focusIn(within(screen.getByRole('list', { name: 'Parts' })).getAllByRole('listitem')[1]!);
-      expect(center.textContent?.replace(/\s+/g, ' ').trim()).toBe('100,00 € Énergie · 11,9 %');
+
+      const activeDots = (): string[] =>
+        [...sheet.querySelectorAll<HTMLElement>('.pager-dot--active')].map((d) => d.dataset.dot!);
+      expect(activeDots()).toEqual(['total', 'total']);
+      fireEvent.click(sheet.querySelector('.swipe-sheet-dots--bottom .pager-dot[data-dot="categories"]')!);
+      expect(screen.getByRole('dialog', { name: 'Graphiques par catégorie' })).toBe(sheet);
+      expect(activeDots()).toEqual(['categories', 'categories']);
+      expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
+
+      fireEvent.keyDown(within(sheet).getByRole('button', { name: 'Fermer' }), { key: 'ArrowLeft' });
+      expect(screen.getByRole('dialog', { name: 'Graphiques du total' })).toBe(sheet);
+      expect(within(dashboard()).getByRole('tab', { name: 'Total' }).getAttribute('aria-selected')).toBe('true');
 
       fireEvent.keyDown(sheet, { key: 'Escape' });
       expect(openChartSheet()).toBeNull();
+    });
+
+    it('ouvre les graphiques sur l’encart observé, et l’anneau donne au centre la part ciblée', async () => {
+      await startCategorized();
+      fireEvent.click(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }));
+
+      openChart();
+
+      expect(screen.getByRole('dialog', { name: 'Graphiques par catégorie' })).toBeTruthy();
+      const center = pieChart('categories').querySelector('.spending-pie-center') as HTMLElement;
+      expect(center.textContent).toContain('839,00 €');
+      fireEvent.focusIn(within(pieChart('categories')).getAllByRole('listitem')[1]!);
+      expect(center.textContent?.replace(/\s+/g, ' ').trim()).toBe('100,00 € Énergie · 11,9 %');
     });
   });
 });

@@ -20,6 +20,9 @@ const OUTER = 88;
 const INNER = 58;
 const CENTER = SIZE / 2;
 
+/** Plusieurs anneaux peuvent coexister : chacun son identifiant de titre. */
+let nextPieId = 0;
+
 const percentFormatter = new Intl.NumberFormat('fr-FR', { style: 'percent', maximumFractionDigits: 1 });
 
 function point(radius: number, angle: number): string {
@@ -48,9 +51,10 @@ export class BuddjSpendingTrackerPie extends HTMLElement {
 
   connectedCallback(): void {
     if (!this.querySelector('.spending-pie')) {
+      const titleId = `spending-pie-title-${++nextPieId}`;
       this.innerHTML = `
-        <figure class="spending-pie" aria-labelledby="spending-pie-title">
-          <figcaption class="spending-pie-title" id="spending-pie-title"></figcaption>
+        <figure class="spending-pie" aria-labelledby="${titleId}">
+          <figcaption class="spending-pie-title" id="${titleId}"></figcaption>
           <div class="spending-pie-body">
             <div class="spending-pie-plot">
               <svg class="spending-pie-svg" viewBox="0 0 ${SIZE} ${SIZE}" aria-hidden="true" focusable="false"></svg>

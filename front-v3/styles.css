@@ -4781,7 +4781,7 @@ buddj-swipe-sheet[hidden] {
   outline-offset: 1px;
 }
 
-/* Graphiques ouverts en grand : la feuille leur sert de carte */
+/* Graphiques ouverts en grand, courbe puis répartition : la feuille leur sert de carte */
 .spending-charts-sheet .spending-chart,
 .spending-charts-sheet .spending-pie {
   padding-left: 0;
@@ -4793,7 +4793,7 @@ buddj-swipe-sheet[hidden] {
   height: 14rem;
 }
 
-/* Icônes qui déplient / replient la courbe cumulée ou la répartition */
+/* Icône qui ouvre les graphiques en grand */
 .spending-tracker-chart-toggle {
   display: inline-flex;
   align-items: center;
