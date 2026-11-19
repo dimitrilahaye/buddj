@@ -501,33 +501,43 @@ describe('écran suivi des dépenses', () => {
         .map((row) => within(row).queryAllByRole('cell').map((c) => c.textContent));
       expect(rows).toContainEqual(['839,00 €', '39,00 €', '800,00 €']);
       expect(rows).toContainEqual(['64,54 €', '3,00 €', '61,54 €']);
-      expect(within(page).getByRole('rowheader', { name: 'Moyenne par semaine' })).toBeTruthy();
+      expect(within(page).getByRole('rowheader', { name: 'par semaine' })).toBeTruthy();
+      expect(within(page).getByRole('rowheader', { name: 'Moyennes' })).toBeTruthy();
       expect(within(page).getByText('Moyennes sur 13 jours écoulés.')).toBeTruthy();
 
       fireEvent.click(within(sheet).getByRole('button', { name: 'Fermer' }));
       expect(screen.queryByRole('dialog', { name: 'Total' })).toBeNull();
     });
 
-    it('ouvre l’encart Par catégorie en grand avec toutes les catégories, et se ferme avec Échap', async () => {
+    it('ouvre l’encart Par catégorie en grand avec un tableau par catégorie, et se ferme avec Échap', async () => {
       await startCategorized();
 
       fireEvent.click(within(dashboard()).getByRole('button', { name: 'Ouvrir en grand : Par catégorie' }));
 
       const sheet = screen.getByRole('dialog', { name: 'Par catégorie' });
-      const food = within(sheet).getByRole('region', { name: 'Alimentation' });
-      expect(food.textContent).toContain('26,00 €');
-      expect(within(food).getByLabelText(/^26,00 €, 3,1\s% du total$/).textContent).toMatch(/26,00 €\s*\(3,1\s%\)/);
-      const statsOf = (name: string): Array<[string | null, string | null]> =>
-        [...food.querySelectorAll(`dl[aria-label="${name}"] > div`)].map((div) => [div.querySelector('dt')!.textContent, div.querySelector('dd')!.textContent]);
-      expect(statsOf('Répartition')).toEqual([
-        ['Dépenses', '26,00 €'],
-        ['Sorties', '0,00 €'],
+      const tables = sheet.querySelectorAll('.swipe-sheet-page[data-page="categories"] table');
+      expect([...tables].map((t) => t.querySelector('caption')?.textContent?.trim())).toEqual([
+        'Logement',
+        'Énergie',
+        'Alimentation',
+        'Divers',
       ]);
-      expect(within(food).getByText('Moyennes :')).toBeTruthy();
-      expect(statsOf('Moyennes')).toEqual([
-        ['Par jour', '2,00 €'],
-        ['Par semaine', '14,00 €'],
-        ['Par mois', '60,88 €'],
+      const food = within(sheet).getByRole('table', { name: 'Alimentation' });
+      expect((food.querySelector('.spending-dashboard-category-fill') as HTMLElement).style.width).toBe('3.10%');
+      const rows = (): Array<Array<string | null | undefined>> =>
+        within(food)
+          .getAllByRole('row')
+          .slice(1)
+          .map((row) => [within(row).queryByRole('rowheader')?.textContent ?? null, ...within(row).queryAllByRole('cell').map((c) => c.textContent?.replace(/\s+/g, ' ').trim())]);
+      expect(rows()).toEqual([
+        ['Sur la période', '26,00 €', '26,00 €', '0,00 €'],
+        ['Parts'],
+        ['sur toute la période', '3,1 %', '3,1 %', '0 %'],
+        ['sur l’ensemble des catégories', '3,1 %', '66,7 %', '0 %'],
+        ['Moyennes'],
+        ['par jour', '2,00 €', '2,00 €', '0,00 €'],
+        ['par semaine', '14,00 €', '14,00 €', '0,00 €'],
+        ['par mois', '60,88 €', '60,88 €', '0,00 €'],
       ]);
       expect(within(dashboard()).getByRole('tab', { name: 'Par catégorie' }).getAttribute('aria-selected')).toBe('true');
 

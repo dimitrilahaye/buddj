@@ -4501,8 +4501,7 @@ buddj-spending-dashboard[hidden] {
   font-variant-numeric: tabular-nums;
 }
 
-.spending-dashboard-category-total,
-.spending-dashboard-category-detail-total {
+.spending-dashboard-category-total {
   color: var(--navy);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -4704,6 +4703,20 @@ buddj-swipe-sheet[hidden] {
   white-space: nowrap;
 }
 
+/* En-tête intermédiaire (Parts, Moyennes) et ses lignes en retrait */
+.spending-dashboard-table .spending-dashboard-table-group-title {
+  padding-top: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--navy);
+}
+
+.spending-dashboard-table .spending-dashboard-table-subrow {
+  padding-left: 1rem;
+}
+
 .spending-dashboard-table-row--total td {
   font-weight: 700;
 }
@@ -4712,70 +4725,21 @@ buddj-swipe-sheet[hidden] {
   color: var(--coral);
 }
 
-.spending-dashboard-category-details {
+.spending-dashboard-category-tables {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.spending-dashboard-category-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.spending-dashboard-category-detail-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.spending-dashboard-category-detail-title {
-  margin: 0;
+/* Dans la vue par catégorie, la légende du tableau porte le nom de la catégorie */
+.spending-dashboard-table-caption--title {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--navy);
 }
 
-.spending-dashboard-category-detail-share {
-  margin-left: 0.25rem;
-  font-weight: 400;
-  color: var(--navy-soft);
-}
-
-/* Dépenses / sorties puis moyennes, alignées sur les mêmes trois colonnes */
-.spending-dashboard-category-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.4rem 1rem;
-  margin: 0.2rem 0 0;
-}
-
-.spending-dashboard-category-stats-title {
-  margin: 0.4rem 0 0;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--navy-soft);
-}
-
-.spending-dashboard-category-stats div {
-  display: flex;
-  flex-direction: column;
-}
-
-.spending-dashboard-category-stats dt {
-  font-size: 0.72rem;
-  color: var(--navy-soft);
-}
-
-.spending-dashboard-category-stats dd {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--navy);
-  font-variant-numeric: tabular-nums;
+.spending-dashboard-table-caption--title .spending-dashboard-category-track {
+  margin-top: 0.4rem;
 }
 
 /* Icône qui déplie / replie la courbe cumulée */
