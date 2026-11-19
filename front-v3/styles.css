@@ -5047,18 +5047,11 @@ buddj-spending-tracker-chart[hidden] {
 }
 
 .spending-chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem 0.85rem;
-  font-size: 0.75rem;
-  color: var(--navy-soft);
+  margin-top: 0.75rem;
 }
 
-.spending-chart-legend-item {
-  display: inline-flex;
-  white-space: nowrap;
-  align-items: center;
-  gap: 0.35rem;
+.spending-chart-legend[hidden] {
+  display: none;
 }
 
 .spending-chart-swatch {
@@ -5110,6 +5103,21 @@ buddj-spending-tracker-chart[hidden] {
   stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
+}
+
+/* Courbe mise en avant depuis la légende ou son aire : les autres s'estompent */
+.spending-chart-area,
+.spending-chart-line {
+  transition: opacity 0.15s ease;
+}
+
+.spending-chart-svg--focused .spending-chart-area:not(.is-active),
+.spending-chart-svg--focused .spending-chart-line:not(.is-active) {
+  opacity: 0.25;
+}
+
+.spending-chart-svg--focused .spending-chart-area.is-active {
+  fill-opacity: 0.3;
 }
 
 .spending-chart-dot {

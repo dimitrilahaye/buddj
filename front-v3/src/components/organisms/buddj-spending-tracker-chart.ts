@@ -4,9 +4,13 @@
  *
  * Interaction : le réticule suit le pointeur (ou se pose au clic / au toucher) et s'aligne sur
  * la période la plus proche, l'infobulle donne les cumuls ; flèches gauche/droite au clavier.
+ * Sous la courbe, la même légende que la répartition en anneau (montant et part de chaque série) :
+ * survoler ou cibler une ligne, ou une aire, met sa courbe en avant et estompe les autres.
  */
 import { niceAxisTicks, type CumulativeStep } from '../../application/spending-tracker/spending-tracker-cumulative.js';
 import type { ChartSeries, StackPoint } from '../../application/spending-tracker/spending-chart-series.js';
+import { pieSlices } from '../../application/spending-tracker/spending-pie-slices.js';
+import { legendItemsHtml, sliceKeyOf } from './spending-legend.js';
 import { formatEuros } from '../../shared/goal.js';
 import { formatBucketAxisLabel, formatBucketLabel } from '../../shared/spending-bucket-label.js';
 
@@ -57,6 +61,8 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
   private _xs: number[] = [];
   private _resizeObserver?: ResizeObserver;
   private _lastWidth = 0;
+  /** Série mise en avant (survol ou focus de la légende ou d'une aire), null si aucune. */
+  private _activeSeries: string | null = null;
 
   connectedCallback(): void {
     if (!this.querySelector('.spending-chart')) {
@@ -64,12 +70,12 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
         <figure class="spending-chart">
           <figcaption class="spending-chart-caption">
             <span class="spending-chart-title">Cumul sur la période</span>
-            <span class="spending-chart-legend"></span>
           </figcaption>
           <div class="spending-chart-plot" tabindex="0" role="group">
             <svg class="spending-chart-svg" aria-hidden="true" focusable="false"></svg>
             <div class="spending-chart-tooltip" role="status" aria-label="Valeurs de la période survolée" hidden></div>
           </div>
+          <ul class="spending-pie-legend spending-chart-legend" aria-label="Courbes" hidden></ul>
         </figure>
       `;
     }
@@ -79,6 +85,10 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     plot.addEventListener('click', this._onClick);
     plot.addEventListener('keydown', this._onKeyDown);
     plot.addEventListener('blur', this._onPointerLeave);
+    this.addEventListener('pointerover', this._onSeriesPointerOver);
+    this.addEventListener('pointerleave', this._onSeriesLeave);
+    this.addEventListener('focusin', this._onSeriesFocusIn);
+    this.addEventListener('focusout', this._onSeriesLeave);
     if (typeof ResizeObserver !== 'undefined') {
       this._resizeObserver = new ResizeObserver(() => {
         if (this._plot().clientWidth !== this._lastWidth) this._draw();
@@ -96,11 +106,16 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
     plot?.removeEventListener('keydown', this._onKeyDown);
     plot?.removeEventListener('blur', this._onPointerLeave);
     this._resizeObserver?.disconnect();
+    this.removeEventListener('pointerover', this._onSeriesPointerOver);
+    this.removeEventListener('pointerleave', this._onSeriesLeave);
+    this.removeEventListener('focusin', this._onSeriesFocusIn);
+    this.removeEventListener('focusout', this._onSeriesLeave);
   }
 
   render(data: SpendingTrackerChartData): void {
     this._data = data;
     this._points = data.points;
+    if (this._activeSeries && !data.series.some((s) => s.key === this._activeSeries)) this._activeSeries = null;
     if (this._activeIndex !== null && this._activeIndex >= this._points.length) this._activeIndex = null;
     this._draw();
   }
@@ -126,7 +141,7 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
 
     plot.classList.toggle('spending-chart-plot--refreshing', data.isRefreshing);
     (this.querySelector('.spending-chart-title') as HTMLElement).textContent = data.title;
-    this._renderLegend(series);
+    this._renderLegend();
 
     const last = points.at(-1);
     const total = last?.total ?? 0;
@@ -188,8 +203,8 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
       const top = points.map((_, i) => `${x(i)},${y(upper[i]!)}`);
       const bottom = points.map((_, i) => `${x(i)},${y(lower[i]!)}`).reverse();
       if (points.length > 1) {
-        add('polygon', { class: 'spending-chart-area', style: `fill: ${color}`, points: [...top, ...bottom].join(' ') });
-        add('polyline', { class: 'spending-chart-line', style: `stroke: ${color}`, points: top.join(' ') });
+        add('polygon', { class: 'spending-chart-area', 'data-slice': key, style: `fill: ${color}`, points: [...top, ...bottom].join(' ') });
+        add('polyline', { class: 'spending-chart-line', 'data-slice': key, style: `stroke: ${color}`, points: top.join(' ') });
       }
       lower = upper;
     }
@@ -226,24 +241,45 @@ export class BuddjSpendingTrackerChart extends HTMLElement {
       add('circle', { class: 'spending-chart-dot', style: `fill: ${topColor}`, cx: x(i), cy: y(p.total), r: 4 });
     }
     this._renderTooltip();
+    this._syncActiveSeries();
   }
 
-  private _renderLegend(series: ChartSeries[]): void {
+  /** Légende de la répartition : montant final et part de chaque série, de la plus grande à la plus petite. */
+  private _renderLegend(): void {
     const legend = this.querySelector('.spending-chart-legend') as HTMLElement;
-    legend.replaceChildren();
+    const data = this._data;
     // Une seule série : le titre suffit, pas de légende.
-    if (series.length < 2) return;
-    for (const { color, label } of [...series].reverse()) {
-      const item = document.createElement('span');
-      item.className = 'spending-chart-legend-item';
-      const swatch = document.createElement('span');
-      swatch.className = 'spending-chart-swatch';
-      swatch.style.background = color;
-      swatch.setAttribute('aria-hidden', 'true');
-      item.append(swatch, document.createTextNode(label));
-      legend.appendChild(item);
-    }
+    const slices = data && data.series.length > 1 ? pieSlices({ series: data.series, points: data.points }) : [];
+    legend.hidden = slices.length === 0;
+    legend.innerHTML = legendItemsHtml(slices);
   }
+
+  /** Met la courbe active en avant (aire, ligne et ligne de légende) et estompe les autres. */
+  private _syncActiveSeries(): void {
+    const key = this._activeSeries;
+    this.querySelector('.spending-chart-svg')?.classList.toggle('spending-chart-svg--focused', key !== null);
+    this.querySelectorAll<HTMLElement | SVGElement>('[data-slice]').forEach((el) => {
+      el.classList.toggle('is-active', el.dataset.slice === key);
+    });
+  }
+
+  private _activateSeries(key: string | null): void {
+    if (key === this._activeSeries) return;
+    this._activeSeries = key;
+    this._syncActiveSeries();
+  }
+
+  private _onSeriesPointerOver = (e: Event): void => {
+    this._activateSeries(sliceKeyOf(e.target));
+  };
+
+  private _onSeriesFocusIn = (e: Event): void => {
+    this._activateSeries(sliceKeyOf(e.target));
+  };
+
+  private _onSeriesLeave = (): void => {
+    this._activateSeries(null);
+  };
 
   private _renderTooltip(): void {
     const tooltip = this.querySelector('.spending-chart-tooltip') as HTMLElement;
