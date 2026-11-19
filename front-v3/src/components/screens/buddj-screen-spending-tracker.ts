@@ -45,10 +45,7 @@ import type {
 } from '../organisms/buddj-spending-dashboard.js';
 import '../organisms/buddj-date-range-picker-drawer.js';
 import type { BuddjDateRangePickerDrawerElement } from '../organisms/buddj-date-range-picker-drawer.js';
-import type {
-  BuddjSpendingTrackerChart,
-  SpendingBucketSelect,
-} from '../organisms/buddj-spending-tracker-chart.js';
+import type { BuddjSpendingTrackerChart } from '../organisms/buddj-spending-tracker-chart.js';
 
 const CHART_PAGES: Array<{ id: SpendingDashboardPanel; label: string }> = [
   { id: 'total', label: 'Graphiques du total' },
@@ -143,11 +140,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
       this._syncFromStore();
       this._main?.querySelector<HTMLElement>('.spending-tracker-chart-toggle')?.focus();
     });
-    // Choisir une période sur une courbe ferme la feuille et en affiche le détail.
-    sheet.addEventListener('spending-bucket-select', (e) => {
-      sheet.close();
-      this._onBucketSelect(e);
-    });
     return sheet;
   })();
 
@@ -220,7 +212,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
 
     main.addEventListener('change', this._onChange);
     main.addEventListener('click', this._onClick);
-    main.addEventListener('spending-bucket-select', this._onBucketSelect);
     main.querySelector('form')?.addEventListener('submit', this._onSubmit);
     store.addEventListener('spendingTrackerStateUpdated', this._onStateUpdated);
 
@@ -243,7 +234,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     if (main) {
       main.removeEventListener('change', this._onChange);
       main.removeEventListener('click', this._onClick);
-      main.removeEventListener('spending-bucket-select', this._onBucketSelect);
       main.querySelector('form')?.removeEventListener('submit', this._onSubmit);
     }
     if (store) {
@@ -321,13 +311,6 @@ export class BuddjScreenSpendingTracker extends HTMLElement {
     const start = button.hasAttribute('data-period') ? PERIOD_KEY : button.getAttribute('data-start');
     if (!start) return;
     this._selectedStart = this._selectedStart === start ? null : start;
-    this._syncFromStore();
-  };
-
-  /** Sélection depuis le graphique : affiche le détail de la période. */
-  private _onBucketSelect = (e: Event): void => {
-    const { start } = (e as CustomEvent<SpendingBucketSelect>).detail;
-    this._selectedStart = start;
     this._syncFromStore();
   };
 
