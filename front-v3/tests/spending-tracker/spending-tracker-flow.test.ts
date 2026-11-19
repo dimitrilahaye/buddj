@@ -559,12 +559,11 @@ describe('écran suivi des dépenses', () => {
           .getAllByRole('row')
           .slice(1)
           .map((row) => [within(row).queryByRole('rowheader')?.textContent ?? null, ...within(row).queryAllByRole('cell').map((c) => c.textContent?.replace(/\s+/g, ' ').trim())]);
-      expect(rows()).toEqual([
-        ['Sur la période', '26,00 €', '26,00 €', '0,00 €'],
-        [null, 'Parts et moyennes'],
-      ]);
+      expect(rows()).toEqual([['Sur la période', '26,00 €', '26,00 €', '0,00 €']]);
 
+      // Le bouton reste en haut du tableau, dans la cellule d'angle de l'en-tête.
       const toggle = within(food).getByRole('button', { name: 'Parts et moyennes : Alimentation' });
+      expect(toggle.closest('thead')).toBeTruthy();
       expect(toggle.getAttribute('aria-expanded')).toBe('false');
       fireEvent.click(toggle);
       expect(toggle.getAttribute('aria-expanded')).toBe('true');
@@ -578,7 +577,6 @@ describe('écran suivi des dépenses', () => {
         ['par jour', '2,00 €', '2,00 €', '0,00 €'],
         ['par semaine', '14,00 €', '14,00 €', '0,00 €'],
         ['par mois', '60,88 €', '60,88 €', '0,00 €'],
-        [null, 'Masquer les parts et moyennes'],
       ]);
       // Les autres catégories restent repliées.
       expect(within(sheet).getByRole('button', { name: 'Parts et moyennes : Logement' }).getAttribute('aria-expanded')).toBe('false');
