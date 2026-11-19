@@ -6,8 +6,9 @@
  * son montant et sa part. La légende liste chaque part avec montant et pourcentage.
  */
 import type { PieSlice } from '../../application/spending-tracker/spending-pie-slices.js';
-import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import { escapeAttr } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
+import { legendItemsHtml, percentFormatter, sliceKeyOf } from './spending-legend.js';
 
 export type SpendingTrackerPieData = {
   title: string;
@@ -23,7 +24,6 @@ const CENTER = SIZE / 2;
 /** Plusieurs anneaux peuvent coexister : chacun son identifiant de titre. */
 let nextPieId = 0;
 
-const percentFormatter = new Intl.NumberFormat('fr-FR', { style: 'percent', maximumFractionDigits: 1 });
 
 function point(radius: number, angle: number): string {
   // Angle 0 en haut, sens horaire
@@ -95,12 +95,11 @@ export class BuddjSpendingTrackerPie extends HTMLElement {
   }
 
   private _onPointerOver = (e: Event): void => {
-    const target = (e.target as Element).closest<HTMLElement | SVGElement>('[data-slice]');
-    this._activate(target?.dataset.slice ?? null);
+    this._activate(sliceKeyOf(e.target));
   };
 
   private _onFocusIn = (e: Event): void => {
-    this._activate((e.target as Element).closest<HTMLElement>('[data-slice]')?.dataset.slice ?? null);
+    this._activate(sliceKeyOf(e.target));
   };
 
   private _onLeave = (): void => {
@@ -128,18 +127,7 @@ export class BuddjSpendingTrackerPie extends HTMLElement {
       })
       .join('');
 
-    (this.querySelector('.spending-pie-legend') as HTMLElement).innerHTML = data.slices
-      .map(
-        (s) => `
-        <li class="spending-pie-legend-item" tabindex="0" data-slice="${escapeAttr(s.key)}"
-          aria-label="${escapeAttr(`${s.label} : ${formatEuros(s.amount)}, ${percentFormatter.format(s.share)}`)}">
-          <span class="spending-chart-swatch" style="background:${escapeAttr(s.color)}" aria-hidden="true"></span>
-          <span class="spending-pie-legend-label">${escapeHtml(s.label)}</span>
-          <span class="spending-pie-legend-amount">${escapeHtml(formatEuros(s.amount))}</span>
-          <span class="spending-pie-legend-share">${escapeHtml(percentFormatter.format(s.share))}</span>
-        </li>`
-      )
-      .join('');
+    (this.querySelector('.spending-pie-legend') as HTMLElement).innerHTML = legendItemsHtml(data.slices);
     this._syncActive();
   }
 

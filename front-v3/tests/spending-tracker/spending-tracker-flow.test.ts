@@ -625,13 +625,25 @@ describe('écran suivi des dépenses', () => {
       expect(parts('total')).toEqual(['Sorties : 800,00 €, 95,4 %', 'Dépenses : 39,00 €, 4,6 %']);
 
       expect(within(curveChart('categories')).getByText('Cumul par catégorie')).toBeTruthy();
-      const legend = curveChart('categories').querySelector('.spending-chart-legend') as HTMLElement;
-      expect([...legend.children].map((item) => item.textContent)).toEqual([
-        'Divers',
-        'Alimentation',
-        'Énergie',
-        'Logement',
+      // Même légende que l'anneau : montant et part de chaque courbe, de la plus grande à la plus petite.
+      const curveLegend = within(curveChart('categories')).getByRole('list', { name: 'Courbes' });
+      expect(
+        within(curveLegend)
+          .getAllByRole('listitem')
+          .map((li) => li.getAttribute('aria-label')?.replace(/\s/g, ' '))
+      ).toEqual([
+        'Logement : 700,00 €, 83,4 %',
+        'Énergie : 100,00 €, 11,9 %',
+        'Alimentation : 26,00 €, 3,1 %',
+        'Divers : 13,00 €, 1,5 %',
       ]);
+      // Cibler une ligne de la légende met sa courbe en avant.
+      fireEvent.focusIn(within(curveLegend).getAllByRole('listitem')[1]!);
+      const svg = curveChart('categories').querySelector('svg') as SVGSVGElement;
+      expect(svg.classList.contains('spending-chart-svg--focused')).toBe(true);
+      expect([...svg.querySelectorAll('.spending-chart-line.is-active')].map((l) => l.getAttribute('data-slice'))).toEqual(['energy']);
+      fireEvent.focusOut(within(curveLegend).getAllByRole('listitem')[1]!);
+      expect(svg.classList.contains('spending-chart-svg--focused')).toBe(false);
       expect(within(chartsPage('categories')).getByRole('group', { name: /^Cumul de 839,00 €/ })).toBeTruthy();
       expect(within(pieChart('categories')).getByText('Répartition par catégorie')).toBeTruthy();
       expect(parts('categories')).toEqual([
