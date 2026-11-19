@@ -2,7 +2,8 @@
  * Tableau de bord du suivi des dépenses, en deux encarts qu'on fait défiler (onglets ou balayage) :
  * - « Total » : total de la période, dépenses / sorties, moyennes par jour, semaine, mois ;
  * - « Par catégorie » : total et moyennes de chaque catégorie d'emoji.
- * Chaque encart s'ouvre en grand pour l'étudier.
+ * Des points sous les encarts indiquent qu'on peut balayer de l'un à l'autre.
+ * Chaque encart s'ouvre en grand pour l'étudier ; on y balaie aussi d'un encart à l'autre (points en haut et en bas).
  *
  * API : render({ dashboard, isChartOpen, hasChart }).
  * Émet `spending-dashboard-change` quand l'encart observé change (la courbe le suit) ; le bouton de courbe
@@ -15,6 +16,8 @@ import type {
   SpendingDashboard,
 } from '../../application/spending-tracker/spending-dashboard.js';
 import { escapeAttr, escapeHtml } from '../../shared/escape.js';
+import './buddj-swipe-sheet.js';
+import type { BuddjSwipeSheet, SwipeSheetEventDetail } from './buddj-swipe-sheet.js';
 import { formatEuros } from '../../shared/goal.js';
 
 export type SpendingDashboardPanel = 'total' | 'categories';
@@ -48,6 +51,14 @@ const percentFormatter = new Intl.NumberFormat('fr-FR', { style: 'percent', maxi
 const CHART_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></svg>`;
 const EXPAND_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>`;
 
+/** Points de pagination : un par encart, celui observé mis en avant. Décoratifs, les onglets portent l'accessibilité. */
+function cardDotsHtml(): string {
+  return `
+    <div class="pager-dots spending-dashboard-dots" aria-hidden="true">
+      ${PANELS.map((p) => `<button type="button" tabindex="-1" class="pager-dot" data-dot="${p.id}"></button>`).join('')}
+    </div>`;
+}
+
 function averagesNote(dashboard: SpendingDashboard): string {
   if (dashboard.elapsedDays === 0) return 'La période n’a pas encore commencé : pas de moyenne.';
   if (dashboard.units.length === 0) return 'Pas de moyenne sur une seule journée.';
@@ -60,25 +71,13 @@ export class BuddjSpendingDashboard extends HTMLElement {
 
   private _data?: SpendingDashboardRenderData;
   private _observed: SpendingDashboardPanel = 'total';
-  /** Encart ouvert en grand, null si aucun. */
-  private _expanded: SpendingDashboardPanel | null = null;
   private _scrollFrame = 0;
   private _resizeObserver?: ResizeObserver;
   /** Encart ouvert en grand, rendu dans <body>. */
-  private readonly _sheet: HTMLElement = (() => {
-    const sheet = document.createElement('div');
-    sheet.className = 'spending-dashboard-sheet';
-    sheet.hidden = true;
-    sheet.innerHTML = `
-      <div class="spending-dashboard-sheet-backdrop" data-sheet-close></div>
-      <div class="spending-dashboard-sheet-panel" role="dialog" aria-modal="true">
-        <div class="spending-dashboard-sheet-header">
-          <h2 class="spending-dashboard-sheet-title"></h2>
-          <button type="button" class="spending-dashboard-sheet-close" data-sheet-close aria-label="Fermer">✕</button>
-        </div>
-        <div class="spending-dashboard-sheet-body"></div>
-      </div>
-    `;
+  private readonly _sheet: BuddjSwipeSheet = (() => {
+    const sheet = document.createElement('buddj-swipe-sheet') as BuddjSwipeSheet;
+    sheet.classList.add('spending-dashboard-sheet');
+    sheet.setPages(PANELS);
     return sheet;
   })();
 
@@ -111,6 +110,7 @@ export class BuddjSpendingDashboard extends HTMLElement {
             </div>`
             ).join('')}
           </div>
+          ${cardDotsHtml()}
         </section>
       `;
     }
@@ -118,8 +118,8 @@ export class BuddjSpendingDashboard extends HTMLElement {
     document.body.appendChild(this._sheet);
     this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
-    this._sheet.addEventListener('click', this._onClick);
-    this._sheet.addEventListener('keydown', this._onKeyDown);
+    this._sheet.addEventListener('swipe-sheet-change', this._onSheetChange);
+    this._sheet.addEventListener('swipe-sheet-close', this._onSheetClose);
     this._track().addEventListener('scroll', this._onScroll, { passive: true });
     // Le contenu d'un encart peut changer de hauteur après coup (polices chargées, largeur).
     if (typeof ResizeObserver !== 'undefined') {
@@ -132,8 +132,8 @@ export class BuddjSpendingDashboard extends HTMLElement {
   disconnectedCallback(): void {
     this.removeEventListener('click', this._onClick);
     this.removeEventListener('keydown', this._onKeyDown);
-    this._sheet.removeEventListener('click', this._onClick);
-    this._sheet.removeEventListener('keydown', this._onKeyDown);
+    this._sheet.removeEventListener('swipe-sheet-change', this._onSheetChange);
+    this._sheet.removeEventListener('swipe-sheet-close', this._onSheetClose);
     this._sheet.remove();
     this._resizeObserver?.disconnect();
     this.querySelector('.spending-dashboard-track')?.removeEventListener('scroll', this._onScroll);
@@ -187,6 +187,22 @@ export class BuddjSpendingDashboard extends HTMLElement {
     });
   };
 
+  /** Le balayage d'une page à l'autre dans la feuille ouverte en grand change l'encart observé (et les graphiques). */
+  private _onSheetChange = (e: Event): void => {
+    this._observe((e as CustomEvent<SwipeSheetEventDetail>).detail.id as SpendingDashboardPanel, { scroll: true });
+  };
+
+  private _onSheetClose = (e: Event): void => {
+    const { id } = (e as CustomEvent<SwipeSheetEventDetail>).detail;
+    this.querySelector<HTMLElement>(`[data-expand="${id}"]`)?.focus();
+  };
+
+  private _openSheet(panel: SpendingDashboardPanel): void {
+    this._observe(panel, { scroll: true });
+    this._drawSheet();
+    this._sheet.open(panel);
+  }
+
   private _onClick = (e: Event): void => {
     const target = e.target as Element;
     const tab = target.closest<HTMLElement>('.spending-dashboard-tab');
@@ -194,26 +210,19 @@ export class BuddjSpendingDashboard extends HTMLElement {
       this._observe(tab.dataset.panel as SpendingDashboardPanel, { scroll: true });
       return;
     }
-    const expand = target.closest<HTMLElement>('.spending-dashboard-expand');
-    if (expand) {
-      this._expanded = expand.dataset.expand as SpendingDashboardPanel;
-      this._observe(this._expanded, { scroll: true });
-      this._drawSheet();
-      (this._sheet.querySelector('.spending-dashboard-sheet-close') as HTMLElement | null)?.focus();
+    const dot = target.closest<HTMLElement>('.pager-dot');
+    if (dot) {
+      this._observe(dot.dataset.dot as SpendingDashboardPanel, { scroll: true });
       return;
     }
-    if (target.closest('[data-sheet-close]')) this._closeSheet();
+    const expand = target.closest<HTMLElement>('.spending-dashboard-expand');
+    if (expand) this._openSheet(expand.dataset.expand as SpendingDashboardPanel);
   };
 
   private _onKeyDown = (e: KeyboardEvent): void => {
-    if (e.key === 'Escape' && this._expanded) {
-      e.preventDefault();
-      this._closeSheet();
-      return;
-    }
     // Flèches gauche / droite entre les onglets
-    const tab = (e.target as Element).closest('.spending-dashboard-tab');
-    if (!tab || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (!(e.target as Element).closest('.spending-dashboard-tab')) return;
     e.preventDefault();
     const index = PANELS.findIndex((p) => p.id === this._observed);
     const next = PANELS[(index + (e.key === 'ArrowRight' ? 1 : PANELS.length - 1)) % PANELS.length]!.id;
@@ -221,18 +230,14 @@ export class BuddjSpendingDashboard extends HTMLElement {
     this.querySelector<HTMLElement>(`#spending-dashboard-tab-${next}`)?.focus();
   };
 
-  private _closeSheet(): void {
-    const expanded = this._expanded;
-    this._expanded = null;
-    this._drawSheet();
-    if (expanded) this.querySelector<HTMLElement>(`[data-expand="${expanded}"]`)?.focus();
-  }
-
   private _syncTabs(): void {
     this.querySelectorAll<HTMLElement>('.spending-dashboard-tab').forEach((tab) => {
       const selected = tab.dataset.panel === this._observed;
       tab.setAttribute('aria-selected', String(selected));
       tab.tabIndex = selected ? 0 : -1;
+    });
+    this.querySelectorAll<HTMLElement>('.pager-dot').forEach((dot) => {
+      dot.classList.toggle('pager-dot--active', dot.dataset.dot === this._observed);
     });
   }
 
@@ -254,21 +259,18 @@ export class BuddjSpendingDashboard extends HTMLElement {
     body('total').innerHTML = this._totalCardHtml(data.dashboard);
     body('categories').innerHTML = this._categoriesCardHtml(data.dashboard);
     this._syncTrackHeight();
-    this._drawSheet();
+    if (this._sheet.current !== null) this._drawSheet();
   }
 
+  /** Contenu des deux pages ouvertes en grand (la feuille garde la page affichée). */
   private _drawSheet(): void {
-    const sheet = this._sheet;
     const data = this._data;
-    const expanded = this._expanded;
-    sheet.hidden = !expanded || !data;
-    if (!expanded || !data) return;
-    const label = PANELS.find((p) => p.id === expanded)!.label;
-    const panel = sheet.querySelector('.spending-dashboard-sheet-panel') as HTMLElement;
-    panel.setAttribute('aria-label', label);
-    (sheet.querySelector('.spending-dashboard-sheet-title') as HTMLElement).textContent = label;
-    (sheet.querySelector('.spending-dashboard-sheet-body') as HTMLElement).innerHTML =
-      expanded === 'total' ? this._totalDetailHtml(data.dashboard) : this._categoriesDetailHtml(data.dashboard);
+    if (!data) {
+      this._sheet.close();
+      return;
+    }
+    this._sheet.page('total').innerHTML = this._totalDetailHtml(data.dashboard);
+    this._sheet.page('categories').innerHTML = this._categoriesDetailHtml(data.dashboard);
   }
 
   private _totalCardHtml(dashboard: SpendingDashboard): string {

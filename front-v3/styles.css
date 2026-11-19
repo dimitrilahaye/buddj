@@ -4337,10 +4337,6 @@ buddj-spending-dashboard[hidden] {
   gap: 0.25rem;
 }
 
-.spending-dashboard-sheet[hidden] {
-  display: none;
-}
-
 .spending-dashboard-tab {
   padding: 0.35rem 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -4360,7 +4356,7 @@ buddj-spending-dashboard[hidden] {
 
 .spending-dashboard-tab:focus-visible,
 .spending-dashboard-expand:focus-visible,
-.spending-dashboard-sheet-close:focus-visible {
+.swipe-sheet-close:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 1px;
 }
@@ -4528,20 +4524,21 @@ buddj-spending-dashboard[hidden] {
   background: var(--coral);
 }
 
-/* Encart ouvert en grand */
-.spending-dashboard-sheet {
+/* Feuille ouverte en grand (encarts du tableau de bord), pages qu'on fait défiler au doigt */
+buddj-swipe-sheet {
+  display: block;
   position: fixed;
   inset: 0;
   z-index: 105;
 }
 
-.spending-dashboard-sheet-backdrop {
+.swipe-sheet-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
 }
 
-.spending-dashboard-sheet-panel {
+.swipe-sheet-panel {
   position: absolute;
   left: 0;
   right: 0;
@@ -4556,10 +4553,14 @@ buddj-spending-dashboard[hidden] {
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: var(--bg-card);
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.35);
-  animation: spending-dashboard-sheet-in 0.25s ease;
+  animation: swipe-sheet-in 0.25s ease;
 }
 
-@keyframes spending-dashboard-sheet-in {
+buddj-swipe-sheet[hidden] {
+  display: none;
+}
+
+@keyframes swipe-sheet-in {
   from {
     transform: translateY(100%);
   }
@@ -4568,22 +4569,22 @@ buddj-spending-dashboard[hidden] {
   }
 }
 
-.spending-dashboard-sheet-header {
+.swipe-sheet-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-.spending-dashboard-sheet-title {
+.swipe-sheet-title {
   margin: 0;
   font-family: var(--font-head);
   font-size: 1.1rem;
   color: var(--navy);
 }
 
-.spending-dashboard-sheet-close {
+.swipe-sheet-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4598,9 +4599,68 @@ buddj-spending-dashboard[hidden] {
   cursor: pointer;
 }
 
-.spending-dashboard-sheet-body {
+/* Points de pagination : on peut balayer d'un encart (ou d'une page) à l'autre */
+.pager-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.spending-dashboard-dots {
+  /* Au-dessus de la marge intérieure de la piste, qui le chevauche */
+  position: relative;
+  z-index: 1;
+  margin-top: 0.75rem;
+}
+
+.swipe-sheet-dots--top {
+  margin-bottom: 0.75rem;
+}
+
+.swipe-sheet-dots--bottom {
+  margin-top: 0.75rem;
+}
+
+.pager-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  transition:
+    width 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.pager-dot--active {
+  width: 1.1rem;
+  background: var(--coral);
+}
+
+/* Les pages de la feuille côte à côte, chacune défilant verticalement */
+.swipe-sheet-track {
   flex: 1;
   min-height: 0;
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+
+.swipe-sheet-track::-webkit-scrollbar {
+  display: none;
+}
+
+.swipe-sheet-page {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
