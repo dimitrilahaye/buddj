@@ -4664,8 +4664,13 @@ buddj-swipe-sheet[hidden] {
   overscroll-behavior: contain;
 }
 
+/*
+ * Largeurs de colonnes fixes : en mise en page automatique, déplier les parts et moyennes
+ * (libellés longs) élargirait la première colonne et resserrerait les montants.
+ */
 .spending-dashboard-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
@@ -4682,6 +4687,11 @@ buddj-swipe-sheet[hidden] {
 .spending-dashboard-table td {
   padding: 0.55rem 0.4rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Libellés de lignes ; les trois colonnes de montants se partagent le reste à parts égales */
+.spending-dashboard-table thead th:first-child {
+  width: 34%;
 }
 
 .spending-dashboard-table thead th {
@@ -4745,7 +4755,7 @@ buddj-swipe-sheet[hidden] {
 /* Parts et moyennes d'une catégorie, dépliées à la demande */
 /* Le bouton suit la ligne de la période, juste au-dessus du bloc qu'il déplie */
 .spending-dashboard-table .spending-dashboard-table-toggle-cell {
-  padding: 0.3rem 0;
+  padding: 0.3rem 0.4rem;
   text-align: left;
 }
 
@@ -4753,7 +4763,7 @@ buddj-swipe-sheet[hidden] {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.25rem 0.1rem;
+  padding: 0.25rem 0;
   border: none;
   background: transparent;
   color: var(--navy-soft);
