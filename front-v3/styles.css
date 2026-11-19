@@ -4742,6 +4742,44 @@ buddj-swipe-sheet[hidden] {
   margin-top: 0.4rem;
 }
 
+/* Parts et moyennes d'une catégorie, dépliées à la demande */
+.spending-dashboard-table .spending-dashboard-table-toggle-cell {
+  padding: 0.4rem 0 0;
+  border-bottom: none;
+  text-align: left;
+}
+
+.spending-dashboard-category-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.1rem;
+  border: none;
+  background: transparent;
+  color: var(--navy-soft);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.spending-dashboard-category-toggle::after {
+  content: '▾';
+  transition: transform 0.2s ease;
+}
+
+.spending-dashboard-category-toggle[aria-expanded='true']::after {
+  transform: rotate(180deg);
+}
+
+.spending-dashboard-category-toggle:hover {
+  color: var(--navy);
+}
+
+.spending-dashboard-category-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
 /* Icône qui déplie / replie la courbe cumulée */
 .spending-tracker-chart-toggle {
   display: inline-flex;
