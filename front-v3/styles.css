@@ -4743,11 +4743,10 @@ buddj-swipe-sheet[hidden] {
 }
 
 /* Parts et moyennes d'une catégorie, dépliées à la demande */
-/* Le bouton occupe la cellule d'angle de l'en-tête : toujours en haut du tableau */
+/* Le bouton suit la ligne de la période, juste au-dessus du bloc qu'il déplie */
 .spending-dashboard-table .spending-dashboard-table-toggle-cell {
-  padding-left: 0;
+  padding: 0.3rem 0;
   text-align: left;
-  white-space: normal;
 }
 
 .spending-dashboard-category-toggle {

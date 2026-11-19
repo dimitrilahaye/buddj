@@ -413,17 +413,19 @@ export class BuddjSpendingDashboard extends HTMLElement {
             : ''
         }</caption>
         <thead>
-          <tr>${
-            collapsible
-              ? `<td class="spending-dashboard-table-toggle-cell">
-              <button type="button" class="spending-dashboard-category-toggle" data-category="${escapeAttr(collapsible.id)}"
-                aria-expanded="${collapsible.open}" aria-label="${escapeAttr(`Parts et moyennes : ${caption}`)}">Parts et moyennes</button>
-            </td>`
-              : '<th scope="col"></th>'
-          }<th scope="col">Total</th><th scope="col">Dépenses</th><th scope="col">Sorties</th></tr>
+          <tr><th scope="col"></th><th scope="col">Total</th><th scope="col">Dépenses</th><th scope="col">Sorties</th></tr>
         </thead>
         <tbody>
           <tr class="spending-dashboard-table-row--total"><th scope="row">Sur la période</th>${cells(euros(amounts))}</tr>
+          ${
+            // Juste sous la ligne de la période, au-dessus du bloc qu'il déplie : il ne bouge pas.
+            collapsible
+              ? `<tr class="spending-dashboard-table-toggle-row"><td colspan="4" class="spending-dashboard-table-toggle-cell">
+            <button type="button" class="spending-dashboard-category-toggle" data-category="${escapeAttr(collapsible.id)}"
+              aria-expanded="${collapsible.open}" aria-label="${escapeAttr(`Parts et moyennes : ${caption}`)}">Parts et moyennes</button>
+          </td></tr>`
+              : ''
+          }
           ${
             categoryShares
               ? ''
