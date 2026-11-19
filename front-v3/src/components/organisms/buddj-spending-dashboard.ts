@@ -11,6 +11,7 @@
  */
 import type {
   AverageUnit,
+  SpendingAmounts,
   SpendingAverage,
   SpendingCategoryStats,
   SpendingDashboard,
@@ -43,7 +44,6 @@ const PANELS: Array<{ id: SpendingDashboardPanel; label: string }> = [
 const COMPACT_CATEGORY_COUNT = 4;
 
 const UNIT_LABELS: Record<AverageUnit, string> = { day: 'par jour', week: 'par semaine', month: 'par mois' };
-const UNIT_TITLES: Record<AverageUnit, string> = { day: 'Par jour', week: 'Par semaine', month: 'Par mois' };
 const UNIT_SHORT_LABELS: Record<AverageUnit, string> = { day: '/ jour', week: '/ sem.', month: '/ mois' };
 
 const percentFormatter = new Intl.NumberFormat('fr-FR', { style: 'percent', maximumFractionDigits: 1 });
@@ -337,75 +337,107 @@ export class BuddjSpendingDashboard extends HTMLElement {
       }`;
   }
 
-  private _amountCells(amounts: { total: number; expensesTotal: number; outflowsTotal: number }): string {
-    return [amounts.total, amounts.expensesTotal, amounts.outflowsTotal]
-      .map((value) => `<td>${escapeHtml(formatEuros(value))}</td>`)
-      .join('');
-  }
-
-  private _totalDetailHtml(dashboard: SpendingDashboard): string {
-    const { totals, averages } = dashboard;
-    const share = (value: number): string => (totals.total > 0 ? percentFormatter.format(value / totals.total) : '–');
+  /**
+   * Tableau commun au total et à chaque catégorie : montants de la période, part du total de toute la période
+   * (et, pour une catégorie, part de chaque colonne sur l'ensemble des catégories), puis moyennes,
+   * en colonnes Total / Dépenses / Sorties.
+   */
+  private _amountsTableHtml({
+    caption,
+    captionClass,
+    amounts,
+    averages,
+    periodTotal,
+    columnTotals,
+    shareBar = false,
+  }: {
+    caption: string;
+    captionClass: string;
+    amounts: SpendingAmounts;
+    averages: SpendingAverage[];
+    periodTotal: number;
+    /** Totaux de chaque colonne sur l'ensemble des catégories : ajoute la part colonne par colonne */
+    columnTotals?: SpendingAmounts;
+    shareBar?: boolean;
+  }): string {
+    const cells = (values: string[]): string => values.map((v) => `<td>${escapeHtml(v)}</td>`).join('');
+    const euros = (a: SpendingAmounts): string[] => [a.total, a.expensesTotal, a.outflowsTotal].map(formatEuros);
+    const ratio = (value: number, of: number): string => (of > 0 ? percentFormatter.format(value / of) : '–');
+    const columns = (a: SpendingAmounts): number[] => [a.total, a.expensesTotal, a.outflowsTotal];
+    const periodShares = columns(amounts).map((v) => ratio(v, periodTotal));
+    const categoryShares = columnTotals
+      ? columns(amounts).map((v, i) => ratio(v, columns(columnTotals)[i]!))
+      : null;
+    // Groupe de lignes coiffé d'une en-tête intermédiaire, ses lignes en retrait dessous
+    const group = (title: string, rows: Array<{ label: string; values: string[] }>): string => `
+        <tbody class="spending-dashboard-table-group">
+          <tr><th scope="rowgroup" colspan="4" class="spending-dashboard-table-group-title">${escapeHtml(title)}</th></tr>
+          ${rows.map((r) => `<tr><th scope="row" class="spending-dashboard-table-subrow">${escapeHtml(r.label)}</th>${cells(r.values)}</tr>`).join('')}
+        </tbody>`;
     return `
       <table class="spending-dashboard-table">
-        <caption class="spending-dashboard-table-caption">Totaux et moyennes de la période</caption>
+        <caption class="${captionClass}">${escapeHtml(caption)}${
+          shareBar
+            ? `<span class="spending-dashboard-category-track" aria-hidden="true">
+            <span class="spending-dashboard-category-fill" style="width:${(periodTotal > 0 ? (amounts.total / periodTotal) * 100 : 0).toFixed(2)}%"></span>
+          </span>`
+            : ''
+        }</caption>
         <thead>
           <tr><th scope="col"></th><th scope="col">Total</th><th scope="col">Dépenses</th><th scope="col">Sorties</th></tr>
         </thead>
         <tbody>
-          <tr class="spending-dashboard-table-row--total"><th scope="row">Sur la période</th>${this._amountCells(totals)}</tr>
-          <tr class="spending-dashboard-table-row--share"><th scope="row">Part</th><td>${share(totals.total)}</td><td>${share(totals.expensesTotal)}</td><td>${share(totals.outflowsTotal)}</td></tr>
-          ${averages
-            .map(
-              (a: SpendingAverage) =>
-                `<tr><th scope="row">Moyenne ${escapeHtml(UNIT_LABELS[a.unit])}</th>${this._amountCells(a)}</tr>`
-            )
-            .join('')}
+          <tr class="spending-dashboard-table-row--total"><th scope="row">Sur la période</th>${cells(euros(amounts))}</tr>
+          ${
+            categoryShares
+              ? ''
+              : `<tr class="spending-dashboard-table-row--share"><th scope="row">Part sur toute la période</th>${cells(periodShares)}</tr>`
+          }
         </tbody>
-      </table>
+        ${
+          categoryShares
+            ? group('Parts', [
+                { label: 'sur toute la période', values: periodShares },
+                { label: 'sur l’ensemble des catégories', values: categoryShares },
+              ])
+            : ''
+        }
+        ${averages.length > 0 ? group('Moyennes', averages.map((a) => ({ label: UNIT_LABELS[a.unit], values: euros(a) }))) : ''}
+      </table>`;
+  }
+
+  private _totalDetailHtml(dashboard: SpendingDashboard): string {
+    const { totals, averages } = dashboard;
+    return `
+      ${this._amountsTableHtml({
+        caption: 'Totaux et moyennes de la période',
+        captionClass: 'spending-dashboard-table-caption',
+        amounts: totals,
+        averages,
+        periodTotal: totals.total,
+      })}
       <p class="spending-dashboard-note">${escapeHtml(averagesNote(dashboard))}</p>`;
   }
 
   private _categoriesDetailHtml(dashboard: SpendingDashboard): string {
-    const { categories } = dashboard;
+    const { categories, totals } = dashboard;
     if (categories.length === 0) {
       return '<p class="spending-dashboard-empty">Aucune dépense sur cette période.</p>';
     }
     return `
-      <div class="spending-dashboard-category-details">
+      <div class="spending-dashboard-category-tables">
         ${categories
-          .map((c) => {
-            const name = c.title;
-            return `
-        <section class="spending-dashboard-category-detail" aria-label="${escapeAttr(name)}">
-          <div class="spending-dashboard-category-detail-header">
-            <h3 class="spending-dashboard-category-detail-title">${escapeHtml(name)}</h3>
-            <span class="spending-dashboard-category-detail-total"
-              aria-label="${escapeAttr(`${formatEuros(c.total)}, ${percentFormatter.format(c.share)} du total`)}">${escapeHtml(formatEuros(c.total))}
-              <span class="spending-dashboard-category-detail-share">(${escapeHtml(percentFormatter.format(c.share))})</span></span>
-          </div>
-          <span class="spending-dashboard-category-track" aria-hidden="true">
-            <span class="spending-dashboard-category-fill" style="width:${(c.share * 100).toFixed(2)}%"></span>
-          </span>
-          <dl class="spending-dashboard-category-stats" aria-label="Répartition">
-            <div><dt>Dépenses</dt><dd>${escapeHtml(formatEuros(c.expensesTotal))}</dd></div>
-            <div><dt>Sorties</dt><dd>${escapeHtml(formatEuros(c.outflowsTotal))}</dd></div>
-          </dl>
-          ${
-            c.averages.length > 0
-              ? `<p class="spending-dashboard-category-stats-title">Moyennes :</p>
-          <dl class="spending-dashboard-category-stats" aria-label="Moyennes">
-            ${c.averages
-              .map(
-                (a) =>
-                  `<div><dt>${escapeHtml(UNIT_TITLES[a.unit])}</dt><dd>${escapeHtml(formatEuros(a.total))}</dd></div>`
-              )
-              .join('')}
-          </dl>`
-              : ''
-          }
-        </section>`;
-          })
+          .map((c) =>
+            this._amountsTableHtml({
+              caption: c.title,
+              captionClass: 'spending-dashboard-table-caption spending-dashboard-table-caption--title',
+              amounts: c,
+              averages: c.averages,
+              periodTotal: totals.total,
+              columnTotals: totals,
+              shareBar: true,
+            })
+          )
           .join('')}
       </div>
       <p class="spending-dashboard-note">${escapeHtml(averagesNote(dashboard))}</p>`;
