@@ -64,10 +64,6 @@ function cardDotsHtml(): string {
     </div>`;
 }
 
-function categoryToggleText(open: boolean): string {
-  return open ? 'Masquer les parts et moyennes' : 'Parts et moyennes';
-}
-
 function averagesNote(dashboard: SpendingDashboard): string {
   if (dashboard.elapsedDays === 0) return 'La période n’a pas encore commencé : pas de moyenne.';
   if (dashboard.units.length === 0) return 'Pas de moyenne sur une seule journée.';
@@ -225,7 +221,6 @@ export class BuddjSpendingDashboard extends HTMLElement {
     if (open) this._openCategoryDetails.add(id);
     else this._openCategoryDetails.delete(id);
     toggle.setAttribute('aria-expanded', String(open));
-    toggle.textContent = categoryToggleText(open);
     toggle.closest('table')?.querySelectorAll<HTMLElement>('.spending-dashboard-table-group').forEach((group) => {
       group.hidden = !open;
     });
@@ -420,7 +415,14 @@ export class BuddjSpendingDashboard extends HTMLElement {
             : ''
         }</caption>
         <thead>
-          <tr><th scope="col"></th><th scope="col">Total</th><th scope="col">Dépenses</th><th scope="col">Sorties</th></tr>
+          <tr>${
+            collapsible
+              ? `<td class="spending-dashboard-table-toggle-cell">
+              <button type="button" class="spending-dashboard-category-toggle" data-category="${escapeAttr(collapsible.id)}"
+                aria-expanded="${collapsible.open}" aria-label="${escapeAttr(`Parts et moyennes : ${caption}`)}">Parts et moyennes</button>
+            </td>`
+              : '<th scope="col"></th>'
+          }<th scope="col">Total</th><th scope="col">Dépenses</th><th scope="col">Sorties</th></tr>
         </thead>
         <tbody>
           <tr class="spending-dashboard-table-row--total"><th scope="row">Sur la période</th>${cells(euros(amounts))}</tr>
@@ -439,16 +441,6 @@ export class BuddjSpendingDashboard extends HTMLElement {
             : ''
         }
         ${averages.length > 0 ? group('Moyennes', averages.map((a) => ({ label: UNIT_LABELS[a.unit], values: euros(a) }))) : ''}
-        ${
-          collapsible
-            ? `<tfoot>
-          <tr><td colspan="4" class="spending-dashboard-table-toggle-cell">
-            <button type="button" class="spending-dashboard-category-toggle" data-category="${escapeAttr(collapsible.id)}"
-              aria-expanded="${collapsible.open}" aria-label="${escapeAttr(`Parts et moyennes : ${caption}`)}">${categoryToggleText(collapsible.open)}</button>
-          </td></tr>
-        </tfoot>`
-            : ''
-        }
       </table>`;
   }
 
