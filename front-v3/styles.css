@@ -3584,6 +3584,8 @@ body.route-home .global-header {
 body.route-new-month .global-header buddj-summary-bar,
 body.route-archived .global-header buddj-summary-bar,
 body.route-spending-tracker .global-header buddj-summary-bar,
+body.route-savings-accounts .global-header buddj-summary-bar,
+body.route-savings-tracker .global-header buddj-summary-bar,
 body.route-savings .global-header buddj-summary-bar,
 body.route-reimbursements .global-header buddj-summary-bar,
 body.route-templates .global-header buddj-summary-bar,
@@ -3597,6 +3599,8 @@ body.route-savings,
 body.route-reimbursements,
 body.route-archived,
 body.route-spending-tracker,
+body.route-savings-accounts,
+body.route-savings-tracker,
 body.route-templates,
 body.route-annual-outflows {
   display: flex;
@@ -3612,6 +3616,8 @@ body.route-savings #screen-outlet,
 body.route-reimbursements #screen-outlet,
 body.route-archived #screen-outlet,
 body.route-spending-tracker #screen-outlet,
+body.route-savings-accounts #screen-outlet,
+body.route-savings-tracker #screen-outlet,
 body.route-templates #screen-outlet,
 body.route-annual-outflows #screen-outlet {
   flex: 1;
@@ -3623,6 +3629,8 @@ body.route-savings buddj-screen-savings,
 body.route-reimbursements buddj-screen-reimbursements,
 body.route-archived buddj-screen-archived,
 body.route-spending-tracker buddj-screen-spending-tracker,
+body.route-savings-accounts buddj-screen-savings-accounts,
+body.route-savings-tracker buddj-screen-savings-tracker,
 body.route-templates buddj-screen-templates,
 body.route-templates buddj-screen-template-detail,
 body.route-annual-outflows buddj-screen-annual-outflows {
@@ -3642,6 +3650,8 @@ body.route-savings buddj-screen-savings main.screen,
 body.route-reimbursements buddj-screen-reimbursements main.screen,
 body.route-archived buddj-screen-archived main.screen,
 body.route-spending-tracker buddj-screen-spending-tracker main.screen,
+body.route-savings-accounts buddj-screen-savings-accounts main.screen,
+body.route-savings-tracker buddj-screen-savings-tracker main.screen,
 body.route-templates buddj-screen-templates main.screen,
 body.route-templates buddj-screen-template-detail main.screen,
 body.route-annual-outflows buddj-screen-annual-outflows main.screen {
@@ -7581,4 +7591,347 @@ buddj-toast.toast--error .toast-message {
   border-color: rgba(224, 122, 95, 0.5);
   color: var(--coral);
   box-shadow: 0 2px 12px var(--coral-glow);
+}
+
+/* ========== Épargnes (comptes épargne, opérations, suivi) ========== */
+/* Couleurs des courbes : palette catégorielle déjà validée sur --bg-card. */
+:root {
+  --series-savings-balance: #3987e5;
+  --series-savings-deposit: #199e70;
+  --series-savings-withdrawal: #d95926;
+}
+
+.savings-accounts-sticky-wrap {
+  flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
+  background: var(--bg);
+}
+
+.savings-accounts-sticky-wrap .screen-header {
+  margin-bottom: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.savings-accounts-sticky-wrap .screen-header .title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+buddj-savings-account-switcher {
+  display: block;
+  padding: 0.6rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow);
+}
+
+buddj-savings-account-switcher[hidden] {
+  display: none;
+}
+
+.btn--nav-month:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.savings-account-switcher-text {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.savings-account-switcher-name {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.savings-account-switcher-amount {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.savings-accounts-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 1.25rem 2rem;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+}
+
+.savings-accounts-loading,
+.savings-accounts-none,
+.savings-tracker-none {
+  color: var(--navy-soft);
+  text-align: center;
+}
+
+.savings-accounts-error,
+.savings-account-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  text-align: center;
+  color: var(--navy);
+}
+
+.savings-accounts-error[hidden],
+.savings-account-empty[hidden],
+.savings-account-operations[hidden] {
+  display: none;
+}
+
+.savings-accounts-error p,
+.savings-account-empty-title {
+  margin: 0;
+}
+
+.savings-account-empty-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--navy-soft);
+}
+
+.savings-accounts-retry {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--coral);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--coral);
+  cursor: pointer;
+}
+
+.savings-account-operations {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.savings-account-add {
+  align-self: stretch;
+  padding: 0.65rem 1rem;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--navy);
+  font-family: var(--font-head);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.savings-account-add:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--mint);
+}
+
+.savings-account-days {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.savings-account-day-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--navy-soft);
+}
+
+.savings-account-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.savings-operation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.5rem 0.55rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+.savings-operation-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.savings-operation--deposit .savings-operation-icon {
+  background: rgba(25, 158, 112, 0.18);
+  color: var(--mint);
+}
+
+.savings-operation--withdrawal .savings-operation-icon {
+  background: rgba(217, 89, 38, 0.18);
+  color: var(--coral);
+}
+
+.savings-operation-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.savings-operation-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--navy);
+}
+
+.savings-operation-type {
+  font-size: 0.75rem;
+  color: var(--navy-soft);
+}
+
+.savings-operation-amount {
+  flex-shrink: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.savings-operation--deposit .savings-operation-amount {
+  color: var(--mint);
+}
+
+.savings-operation--withdrawal .savings-operation-amount {
+  color: var(--coral);
+}
+
+/* Drawer d'opération : même allure que le drawer d'ajout de dépense */
+buddj-savings-operation-drawer {
+  display: contents;
+}
+
+buddj-savings-operation-drawer.savings-operation-drawer--open {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 102;
+  pointer-events: none;
+}
+
+buddj-savings-operation-drawer.savings-operation-drawer--open .expense-add-drawer-backdrop,
+buddj-savings-operation-drawer.savings-operation-drawer--open .expense-add-drawer-panel,
+buddj-savings-operation-drawer.savings-operation-drawer--open buddj-date-range-picker-drawer {
+  pointer-events: auto;
+}
+
+buddj-savings-operation-drawer.savings-operation-drawer--open .expense-add-drawer-backdrop {
+  opacity: 1;
+  visibility: visible;
+}
+
+buddj-savings-operation-drawer.savings-operation-drawer--open .expense-add-drawer-panel {
+  transform: translateY(0);
+}
+
+.savings-operation-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.savings-operation-types legend {
+  width: 100%;
+  margin-bottom: 0.35rem;
+  padding: 0;
+}
+
+/* Suivi des épargnes */
+.savings-tracker-totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0 0 1rem;
+}
+
+.savings-tracker-totals[hidden] {
+  display: none;
+}
+
+.savings-tracker-total {
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+.savings-tracker-total dt {
+  font-size: 0.75rem;
+  color: var(--navy-soft);
+}
+
+.savings-tracker-total dd {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.savings-tracker-total--deposit dd {
+  color: var(--mint);
+}
+
+.savings-tracker-total--withdrawal dd {
+  color: var(--coral);
+}
+
+.savings-tracker-total--balance dd {
+  color: var(--gold);
+}
+
+buddj-savings-tracker-chart {
+  display: block;
+}
+
+buddj-savings-tracker-chart[hidden] {
+  display: none;
+}
+
+.savings-chart-zero {
+  stroke-opacity: 0.35;
+}
+
+.savings-chart .spending-pie-legend-item {
+  cursor: pointer;
+}
+
+.spending-chart-svg--focused .spending-chart-dot[data-slice]:not(.is-active) {
+  opacity: 0.25;
 }

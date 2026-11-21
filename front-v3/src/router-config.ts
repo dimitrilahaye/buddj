@@ -12,6 +12,8 @@ import './components/screens/buddj-screen-template-detail.js';
 import './components/screens/buddj-screen-annual-outflows.js';
 import './components/screens/buddj-screen-archived.js';
 import './components/screens/buddj-screen-spending-tracker.js';
+import './components/screens/buddj-screen-savings-accounts.js';
+import './components/screens/buddj-screen-savings-tracker.js';
 import type { DefaultRoute, RouteContext, RouteDef } from './router.js';
 import type { AuthStore } from './application/auth/auth-store.js';
 import type { ArchivedMonthStore } from './application/month/archived-month-store.js';
@@ -23,6 +25,10 @@ import type { BuddjScreenNewMonth } from './components/screens/buddj-screen-new-
 import type { BuddjScreenArchived } from './components/screens/buddj-screen-archived.js';
 import type { BuddjScreenSpendingTracker } from './components/screens/buddj-screen-spending-tracker.js';
 import type { SpendingTrackerStore } from './application/spending-tracker/spending-tracker-store.js';
+import type { BuddjScreenSavingsAccounts } from './components/screens/buddj-screen-savings-accounts.js';
+import type { BuddjScreenSavingsTracker } from './components/screens/buddj-screen-savings-tracker.js';
+import type { SavingsAccountsStore } from './application/savings-account/savings-accounts-store.js';
+import type { SavingsTrackerStore } from './application/savings-account/savings-tracker-store.js';
 import type { BuddjScreenTemplates } from './components/screens/buddj-screen-templates.js';
 import type { BuddjScreenTemplateDetail } from './components/screens/buddj-screen-template-detail.js';
 import type { BuddjScreenAnnualOutflows } from './components/screens/buddj-screen-annual-outflows.js';
@@ -68,6 +74,8 @@ export function createRoutes({
   savingsStore,
   reimbursementsStore,
   spendingTrackerStore,
+  savingsAccountsStore,
+  savingsTrackerStore,
   templateService,
   navigateToPath,
   redirectToHome,
@@ -80,6 +88,8 @@ export function createRoutes({
   savingsStore: SavingsStore;
   reimbursementsStore: ReimbursementsStore;
   spendingTrackerStore: SpendingTrackerStore;
+  savingsAccountsStore: SavingsAccountsStore;
+  savingsTrackerStore: SavingsTrackerStore;
   templateService: TemplateService;
   navigateToPath: (path: string) => void;
   redirectToHome: () => void;
@@ -100,6 +110,24 @@ export function createRoutes({
       handle: wrapGuard(authStore, redirectToHome, (ctx) => {
         const el = document.createElement('buddj-screen-spending-tracker') as BuddjScreenSpendingTracker;
         el.init({ spendingTrackerStore });
+        ctx.outlet.replaceChildren(el);
+      }),
+    },
+    {
+      name: 'savings-accounts',
+      pattern: '/savings-accounts',
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
+        const el = document.createElement('buddj-screen-savings-accounts') as BuddjScreenSavingsAccounts;
+        el.init({ savingsAccountsStore });
+        ctx.outlet.replaceChildren(el);
+      }),
+    },
+    {
+      name: 'savings-tracker',
+      pattern: '/savings-tracker',
+      handle: wrapGuard(authStore, redirectToHome, (ctx) => {
+        const el = document.createElement('buddj-screen-savings-tracker') as BuddjScreenSavingsTracker;
+        el.init({ savingsAccountsStore, savingsTrackerStore });
         ctx.outlet.replaceChildren(el);
       }),
     },

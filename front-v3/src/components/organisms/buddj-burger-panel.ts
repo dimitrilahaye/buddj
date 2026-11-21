@@ -77,6 +77,7 @@ export class BuddjBurgerPanel extends HTMLElement {
         </div>
         <nav class="burger-panel-content">
           <ul class="burger-panel-list">
+            <li><a href="/savings-tracker" class="burger-panel-link">Suivi des épargnes</a></li>
             <li><a href="/spending-tracker" class="burger-panel-link">Suivi des dépenses</a></li>
           </ul>
           <div class="burger-panel-divider" aria-hidden="true"></div>

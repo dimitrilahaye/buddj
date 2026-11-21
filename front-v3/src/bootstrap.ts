@@ -66,6 +66,17 @@ import type { SpendingTrackerService } from './application/spending-tracker/spen
 import { createSpendingTrackerServiceFromApi } from './adapters/spending-tracker-service-from-api.js';
 import { createLoadSpendingTracker } from './application/spending-tracker/load-spending-tracker.js';
 import { SpendingTrackerStore } from './application/spending-tracker/spending-tracker-store.js';
+import type { SavingsAccountService } from './application/savings-account/savings-account-service.js';
+import { createSavingsAccountServiceFromApi } from './adapters/savings-account-service-from-api.js';
+import {
+  createAddSavingsOperation,
+  createDeleteSavingsOperation,
+  createLoadSavingsAccounts,
+  createLoadSavingsTracker,
+  createUpdateSavingsOperation,
+} from './application/savings-account/savings-account-use-cases.js';
+import { SavingsAccountsStore } from './application/savings-account/savings-accounts-store.js';
+import { SavingsTrackerStore } from './application/savings-account/savings-tracker-store.js';
 import { createRouter } from './router.js';
 import { createRoutes, DEFAULT_MONTH_ID, DEFAULT_ROUTE } from './router-config.js';
 import { BuddjBurgerPanel } from './components/organisms/buddj-burger-panel.js';
@@ -86,6 +97,8 @@ function isSpaInternalPath(pathname: string): boolean {
     pathname.startsWith('/budgets/') ||
     pathname === '/new-month' ||
     pathname === '/spending-tracker' ||
+    pathname === '/savings-accounts' ||
+    pathname === '/savings-tracker' ||
     pathname === '/archived' ||
     pathname === '/annual-outflows' ||
     pathname === '/savings' ||
@@ -103,6 +116,7 @@ const STANDALONE_ROUTE_NAMES = new Set([
   'home',
   'new-month',
   'spending-tracker',
+  'savings-tracker',
   'archived',
   'savings',
   'reimbursements',
@@ -120,6 +134,8 @@ function getBodyClassToggles(match: { name: string }): Array<{ class: string; ac
     { class: 'route-annual-outflows', active: match.name === 'annual-outflows' },
     { class: 'route-new-month', active: match.name === 'new-month' },
     { class: 'route-spending-tracker', active: match.name === 'spending-tracker' },
+    { class: 'route-savings-accounts', active: match.name === 'savings-accounts' },
+    { class: 'route-savings-tracker', active: match.name === 'savings-tracker' },
     { class: 'route-archived', active: match.name === 'archived' },
     { class: 'route-savings', active: match.name === 'savings' },
     { class: 'route-reimbursements', active: match.name === 'reimbursements' },
@@ -127,6 +143,7 @@ function getBodyClassToggles(match: { name: string }): Array<{ class: string; ac
 }
 
 const BURGER_LINK_ACTIVE_BY_HREF: Record<string, string[]> = {
+  '/savings-tracker': ['savings-tracker'],
   '/spending-tracker': ['spending-tracker'],
   '/new-month': ['new-month'],
   '/archived': ['archived'],
@@ -144,6 +161,7 @@ export type BootstrapOptions = {
   yearlyOutflowsService?: YearlyOutflowsService;
   projectService?: ProjectService;
   spendingTrackerService?: SpendingTrackerService;
+  savingsAccountService?: SavingsAccountService;
 };
 
 export function bootstrap(options: BootstrapOptions): void {
@@ -155,6 +173,8 @@ export function bootstrap(options: BootstrapOptions): void {
   const projectService = options.projectService ?? createProjectServiceFromApi({ apiUrl: config.apiUrl });
   const spendingTrackerService =
     options.spendingTrackerService ?? createSpendingTrackerServiceFromApi({ apiUrl: config.apiUrl });
+  const savingsAccountService =
+    options.savingsAccountService ?? createSavingsAccountServiceFromApi({ apiUrl: config.apiUrl });
   const loadUnarchivedMonths = createLoadUnarchivedMonths({ monthService: options.monthService });
   const putExpensesChecking = createPutExpensesChecking({ monthService: options.monthService });
   const putOutflowsChecking = createPutOutflowsChecking({ monthService: options.monthService });
@@ -254,6 +274,15 @@ export function bootstrap(options: BootstrapOptions): void {
   const spendingTrackerStore = new SpendingTrackerStore({
     loadSpendingTracker: createLoadSpendingTracker({ spendingTrackerService }),
   });
+  const savingsAccountsStore = new SavingsAccountsStore({
+    loadSavingsAccounts: createLoadSavingsAccounts({ savingsAccountService }),
+    addSavingsOperation: createAddSavingsOperation({ savingsAccountService }),
+    updateSavingsOperation: createUpdateSavingsOperation({ savingsAccountService }),
+    deleteSavingsOperation: createDeleteSavingsOperation({ savingsAccountService }),
+  });
+  const savingsTrackerStore = new SavingsTrackerStore({
+    loadSavingsTracker: createLoadSavingsTracker({ savingsAccountService }),
+  });
   // config injecté là où nécessaire (ex. futur client API : config.apiUrl)
   const outlet = document.getElementById('screen-outlet')!;
 
@@ -297,6 +326,8 @@ export function bootstrap(options: BootstrapOptions): void {
     savingsStore,
     reimbursementsStore,
     spendingTrackerStore,
+    savingsAccountsStore,
+    savingsTrackerStore,
     templateService,
     navigateToPath: (path: string) => navigateHolder.navigate?.(path),
     redirectToHome: () => {

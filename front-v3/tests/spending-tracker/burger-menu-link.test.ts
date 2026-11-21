@@ -11,7 +11,7 @@ describe('menu burger : suivi des dépenses', () => {
     window.history.replaceState(null, '', '/');
   });
 
-  it('est le premier lien du menu, dans sa propre section, et ouvre l’écran', async () => {
+  it('est dans la première section du menu, sous le suivi des épargnes, et ouvre l’écran', async () => {
     document.body.innerHTML = `
       <buddj-toast></buddj-toast>
       <buddj-burger-panel id="burger-panel"></buddj-burger-panel>
@@ -27,7 +27,10 @@ describe('menu burger : suivi des dépenses', () => {
     const menu = screen.getByRole('dialog', { name: 'Menu' });
 
     const [firstSection] = within(menu).getAllByRole('list');
-    expect(within(firstSection!).getAllByRole('link').map((a) => a.textContent)).toEqual(['Suivi des dépenses']);
+    expect(within(firstSection!).getAllByRole('link').map((a) => a.textContent)).toEqual([
+      'Suivi des épargnes',
+      'Suivi des dépenses',
+    ]);
 
     fireEvent.click(within(menu).getByRole('link', { name: 'Suivi des dépenses' }));
 
