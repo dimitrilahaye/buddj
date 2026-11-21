@@ -2,6 +2,7 @@
  * Drawer calendrier pour choisir une période d'un seul geste, à la Airbnb :
  * clic sur le début, clic sur la fin, Valider. Valider sans fin = ce seul jour.
  * Aujourd'hui est mis en évidence ; passé et futur sont sélectionnables.
+ * En mode `day`, un seul jour se choisit (date d'une opération d'épargne).
  */
 import {
   EMPTY_SELECTION,
@@ -41,10 +42,14 @@ function dateOf(day: string): Date {
   return new Date(`${day}T00:00:00Z`);
 }
 
+export type DateRangePickerMode = 'range' | 'day';
+
 export interface DateRangePickerOpenOptions {
   range: SpendingRange | null;
   today: string;
   onValidate: (range: SpendingRange) => void;
+  /** `day` : un seul jour, `onValidate` reçoit `from === to`. Par défaut `range`. */
+  mode?: DateRangePickerMode;
 }
 
 export type BuddjDateRangePickerDrawerElement = HTMLElement & {
@@ -60,6 +65,7 @@ export class BuddjDateRangePickerDrawer extends HTMLElement {
   private _today = '';
   private _onValidate: ((range: SpendingRange) => void) | null = null;
   private _returnFocus: HTMLElement | null = null;
+  private _mode: DateRangePickerMode = 'range';
 
   connectedCallback(): void {
     this.addEventListener('click', this._onClick);
@@ -71,7 +77,8 @@ export class BuddjDateRangePickerDrawer extends HTMLElement {
     this.removeEventListener('keydown', this._onKeyDown);
   }
 
-  open({ range, today, onValidate }: DateRangePickerOpenOptions): void {
+  open({ range, today, onValidate, mode = 'range' }: DateRangePickerOpenOptions): void {
+    this._mode = mode;
     this._selection = range ? selectionFromRange(range) : EMPTY_SELECTION;
     this._today = today;
     this._month = monthOf({ day: range?.to ?? today });
@@ -112,7 +119,10 @@ export class BuddjDateRangePickerDrawer extends HTMLElement {
     }
     const dayButton = target.closest<HTMLButtonElement>('[data-day]');
     if (dayButton && !dayButton.disabled && dayButton.dataset.day) {
-      this._selection = pickDay({ selection: this._selection, day: dayButton.dataset.day });
+      this._selection =
+        this._mode === 'day'
+          ? { start: dayButton.dataset.day, end: null }
+          : pickDay({ selection: this._selection, day: dayButton.dataset.day });
       this.render();
       this.querySelector<HTMLElement>(`[data-day="${dayButton.dataset.day}"]`)?.focus();
     }
@@ -128,6 +138,9 @@ export class BuddjDateRangePickerDrawer extends HTMLElement {
 
   private _hint(): string {
     const { start, end } = this._selection;
+    if (this._mode === 'day') {
+      return start === null ? 'Choisis une date.' : `Le ${dayNameFormatter.format(dateOf(start))}.`;
+    }
     if (start === null) return 'Choisis la date de début.';
     if (end === null) {
       return `Début le ${shortDayFormatter.format(dateOf(start))}. Choisis la date de fin, ou valide pour ce seul jour.`;
@@ -137,10 +150,11 @@ export class BuddjDateRangePickerDrawer extends HTMLElement {
 
   /** Panneau stable (dialog, consigne, pied) ; seul le calendrier est redessiné. */
   private _renderShell(): void {
+    const title = this._mode === 'day' ? 'Choisir une date' : 'Choisir une période';
     this.innerHTML = `
       <div class="date-range-picker-backdrop" data-date-range-backdrop></div>
-      <div class="date-range-picker-panel" role="dialog" aria-modal="true" aria-label="Choisir une période">
-        <h2 class="date-range-picker-title">Choisir une période</h2>
+      <div class="date-range-picker-panel" role="dialog" aria-modal="true" aria-label="${title}">
+        <h2 class="date-range-picker-title">${title}</h2>
         <p class="date-range-picker-hint" role="status"></p>
         <div class="date-range-picker-calendar"></div>
         <div class="date-range-picker-footer">
