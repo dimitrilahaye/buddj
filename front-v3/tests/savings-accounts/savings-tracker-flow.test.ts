@@ -35,6 +35,9 @@ describe('suivi des épargnes', () => {
 
     await screen.findByRole('heading', { name: 'Suivi des épargnes', level: 1 });
     expect(window.location.pathname).toBe('/savings-tracker');
+    // Seul raccourci : « Ce mois » ; le reste passe par le calendrier.
+    const period = screen.getByRole('group', { name: 'Période' });
+    expect(within(period).getAllByRole('radio').map((r) => r.closest('label')?.textContent?.trim())).toEqual(['Ce mois']);
     expect((screen.getByRole('radio', { name: 'Ce mois' }) as HTMLInputElement).checked).toBe(true);
     await waitFor(() => expect(total('Ajouté')).toBe('Ajouté : + 150,00 €'));
     expect(total('Retiré')).toBe('Retiré : − 300,00 €');
