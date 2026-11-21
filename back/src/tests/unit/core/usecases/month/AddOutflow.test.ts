@@ -24,7 +24,7 @@ describe("Unit | Core | Usecases | AddOutflow", function () {
     clock.restore();
   });
 
-  it("should return a new added outflow", async function () {
+  it("should return a new added outflow without tracking it", async function () {
     // given
     const command: AddOutflowCommand = {
       monthId: "month-id",
@@ -44,11 +44,7 @@ describe("Unit | Core | Usecases | AddOutflow", function () {
     };
     monthRepositoryStub.getById.withArgs(command.monthId).resolves(month);
 
-    const usecase = new AddOutflow(
-      outflowFactory,
-      monthRepositoryStub,
-      eventPublisherStub
-    );
+    const usecase = new AddOutflow(outflowFactory, monthRepositoryStub);
 
     // when
     const updatedMonth = await usecase.execute(command);
@@ -63,15 +59,7 @@ describe("Unit | Core | Usecases | AddOutflow", function () {
     expect(month.addOutflow.calledOnceWithExactly(outflow)).to.be.true;
     expect(monthRepositoryStub.addOutflow.calledOnceWithExactly(month, outflow))
       .to.be.true;
-    expect(eventPublisherStub.publish).to.have.been.calledOnce;
-    const [eventName, payload] = eventPublisherStub.publish.firstCall.args;
-    expect(eventName).to.equal("outflowAdded");
-    expect(payload).to.include({
-      outflowId: "outflow-id",
-      label: "JOW",
-      amount: 10,
-    });
-    expect(payload.occurredAt.getTime()).to.be.at.least(now.getTime());
+    expect(eventPublisherStub.publish).not.to.have.been.called;
     expect(updatedMonth).to.deep.equal(month);
   });
 
@@ -92,11 +80,7 @@ describe("Unit | Core | Usecases | AddOutflow", function () {
 
     monthRepositoryStub.getById.withArgs(command.monthId).resolves(null);
 
-    const usecase = new AddOutflow(
-      outflowFactory,
-      monthRepositoryStub,
-      eventPublisherStub
-    );
+    const usecase = new AddOutflow(outflowFactory, monthRepositoryStub);
 
     // when / then
     await expect(usecase.execute(command)).to.be.rejectedWith(

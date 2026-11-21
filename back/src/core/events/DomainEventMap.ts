@@ -9,11 +9,15 @@ export type ExpenseDeletedEvent = {
   expenseId: string;
 };
 
-export type OutflowAddedEvent = {
+export type OutflowCheckedEvent = {
   outflowId: string;
   label: string;
   amount: number;
   occurredAt: Date;
+};
+
+export type OutflowUncheckedEvent = {
+  outflowId: string;
 };
 
 export type OutflowDeletedEvent = {
@@ -35,7 +39,8 @@ export type OutflowUpdatedEvent = {
 export type DomainEventMap = {
   expenseAdded: ExpenseAddedEvent;
   expenseDeleted: ExpenseDeletedEvent;
-  outflowAdded: OutflowAddedEvent;
+  outflowChecked: OutflowCheckedEvent;
+  outflowUnchecked: OutflowUncheckedEvent;
   outflowDeleted: OutflowDeletedEvent;
   expenseUpdated: ExpenseUpdatedEvent;
   outflowUpdated: OutflowUpdatedEvent;

@@ -75,7 +75,8 @@ const manageExpensesCheckingUsecase = new ManageExpensesChecking(
 );
 
 const manageOutflowsCheckingUsecase = new ManageOutflowsChecking(
-  monthRepository
+  monthRepository,
+  eventBus
 );
 
 const getDefaultMonthlyTemplateUsecase = new GetDefaultMonthlyTemplate(
@@ -165,11 +166,7 @@ const updateTrackedSpendingUsecase = new UpdateTrackedSpending(
 
 const deleteOutflowUsecase = new DeleteOutflow(monthRepository, eventBus);
 
-const addOutflowUsecase = new AddOutflow(
-  outflowFactory,
-  monthRepository,
-  eventBus
-);
+const addOutflowUsecase = new AddOutflow(outflowFactory, monthRepository);
 
 const addBudgetUsecase = new AddBudget(budgetFactory, monthRepository);
 
