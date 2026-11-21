@@ -15,6 +15,13 @@ const trackedSpendingRepositoryStub = {
   findBetween: sinon.stub(),
 };
 
+const savingsAccountRepositoryStub = {
+  findAll: sinon.stub(),
+  findById: sinon.stub(),
+  saveOperation: sinon.stub(),
+  deleteOperation: sinon.stub(),
+};
+
 const projectRepositoryStub = {
   getAllByCategory: sinon.stub(),
   getById: sinon.stub(),
@@ -78,6 +85,10 @@ const yearlyOutflowRepositoryStub = {
 };
 
 function resetStubs() {
+  savingsAccountRepositoryStub.findAll.reset();
+  savingsAccountRepositoryStub.findById.reset();
+  savingsAccountRepositoryStub.saveOperation.reset();
+  savingsAccountRepositoryStub.deleteOperation.reset();
   eventPublisherStub.publish.reset();
   trackedSpendingRepositoryStub.save.reset();
   trackedSpendingRepositoryStub.deleteBySource.reset();
@@ -138,5 +149,6 @@ export {
   projectRepositoryStub,
   eventPublisherStub,
   trackedSpendingRepositoryStub,
+  savingsAccountRepositoryStub,
   resetStubs,
 };
