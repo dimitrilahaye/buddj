@@ -1,5 +1,6 @@
 /**
- * Navigation principale : liens vers /outflows/:monthId et /budgets/:monthId (même mois courant).
+ * Navigation principale : liens vers /outflows/:monthId et /budgets/:monthId (même mois courant),
+ * puis /savings-accounts (comptes épargne, hors cycle des mois).
  * Attribut month-id pour construire les hrefs ; l’état actif est géré via .nav-link--active.
  */
 export class BuddjNav extends HTMLElement {
@@ -49,6 +50,7 @@ export class BuddjNav extends HTMLElement {
         <div class="nav-main-links">
           <a href="/outflows/${m}" class="nav-link">Charges</a>
           <a href="/budgets/${m}" class="nav-link">Budgets</a>
+          <a href="/savings-accounts" class="nav-link">Épargnes</a>
         </div>
         <button type="button" class="btn nav-burger" title="${burgerTitle}" aria-label="${burgerTitle}" aria-expanded="${this._burgerOpen}">${burgerIcon}</button>
       </nav>
