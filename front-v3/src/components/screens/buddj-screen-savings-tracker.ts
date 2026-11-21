@@ -24,11 +24,8 @@ import type { BuddjDateRangePickerDrawerElement } from '../organisms/buddj-date-
 
 const DEFAULT_SHORTCUT: SpendingRangeShortcut = 'month';
 
-const SHORTCUTS: Array<{ value: SpendingRangeShortcut; label: string }> = [
-  { value: 'today', label: "Aujourd'hui" },
-  { value: 'week', label: 'Cette semaine' },
-  { value: 'month', label: 'Ce mois' },
-];
+/** Seul raccourci utile ici : le mois en cours ; le reste passe par le calendrier. */
+const SHORTCUTS: Array<{ value: SpendingRangeShortcut; label: string }> = [{ value: 'month', label: 'Ce mois' }];
 
 function signedEuros(value: number): string {
   if (value > 0) return `+ ${formatEuros(value)}`;
