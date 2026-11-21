@@ -3,13 +3,10 @@ import {
   monthlyTemplateRepositoryStub,
   pendingDebitRepositoryStub,
   resetStubs,
-  yearlyOutflowRepositoryStub,
-  idProviderStub,
   monthlyOutflowTemplateRepositoryStub,
   monthlyBudgetTemplateRepositoryStub,
 } from "../test-helpers.js";
 import GetDefaultMonthlyTemplate from "../../../../../core/usecases/monthly-template/GetDefaultMonthlyTemplate.js";
-import sinon from "sinon";
 
 describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
   afterEach(() => {
@@ -21,17 +18,10 @@ describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
     const expectedDebits = Symbol("debits");
     pendingDebitRepositoryStub.getAll.resolves(expectedDebits);
 
-    const expectedTotal = 120;
-    const expectedOutflows = {
-      getMonthlyProjectsAmount: () => expectedTotal,
-    };
-    yearlyOutflowRepositoryStub.getAll.resolves(expectedOutflows);
-
     const expectedTemplate = {
       id: "id",
       outflows: [],
       budgets: [],
-      addMonthlyProjectForAmount: sinon.stub(),
     };
     monthlyTemplateRepositoryStub.getDefault.resolves(expectedTemplate);
 
@@ -49,9 +39,7 @@ describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
       monthlyTemplateRepositoryStub,
       monthlyOutflowTemplateRepositoryStub,
       monthlyBudgetTemplateRepositoryStub,
-      pendingDebitRepositoryStub,
-      yearlyOutflowRepositoryStub,
-      idProviderStub
+      pendingDebitRepositoryStub
     );
 
     // when
@@ -66,9 +54,6 @@ describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
       monthlyBudgetTemplateRepositoryStub.getAllByTemplateId
     ).to.have.been.calledOnceWith(expectedTemplate.id);
     expect(monthlyTemplateRepositoryStub.getDefault).to.have.been.calledOnce;
-    expect(
-      expectedTemplate.addMonthlyProjectForAmount
-    ).to.have.been.calledOnceWith(idProviderStub, expectedTotal);
     expect(monthlyTemplate.pendingDebits).to.be.equals(expectedDebits);
     expect(monthlyTemplate.template?.budgets).to.be.equals(
       expectedTemplateBudgets
@@ -86,9 +71,7 @@ describe("Unit | Core | Usecases | GetDefaultMonthlyTemplate", function () {
       monthlyTemplateRepositoryStub,
       monthlyOutflowTemplateRepositoryStub,
       monthlyBudgetTemplateRepositoryStub,
-      pendingDebitRepositoryStub,
-      yearlyOutflowRepositoryStub,
-      idProviderStub
+      pendingDebitRepositoryStub
     );
 
     // when

@@ -24,7 +24,7 @@ describe("Unit | Core | Models | Yearly outflows | YearlyOutflows#update", () =>
     expect(updated).to.deep.equal(
       new YearlyOutflow({ id: "outflow-id", month: 3, label: "Assurance auto", amount: 660 })
     );
-    expect(l.getMonthlyProjectsAmount()).to.equal(Number(((660 + 1200) / 12).toFixed(2)));
+    expect(l.getAll()).to.deep.include(updated);
   });
 
   it("should update a budget, keeping its month", () => {

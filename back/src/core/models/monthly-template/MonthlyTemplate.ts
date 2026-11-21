@@ -5,7 +5,6 @@ import {
   MonthlyOutflowTemplateNotFoundError,
   MonthlyTemplateNameCanNotBeEmptyError,
 } from "../../errors/MonthlyTemplateErrors.js";
-import IdProvider from "../../ports/providers/IdProvider.js";
 
 export default class MonthlyTemplate {
   id: string;
@@ -86,15 +85,5 @@ export default class MonthlyTemplate {
 
   addBudget(budget: MonthlyBudgetTemplate) {
     this.budgets.push(budget);
-  }
-
-  addMonthlyProjectForAmount(idProvider: IdProvider, amount: number) {
-    this.outflows.push(
-      new MonthlyOutflowTemplate({
-        id: idProvider.get(),
-        label: "Projets mensuels",
-        amount: amount,
-      })
-    );
   }
 }

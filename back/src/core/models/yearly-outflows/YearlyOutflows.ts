@@ -24,16 +24,6 @@ export default class YearlyOutflows {
     return [...this.outflowsList, ...this.budgetsList];
   }
 
-  getMonthlyProjectsAmount() {
-    let total = this.outflowsList.reduce((previous, current) => {
-      return previous + current.amount;
-    }, 0);
-    total += this.budgetsList.reduce((previous, current) => {
-      return previous + current.initialBalance;
-    }, 0);
-    return Number((total / 12).toFixed(2));
-  }
-
   add(saving: YearlyOutflow | YearlyBudget) {
     if (saving.month < 1 || saving.month > 12) {
       throw new YearlySavingsAddError();
