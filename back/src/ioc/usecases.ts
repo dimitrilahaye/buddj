@@ -89,9 +89,7 @@ const getDefaultMonthlyTemplateUsecase = new GetDefaultMonthlyTemplate(
   monthlyTemplateRepository,
   monthlyOutflowTemplateRepository,
   monthlyBudgetTemplateRepository,
-  pendingDebitRepository,
-  yearlyOutflowRepository,
-  idProvider
+  pendingDebitRepository
 );
 
 const getAllMonthlyTemplatesUsecase = new GetAllMonthlyTemplates(
