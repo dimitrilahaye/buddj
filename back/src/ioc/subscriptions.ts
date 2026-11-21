@@ -27,7 +27,7 @@ function registerSubscriptions(
     })
   );
 
-  subscriber.subscribe("outflowAdded", (event) =>
+  subscriber.subscribe("outflowChecked", (event) =>
     trackSpendingUsecase.execute({
       kind: "outflow",
       sourceId: event.outflowId,
@@ -39,6 +39,10 @@ function registerSubscriptions(
 
   subscriber.subscribe("expenseDeleted", (event) =>
     untrackSpendingUsecase.execute({ kind: "expense", sourceId: event.expenseId })
+  );
+
+  subscriber.subscribe("outflowUnchecked", (event) =>
+    untrackSpendingUsecase.execute({ kind: "outflow", sourceId: event.outflowId })
   );
 
   subscriber.subscribe("outflowDeleted", (event) =>

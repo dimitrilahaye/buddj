@@ -110,6 +110,10 @@ export default class Month {
     this.account.uncheckOutflow(outflowId);
   }
 
+  findOutflow(outflowId: string) {
+    return this.account.findOutflow(outflowId);
+  }
+
   updateOutflow(outflowId: string, label: string, amount: number) {
     return this.account.updateOutflow(outflowId, label, amount);
   }

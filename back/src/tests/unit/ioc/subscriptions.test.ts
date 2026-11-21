@@ -48,11 +48,11 @@ describe("Unit | IoC | Subscriptions", function () {
     });
   });
 
-  it("should track an added outflow", async function () {
+  it("should track a checked outflow", async function () {
     const { handlers, trackSpendingUsecase } = setup();
     const occurredAt = new Date();
 
-    await handlers.get("outflowAdded")!({
+    await handlers.get("outflowChecked")!({
       outflowId: "outflow-id",
       label: "EDF",
       amount: 114.62,
@@ -76,6 +76,17 @@ describe("Unit | IoC | Subscriptions", function () {
     expect(untrackSpendingUsecase.execute).to.have.been.calledOnceWithExactly({
       kind: "expense",
       sourceId: "expense-id",
+    });
+  });
+
+  it("should untrack an unchecked outflow", async function () {
+    const { handlers, untrackSpendingUsecase } = setup();
+
+    await handlers.get("outflowUnchecked")!({ outflowId: "outflow-id" });
+
+    expect(untrackSpendingUsecase.execute).to.have.been.calledOnceWithExactly({
+      kind: "outflow",
+      sourceId: "outflow-id",
     });
   });
 
