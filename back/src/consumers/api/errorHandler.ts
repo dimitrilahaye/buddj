@@ -23,6 +23,8 @@ const errorHandler = (
     case "MonthlyOutflowTemplateNotFoundError":
     case "MonthlyBudgetTemplateNotFoundError":
     case "ProjectNotFoundError":
+    case "SavingsAccountNotFoundError":
+    case "SavingsAccountOperationNotFoundError":
       statusCode = 404;
       break;
     case "AccountInitialBalanceError":
@@ -48,6 +50,8 @@ const errorHandler = (
     case "ProjectAmountMustBePositiveError":
     case "UnknownCategoryError":
     case "SpendingTrackerRangeError":
+    case "SavingsAccountOperationAmountMustBePositiveError":
+    case "SavingsAccountTrackerRangeError":
       statusCode = 422;
       break;
     default:

@@ -124,6 +124,28 @@ import getSpendingTrackerDeserializer, {
 import spendingTrackerDto, {
   SpendingTrackerDtoBuilder,
 } from "../consumers/api/dtos/spendingTrackerDto.js";
+import GetSavingsAccounts from "../core/usecases/savings-account/GetSavingsAccounts.js";
+import AddSavingsAccountOperation from "../core/usecases/savings-account/AddSavingsAccountOperation.js";
+import UpdateSavingsAccountOperation from "../core/usecases/savings-account/UpdateSavingsAccountOperation.js";
+import DeleteSavingsAccountOperation from "../core/usecases/savings-account/DeleteSavingsAccountOperation.js";
+import GetSavingsAccountTracker from "../core/usecases/savings-account/GetSavingsAccountTracker.js";
+import {
+  savingsAccountDto,
+  SavingsAccountDtoBuilder,
+  savingsAccountTrackerDto,
+  SavingsAccountTrackerDtoBuilder,
+} from "../consumers/api/dtos/savingsAccountDto.js";
+import {
+  addSavingsAccountOperationDeserializer,
+  AddSavingsAccountOperationDeserializer,
+  updateSavingsAccountOperationDeserializer,
+  UpdateSavingsAccountOperationDeserializer,
+  deleteSavingsAccountOperationDeserializer,
+  DeleteSavingsAccountOperationDeserializer,
+} from "../consumers/api/deserializers/savings-account/savingsAccountOperation.js";
+import getSavingsAccountTrackerDeserializer, {
+  GetSavingsAccountTrackerDeserializer,
+} from "../consumers/api/deserializers/savings-account/getSavingsAccountTracker.js";
 import { client, userRepository } from "./persistence.js";
 import * as usecases from "./usecases.js";
 import { eventBus } from "./events.js";
@@ -177,6 +199,17 @@ export type Deps = {
   rollbackProjectUsecase: RollbackProject;
   updateProjectUsecase: UpdateProject;
   getSpendingTrackerUsecase: GetSpendingTracker;
+  getSavingsAccountsUsecase: GetSavingsAccounts;
+  addSavingsAccountOperationUsecase: AddSavingsAccountOperation;
+  updateSavingsAccountOperationUsecase: UpdateSavingsAccountOperation;
+  deleteSavingsAccountOperationUsecase: DeleteSavingsAccountOperation;
+  getSavingsAccountTrackerUsecase: GetSavingsAccountTracker;
+  savingsAccountDto: SavingsAccountDtoBuilder;
+  savingsAccountTrackerDto: SavingsAccountTrackerDtoBuilder;
+  addSavingsAccountOperationDeserializer: AddSavingsAccountOperationDeserializer;
+  updateSavingsAccountOperationDeserializer: UpdateSavingsAccountOperationDeserializer;
+  deleteSavingsAccountOperationDeserializer: DeleteSavingsAccountOperationDeserializer;
+  getSavingsAccountTrackerDeserializer: GetSavingsAccountTrackerDeserializer;
   addOutflowDeserializer: AddOutflowDeserializer;
   addBudgetDeserializer: AddBudgetDeserializer;
   updateBudgetDeserializer: UpdateBudgetDeserializer;
@@ -237,4 +270,10 @@ export default {
   updateMonthlyOutflowDeserializer,
   updateMonthlyBudgetDeserializer,
   updateYearlyOutflowDeserializer,
+  savingsAccountDto,
+  savingsAccountTrackerDto,
+  addSavingsAccountOperationDeserializer,
+  updateSavingsAccountOperationDeserializer,
+  deleteSavingsAccountOperationDeserializer,
+  getSavingsAccountTrackerDeserializer,
 } as const;

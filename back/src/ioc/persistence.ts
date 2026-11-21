@@ -12,6 +12,7 @@ import MonthlyOutflowTemplateRepository from "../providers/persistence/repositor
 import MonthlyBudgetTemplateRepository from "../providers/persistence/repositories/MonthlyBudgetTemplateRepository.js";
 import UserRepository from "../providers/persistence/repositories/UserRepository.js";
 import TrackedSpendingRepository from "../providers/persistence/repositories/TrackedSpendingRepository.js";
+import SavingsAccountRepository from "../providers/persistence/repositories/SavingsAccountRepository.js";
 
 if (process.env.MOCHA_TEST !== "unit") {
   await typeormDataSource.initialize();
@@ -43,6 +44,8 @@ const projectRepository = new ProjectRepository();
 
 const trackedSpendingRepository = new TrackedSpendingRepository();
 
+const savingsAccountRepository = new SavingsAccountRepository();
+
 export {
   client,
   userRepository,
@@ -54,4 +57,5 @@ export {
   yearlyOutflowRepository,
   projectRepository,
   trackedSpendingRepository,
+  savingsAccountRepository,
 };
