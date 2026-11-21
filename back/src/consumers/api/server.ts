@@ -403,6 +403,41 @@ function buildApi(
   );
 
   api.use(
+    routes.savingsAccount.getSavingsAccounts(router, {
+      usecase: dependencies.getSavingsAccountsUsecase,
+      dto: dependencies.savingsAccountDto,
+    })
+  );
+  api.use(
+    routes.savingsAccount.addSavingsAccountOperation(router, {
+      usecase: dependencies.addSavingsAccountOperationUsecase,
+      dto: dependencies.savingsAccountDto,
+      deserializer: dependencies.addSavingsAccountOperationDeserializer,
+    })
+  );
+  api.use(
+    routes.savingsAccount.updateSavingsAccountOperation(router, {
+      usecase: dependencies.updateSavingsAccountOperationUsecase,
+      dto: dependencies.savingsAccountDto,
+      deserializer: dependencies.updateSavingsAccountOperationDeserializer,
+    })
+  );
+  api.use(
+    routes.savingsAccount.deleteSavingsAccountOperation(router, {
+      usecase: dependencies.deleteSavingsAccountOperationUsecase,
+      dto: dependencies.savingsAccountDto,
+      deserializer: dependencies.deleteSavingsAccountOperationDeserializer,
+    })
+  );
+  api.use(
+    routes.savingsAccount.getSavingsAccountTracker(router, {
+      usecase: dependencies.getSavingsAccountTrackerUsecase,
+      dto: dependencies.savingsAccountTrackerDto,
+      deserializer: dependencies.getSavingsAccountTrackerDeserializer,
+    })
+  );
+
+  api.use(
     routes.month.updateExpense(router, {
       updateExpenseUsecase: dependencies.updateExpenseUsecase,
       monthDto: dependencies.monthDto,

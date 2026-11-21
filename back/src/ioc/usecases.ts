@@ -41,6 +41,11 @@ import RemoveYearlyOutflow from "../core/usecases/yearly-saving/RemoveYearlyOutf
 import TrackSpending from "../core/usecases/spending-tracker/TrackSpending.js";
 import UntrackSpending from "../core/usecases/spending-tracker/UntrackSpending.js";
 import GetSpendingTracker from "../core/usecases/spending-tracker/GetSpendingTracker.js";
+import GetSavingsAccounts from "../core/usecases/savings-account/GetSavingsAccounts.js";
+import AddSavingsAccountOperation from "../core/usecases/savings-account/AddSavingsAccountOperation.js";
+import UpdateSavingsAccountOperation from "../core/usecases/savings-account/UpdateSavingsAccountOperation.js";
+import DeleteSavingsAccountOperation from "../core/usecases/savings-account/DeleteSavingsAccountOperation.js";
+import GetSavingsAccountTracker from "../core/usecases/savings-account/GetSavingsAccountTracker.js";
 import { eventBus } from "./events.js";
 import {
   monthRepository,
@@ -51,6 +56,7 @@ import {
   yearlyOutflowRepository,
   projectRepository,
   trackedSpendingRepository,
+  savingsAccountRepository,
 } from "./persistence.js";
 import {
   monthFactory,
@@ -221,6 +227,27 @@ const getSpendingTrackerUsecase = new GetSpendingTracker(
   trackedSpendingRepository
 );
 
+const getSavingsAccountsUsecase = new GetSavingsAccounts(
+  savingsAccountRepository
+);
+
+const addSavingsAccountOperationUsecase = new AddSavingsAccountOperation(
+  idProvider,
+  savingsAccountRepository
+);
+
+const updateSavingsAccountOperationUsecase = new UpdateSavingsAccountOperation(
+  savingsAccountRepository
+);
+
+const deleteSavingsAccountOperationUsecase = new DeleteSavingsAccountOperation(
+  savingsAccountRepository
+);
+
+const getSavingsAccountTrackerUsecase = new GetSavingsAccountTracker(
+  savingsAccountRepository
+);
+
 export {
   createNewMonthUsecase,
   getUnarchivedMonthsUsecase,
@@ -265,4 +292,9 @@ export {
   trackSpendingUsecase,
   untrackSpendingUsecase,
   getSpendingTrackerUsecase,
+  getSavingsAccountsUsecase,
+  addSavingsAccountOperationUsecase,
+  updateSavingsAccountOperationUsecase,
+  deleteSavingsAccountOperationUsecase,
+  getSavingsAccountTrackerUsecase,
 };
