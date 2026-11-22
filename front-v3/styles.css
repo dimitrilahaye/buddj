@@ -7934,10 +7934,19 @@ buddj-savings-tracker-chart[hidden] {
   stroke-opacity: 0.35;
 }
 
-.savings-chart .spending-pie-legend-item {
-  cursor: pointer;
+.savings-chart-balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--navy);
 }
 
-.spending-chart-svg--focused .spending-chart-dot[data-slice]:not(.is-active) {
-  opacity: 0.25;
+.savings-chart-balance-value {
+  font-weight: 700;
+}
+
+.savings-chart-movement {
+  stroke: var(--bg-card);
+  stroke-width: 1.5;
 }

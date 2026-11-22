@@ -1,14 +1,14 @@
 /**
  * Écran « Suivi des épargnes » : pour un compte épargne (flèches ← → pour changer de compte),
  * ce qui a été ajouté et retiré sur une période (raccourcis ou calendrier, comme le suivi des
- * dépenses), le net et le solde, puis les courbes solde / ajouts cumulés / retraits cumulés.
+ * dépenses), le net et le solde, puis la courbe du solde.
  */
 import {
   getCurrentSavingsAccount,
   type SavingsAccountsStore,
 } from '../../application/savings-account/savings-accounts-store.js';
 import type { SavingsTrackerStore } from '../../application/savings-account/savings-tracker-store.js';
-import { SAVINGS_SERIES, savingsChartPoints } from '../../application/savings-account/savings-tracker-series.js';
+import { savingsChartPoints } from '../../application/savings-account/savings-tracker-series.js';
 import type { SavingsTrackerView } from '../../application/savings-account/savings-account-types.js';
 import { rangeForShortcut, todayIso } from '../../application/spending-tracker/spending-tracker-range.js';
 import type { SpendingRange, SpendingRangeShortcut } from '../../application/spending-tracker/spending-tracker-types.js';
@@ -248,7 +248,6 @@ export class BuddjScreenSavingsTracker extends HTMLElement {
     chart.hidden = shown === null;
     if (shown) {
       chart.render({
-        series: SAVINGS_SERIES,
         points: savingsChartPoints({ view: shown }),
         granularity: shown.granularity,
         isRefreshing: isLoading,

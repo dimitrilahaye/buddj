@@ -68,23 +68,24 @@ describe('suivi des épargnes', () => {
     expect(service.trackerCalls.at(-1)).toEqual({ savingsAccountId: 'ldds', from: '2026-10-01', to: '2026-11-21' });
   });
 
-  it('trace solde, ajouts et retraits cumulés et met une courbe en avant au clic sur la légende', async () => {
+  it('trace une seule courbe du solde et détaille les mouvements dans l’infobulle', async () => {
     startOn({ path: '/savings-tracker' });
-    const legend = await screen.findByRole('list', { name: 'Courbes' });
-    await waitFor(() =>
-      expect(within(legend).getAllByRole('button').map((b) => b.getAttribute('aria-label'))).toEqual([
-        'Solde : 4850,00 €',
-        'Ajouts cumulés : 150,00 €',
-        'Retraits cumulés : 300,00 €',
-      ])
-    );
+    const plot = await screen.findByRole('group', { name: /^Solde : 4850,00 € au / });
+    expect(screen.queryByRole('list', { name: 'Courbes' })).toBeNull();
+    expect(document.querySelectorAll('.savings-chart-line')).toHaveLength(1);
+    // Un point par jour avec mouvement : l'ajout du 2 et le retrait du 10 novembre.
+    expect(document.querySelectorAll('.savings-chart-movement')).toHaveLength(2);
 
-    fireEvent.click(within(legend).getByRole('button', { name: 'Retraits cumulés : 300,00 €' }));
-    expect(within(legend).getByRole('button', { name: 'Retraits cumulés : 300,00 €' }).getAttribute('aria-pressed')).toBe('true');
-    expect(within(legend).getByRole('button', { name: 'Solde : 4850,00 €' }).getAttribute('aria-pressed')).toBe('false');
+    fireEvent.keyDown(plot, { key: 'ArrowLeft' });
+    const tooltip = within(plot).getByRole('status', { name: 'Valeurs de la période survolée' });
+    expect(tooltip.textContent).toContain('4850,00 € de solde');
+    expect(tooltip.textContent).not.toContain('retirés');
 
-    fireEvent.click(within(legend).getByRole('button', { name: 'Retraits cumulés : 300,00 €' }));
-    expect(within(legend).getByRole('button', { name: 'Retraits cumulés : 300,00 €' }).getAttribute('aria-pressed')).toBe('false');
+    // Du 21 au 10 novembre : le jour du retrait.
+    for (let i = 0; i < 11; i++) fireEvent.keyDown(plot, { key: 'ArrowLeft' });
+    expect(tooltip.textContent).toContain('4850,00 € de solde');
+    expect(tooltip.textContent).toContain('− 300,00 € retirés');
+    expect(tooltip.textContent).not.toContain('ajoutés');
   });
 
   it('affiche une erreur quand le suivi ne se charge pas', async () => {
@@ -93,6 +94,6 @@ describe('suivi des épargnes', () => {
     startOn({ path: '/savings-tracker', service });
 
     expect(await screen.findByRole('alert')).toBeTruthy();
-    expect(screen.queryByRole('list', { name: 'Courbes' })).toBeNull();
+    expect(screen.queryByRole('group', { name: /^Solde : / })).toBeNull();
   });
 });
