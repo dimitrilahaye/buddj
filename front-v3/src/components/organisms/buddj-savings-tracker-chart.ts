@@ -1,25 +1,16 @@
 /**
- * Courbes du suivi des épargnes : solde, ajouts cumulés et retraits cumulés sur la période.
- * SVG fait main, sans dépendance, sur le modèle de la courbe cumulée du suivi des dépenses
- * (réticule, infobulle, flèches gauche/droite au clavier).
- *
- * Légende commune au suivi des dépenses : survoler, cibler ou toucher une ligne de légende
- * (ou une courbe) met cette courbe en avant et estompe les deux autres.
+ * Courbe du suivi des épargnes : le solde sur la période, qui monte avec les ajouts et
+ * descend avec les retraits. Un point vert ou orange marque chaque période où l'argent
+ * est entré ou sorti. SVG fait main, sans dépendance, sur le modèle de la courbe cumulée
+ * du suivi des dépenses (réticule, infobulle, flèches gauche/droite au clavier).
  */
 import { niceAxisTicks } from '../../application/spending-tracker/spending-tracker-cumulative.js';
-import {
-  savingsValueDomain,
-  type SavingsChartPoint,
-  type SavingsChartSeries,
-} from '../../application/savings-account/savings-tracker-series.js';
+import { savingsValueDomain, type SavingsChartPoint } from '../../application/savings-account/savings-tracker-series.js';
 import type { SpendingGranularity } from '../../application/spending-tracker/spending-tracker-types.js';
-import { escapeAttr, escapeHtml } from '../../shared/escape.js';
 import { formatEuros } from '../../shared/goal.js';
 import { formatBucketAxisLabel, formatBucketLabel } from '../../shared/spending-bucket-label.js';
-import { sliceKeyOf } from './spending-legend.js';
 
 export type SavingsTrackerChartData = {
-  series: SavingsChartSeries[];
   points: SavingsChartPoint[];
   granularity: SpendingGranularity;
   isRefreshing: boolean;
@@ -29,16 +20,19 @@ const HEIGHT = 220;
 const PAD = { top: 20, right: 16, bottom: 26, left: 56 };
 const FALLBACK_WIDTH = 340;
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const BALANCE_COLOR = 'var(--series-savings-balance)';
+const DEPOSIT_COLOR = 'var(--series-savings-deposit)';
+const WITHDRAWAL_COLOR = 'var(--series-savings-withdrawal)';
 
 function compactEuros(value: number): string {
   if (Math.abs(value) >= 10_000) return `${Math.round(value / 1000)} k€`;
   return `${Math.round(value)} €`;
 }
 
-/** Graduations « rondes » couvrant [min, max], 0 compris. */
+/** Graduations « rondes » couvrant [min, max]. */
 function axisTicks({ min, max }: { min: number; max: number }): number[] {
   const span = max - min;
-  if (span <= 0) return [0];
+  if (span <= 0) return [min];
   const [, step = span] = niceAxisTicks({ max: span });
   const start = Math.floor(min / step) * step;
   const ticks: number[] = [];
@@ -49,6 +43,12 @@ function axisTicks({ min, max }: { min: number; max: number }): number[] {
   return ticks;
 }
 
+/** Couleur du point de mouvement d'un bucket, ou null s'il ne s'est rien passé. */
+function movementColor(point: SavingsChartPoint): string | null {
+  if (point.deposits === 0 && point.withdrawals === 0) return null;
+  return point.deposits - point.withdrawals < 0 ? WITHDRAWAL_COLOR : DEPOSIT_COLOR;
+}
+
 export class BuddjSavingsTrackerChart extends HTMLElement {
   static readonly tagName = 'buddj-savings-tracker-chart';
 
@@ -57,23 +57,23 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
   private _xs: number[] = [];
   private _resizeObserver?: ResizeObserver;
   private _lastWidth = 0;
-  /** Courbe mise en avant par survol ou focus */
-  private _hoveredSeries: string | null = null;
-  /** Courbe mise en avant par un clic sur la légende (reste tant qu'on ne reclique pas) */
-  private _pinnedSeries: string | null = null;
 
   connectedCallback(): void {
     if (!this.querySelector('.spending-chart')) {
       this.innerHTML = `
         <figure class="spending-chart savings-chart">
           <figcaption class="spending-chart-caption">
-            <span class="spending-chart-title">Évolution sur la période</span>
+            <span class="spending-chart-title">Évolution du solde</span>
+            <span class="savings-chart-balance">
+              <span class="spending-chart-swatch" style="background:${BALANCE_COLOR}" aria-hidden="true"></span>
+              <span class="savings-chart-balance-label">Solde</span>
+              <strong class="savings-chart-balance-value"></strong>
+            </span>
           </figcaption>
           <div class="spending-chart-plot" tabindex="0" role="group">
             <svg class="spending-chart-svg" aria-hidden="true" focusable="false"></svg>
             <div class="spending-chart-tooltip" role="status" aria-label="Valeurs de la période survolée" hidden></div>
           </div>
-          <ul class="spending-pie-legend spending-chart-legend" aria-label="Courbes"></ul>
         </figure>
       `;
     }
@@ -83,12 +83,6 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
     plot.addEventListener('click', this._onPlotClick);
     plot.addEventListener('keydown', this._onKeyDown);
     plot.addEventListener('blur', this._onPointerLeave);
-    this.addEventListener('pointerover', this._onSeriesHover);
-    this.addEventListener('pointerleave', this._onSeriesLeave);
-    this.addEventListener('focusin', this._onSeriesHover);
-    this.addEventListener('focusout', this._onSeriesLeave);
-    this._legend().addEventListener('click', this._onLegendClick);
-    this._legend().addEventListener('keydown', this._onLegendKeyDown);
     if (typeof ResizeObserver !== 'undefined') {
       this._resizeObserver = new ResizeObserver(() => {
         if (this._plot().clientWidth !== this._lastWidth) this._draw();
@@ -105,13 +99,6 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
     plot?.removeEventListener('click', this._onPlotClick);
     plot?.removeEventListener('keydown', this._onKeyDown);
     plot?.removeEventListener('blur', this._onPointerLeave);
-    this.removeEventListener('pointerover', this._onSeriesHover);
-    this.removeEventListener('pointerleave', this._onSeriesLeave);
-    this.removeEventListener('focusin', this._onSeriesHover);
-    this.removeEventListener('focusout', this._onSeriesLeave);
-    const legend = this.querySelector<HTMLElement>('.spending-chart-legend');
-    legend?.removeEventListener('click', this._onLegendClick);
-    legend?.removeEventListener('keydown', this._onLegendKeyDown);
     this._resizeObserver?.disconnect();
   }
 
@@ -125,14 +112,6 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
     return this.querySelector('.spending-chart-plot') as HTMLElement;
   }
 
-  private _legend(): HTMLElement {
-    return this.querySelector('.spending-chart-legend') as HTMLElement;
-  }
-
-  private _activeSeries(): string | null {
-    return this._hoveredSeries ?? this._pinnedSeries;
-  }
-
   private _draw(): void {
     const data = this._data;
     if (!data || !this.querySelector('.spending-chart')) return;
@@ -140,16 +119,16 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
     const svg = this.querySelector('svg') as SVGSVGElement;
     const width = plot.clientWidth || FALLBACK_WIDTH;
     this._lastWidth = plot.clientWidth;
-    const { points, series, granularity } = data;
+    const { points, granularity } = data;
 
     plot.classList.toggle('spending-chart-plot--refreshing', data.isRefreshing);
-    this._renderLegend();
 
     const last = points.at(-1);
+    (this.querySelector('.savings-chart-balance-value') as HTMLElement).textContent = formatEuros(last?.balance ?? 0);
     plot.setAttribute(
       'aria-label',
       last
-        ? `${series.map((s) => `${s.label} : ${formatEuros(last.values[s.key])}`).join(', ')} au ${formatBucketLabel({ start: last.key, granularity })}. Flèches gauche et droite pour parcourir.`
+        ? `Solde : ${formatEuros(last.balance)} au ${formatBucketLabel({ start: last.key, granularity })}. Flèches gauche et droite pour parcourir.`
         : 'Aucune donnée'
     );
 
@@ -202,96 +181,33 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
 
     if (points.length === 0) return;
 
-    for (const { key, color } of series) {
-      const coords = points.map((p, i) => `${x(i)},${y(p.values[key])}`);
-      if (points.length > 1) {
-        add('polyline', { class: 'spending-chart-line savings-chart-line', 'data-slice': key, style: `stroke: ${color}`, points: coords.join(' ') });
-      }
-      const lastIndex = points.length - 1;
-      add('circle', {
-        class: 'spending-chart-dot',
-        'data-slice': key,
-        style: `fill: ${color}`,
-        cx: x(lastIndex),
-        cy: y(points[lastIndex]!.values[key]),
-        r: 3.5,
+    if (points.length > 1) {
+      add('polyline', {
+        class: 'spending-chart-line savings-chart-line',
+        style: `stroke: ${BALANCE_COLOR}`,
+        points: points.map((p, i) => `${x(i)},${y(p.balance)}`).join(' '),
       });
     }
+    points.forEach((p, i) => {
+      const color = movementColor(p);
+      if (color) add('circle', { class: 'savings-chart-movement', style: `fill: ${color}`, cx: x(i), cy: y(p.balance), r: 3 });
+    });
+    const lastIndex = points.length - 1;
+    add('circle', {
+      class: 'spending-chart-dot',
+      style: `fill: ${BALANCE_COLOR}`,
+      cx: x(lastIndex),
+      cy: y(points[lastIndex]!.balance),
+      r: 3.5,
+    });
 
     if (this._activeIndex !== null) {
       const i = this._activeIndex;
-      const p = points[i]!;
       add('line', { class: 'spending-chart-crosshair', x1: x(i), x2: x(i), y1: PAD.top, y2: PAD.top + innerH });
-      for (const { key, color } of series) {
-        add('circle', { class: 'spending-chart-dot', 'data-slice': key, style: `fill: ${color}`, cx: x(i), cy: y(p.values[key]), r: 4 });
-      }
+      add('circle', { class: 'spending-chart-dot', style: `fill: ${BALANCE_COLOR}`, cx: x(i), cy: y(points[i]!.balance), r: 4 });
     }
     this._renderTooltip();
-    this._syncActiveSeries();
   }
-
-  /** Une ligne par courbe : valeur en fin de période ; cliquer la met en avant. */
-  private _renderLegend(): void {
-    const data = this._data;
-    const last = data?.points.at(-1);
-    const legend = this._legend();
-    legend.innerHTML = (data?.series ?? [])
-      .map((s) => {
-        const value = formatEuros(last?.values[s.key] ?? 0);
-        const pinned = this._pinnedSeries === s.key;
-        return `
-        <li class="spending-pie-legend-item" tabindex="0" role="button" aria-pressed="${pinned}" data-slice="${escapeAttr(s.key)}"
-          aria-label="${escapeAttr(`${s.label} : ${value}`)}">
-          <span class="spending-chart-swatch" style="background:${escapeAttr(s.color)}" aria-hidden="true"></span>
-          <span class="spending-pie-legend-label">${escapeHtml(s.label)}</span>
-          <span class="spending-pie-legend-amount">${escapeHtml(value)}</span>
-        </li>`;
-      })
-      .join('');
-  }
-
-  private _syncActiveSeries(): void {
-    const key = this._activeSeries();
-    this.querySelector('.spending-chart-svg')?.classList.toggle('spending-chart-svg--focused', key !== null);
-    this.querySelectorAll<HTMLElement | SVGElement>('[data-slice]').forEach((el) => {
-      el.classList.toggle('is-active', el.dataset.slice === key);
-    });
-    this._legend()
-      .querySelectorAll<HTMLElement>('[data-slice]')
-      .forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.slice === this._pinnedSeries)));
-  }
-
-  private _onSeriesHover = (e: Event): void => {
-    const key = sliceKeyOf(e.target);
-    if (key === this._hoveredSeries) return;
-    this._hoveredSeries = key;
-    this._syncActiveSeries();
-  };
-
-  private _onSeriesLeave = (): void => {
-    if (this._hoveredSeries === null) return;
-    this._hoveredSeries = null;
-    this._syncActiveSeries();
-  };
-
-  private _togglePinned(target: EventTarget | null): void {
-    const key = sliceKeyOf(target);
-    if (!key) return;
-    this._pinnedSeries = this._pinnedSeries === key ? null : key;
-    // Au toucher, le focus reste sur la ligne : on lâche le survol pour que le clic décide seul.
-    this._hoveredSeries = null;
-    this._syncActiveSeries();
-  }
-
-  private _onLegendClick = (e: Event): void => {
-    this._togglePinned(e.target);
-  };
-
-  private _onLegendKeyDown = (e: KeyboardEvent): void => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    this._togglePinned(e.target);
-  };
 
   private _renderTooltip(): void {
     const tooltip = this.querySelector('.spending-chart-tooltip') as HTMLElement;
@@ -308,7 +224,13 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
     title.className = 'spending-chart-tooltip-title';
     title.textContent = formatBucketLabel({ start: p.key, granularity: data.granularity });
     tooltip.appendChild(title);
-    for (const { key, label, color } of data.series) {
+
+    const rows: Array<{ color: string; value: string; label: string }> = [
+      { color: BALANCE_COLOR, value: formatEuros(p.balance), label: 'de solde' },
+    ];
+    if (p.deposits > 0) rows.push({ color: DEPOSIT_COLOR, value: `+ ${formatEuros(p.deposits)}`, label: 'ajoutés' });
+    if (p.withdrawals > 0) rows.push({ color: WITHDRAWAL_COLOR, value: `− ${formatEuros(p.withdrawals)}`, label: 'retirés' });
+    for (const { color, value, label } of rows) {
       const row = document.createElement('p');
       row.className = 'spending-chart-tooltip-row';
       const swatch = document.createElement('span');
@@ -316,7 +238,7 @@ export class BuddjSavingsTrackerChart extends HTMLElement {
       swatch.style.background = color;
       swatch.setAttribute('aria-hidden', 'true');
       const strong = document.createElement('strong');
-      strong.textContent = formatEuros(p.values[key]);
+      strong.textContent = value;
       row.append(swatch, strong, document.createTextNode(` ${label}`));
       tooltip.appendChild(row);
     }
