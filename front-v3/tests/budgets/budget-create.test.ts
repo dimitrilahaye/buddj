@@ -62,7 +62,7 @@ describe('création budget → POST (in-memory)', () => {
     });
 
     const budgetsMain = screen.getByRole('heading', { name: 'Mes budgets', level: 1 }).closest('main') as HTMLElement;
-    fireEvent.click(within(budgetsMain).getByRole('button', { name: 'Ajouter un budget' }));
+    fireEvent.click(within(budgetsMain).getByRole('button', { name: '+ Ajouter un budget' }));
 
     const budgetDrawer = await screen.findByRole('dialog', { name: 'Ajouter un budget' });
 
@@ -121,9 +121,9 @@ describe('création budget → POST (in-memory)', () => {
 
     const budgetsMain = screen.getByRole('heading', { name: 'Mes budgets', level: 1 }).closest('main') as HTMLElement;
     await waitFor(() => {
-      expect(within(budgetsMain).getByRole('button', { name: 'Ajouter un budget' })).toBeTruthy();
+      expect(within(budgetsMain).getByRole('button', { name: '+ Ajouter un budget' })).toBeTruthy();
     });
-    fireEvent.click(within(budgetsMain).getByRole('button', { name: 'Ajouter un budget' }));
+    fireEvent.click(within(budgetsMain).getByRole('button', { name: '+ Ajouter un budget' }));
 
     const budgetDrawer = await screen.findByRole('dialog', { name: 'Ajouter un budget' });
 

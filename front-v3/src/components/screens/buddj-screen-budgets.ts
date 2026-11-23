@@ -91,7 +91,6 @@ export class BuddjScreenBudgets extends HTMLElement {
           <div class="screen-header-row screen-header-row--title">
             <h1 class="title">Mes budgets</h1>
             <buddj-toggle-all target-selector=".budget-details" title-expand="Déplier tous les budgets" title-collapse="Replier tous les budgets"></buddj-toggle-all>
-            <buddj-btn-add label="" title="Ajouter un budget" data-budget-header-add hidden></buddj-btn-add>
           </div>
           <p class="budget-screen-recap" data-budget-screen-recap hidden aria-live="polite"></p>
         </header>
@@ -365,8 +364,6 @@ export class BuddjScreenBudgets extends HTMLElement {
     ) {
       this.removeAttribute('current-account-id');
       this.querySelector('#budgets')?.removeAttribute('data-account-id');
-      const headerAddBtn = this.querySelector('[data-budget-header-add]');
-      if (headerAddBtn) headerAddBtn.setAttribute('hidden', '');
       listSection.replaceChildren();
       listSection.appendChild(document.createElement('buddj-months-empty-placeholder'));
       this._hideBudgetScreenRecap();
@@ -387,9 +384,13 @@ export class BuddjScreenBudgets extends HTMLElement {
     }
     listSection.replaceChildren();
     const groups: BudgetGroupData[] = month?.budgetGroups ?? [];
-    const headerAddBtn = this.querySelector('[data-budget-header-add]');
-    if (headerAddBtn) {
-      headerAddBtn.toggleAttribute('hidden', !groups.some((g) => g.showAdd));
+    if (groups.some((g) => g.showAdd)) {
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'btn btn-add-row';
+      addBtn.setAttribute('data-budget-add', '');
+      addBtn.textContent = '+ Ajouter un budget';
+      listSection.appendChild(addBtn);
     }
     for (const group of groups) {
       const groupEl = document.createElement('buddj-budget-group');
@@ -428,8 +429,7 @@ export class BuddjScreenBudgets extends HTMLElement {
   private attachListeners(): void {
     this.addEventListener('click', (e) => {
       const target = e.target as Element;
-      const headerAdd = target.closest('[data-budget-header-add]');
-      if (headerAdd && !headerAdd.hasAttribute('hidden')) {
+      if (target.closest('[data-budget-add]')) {
         e.preventDefault();
         const drawer = document.getElementById('budget-add-drawer') as BuddjBudgetAddDrawerElement;
         drawer?.open();

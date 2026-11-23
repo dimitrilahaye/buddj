@@ -80,10 +80,10 @@ export class BuddjScreenSavingsAccounts extends HTMLElement {
     main.className = 'screen screen--savings-accounts';
     main.innerHTML = `
       <div class="screen-sticky-header-wrap savings-accounts-sticky-wrap">
+        <buddj-savings-account-switcher hidden></buddj-savings-account-switcher>
         <header class="screen-header">
           <h1 class="title">Épargnes</h1>
         </header>
-        <buddj-savings-account-switcher hidden></buddj-savings-account-switcher>
       </div>
       <div class="savings-accounts-content">
         <p class="savings-accounts-loading" hidden>Chargement des comptes épargne…</p>
@@ -93,7 +93,7 @@ export class BuddjScreenSavingsAccounts extends HTMLElement {
         </div>
         <p class="savings-accounts-none" hidden>Aucun compte épargne pour le moment.</p>
         <section class="savings-account-operations" aria-label="Opérations" hidden>
-          <button type="button" class="btn savings-account-add">+ Ajouter une opération</button>
+          <button type="button" class="btn btn-add-row savings-account-add">+ Ajouter une opération</button>
           <div class="savings-account-days"></div>
           <div class="savings-account-empty" hidden>
             <p class="savings-account-empty-title">Aucune opération sur ce compte.</p>
